@@ -1,0 +1,61 @@
+.containerTotal{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.containerLogin{
+    background-color: #ffffff;
+    border-radius: 50px;
+    width: 30%;
+    height: 75%;
+}
+
+.containerForm{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 80%;
+}
+
+label {
+    padding-bottom: 2%;
+}
+
+.input{
+    width: 100%;
+    height: 40%;
+}
+
+.error{
+    font-size: 12px;
+    color: red;
+}
+
+.containerInput{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 50%;
+    height: 20%;
+}
+
+.cuenta{
+    font-size: 14px;
+    margin: 0;
+    padding-right: 1%;
+}
+
+.register-btn{
+    color: #373737;
+    padding-top: 1rem;
+}
+
+.containerRegistro{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+}

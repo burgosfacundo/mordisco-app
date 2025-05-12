@@ -1,0 +1,32 @@
+.containerHome{
+    display: flex;
+    width: 99%;
+    height: 85%;
+    align-items: center;
+    justify-content: center;
+}
+.banner{
+    display: flex;
+    width: 90%;
+    height: 80%;
+    justify-content: space-around;
+}
+
+
+.textoPublicitario{
+    display: flex;
+    align-items: center;
+    width: 30%;
+    height: 100%;
+}
+
+.imagen{
+    width: 45%;
+}
+
+.texto{
+    font-family: cursive;
+    font-size: 28px;
+    margin: 0;
+    line-height: 2.8;
+}
