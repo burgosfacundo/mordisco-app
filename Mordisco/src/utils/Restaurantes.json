@@ -1,0 +1,79 @@
+{
+  "restaurantes": [
+    {
+      "nombre": "El Buen Sabor",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Av. Siempre Viva 123, Springfield"
+    },
+    {
+      "nombre": "Parrilla Don Pepe",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Calle Falsa 456, Shelbyville"
+    },
+    {
+      "nombre": "La Pasta Loca",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Boulevard Central 789, Capital City"
+    },
+    {
+      "nombre": "Sushi Express",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Av. Japón 1010, Little Tokyo"
+    },
+    {
+      "nombre": "Tacos del Rey",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Ruta 40 km 15, Pueblo Nuevo"
+    },
+    {
+      "nombre": "Burger House",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Main Street 200, Downtown"
+    },
+    {
+      "nombre": "Café Central",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Plaza Mayor 12, Old Town"
+    },
+    {
+      "nombre": "Sabores del Mar",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Costanera Sur 456, Puerto Azul"
+    },
+    {
+      "nombre": "Pizzería La Nonna",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Via Roma 33, Barrio Italiano"
+    },
+    {
+      "nombre": "Wok & Roll",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Chinatown 88, Ciudad Nueva"
+    },
+    {
+      "nombre": "Bistró Lumière",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Rue de Paris 75, Ciudad Luz"
+    },
+    {
+      "nombre": "El Rincón Árabe",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Pasaje Oriente 22, Barrio Antiguo"
+    },
+    {
+      "nombre": "Veggie Life",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Eco Avenida 300, Villa Verde"
+    },
+    {
+      "nombre": "Don Pastelito",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Mercado Central, Local 18"
+    },
+    {
+      "nombre": "Asador Criollo",
+      "imagenUrl": "https://www.cronista.com/files/image/324/324234/6052513b36479_700_484!.jpg?s=9cabedf2c6895ee9f197d03773bc5670&d=1617212736",
+      "direccion": "Ruta Nacional 3, km 102"
+    }
+  ]
+}

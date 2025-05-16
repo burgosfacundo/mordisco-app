@@ -1,0 +1,39 @@
+.parent {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+    justify-items: center;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.containerCards{
+    width: 100%;
+    height: 80vh;            /* o el alto que necesites */
+    overflow-y: auto;        /* activa scroll solo en este contenedor */
+    overflow-x: hidden;      /* evita scroll horizontal */
+    padding: 1rem;
+    box-sizing: border-box;
+
+}
+
+.containerCards::-webkit-scrollbar {
+  width: 10px;               /* ancho de la barra */
+}
+
+.containerCards::-webkit-scrollbar-track {
+  background: #f1f1f1;       /* fondo de la pista */
+  border-radius: 10px;
+}
+
+.containerCards::-webkit-scrollbar-thumb {
+  background: #e8d5d5;          /* color del scroll */
+  border-radius: 10px;
+}
+
+.containerCards::-webkit-scrollbar-thumb:hover {
+  background: #e09393;          /* color cuando hacés hover */
+}
+
