@@ -12,7 +12,7 @@ import utn.back.mordiscoapi.model.dto.PromocionDTO;
 import utn.back.mordiscoapi.model.entity.Promocion;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.repository.PromocionRepository;
-import utn.back.mordiscoapi.service.PromocionService;
+import utn.back.mordiscoapi.service.CrudService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,10 +20,9 @@ import java.util.List;
 @Slf4j // Anotación de Lombok para el registro de logs
 @Service // Anotación de servicio de Spring para indicar que esta clase es un servicio
 @RequiredArgsConstructor // Anotación de lombok para generar un constructor con los campos finales
-public class PromocionServiceImpl implements PromocionService {
+public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionProjection,Long> {
     // Inyección de dependencias de PromocionRepository a través del constructor de lombok @RequiredArgsConstructor
     private final PromocionRepository repository;
-
 
     /**
      * Guarda una promoción.
@@ -43,8 +42,9 @@ public class PromocionServiceImpl implements PromocionService {
 
         try {
             // Mapeo la DTO a la entidad
-            // Guardar la promoción en la base de datos
-            repository.save(PromocionMapper.toEntity(dto));
+            Promocion promocion = PromocionMapper.toEntity(dto);
+            // Guardar la entidad en la base de datos
+            repository.save(promocion);
         } catch (DataIntegrityViolationException e) {
             // Manejar la excepción si hay un error de integridad de datos
             log.error(e.getMessage());

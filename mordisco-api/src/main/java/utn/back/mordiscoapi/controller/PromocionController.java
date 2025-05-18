@@ -12,7 +12,7 @@ import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.PromocionDTO;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
-import utn.back.mordiscoapi.service.PromocionService;
+import utn.back.mordiscoapi.service.impl.PromocionServiceImpl;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor // Anotación de lombok para generar un constructor con los campos finales
 public class PromocionController {
     // Inyección de dependencias de PromocionService a través del constructor de lombok @RequiredArgsConstructor
-    private final PromocionService service;
+    private final PromocionServiceImpl service;
 
     /**
      * Función para guardar una nueva promoción.
