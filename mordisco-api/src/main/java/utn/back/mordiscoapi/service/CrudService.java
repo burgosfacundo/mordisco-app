@@ -13,6 +13,5 @@ public interface CrudService <T,R,ID>{
     void save(T t) throws BadRequestException;
     List<R> findAll();
     R findById(ID id) throws NotFoundException;
-    void update(ID id, T t) throws NotFoundException,BadRequestException;
     void delete(ID id) throws NotFoundException;
 }

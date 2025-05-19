@@ -88,7 +88,7 @@ public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionP
      * @throws NotFoundException si la promoción no se encuentra.
      * @throws BadRequestException si hay un error al actualizar la promoción.
      */
-    @Override
+
     public void update(Long id, PromocionDTO dto) throws NotFoundException,BadRequestException {
         // Manejo de Optional
         // Obtenemos Optional<Promocion> usando el findById por defecto
