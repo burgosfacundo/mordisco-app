@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.UsuarioUpdateDTO;
 import utn.back.mordiscoapi.model.projection.UsuarioProjection;
 import utn.back.mordiscoapi.service.impl.UsuarioServiceImpl;
 
@@ -97,7 +98,7 @@ public class UsuarioController {
                                          Long id,
                                          @RequestBody
                                          @Valid
-                                         UsuarioDTO dto) throws NotFoundException, BadRequestException {
+                                         UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         service.update(id,dto);
         return ResponseEntity.ok().body("Usuario actualizado exitosamente");
     }

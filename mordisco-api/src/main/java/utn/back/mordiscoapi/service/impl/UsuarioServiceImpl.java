@@ -8,6 +8,7 @@ import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.UsuarioMapper;
 import utn.back.mordiscoapi.model.dto.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.UsuarioUpdateDTO;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.model.projection.UsuarioProjection;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
@@ -66,7 +67,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
      * @throws BadRequestException si hay un error al actualizar el usuario.
      */
     @Override
-    public void update(Long id, UsuarioDTO dto) throws NotFoundException, BadRequestException {
+    public void update(Long id, UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         Usuario usuario = repository.findById(id).orElseThrow(
                 () -> new NotFoundException("Usuario no encontrado")
         );
