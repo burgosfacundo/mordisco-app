@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
 
-import java.util.List;
-
 @Entity
 @Table(name = "usuarios")
 @Getter
@@ -39,12 +37,12 @@ public class Usuario {
     private Rol rol;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<CalificacionProducto> calificaciones;
+    private List<CalificacionProducto> calificacionesProducto;
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Restaurante restaurante;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CalificacionRestaurante> calificaciones;
+    private List<CalificacionRestaurante> calificacionesRestaurante;
 
 }
