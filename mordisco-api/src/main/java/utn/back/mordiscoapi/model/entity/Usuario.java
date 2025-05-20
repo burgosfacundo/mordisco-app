@@ -2,6 +2,7 @@ package utn.back.mordiscoapi.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -26,4 +27,6 @@ public class Usuario {
     @ManyToOne
     @JoinColumn(name = "rol_id",nullable = false)
     private Rol rol;
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CalificacionProducto> calificaciones;
 }
