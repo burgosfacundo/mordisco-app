@@ -2,6 +2,9 @@ package utn.back.mordiscoapi.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import utn.back.mordiscoapi.Enums.EstadoPedido;
+import utn.back.mordiscoapi.Enums.TipoEntrega;
+import utn.back.mordiscoapi.Enums.TipoPago;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,13 +20,13 @@ public class Pedido {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private String tipoEntrega; ///Tipo de dato: TipoEntrega
+    private TipoEntrega tipoEntrega;
     @Column(nullable = false)
-    private String tipoPago; /// Tipo de dato: TipoPago
+    private TipoPago tipoPago;
     @Column(nullable = false)
     private LocalDateTime fechaHora;
     @Column(nullable = false)
-    private String estado; ///Tipo de dato: EstadoPedido
+    private EstadoPedido estado;
     @Column(nullable = false)
     private BigDecimal total;
 
