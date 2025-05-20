@@ -2,6 +2,7 @@ package utn.back.mordiscoapi.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 import java.util.List;
 
@@ -37,9 +38,13 @@ public class Usuario {
     @JoinColumn(name = "rol_id",nullable = false)
     private Rol rol;
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CalificacionProducto> calificaciones;
+
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Restaurante restaurante;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CalificacionRestaurante> calificaciones;
+
 }
