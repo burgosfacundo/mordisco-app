@@ -36,5 +36,6 @@ public class Producto {
     @JoinColumn(name = "imagen_id", referencedColumnName = "id", unique = true)
     private Imagen imagen;
 
-
+    @OneToMany(mappedBy = "productoPedido_id", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductoPedido> productoPedido;
 }

@@ -13,19 +13,24 @@ import java.util.Optional;
 public interface PedidoRepository extends JpaRepository<Pedido,Long> {
     @Query("""
         SELECT
-              p.id AS id,
-              p.clienteID AS clienteID,
-              p.restauranteID AS restauranteID,
-              p.direccionEntregaID AS direccionEntregaID,
-              p.tipoEntrega AS tipoEntrega
-              p.tipoPago AS tipoPago,
-              p.fecahHora AS fechaHora,
-              p.estado AS estado,
-              p.total AS total
-        FROM Pedidos p
+             p,pp,pr
+        FROM Pedido p INNER JOIN PedidoProducto pp
+            ON p.id = pp.pedido_id
+            INNER JOIN Producto pr
+            ON pp.producto_id = pr.id
+        WHERE p.id = :id
         """) // Anotación para realizar una query personalizada JPQL
-    List<Pedido> findAllByRestaurante();
+    Optional<Pedido> findCompletById(@Param("id") Long id);
 
-
-
+    @Query("""
+        SELECT
+             p,pp,pr
+        FROM Pedido p INNER JOIN PedidoProducto pp
+            ON p.id = pp.pedido_id
+            INNER JOIN Producto pr
+            ON pp.producto_id = pr.id
+        WHERE 
+            p.restaurante_id = :id
+            """)
+    List<Pedido> findAllByRestaurante(@Param("id")Long id);
 }

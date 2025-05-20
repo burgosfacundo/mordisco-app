@@ -39,6 +39,6 @@ public class Restaurante {
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
     private Usuario usuario;
 
-    //Relacion a Direccion
-    //private Direccion direccion;
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    private Direccion direccion;
 }
