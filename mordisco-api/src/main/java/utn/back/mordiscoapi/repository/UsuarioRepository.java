@@ -62,4 +62,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
            u.id = :id
     """)
     void changePassword(String newPassword, Long id);
+
+    Optional<Usuario> findByEmail(String email);
 }

@@ -7,12 +7,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.UsuarioDTO;
 import utn.back.mordiscoapi.model.dto.UsuarioUpdateDTO;
 import utn.back.mordiscoapi.model.projection.UsuarioProjection;
+import utn.back.mordiscoapi.security.jwt.JwtUtil;
+import utn.back.mordiscoapi.security.jwt.model.AuthenticationRequest;
+import utn.back.mordiscoapi.security.jwt.model.AuthenticationResponse;
 import utn.back.mordiscoapi.service.impl.UsuarioServiceImpl;
 
 import java.util.List;
@@ -23,6 +30,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsuarioController {
     private final UsuarioServiceImpl service;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     /**
      * Función para guardar un nuevo usuario.
@@ -168,5 +177,22 @@ public class UsuarioController {
                                                             Long id
     ) {
         return ResponseEntity.ok(service.findByProjectRol(id));
+    }
+
+    /**
+     * Función para logearme.
+     * @return Devuelve un token.
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception{
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.email(), authenticationRequest.password()));
+        }catch (BadCredentialsException e) {
+            throw new Exception("Incorrect", e);
+        }
+        final UserDetails userDetails = service.loadUserByUsername(authenticationRequest.email());
+        final String jwt = jwtUtil.generateToken(userDetails);
+
+        return ResponseEntity.ok(new AuthenticationResponse((jwt)));
     }
 }

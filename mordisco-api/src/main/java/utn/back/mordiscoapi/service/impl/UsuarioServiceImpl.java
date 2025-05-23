@@ -3,6 +3,10 @@ package utn.back.mordiscoapi.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
@@ -19,8 +23,9 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UsuarioServiceImpl implements IUsuarioService {
+public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     private final UsuarioRepository repository;
+
     /**
      * Guarda un usuario.
      * @param dto DTO del usuario a guardar.
@@ -131,5 +136,11 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     public List<UsuarioProjection> findByProjectRol(Long id){
         return repository.findProjectByRol(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return repository.findByEmail(username).orElseThrow(
+                () -> new UsernameNotFoundException("El email no se encuentra registrado."));
     }
 }

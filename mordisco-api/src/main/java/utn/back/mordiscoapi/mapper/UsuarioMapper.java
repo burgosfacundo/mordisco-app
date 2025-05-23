@@ -1,6 +1,7 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import utn.back.mordiscoapi.model.dto.UsuarioDTO;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
@@ -13,6 +14,7 @@ public class UsuarioMapper {
      * @return la entidad de usuario con los datos del DTO
      */
     public static Usuario toUsuario(UsuarioDTO dto) {
+        final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         Rol rol = Rol.builder()
                 .id(dto.rolId())
                 .build();
@@ -22,7 +24,7 @@ public class UsuarioMapper {
                 .apellido(dto.apellido())
                 .telefono(dto.telefono())
                 .email(dto.email())
-                .password(dto.password())
+                .password(passwordEncoder.encode(dto.password()))
                 .rol(rol)
                 .build();
     }
