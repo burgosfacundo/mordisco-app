@@ -15,7 +15,7 @@ import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.CrudService;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -66,8 +66,16 @@ public class CalificacionRestauranteImpl implements CrudService<CalificacionRest
         return null;
     }
 
+    /**
+     * Elimina un calificacion por id
+     * @param aLong id de la calificacion que se desea borrar
+     * @throws NotFoundException si no encuentra la calificacion que se desea borrar
+     */
     @Override
     public void delete(Long aLong) throws NotFoundException {
-
+        if (!repository.existsById(aLong)) {
+            throw new NotFoundException("No se encontro la claificacion que se desea borrar");
+        }
+        repository.deleteById(aLong);
     }
 }

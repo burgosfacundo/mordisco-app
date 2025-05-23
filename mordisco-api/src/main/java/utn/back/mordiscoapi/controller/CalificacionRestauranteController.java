@@ -57,6 +57,18 @@ public class CalificacionRestauranteController {
         return ResponseEntity.ok(service.findAll());
     }
 
+    @Operation(summary = "Borrar una calificacion", description = "Borra la calificacion que tenga el id que se le pasa")
+    @ApiResponses(value ={
+            @ApiResponse(responseCode =  "200", description = "Elimina la calificacion"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+            @ApiResponse(responseCode = "404", description = "Calificacion no encontrada")})
+    @DeleteMapping ("/{id}")
+    public ResponseEntity<String> deleteById(@PathVariable
+                                             Long id) throws NotFoundException {
+        service.delete(id);
+        return ResponseEntity.ok("La calificacion fue eliminada correctamente!");
+    }
+
 
 
 }
