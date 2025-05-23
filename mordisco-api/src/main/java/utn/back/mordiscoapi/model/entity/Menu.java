@@ -17,16 +17,9 @@ public class Menu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column (nullable = false)
+    @Column (nullable = false, length = 50)
     private String nombre;
 
-    //RELACIONES
-    @OneToMany
-    @JoinTable(
-            name = "menu_productos",
-            joinColumns = @JoinColumn(name = "menu_id"),
-            inverseJoinColumns = @JoinColumn(name = "producto_id")
-    )
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Producto> productos;
-
 }

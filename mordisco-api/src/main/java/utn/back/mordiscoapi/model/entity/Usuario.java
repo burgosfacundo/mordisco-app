@@ -29,8 +29,9 @@ public class Usuario {
     @Column (nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Direccion direccion;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private List<Direccion> direcciones;
 
     @ManyToOne
     @JoinColumn(name = "rol_id",nullable = false)

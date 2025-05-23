@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.PromocionDTO;
+import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.service.impl.PromocionServiceImpl;
 

@@ -1,4 +1,4 @@
-package utn.back.mordiscoapi.Enums;
+package utn.back.mordiscoapi.enums;
 
 public enum EstadoPedido {
     PENDIENTE,EN_PROCESO,EN_CAMINO,RECIBIDO

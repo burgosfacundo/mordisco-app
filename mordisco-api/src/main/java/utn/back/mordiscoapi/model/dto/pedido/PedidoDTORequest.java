@@ -1,10 +1,11 @@
-package utn.back.mordiscoapi.model.dto;
+package utn.back.mordiscoapi.model.dto.pedido;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import utn.back.mordiscoapi.model.dto.productoPedido.ProductoPedidoDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

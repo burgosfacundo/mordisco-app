@@ -6,7 +6,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "calificaciones_productos")
+@Table(name = "calificaciones_productos",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"producto_id", "usuario_id"}))
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,25 +18,19 @@ public class CalificacionProducto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //RELACIONES
-    @ManyToOne
-    @JoinColumn(name = "producto_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     @Column(nullable = false)
     private Integer puntaje;
 
-    @Column(nullable = false)
     private String comentario;
 
     @Column (nullable = false)
     private LocalDateTime fecha;
-    //RELACIONES
-
-
-
 }

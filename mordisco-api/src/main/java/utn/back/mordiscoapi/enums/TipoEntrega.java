@@ -1,4 +1,4 @@
-package utn.back.mordiscoapi.Enums;
+package utn.back.mordiscoapi.enums;
 
 public enum TipoEntrega {
     DELIVERY, RETIRO_POR_LOCAL

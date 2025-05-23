@@ -1,13 +1,11 @@
-package utn.back.mordiscoapi.model.dto;
+package utn.back.mordiscoapi.model.dto.pedido;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record PedidoDTOResponse(
         @NotNull(message = "El cliente no puede ser nulo.")

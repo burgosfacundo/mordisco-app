@@ -1,4 +1,4 @@
-package utn.back.mordiscoapi.model.dto;
+package utn.back.mordiscoapi.model.dto.promocion;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

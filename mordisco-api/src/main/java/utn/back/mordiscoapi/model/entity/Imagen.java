@@ -17,8 +17,6 @@ public class Imagen {
     @Column (nullable = false, unique = true)
     private String url;
 
-    @Column (nullable = false)
+    @Column (nullable = false,length = 50)
     private String nombre;
-
-    //FALTA AGREGAR LA RELACION CON LA TABLA PRODUCTOS Y RESTAURANTE
 }

@@ -6,7 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "ProductoPedidos")
+@Table(name = "productos_pedidos")
 @Getter
 @Setter
 @AllArgsConstructor @NoArgsConstructor
@@ -15,7 +15,11 @@ public class ProductoPedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private Integer cantidad;
+
+    @Column(nullable = false)
     private BigDecimal precioUnitario;
 
     @ManyToOne

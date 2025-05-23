@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.PromocionMapper;
-import utn.back.mordiscoapi.model.dto.PromocionDTO;
+import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
 import utn.back.mordiscoapi.model.entity.Promocion;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.repository.PromocionRepository;

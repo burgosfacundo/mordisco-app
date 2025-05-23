@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.model.entity.Menu;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -14,18 +13,10 @@ public interface MenuRepository extends JpaRepository<Menu,Long> {
                SELECT
                     m.id AS id,
                     m.nombre AS nombre,
-                    m.productos AS productos
+                    p AS producto
                FROM Menu m
-            """)
-    List<Menu> findAllProject();
-
-    @Query("""
-               SELECT
-                    m.id AS id,
-                    m.nombre AS nombre,
-                    m.productos AS productos
-               FROM Menu m
+               JOIN Producto p ON p.menu.id = m.id
                WHERE m.id = :id
             """)
-    Optional<Menu> findProjectById(Long id);
+    Optional<Menu> findWithProductosById(Long id);
 }

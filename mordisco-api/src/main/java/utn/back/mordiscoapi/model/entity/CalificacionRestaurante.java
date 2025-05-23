@@ -5,7 +5,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity @Table(name = "calificaciones_restaurante")
+@Entity
+@Table(name = "calificaciones_restaurante",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"restaurante_id", "usuario_id"}))
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Builder
@@ -22,11 +24,11 @@ public class CalificacionRestaurante {
     @Column(nullable = false)
     private LocalDateTime fechaHora;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "restaurante_id", nullable = false)
     private Restaurante restaurante;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 }

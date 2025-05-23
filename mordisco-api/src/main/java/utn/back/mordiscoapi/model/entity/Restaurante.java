@@ -19,18 +19,23 @@ public class Restaurante {
     @Column(nullable = false, length = 50)
     private String razonSocial;
 
-    //Relacion a Menu
-    //private Menu menu;
+    @Column(nullable = false)
+    private Boolean activo;
 
-    //Relacion a Imagen
-    //private Imagen logo;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "menu_id")
+    private Menu menu;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "imagen_id", referencedColumnName = "id", unique = true)
+    private Imagen imagen;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<Promocion> promociones;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
-    @JoinColumn(name = "horario_atencion_id", referencedColumnName = "id")
-    private HorarioAtencion horarioAtencion;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurante_id")
+    private List<HorarioAtencion> horariosAtencion;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<CalificacionRestaurante> calificaciones;
@@ -39,6 +44,7 @@ public class Restaurante {
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "direccion_id", referencedColumnName = "id")
     private Direccion direccion;
 }

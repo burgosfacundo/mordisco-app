@@ -12,19 +12,34 @@ import lombok.*;
 public class Direccion {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+
+    @Column(nullable = false, length = 50)
     private String calle;
-    @Column(nullable = false)
+
+    @Column(nullable = false,length = 5)
     private String numero;
+
+    @Column(length = 20)
     private String piso;
+
+    @Column(length = 20)
     private String depto;
-    @Column(nullable = false)
+
+    @Column(nullable = false, length = 10)
     private String codigoPostal;
+
     private String referencias;
-    @Column(nullable = false)
+
+    @Column(nullable = false, length = 50)
     private Double latitud;
-    @Column(nullable = false)
+
+    @Column(nullable = false, length = 50)
     private Double longitud;
+
+    @Column(nullable = false, length = 50)
+    private String ciudad;
+
     @Column(nullable = false)
-    private String ciudad; ///TIPO CIUDAD PERO NO EXISTE AUN
+    @Builder.Default
+    private Boolean esTemporal = false;
 }

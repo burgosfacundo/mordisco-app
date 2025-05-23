@@ -1,7 +1,7 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
-import utn.back.mordiscoapi.model.dto.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioDTO;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
 

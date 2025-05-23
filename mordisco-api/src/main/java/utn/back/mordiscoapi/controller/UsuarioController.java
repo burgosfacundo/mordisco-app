@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.UsuarioDTO;
-import utn.back.mordiscoapi.model.dto.UsuarioUpdateDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
 import utn.back.mordiscoapi.model.projection.UsuarioProjection;
 import utn.back.mordiscoapi.service.impl.UsuarioServiceImpl;
 

@@ -2,8 +2,8 @@ package utn.back.mordiscoapi.service.interf;
 
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.UsuarioDTO;
-import utn.back.mordiscoapi.model.dto.UsuarioUpdateDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
 import utn.back.mordiscoapi.model.projection.UsuarioProjection;
 import utn.back.mordiscoapi.service.CrudService;
 

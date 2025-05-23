@@ -1,12 +1,8 @@
-package utn.back.mordiscoapi.model.dto;
+package utn.back.mordiscoapi.model.dto.productoPedido;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
-import utn.back.mordiscoapi.model.entity.Pedido;
-import utn.back.mordiscoapi.model.entity.Producto;
 
 import java.math.BigDecimal;
 

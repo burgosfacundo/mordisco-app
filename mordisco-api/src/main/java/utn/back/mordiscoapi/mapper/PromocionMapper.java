@@ -1,7 +1,7 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
-import utn.back.mordiscoapi.model.dto.PromocionDTO;
+import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
 import utn.back.mordiscoapi.model.entity.Promocion;
 
 @UtilityClass // Anotación de lombok para indicar que esta clase es una clase de utilidad

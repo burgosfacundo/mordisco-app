@@ -1,8 +1,9 @@
-package utn.back.mordiscoapi.model.dto;
+package utn.back.mordiscoapi.model.dto.restaurante;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
 
 import java.util.List;
 

@@ -42,6 +42,8 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
+
+
     /**
      * Maneja violaciones de integridad de datos, como claves únicas duplicadas.
      *

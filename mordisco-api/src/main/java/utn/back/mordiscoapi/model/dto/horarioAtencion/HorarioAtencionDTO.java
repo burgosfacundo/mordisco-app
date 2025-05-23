@@ -1,4 +1,4 @@
-package utn.back.mordiscoapi.model.dto;
+package utn.back.mordiscoapi.model.dto.horarioAtencion;
 
 import jakarta.validation.constraints.NotNull;
 

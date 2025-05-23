@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import utn.back.mordiscoapi.model.dto.PedidoDTOResponse;
 import utn.back.mordiscoapi.model.entity.Pedido;
 
 import java.util.List;
@@ -14,23 +13,20 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
     @Query("""
         SELECT
              p,pp,pr
-        FROM Pedido p INNER JOIN PedidoProducto pp
-            ON p.id = pp.pedido_id
-            INNER JOIN Producto pr
-            ON pp.producto_id = pr.id
+        FROM Pedido p
+        JOIN ProductoPedido pp ON p.id = pp.pedido.id
+        JOIN Producto pr ON pp.producto.id = pr.id
         WHERE p.id = :id
         """) // Anotación para realizar una query personalizada JPQL
-    Optional<Pedido> findCompletById(@Param("id") Long id);
+    Optional<Pedido> findCompleteById(@Param("id") Long id);
 
     @Query("""
         SELECT
              p,pp,pr
-        FROM Pedido p INNER JOIN PedidoProducto pp
-            ON p.id = pp.pedido_id
-            INNER JOIN Producto pr
-            ON pp.producto_id = pr.id
-        WHERE 
-            p.restaurante_id = :id
-            """)
-    List<Pedido> findAllByRestaurante(@Param("id")Long id);
+        FROM Pedido p
+        JOIN ProductoPedido pp ON p.id = pp.pedido.id
+        JOIN Producto pr ON pp.producto.id = pr.id
+        WHERE p.restaurante.id = :id
+        """)
+    List<Pedido> findAllCompleteByRestaurante(@Param("id")Long id);
 }
