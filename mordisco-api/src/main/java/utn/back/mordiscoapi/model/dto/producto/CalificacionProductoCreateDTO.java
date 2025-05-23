@@ -1,13 +1,15 @@
-package utn.back.mordiscoapi.model.dto.calificaciones;
+package utn.back.mordiscoapi.model.dto.producto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
 public record CalificacionProductoCreateDTO(
     @NotNull(message = "El id del producto no debe ser nulo")
+    @Positive(message = "El id del producto debe ser positivo")
     @Schema(description = "El id del producto calificado ", example = "10")
     Long idProducto,
     @NotNull(message = "El id del usuario no debe ser nulo")
+    @Positive(message = "El id del usuario debe ser positivo")
     @Schema(description = "El id del usuario que califica ", example = "3")
     Long idUsuario,
     @NotNull(message = "Se debe ingresar un puntaje no nulo")

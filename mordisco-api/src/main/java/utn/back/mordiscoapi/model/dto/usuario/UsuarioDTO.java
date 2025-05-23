@@ -24,8 +24,6 @@ public record UsuarioDTO(
         @NotNull(message = "El contraseña del usuario es obligatorio")
         String password,
 
-                //Direcciones
-
         @NotNull(message = "El rol del usuario es obligatorio")
         Long rolId
 ) {

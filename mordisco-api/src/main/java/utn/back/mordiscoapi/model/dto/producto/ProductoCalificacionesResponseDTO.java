@@ -1,6 +1,7 @@
-package utn.back.mordiscoapi.model.dto.calificaciones;
+package utn.back.mordiscoapi.model.dto.producto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import utn.back.mordiscoapi.model.dto.calificacion.CalificacionDTO;
 
 import java.util.List;
 
