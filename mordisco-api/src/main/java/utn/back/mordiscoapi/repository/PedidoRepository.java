@@ -57,4 +57,15 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
             UPDATE Pedido SET estado = :nuevoEstado WHERE id =:id
             """)
     void changeState(@Param("id") Long id, @Param("nuevoEstado") EstadoPedido nuevoEstado);
+
+    @Query("""
+            SELECT
+                p
+            FROM
+                Pedido as p
+            WHERE
+                p.cliente.id = :id AND p.estado = :estado    
+            """)
+    List<PedidoDTOResponse> findAllXClientesXEstado(@Param("id") Long id, @Param("estado") EstadoPedido estado);
+
 }

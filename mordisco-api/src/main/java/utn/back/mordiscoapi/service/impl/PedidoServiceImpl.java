@@ -17,6 +17,7 @@ import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.repository.PedidoRepository;
 import utn.back.mordiscoapi.repository.ProductoRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
+import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.CrudService;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public class PedidoServiceImpl implements CrudService<PedidoDTORequest, PedidoDT
     private final PedidoRepository pedidoRepository;
     private final RestauranteRepository restauranteRepository;
     private final ProductoRepository productoRepository;
+    private final UsuarioRepository usuarioRepository;
     /**
      * Guarda un pedido.
      * @param dto DTORequest del pedido a guardar.
@@ -127,6 +129,23 @@ public class PedidoServiceImpl implements CrudService<PedidoDTORequest, PedidoDT
             log.error(e.getMessage());
             throw new BadRequestException("Error al guardar pedido");
         }
+    }
+
+    /**
+     * Lista los pedidos de un cliente por el estado
+     * @param id el ID del cliente a buscar sus pedidos.
+     * @param estado el EstadoPedido por el que  hay que filtrar.
+     * @throws NotFoundException si el cliente no se encuentra.
+     * @throws BadRequestException si hay un error al actualizar el pedido.
+     */
+    public List<PedidoDTOResponse> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException, BadRequestException {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Usuario no encontrado")
+        );
+
+        return pedidoRepository.findAllXClientesXEstado(id, estado);
+
+
     }
 }
 
