@@ -4,6 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import utn.back.mordiscoapi.enums.EstadoPedido;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoDTORequest;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoDTOResponse;
 import utn.back.mordiscoapi.model.entity.Pedido;
 
 import java.util.List;
@@ -28,5 +31,30 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
         JOIN Producto pr ON pp.producto.id = pr.id
         WHERE p.restaurante.id = :id
         """)
-    List<Pedido> findAllCompleteByRestaurante(@Param("id")Long id);
+    List<PedidoDTOResponse> findAllCompleteByRestaurante(@Param("id")Long id);
+
+    @Query("""
+        SELECT
+             p,pp,pr
+        FROM Pedido p
+        JOIN ProductoPedido pp ON p.id = pp.pedido.id
+        JOIN Producto pr ON pp.producto.id = pr.id
+        """)
+    List<PedidoDTOResponse> findAllDTO ();
+
+    @Query("""
+        SELECT
+             p,pp,pr
+        FROM Pedido p
+        JOIN ProductoPedido pp ON p.id = pp.pedido.id
+        JOIN Producto pr ON pp.producto.id = pr.id
+        WHERE p.pedido.id = :id
+        """)
+    Optional<PedidoDTOResponse> findByProjectID(@Param("id") Long id);
+
+
+    @Query("""
+            UPDATE Pedido SET estado = :nuevoEstado WHERE id =:id
+            """)
+    void changeState(@Param("id") Long id, @Param("nuevoEstado") EstadoPedido nuevoEstado);
 }
