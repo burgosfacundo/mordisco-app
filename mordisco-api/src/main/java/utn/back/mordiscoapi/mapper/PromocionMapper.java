@@ -2,6 +2,7 @@ package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
+import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.entity.Promocion;
 
 @UtilityClass // Anotación de lombok para indicar que esta clase es una clase de utilidad
@@ -19,5 +20,12 @@ public class PromocionMapper {
                 .fechaInicio(dto.fechaInicio())
                 .fechaFin(dto.fechaFin())
                 .build();
+    }
+    public static PromocionResponseDTO toDTO (Promocion promocion){
+        return new PromocionResponseDTO(promocion.getId(),
+                promocion.getDescripcion(),
+                promocion.getDescuento(),
+                promocion.getFechaInicio(),
+                promocion.getFechaFin());
     }
 }

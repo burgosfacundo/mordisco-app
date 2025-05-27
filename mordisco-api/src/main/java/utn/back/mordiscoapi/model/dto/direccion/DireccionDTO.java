@@ -27,16 +27,17 @@ public record DireccionDTO(
     @Size(message = "La referencia no puede contener mas de 255 caracteres", max = 255)
     @Schema(description = "Referencia de la dirección", example = "Edificio al lado de porton rojo")
     String referencias,
-    @Size(message = "La latitud no puede contener mas de 50 caracteres", max = 50)
     @NotNull(message = "La latitud no puede ser nula.")
     @Schema(description = "Latitud de la dirección", example = "-38.00965070799693")
     Double latitud,
-    @Size(message = "La longitud no puede contener mas de 50 caracteres", max = 50)
     @NotNull(message = "La longitud no puede ser nula.")
     @Schema(description = "Longitud de la dirección", example = "-57.55554272466376")
     Double longitud,
     @Size(message = "La ciudad no puede contener mas de 50 caracteres", max = 50)
     @NotBlank(message = "La ciudad es obligatoria")
     @Schema(description = "Ciudad de la dirección", example = "Mar del Plata")
-    String ciudad
+    String ciudad,
+    @NotNull(message = "Hay que aclarar si es temporal o no")
+    @Schema(description = "La direccion es temporal", example = "true")
+    Boolean esTemporal
 ) {}

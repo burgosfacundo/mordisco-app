@@ -2,7 +2,7 @@ package utn.back.mordiscoapi.model.dto.producto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import utn.back.mordiscoapi.model.dto.imagen.ImagenDTO;
+import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
 
 import java.math.BigDecimal;
 
@@ -26,7 +26,7 @@ public record ProductoRequestDTO(
         @Schema(description = "El producto esta disponible", example = "true")
         Boolean disponible,
         @NotNull(message = "La imagen es obligatoria")
-        ImagenDTO imagen
+        ImagenResponseDTO imagen
 ) {
 
 }

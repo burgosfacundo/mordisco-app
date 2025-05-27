@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public record ImagenDTO(
+public record ImagenResponseDTO(
         @Positive(message = "El id de la imagen debe ser positivo")
         @Schema(description = "Id de la imagen", example = "5")
         Long id,

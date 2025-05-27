@@ -17,10 +17,10 @@ public class Restaurante {
     private Long id;
 
     @Column(nullable = false, length = 50)
-    private String razonSocial;
+    private String razonSocial; //si
 
     @Column(nullable = false)
-    private Boolean activo;
+    private Boolean activo; //si
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "menu_id")
@@ -28,23 +28,23 @@ public class Restaurante {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "imagen_id", referencedColumnName = "id", unique = true)
-    private Imagen imagen;
+    private Imagen imagen; //si
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<Promocion> promociones;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurante_id")
-    private List<HorarioAtencion> horariosAtencion;
+    private List<HorarioAtencion> horariosAtencion; //si
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<CalificacionRestaurante> calificaciones;
 
     @OneToOne(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
-    private Usuario usuario;
+    private Usuario usuario; //id
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "direccion_id", referencedColumnName = "id")
-    private Direccion direccion;
+    private Direccion direccion; //si
 }
