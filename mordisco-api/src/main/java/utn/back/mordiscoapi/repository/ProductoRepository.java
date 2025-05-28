@@ -15,11 +15,11 @@ public interface ProductoRepository extends JpaRepository<Producto,Long> {
         SELECT
              p
         FROM Producto p INNER JOIN Imagen i
-        ON p.imagen_id = i.id
+        ON p.imagen.id = i.id
         INNER JOIN Menu m
-        ON p.menu_id = m.id
+        ON p.menu.id = m.id
         WHERE p.id = :id
-        """) // Anotación para realizar una query personalizada JPQL
+        """)
     Optional<ProductoProjection> findCompleteById(@Param("id") Long id);
 
 

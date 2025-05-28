@@ -13,9 +13,7 @@ import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoDTORequest;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoDTOResponse;
-import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
-import utn.back.mordiscoapi.model.projection.UsuarioProjection;
+import utn.back.mordiscoapi.model.projection.PedidoProjection;
 import utn.back.mordiscoapi.service.impl.PedidoServiceImpl;
 
 import java.util.List;
@@ -58,7 +56,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping
-    public ResponseEntity<List<PedidoDTOResponse>> findAll() {
+    public ResponseEntity<List<PedidoProjection>> findAll() {
         return ResponseEntity.ok(pedidoService.findAll());
     }
 
@@ -76,7 +74,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoDTOResponse> findById(@PathVariable
+    public ResponseEntity<List<PedidoProjection>> findById(@PathVariable
                                                       Long id) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findById(id));
     }
