@@ -125,5 +125,22 @@ public class PedidoController {
         return ResponseEntity.ok().body("Pedido actualizado exitosamente");
     }
 
+    /**
+     * Función para obtener todos los pedidos de un cliente por estado.
+     * @param id del cliente de los pedidos.
+     * @param estado del pedido a busacar.
+     * @return Respuesta HTTP con una lista de proyecciones de pedidos.
+     */
+    @Operation(summary = "Obtener todos los pedidos de un cliente por estado", description = "Devuelve una lista con todos los pedidos del cliente por estado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Pedidos encontrados exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping
+    public ResponseEntity<List<PedidoDTOResponse>> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException, BadRequestException {
+        return ResponseEntity.ok(pedidoService.findAllXClientesXEstado(id, estado));
+    }
+
 }
 
