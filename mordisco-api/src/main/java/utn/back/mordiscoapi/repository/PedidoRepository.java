@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.enums.EstadoPedido;
-import utn.back.mordiscoapi.model.dto.pedido.PedidoDTOResponse;
 import utn.back.mordiscoapi.model.entity.Pedido;
 import utn.back.mordiscoapi.model.projection.PedidoProjection;
 
@@ -85,13 +84,25 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
     void changeState(@Param("id") Long id, @Param("nuevoEstado") EstadoPedido nuevoEstado);
 
     @Query("""
-            SELECT
-                p
-            FROM
-                Pedido as p
+            SELECT 
+                p.id AS id,
+                p.cliente.id AS clienteId,
+                p.restaurante.id AS restauranteId,
+                p.direccionEntrega.id AS direccionId,
+                p.tipoEntrega AS tipoEntrega,
+                p.fechaHora AS fechaHora,
+                p.estado AS estado,
+                p.total AS total,
+                pp.id AS productoPedidoId,
+                pp.cantidad AS cantidad,
+                pp.precioUnitario AS precioUnitario,
+                pr.id AS productoId
+            FROM Pedido p
+            JOIN p.items pp
+            JOIN pp.producto pr
             WHERE
                 p.cliente.id = :id AND p.estado = :estado    
             """)
-    List<PedidoDTOResponse> findAllXClientesXEstado(@Param("id") Long id, @Param("estado") EstadoPedido estado);
+    List<PedidoProjection> findAllXClientesXEstado(@Param("id") Long id, @Param("estado") EstadoPedido estado);
 
 }

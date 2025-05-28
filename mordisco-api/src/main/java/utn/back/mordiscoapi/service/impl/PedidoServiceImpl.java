@@ -9,17 +9,10 @@ import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoDTORequest;
-import utn.back.mordiscoapi.model.dto.pedido.PedidoDTOResponse;
-import utn.back.mordiscoapi.model.dto.productoPedido.ProductoPedidoDTOResponse;
 import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.model.projection.PedidoProjection;
-import utn.back.mordiscoapi.model.projection.ProductoPedidoProjection;
 import utn.back.mordiscoapi.model.projection.ProductoProjection;
-import utn.back.mordiscoapi.repository.PedidoRepository;
-import utn.back.mordiscoapi.repository.ProductoPedidoRepository;
-import utn.back.mordiscoapi.repository.ProductoRepository;
-import utn.back.mordiscoapi.repository.RestauranteRepository;
-import utn.back.mordiscoapi.service.CrudService;
+import utn.back.mordiscoapi.repository.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,7 +27,7 @@ public class PedidoServiceImpl{
     private final PedidoRepository pedidoRepository;
     private final RestauranteRepository restauranteRepository;
     private final ProductoRepository productoRepository;
-    private final ProductoPedidoRepository productoPedidoRepository;
+    private final UsuarioRepository usuarioRepository;
     /**
      * Guarda un pedido.
      * @param dto DTORequest del pedido a guardar.
@@ -138,6 +131,22 @@ public class PedidoServiceImpl{
             log.error(e.getMessage());
             throw new BadRequestException("Error al guardar pedido");
         }
+    }
+
+    /**
+     * Lista los pedidos de un cliente por el estado
+     * @param id el ID del cliente a buscar sus pedidos.
+     * @param estado el EstadoPedido por el que  hay que filtrar.
+     * @throws NotFoundException si el cliente no se encuentra.
+     * @throws BadRequestException si hay un error al actualizar el pedido.
+     */
+    public List<PedidoProjection> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException, BadRequestException {
+        usuarioRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Usuario no encontrado")
+        );
+        return pedidoRepository.findAllXClientesXEstado(id, estado);
+
+
     }
 
 }

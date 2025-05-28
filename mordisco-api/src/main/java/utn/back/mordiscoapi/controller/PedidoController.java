@@ -12,7 +12,6 @@ import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoDTORequest;
-import utn.back.mordiscoapi.model.dto.pedido.PedidoDTOResponse;
 import utn.back.mordiscoapi.model.projection.PedidoProjection;
 import utn.back.mordiscoapi.service.impl.PedidoServiceImpl;
 
@@ -137,8 +136,9 @@ public class PedidoController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping
-    public ResponseEntity<List<PedidoDTOResponse>> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException, BadRequestException {
+
+    @GetMapping("/findByClientAndState")
+    public ResponseEntity<List<PedidoProjection>> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException, BadRequestException {
         return ResponseEntity.ok(pedidoService.findAllXClientesXEstado(id, estado));
     }
 
