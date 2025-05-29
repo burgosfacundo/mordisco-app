@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "restaurantes")
@@ -31,11 +32,11 @@ public class Restaurante {
     private Imagen imagen; //si
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<Promocion> promociones;
+    private Set<Promocion> promociones;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurante_id")
-    private List<HorarioAtencion> horariosAtencion; //si
+    private Set<HorarioAtencion> horariosAtencion; //si
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<CalificacionRestaurante> calificaciones;
