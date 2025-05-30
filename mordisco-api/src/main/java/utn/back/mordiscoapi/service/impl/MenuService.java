@@ -92,10 +92,13 @@ public class MenuService {
 
     @Transactional
     public void deleteByIdRestaurante(Long restauranteId) throws NotFoundException {
-        if (!restauranteRepository.existsById(restauranteId)){
-            throw new NotFoundException("Restaurante no encontrado");
+        Restaurante restaurante = restauranteRepository.findById(restauranteId)
+                .orElseThrow(() -> new NotFoundException("Restaurante no encontrado"));
+        Menu menu = restaurante.getMenu();
+        restaurante.setMenu(null);
+        restauranteRepository.save(restaurante);
+        if (menu != null) {
+            menuRepository.deleteById(menu.getId());
         }
-
-        menuRepository.deleteByIdRestaurante(restauranteId);
     }
 }
