@@ -138,8 +138,9 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
 
-    @GetMapping("/findByClientAndState")
-    public ResponseEntity<List<PedidoProjection>> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException {
+    @GetMapping("/findByClientAndState/{id}/{estado}")
+    public ResponseEntity<List<PedidoProjection>> findAllXClientesXEstado(@PathVariable Long id,
+                                                                          @PathVariable  EstadoPedido estado) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllXClientesXEstado(id, estado));
     }
 
@@ -155,8 +156,8 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
 
-    @GetMapping("/findByClient")
-    public ResponseEntity<List<PedidoProjection>> findAllXClientes(Long id) throws NotFoundException {
+    @GetMapping("/findByClient/{id}")
+    public ResponseEntity<List<PedidoProjection>> findAllXClientes(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllXClientes(id));
     }
 
@@ -173,8 +174,9 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
 
-    @GetMapping("/findByRestauranteAndState")
-    public ResponseEntity<List<PedidoProjection>> findAllXRestauranteXEstado(Long id, EstadoPedido estado) throws NotFoundException {
+    @GetMapping("/findByRestauranteAndState/{id}/{estado}")
+    public ResponseEntity<List<PedidoProjection>> findAllXRestauranteXEstado(@PathVariable Long id,
+                                                                             @PathVariable EstadoPedido estado) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllXRestauranteXEstado(id, estado));
     }
 
@@ -191,8 +193,9 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
 
-    @GetMapping("/cantidadPedidosXEstado")
-    public  ResponseEntity<Optional<Integer>> cantidadPedidosXEstado(Long id, EstadoPedido estado) throws NotFoundException {
+    @GetMapping("/cantidadPedidosXEstado/{id}/{estado}")
+    public  ResponseEntity<Optional<Long>> cantidadPedidosXEstado(@PathVariable Long id,
+                                                                  @PathVariable EstadoPedido estado) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.cantidadPedidosXEstado(id, estado));
     }
 

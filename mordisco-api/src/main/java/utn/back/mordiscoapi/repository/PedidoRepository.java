@@ -153,10 +153,10 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
 
     @Query("""
             SELECT 
-                sum(p.id) AS cantidad_pedidos
+                count(p.id) AS cantidad_pedidos
             FROM Pedido p
             WHERE
                 p.restaurante.id = :id AND p.estado = :estado    
             """)
-    Optional<Integer> cantidadPedidosXEstado(Long id, EstadoPedido estado);
+    Optional<Long> cantidadPedidosXEstado(Long id, EstadoPedido estado);
 }

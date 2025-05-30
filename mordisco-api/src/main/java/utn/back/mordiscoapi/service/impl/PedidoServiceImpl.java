@@ -178,7 +178,7 @@ public class PedidoServiceImpl{
      * @throws NotFoundException si el Restaurante no se encuentra.
      */
 
-    public Optional<Integer> cantidadPedidosXEstado(Long id, EstadoPedido estado) throws NotFoundException {
+    public Optional<Long> cantidadPedidosXEstado(Long id, EstadoPedido estado) throws NotFoundException {
         restauranteRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Restaurante no encontrado")
         );

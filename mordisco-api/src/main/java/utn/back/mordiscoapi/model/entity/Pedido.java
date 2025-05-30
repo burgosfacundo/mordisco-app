@@ -23,7 +23,6 @@ public class Pedido {
     @Column(nullable = false)
     private TipoEntrega tipoEntrega;
 
-    @Column(nullable = false)
     private LocalDateTime fechaHora;
 
     @Column(nullable = false)
