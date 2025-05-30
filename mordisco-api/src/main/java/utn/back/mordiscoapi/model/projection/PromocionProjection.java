@@ -19,5 +19,7 @@ public interface PromocionProjection {
     LocalDate getFechaInicio();
     @Schema(description = "Fecha de fin de la promoción", example = "2025-05-10")
     LocalDate getFechaFin();
+    @Schema(description = "ID del restaurante al que pertenece la promoción", example = "1")
+    Long getRestaurante_Id();
 
 }
