@@ -37,9 +37,6 @@ public class Usuario {
     @JoinColumn(name = "rol_id",nullable = false)
     private Rol rol;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<CalificacionProducto> calificacionesProducto;
-
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Restaurante restaurante;
 
