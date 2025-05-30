@@ -138,16 +138,51 @@ public class PedidoServiceImpl{
      * @param id el ID del cliente a buscar sus pedidos.
      * @param estado el EstadoPedido por el que  hay que filtrar.
      * @throws NotFoundException si el cliente no se encuentra.
-     * @throws BadRequestException si hay un error al actualizar el pedido.
      */
-    public List<PedidoProjection> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException, BadRequestException {
+    public List<PedidoProjection> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException {
         usuarioRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Usuario no encontrado")
         );
         return pedidoRepository.findAllXClientesXEstado(id, estado);
-
-
     }
 
+    /**
+     * Lista todos los pedidos de un cliente
+     * @param id el ID del cliente a buscar sus pedidos.
+     * @throws NotFoundException si el cliente no se encuentra.
+     */
+    public List<PedidoProjection> findAllXClientes(Long id) throws NotFoundException {
+        usuarioRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Usuario no encontrado")
+        );
+        return pedidoRepository.findAllXClientes(id);
+    }
+
+    /**
+     * Lista los pedidos de un Restaurante por el estado
+     * @param id el ID del Restaurante a buscar sus pedidos.
+     * @param estado el EstadoPedido por el que  hay que filtrar.
+     * @throws NotFoundException si el Restaurante no se encuentra.
+     */
+    public List<PedidoProjection> findAllXRestauranteXEstado(Long id, EstadoPedido estado) throws NotFoundException {
+        restauranteRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Restaurante no encontrado")
+        );
+        return pedidoRepository.findAllXRestauranteXEstado(id, estado);
+    }
+
+    /**
+     * Cantidad de pedidos de un Restaurante por el estado
+     * @param id el ID del Restaurante a buscar sus pedidos.
+     * @param estado el EstadoPedido por el que  hay que filtrar.
+     * @throws NotFoundException si el Restaurante no se encuentra.
+     */
+
+    public Optional<Integer> cantidadPedidosXEstado(Long id, EstadoPedido estado) throws NotFoundException {
+        restauranteRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Restaurante no encontrado")
+        );
+        return pedidoRepository.cantidadPedidosXEstado(id, estado);
+    }
 }
 

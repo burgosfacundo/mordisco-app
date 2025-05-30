@@ -16,6 +16,7 @@ import utn.back.mordiscoapi.model.projection.PedidoProjection;
 import utn.back.mordiscoapi.service.impl.PedidoServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 @Tag(name = "Pedidos", description = "Operaciones relacionadas con los pedidos de los restaurantes")
 @RestController
@@ -138,8 +139,61 @@ public class PedidoController {
     })
 
     @GetMapping("/findByClientAndState")
-    public ResponseEntity<List<PedidoProjection>> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException, BadRequestException {
+    public ResponseEntity<List<PedidoProjection>> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllXClientesXEstado(id, estado));
+    }
+
+    /**
+     * Función para obtener todos los pedidos de un cliente.
+     * @param id del cliente de los pedidos.
+     * @return Respuesta HTTP con una lista de proyecciones de pedidos.
+     */
+    @Operation(summary = "Obtener todos los pedidos de un cliente", description = "Devuelve una lista con todos los pedidos del cliente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Pedidos encontrados exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+
+    @GetMapping("/findByClient")
+    public ResponseEntity<List<PedidoProjection>> findAllXClientes(Long id) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllXClientes(id));
+    }
+
+    /**
+     * Función para obtener todos los pedidos de un restaurante por estado.
+     * @param id del restaurante a buscar pedidos.
+     * @param estado del pedido a buscar.
+     * @return Respuesta HTTP con una lista de proyecciones de pedidos.
+     */
+    @Operation(summary = "Obtener todos los pedidos de un restaurante por estado", description = "Devuelve una lista con todos los pedidos del restaurante por estado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Pedidos encontrados exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+
+    @GetMapping("/findByRestauranteAndState")
+    public ResponseEntity<List<PedidoProjection>> findAllXRestauranteXEstado(Long id, EstadoPedido estado) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllXRestauranteXEstado(id, estado));
+    }
+
+    /**
+     * Función para obtener cantidad de pedidos de un restaurante por estado.
+     * @param id del restaurante a buscar.
+     * @param estado del pedido a buscar.
+     * @return Respuesta HTTP con la cantidad de pedidos.
+     */
+    @Operation(summary = "Obtener la cantidad de pedidos de un restaurante por estado", description = "Devuelve una Optional con la cantidad de pedidos del restaurante por estado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Pedidos encontrados exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+
+    @GetMapping("/cantidadPedidosXEstado")
+    public  ResponseEntity<Optional<Integer>> cantidadPedidosXEstado(Long id, EstadoPedido estado) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.cantidadPedidosXEstado(id, estado));
     }
 
 }

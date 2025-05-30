@@ -105,4 +105,58 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
             """)
     List<PedidoProjection> findAllXClientesXEstado(@Param("id") Long id, @Param("estado") EstadoPedido estado);
 
+    @Query("""
+            SELECT 
+                p.id AS id,
+                p.cliente.id AS clienteId,
+                p.restaurante.id AS restauranteId,
+                p.direccionEntrega.id AS direccionId,
+                p.tipoEntrega AS tipoEntrega,
+                p.fechaHora AS fechaHora,
+                p.estado AS estado,
+                p.total AS total,
+                pp.id AS productoPedidoId,
+                pp.cantidad AS cantidad,
+                pp.precioUnitario AS precioUnitario,
+                pr.id AS productoId
+            FROM Pedido p
+            JOIN p.items pp
+            JOIN pp.producto pr
+            WHERE
+                p.cliente.id = :id    
+            """)
+    List<PedidoProjection> findAllXClientes(Long id);
+
+
+    @Query("""
+            SELECT 
+                p.id AS id,
+                p.cliente.id AS clienteId,
+                p.restaurante.id AS restauranteId,
+                p.direccionEntrega.id AS direccionId,
+                p.tipoEntrega AS tipoEntrega,
+                p.fechaHora AS fechaHora,
+                p.estado AS estado,
+                p.total AS total,
+                pp.id AS productoPedidoId,
+                pp.cantidad AS cantidad,
+                pp.precioUnitario AS precioUnitario,
+                pr.id AS productoId
+            FROM Pedido p
+            JOIN p.items pp
+            JOIN pp.producto pr
+            WHERE
+                p.restaurante.id = :id AND p.estado = :estado    
+            """)
+    List<PedidoProjection> findAllXRestauranteXEstado(@Param("id")Long id, @Param("estado") EstadoPedido estado);
+
+
+    @Query("""
+            SELECT 
+                sum(p.id) AS cantidad_pedidos
+            FROM Pedido p
+            WHERE
+                p.restaurante.id = :id AND p.estado = :estado    
+            """)
+    Optional<Integer> cantidadPedidosXEstado(Long id, EstadoPedido estado);
 }
