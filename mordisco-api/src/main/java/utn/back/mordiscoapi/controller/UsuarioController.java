@@ -50,7 +50,7 @@ public class UsuarioController {
      */
     @Operation(summary = "Obtener todos los usuarios", description = "Devuelve una lista con todos los usuarios")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Promoción creada exitosamente"),
+            @ApiResponse(responseCode = "200",description = "Usuarios encontrados exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })

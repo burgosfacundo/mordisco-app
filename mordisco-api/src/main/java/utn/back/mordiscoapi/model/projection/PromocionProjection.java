@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public interface PromocionProjection {
     @Schema(description = "ID de la promoción", example = "1") // Anotación para documentar un campo de ejemplo en Swagger
     Long getId();
-    @Schema(description = "Nombre de la promoción", example = "Descuento del 20%")
+    @Schema(description = "Descripcion de la promoción", example = "Descuento del 20%")
     String getDescripcion();
     @Schema(description = "ID del restaurante al que pertenece la promoción", example = "0.20")
     Double getDescuento();
