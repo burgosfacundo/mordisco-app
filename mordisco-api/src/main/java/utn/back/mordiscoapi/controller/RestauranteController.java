@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteDTO;
-import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseListarDTO;
 import utn.back.mordiscoapi.service.impl.RestauranteServiceImpl;
 
@@ -59,7 +58,7 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     }) // Anotación para documentar las posibles respuestas
     @GetMapping("/usuario/{idUsuario}") // Anotación para indicar que esta función maneja las peticiones GET a la ruta /{idU}
-    public ResponseEntity<RestauranteResponseDTO> findByDuenio(@PathVariable // Anotación para indicar que este parámetro se obtiene de la ruta
+    public ResponseEntity<RestauranteResponseListarDTO> findByDuenio(@PathVariable // Anotación para indicar que este parámetro se obtiene de la ruta
                                             Long idUsuario) throws NotFoundException, BadRequestException {
     return ResponseEntity.ok(restauranteService.findProjectByDuenio(idUsuario));
 }
@@ -77,7 +76,7 @@ public class RestauranteController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @DeleteMapping("/delete/{id:[0-9]+}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable // Anotación para indicar que este parámetro se obtiene de la ruta
                                                           Long id) throws NotFoundException{
         restauranteService.delete(id);
@@ -137,8 +136,8 @@ public class RestauranteController {
             @ApiResponse(responseCode = "200",description = "Restaurantes listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping("/listarPorCiudad/{ciudad}")
-    public ResponseEntity<List<RestauranteResponseListarDTO>> listarPorCiudad(@PathVariable
+    @GetMapping("/listarPorCiudad/")
+    public ResponseEntity<List<RestauranteResponseListarDTO>> listarPorCiudad(@RequestParam
                                                                         String ciudad) throws NotFoundException {
         List<RestauranteResponseListarDTO> lista = restauranteService.listarPorCiudad(ciudad);
         return ResponseEntity.ok(lista);

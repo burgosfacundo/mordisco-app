@@ -15,11 +15,11 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     @Query("""
                 SELECT DISTINCT r
                 FROM Restaurante r
-                LEFT JOIN FETCH r.imagen
-                LEFT JOIN FETCH r.promociones
-                LEFT JOIN FETCH r.horariosAtencion
-                LEFT JOIN FETCH r.calificaciones
-                LEFT JOIN FETCH r.direccion
+                LEFT JOIN  r.imagen
+                LEFT JOIN  r.promociones
+                LEFT JOIN  r.horariosAtencion
+                LEFT JOIN  r.calificaciones
+                LEFT JOIN  r.direccion
                 WHERE r.id = :id
             """)
     Optional<Restaurante> findRestauranteById(@Param("id") Long id);
@@ -28,11 +28,11 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     @Query("""
                 SELECT DISTINCT r
                 FROM Restaurante r
-                LEFT JOIN FETCH r.imagen
-                LEFT JOIN FETCH r.promociones
-                LEFT JOIN FETCH r.horariosAtencion
-                LEFT JOIN FETCH r.calificaciones
-                LEFT JOIN FETCH r.direccion
+                LEFT JOIN  r.imagen
+                LEFT JOIN  r.promociones
+                LEFT JOIN  r.horariosAtencion
+                LEFT JOIN  r.calificaciones
+                LEFT JOIN  r.direccion
                 WHERE r.usuario.id = :usuarioId
             """)
     Optional<Restaurante> findByDuenio(@Param("usuarioId") Long usuarioId);
@@ -41,18 +41,18 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     @Query("""
                 SELECT DISTINCT r
                 FROM Restaurante r
-                LEFT JOIN FETCH r.imagen
-                LEFT JOIN FETCH r.promociones
-                LEFT JOIN FETCH r.horariosAtencion
-                LEFT JOIN FETCH r.calificaciones
-                LEFT JOIN FETCH r.direccion
+                LEFT JOIN  r.imagen
+                LEFT JOIN  r.promociones
+                LEFT JOIN  r.horariosAtencion
+                LEFT JOIN  r.calificaciones
+                LEFT JOIN  r.direccion
             """)
     List<Restaurante> findAllRestaurantes();
 
     @Query ("""
                 SELECT DISTINCT r
                 FROM Restaurante r
-                LEFT JOIN FETCH r.imagen
+                LEFT JOIN  r.imagen
                 LEFT JOIN  r.promociones
                 LEFT JOIN  r.horariosAtencion
                 LEFT JOIN  r.calificaciones
@@ -64,11 +64,11 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     @Query("""
             SELECT DISTINCT r
             FROM Restaurante r
-            LEFT JOIN FETCH r.imagen
-            LEFT JOIN FETCH r.promociones
-            LEFT JOIN FETCH r.horariosAtencion
-            LEFT JOIN FETCH r.calificaciones
-            LEFT JOIN FETCH r.direccion
+            LEFT JOIN  r.imagen
+            LEFT JOIN  r.promociones
+            LEFT JOIN  r.horariosAtencion
+            LEFT JOIN  r.calificaciones
+            LEFT JOIN  r.direccion
             WHERE r.direccion.ciudad = :ciudad
             """)
     List<Restaurante> findAllByCiudad(@Param("ciudad")String ciudad);

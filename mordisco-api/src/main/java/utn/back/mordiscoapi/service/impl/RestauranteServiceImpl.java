@@ -8,7 +8,6 @@ import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteDTO;
-import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseListarDTO;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
@@ -49,7 +48,7 @@ public class RestauranteServiceImpl implements CrudService<RestauranteDTO, Resta
 
 
     }
-    public RestauranteResponseDTO findProjectByDuenio (Long idUsuario) throws NotFoundException, BadRequestException {
+    public RestauranteResponseListarDTO findProjectByDuenio (Long idUsuario) throws NotFoundException, BadRequestException {
         if(!usuarioRepository.existsById(idUsuario)){
                 throw new NotFoundException("el usuario no fue encontrado!");
         }
@@ -59,15 +58,15 @@ public class RestauranteServiceImpl implements CrudService<RestauranteDTO, Resta
             throw new BadRequestException("El dueño buscado no tiene ningun restaurante");
         }
 
-        return RestauranteMapper.toDTOX(exist.get());
+        return RestauranteMapper.toDTO(exist.get());
     }
 
     @Override
-    public void delete(Long aLong) throws NotFoundException {
-        if(!restauranteRepository.existsById(aLong)){
+    public void delete(Long id) throws NotFoundException {
+        if(!restauranteRepository.existsById(id)){
             throw new NotFoundException("El restaurante a borrar no fue encontrado");
         }
-        restauranteRepository.deleteById(aLong);
+        restauranteRepository.deleteById(id);
     }
     public List<RestauranteResponseListarDTO> listarTodos() throws NotFoundException {
         if (restauranteRepository.findAllRestaurantes().isEmpty()){

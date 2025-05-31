@@ -1,15 +1,12 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionRestauranteDTO;
-import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseRestauranteDTO;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionResponseDTO;
+import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteDTO;
-import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseListarDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
 
-import java.util.List;
 
 @UtilityClass
 public class RestauranteMapper {
@@ -45,35 +42,19 @@ public class RestauranteMapper {
                 .direccion(direccion) //preguntar
                 .build();
     }
-    public static RestauranteResponseDTO toDTOX (Restaurante restaurante){
-        return new RestauranteResponseDTO(restaurante.getId(),
-                restaurante.getRazonSocial(),
-                restaurante.getActivo(),
-                restaurante.getImagen() != null ? ImagenMapper.toDTO(restaurante.getImagen()) : null,
-                restaurante.getMenu() != null ? restaurante.getMenu().getId() : null,
-                restaurante.getPromociones() != null ? restaurante.getPromociones().stream().map(PromocionMapper::toDTO).toList() : List.of(),
-                restaurante.getHorariosAtencion() != null ? restaurante.getHorariosAtencion().stream().map(HorarioDeAtencionMapper::toDTO).toList() : List.of(),
-                restaurante.getCalificaciones() != null ? restaurante.getCalificaciones().stream().map(CalificacionRestauranteMapper::toDTO).toList() : List.of(),
-                restaurante.getDireccion() != null ? DireccionMapper.toDTO(restaurante.getDireccion()) : null
 
-        );
-    }
     public static RestauranteResponseListarDTO toDTO (Restaurante dto){
-        UsuarioResponseDTO usuarioRDTO = new UsuarioResponseDTO(dto.getUsuario().getId());
-        ImagenResponseRestauranteDTO imagen = new ImagenResponseRestauranteDTO(dto.getImagen().getId());
-        DireccionRestauranteDTO direccionDto = new DireccionRestauranteDTO(dto.getDireccion().getId());
-
+        ImagenResponseDTO imagen = new ImagenResponseDTO(dto.getImagen().getId(), dto.getImagen().getUrl(), dto.getImagen().getNombre());
+        DireccionResponseDTO direccionDto = new DireccionResponseDTO(dto.getDireccion().getId(),dto.getDireccion().getCalle(),dto.getDireccion().getNumero(),dto.getDireccion().getPiso(),dto.getDireccion().getDepto(),dto.getDireccion().getCodigoPostal(),dto.getDireccion().getReferencias(),dto.getDireccion().getLatitud(),dto.getDireccion().getLongitud(),dto.getDireccion().getCiudad());
         return new RestauranteResponseListarDTO(
                 dto.getId(),
                 dto.getRazonSocial(),
                 dto.getActivo(),
                 imagen,
                 dto.getMenu().getId(),
-                dto.getMenu().getId(),//preguntar
-                direccionDto.id() //preguntar
+                direccionDto,
+                dto.getUsuario().getId()
                 );
-
-
     }
 
 }
