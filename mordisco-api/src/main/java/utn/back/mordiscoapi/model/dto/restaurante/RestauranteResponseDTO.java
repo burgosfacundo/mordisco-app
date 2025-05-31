@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionRestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.direccion.DireccionResponseDTO;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioDeAtencionResponseDTO;
-import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseRestauranteDTO;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 

@@ -1,7 +1,7 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
-import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
+
 import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseRestauranteDTO;
 import utn.back.mordiscoapi.model.entity.Imagen;
 @UtilityClass

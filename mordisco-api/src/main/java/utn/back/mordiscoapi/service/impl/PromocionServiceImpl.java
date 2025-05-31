@@ -3,7 +3,6 @@ package utn.back.mordiscoapi.service.impl;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;

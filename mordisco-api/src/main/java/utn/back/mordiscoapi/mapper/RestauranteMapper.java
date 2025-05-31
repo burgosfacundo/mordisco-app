@@ -2,8 +2,6 @@ package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
 import utn.back.mordiscoapi.model.dto.direccion.DireccionRestauranteDTO;
-import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
-import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioDeAtencionResponseDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseRestauranteDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;

@@ -13,12 +13,9 @@ import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseListarDTO;
-import utn.back.mordiscoapi.model.entity.Restaurante;
-import utn.back.mordiscoapi.model.projection.CalificacionRestauranteProjection;
 import utn.back.mordiscoapi.service.impl.RestauranteServiceImpl;
 
 import java.util.List;
-import java.util.Optional;
 
 @Tag(name = "Restaurante", description = "Operaciones relacionadas con los restaurantes")
 @RestController
