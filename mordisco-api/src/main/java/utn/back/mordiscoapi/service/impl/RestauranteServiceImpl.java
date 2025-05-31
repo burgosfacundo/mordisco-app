@@ -9,6 +9,7 @@ import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseListarDTO;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
@@ -18,7 +19,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RestauranteServiceImpl implements CrudService<RestauranteDTO, RestauranteResponseDTO,Long> {
+public class RestauranteServiceImpl implements CrudService<RestauranteDTO, RestauranteResponseListarDTO, Long> {
     private final RestauranteRepository restauranteRepository;
     private final UsuarioRepository usuarioRepository;
 
@@ -34,12 +35,13 @@ public class RestauranteServiceImpl implements CrudService<RestauranteDTO, Resta
     }
 
     @Override
-    public List<RestauranteResponseDTO> findAll() {
-        return List.of();
+    public List<RestauranteResponseListarDTO> findAll() {
+        List<Restaurante> restaurantes = restauranteRepository.findAll();
+        return restaurantes.stream().map(RestauranteMapper::toDTO).toList();
     }
 
     @Override
-    public RestauranteResponseDTO findById(Long id) throws NotFoundException {
+    public RestauranteResponseListarDTO findById(Long id) throws NotFoundException {
         Restaurante rest = restauranteRepository.findRestauranteById(id).orElseThrow(
                 () -> new NotFoundException("Restaurante no encontrada"));
 
@@ -57,7 +59,7 @@ public class RestauranteServiceImpl implements CrudService<RestauranteDTO, Resta
             throw new BadRequestException("El dueño buscado no tiene ningun restaurante");
         }
 
-        return RestauranteMapper.toDTO(exist.get());
+        return RestauranteMapper.toDTOX(exist.get());
     }
 
     @Override
@@ -66,6 +68,28 @@ public class RestauranteServiceImpl implements CrudService<RestauranteDTO, Resta
             throw new NotFoundException("El restaurante a borrar no fue encontrado");
         }
         restauranteRepository.deleteById(aLong);
+    }
+    public List<RestauranteResponseListarDTO> listarTodos() throws NotFoundException {
+        if (restauranteRepository.findAllRestaurantes().isEmpty()){
+            throw new NotFoundException("No hay restaurantes en la lista");
+        }
+        List<Restaurante> list = restauranteRepository.findAllRestaurantes();
+        return list.stream().map(RestauranteMapper::toDTO).toList();
+    }
+    public List<RestauranteResponseListarDTO> listarPorEstado(Boolean estado) throws NotFoundException{
+        if(restauranteRepository.findAllActivosOno(estado).isEmpty()){
+            throw new NotFoundException("No se encontraron restaurantes en ese estado");
+        }
+        List<Restaurante> listaAcrtivosOnO = restauranteRepository.findAllActivosOno(estado);
+        return listaAcrtivosOnO.stream().map(RestauranteMapper::toDTO).toList();
+    }
+
+    public List<RestauranteResponseListarDTO> listarPorCiudad(String ciudad) throws NotFoundException {
+        if (restauranteRepository.findAllByCiudad(ciudad).isEmpty()){
+            throw new NotFoundException("No se encontro un restaurante en esa ciudad");
+        }
+        List<Restaurante> listaPorCiudad = restauranteRepository.findAllByCiudad(ciudad);
+        return listaPorCiudad.stream().map(RestauranteMapper::toDTO).toList();
     }
 
 

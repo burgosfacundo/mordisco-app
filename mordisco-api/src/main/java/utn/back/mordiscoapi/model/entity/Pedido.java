@@ -20,13 +20,13 @@ public class Pedido {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private TipoEntrega tipoEntrega;
 
     @Column(nullable = false)
     private LocalDateTime fechaHora;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private EstadoPedido estado;
 
     @Column(nullable = false)
