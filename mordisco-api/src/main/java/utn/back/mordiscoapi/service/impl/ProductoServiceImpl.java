@@ -8,16 +8,16 @@ import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.producto.ProductoRequestDTO;
 import utn.back.mordiscoapi.model.projection.ProductoProjection;
 import utn.back.mordiscoapi.repository.ProductoRepository;
-import utn.back.mordiscoapi.service.CrudService;
+import utn.back.mordiscoapi.service.interf.IProductoService;
 
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProductoServiceImpl implements CrudService<ProductoRequestDTO, ProductoProjection, Long> {
+public class ProductoServiceImpl implements IProductoService {
 
-    private static ProductoRepository repository;
+    private final ProductoRepository repository;
 
     @Override
     public void save(ProductoRequestDTO productoRequestDTO) throws BadRequestException {

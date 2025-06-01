@@ -79,6 +79,24 @@ public class PedidoController {
     }
 
     /**
+     * Función para obtener todos los pedidos de un restaurante.
+     * @param id del restaurante a buscar pedidos.
+     * @return Respuesta HTTP con una lista de proyecciones de pedidos.
+     * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
+     */
+    @Operation(summary = "Obtener todos los pedidos de un restaurante", description = "Devuelve una lista con todos los pedidos del restaurante")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Pedidos encontrados exitosamente"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/restaurante/{id}")
+    public ResponseEntity<List<PedidoProjection>> findAllCompleteByRestaurante(@PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllCompleteByRestaurante(id));
+    }
+
+    /**
      * Función para eliminar un pedido por su ID.
      * @param id del pedido a eliminar.
      * @return Respuesta HTTP con un mensaje de éxito.
@@ -127,7 +145,7 @@ public class PedidoController {
     /**
      * Función para obtener todos los pedidos de un cliente por estado.
      * @param id del cliente de los pedidos.
-     * @param estado del pedido a busacar.
+     * @param estado del pedido a buscar.
      * @return Respuesta HTTP con una lista de proyecciones de pedidos.
      */
     @Operation(summary = "Obtener todos los pedidos de un cliente por estado", description = "Devuelve una lista con todos los pedidos del cliente por estado")

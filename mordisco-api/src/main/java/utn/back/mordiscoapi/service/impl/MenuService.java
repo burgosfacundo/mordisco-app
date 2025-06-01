@@ -14,18 +14,29 @@ import utn.back.mordiscoapi.model.entity.Restaurante;
 import utn.back.mordiscoapi.repository.MenuRepository;
 import utn.back.mordiscoapi.repository.ProductoRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
+import utn.back.mordiscoapi.service.interf.IMenuService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class MenuService {
+public class MenuService implements IMenuService {
     private final MenuRepository menuRepository;
     private final RestauranteRepository restauranteRepository;
     private final ProductoRepository productoRepository;
 
+    /**
+     * Guarda un menú asociado a un restaurante.
+     * Si el menú ya existe, lo actualiza; si no, lo crea.
+     * También maneja la creación o actualización de productos dentro del menú.
+     *
+     * @param restauranteId ID del restaurante al que se asocia el menú.
+     * @param dto           DTO que contiene los datos del menú y sus productos.
+     * @throws NotFoundException si el restaurante o algún producto no se encuentra.
+     */
     @Transactional
+    @Override
     public void save(Long restauranteId, MenuDTO dto) throws NotFoundException {
         Restaurante restaurante = restauranteRepository.findById(restauranteId)
                 .orElseThrow(() -> new NotFoundException("Restaurante no encontrado"));
@@ -79,7 +90,15 @@ public class MenuService {
         }
     }
 
+    /**
+     * Busca un menú por el ID del restaurante.
+     *
+     * @param restauranteId ID del restaurante.
+     * @return DTO del menú asociado al restaurante.
+     * @throws NotFoundException si el restaurante o el menú no se encuentran.
+     */
     @Transactional
+    @Override
     public MenuDTO findByRestauranteId(Long restauranteId) throws NotFoundException {
         if (!restauranteRepository.existsById(restauranteId)) {
             throw new NotFoundException("Restaurante no encontrado");
@@ -90,6 +109,14 @@ public class MenuService {
         return MenuMapper.toDto(menu);
     }
 
+    /**
+     * Elimina el menú asociado a un restaurante por su ID.
+     * También elimina los productos asociados al menú.
+     *
+     * @param restauranteId ID del restaurante cuyo menú se eliminará.
+     * @throws NotFoundException si el restaurante o el menú no se encuentran.
+     */
+    @Override
     @Transactional
     public void deleteByIdRestaurante(Long restauranteId) throws NotFoundException {
         Restaurante restaurante = restauranteRepository.findById(restauranteId)

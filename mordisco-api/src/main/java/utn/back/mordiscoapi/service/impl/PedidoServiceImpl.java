@@ -1,5 +1,6 @@
 package utn.back.mordiscoapi.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,6 +14,7 @@ import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.model.projection.PedidoProjection;
 import utn.back.mordiscoapi.model.projection.ProductoProjection;
 import utn.back.mordiscoapi.repository.*;
+import utn.back.mordiscoapi.service.interf.IPedidoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,7 +24,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PedidoServiceImpl{
+public class PedidoServiceImpl implements IPedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final RestauranteRepository restauranteRepository;
@@ -33,6 +35,8 @@ public class PedidoServiceImpl{
      * @param dto DTORequest del pedido a guardar.
      * @throws BadRequestException si hay un error al guardar el pedido.
      */
+    @Transactional
+    @Override
     public void save(PedidoDTORequest dto) throws BadRequestException {
         if(!restauranteRepository.existsById(dto.idRestaurante())){
             throw new BadRequestException("El restaurante no existe");
@@ -68,8 +72,9 @@ public class PedidoServiceImpl{
 
     /**
      * Lista todos los pedidos.
+     * @return una lista de pedidos.
      */
-
+    @Override
     public List<PedidoProjection> findAll() {
         return pedidoRepository.findAllDTO();
     }
@@ -80,6 +85,7 @@ public class PedidoServiceImpl{
      * @param id el ID del restaurante para listar sus pedidos.
      * @throws NotFoundException si el restaurante no se encuentra.
      */
+    @Override
     public List<PedidoProjection> findAllCompleteByRestaurante(Long id) throws NotFoundException {
         if(restauranteRepository.findById(id).isEmpty()){
             throw new NotFoundException("El restaurante no existe");
@@ -92,6 +98,7 @@ public class PedidoServiceImpl{
      * @param id el ID del pedido a buscar.
      * @throws NotFoundException si el pedido no se encuentra.
      */
+    @Override
     public PedidoProjection findById(Long id) throws NotFoundException {
         Optional<PedidoProjection> pedido = pedidoRepository.findByProjectID(id);
         if (pedido.isEmpty()) {
@@ -105,6 +112,7 @@ public class PedidoServiceImpl{
      * @param id el ID del pedido a eliminar.
      * @throws NotFoundException si el pedido no se encuentra.
      */
+    @Override
     public void delete(Long id) throws NotFoundException {
         if(!pedidoRepository.existsById(id)){
             throw new NotFoundException("Pedido no encontrado");
@@ -119,6 +127,7 @@ public class PedidoServiceImpl{
      * @throws NotFoundException si el pedido no se encuentra.
      * @throws BadRequestException si hay un error al actualizar el pedido.
      */
+    @Override
     public void changeState(Long id, EstadoPedido nuevoEstado) throws NotFoundException, BadRequestException {
         Pedido pedido = pedidoRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Pedido no encontrado")
@@ -128,13 +137,8 @@ public class PedidoServiceImpl{
             throw new BadRequestException("El pedido ya se encuentra en ese estado");
         }
 
-        try{
-            pedido.setEstado(nuevoEstado);
-            pedidoRepository.changeState(id, nuevoEstado);
-        }catch (DataIntegrityViolationException e){
-            log.error(e.getMessage());
-            throw new BadRequestException("Error al guardar pedido");
-        }
+        pedido.setEstado(nuevoEstado);
+        pedidoRepository.changeState(id, nuevoEstado);
     }
 
     /**
@@ -143,6 +147,7 @@ public class PedidoServiceImpl{
      * @param estado el EstadoPedido por el que  hay que filtrar.
      * @throws NotFoundException si el cliente no se encuentra.
      */
+    @Override
     public List<PedidoProjection> findAllXClientesXEstado(Long id, EstadoPedido estado) throws NotFoundException {
         if (!usuarioRepository.existsById(id)) {
             throw new NotFoundException("Usuario no encontrado");
@@ -155,6 +160,7 @@ public class PedidoServiceImpl{
      * @param id el ID del cliente a buscar sus pedidos.
      * @throws NotFoundException si el cliente no se encuentra.
      */
+    @Override
     public List<PedidoProjection> findAllXClientes(Long id) throws NotFoundException {
         if (!usuarioRepository.existsById(id)) {
             throw new NotFoundException("Usuario no encontrado");
@@ -168,6 +174,7 @@ public class PedidoServiceImpl{
      * @param estado el EstadoPedido por el que  hay que filtrar.
      * @throws NotFoundException si el Restaurante no se encuentra.
      */
+    @Override
     public List<PedidoProjection> findAllXRestauranteXEstado(Long id, EstadoPedido estado) throws NotFoundException {
         if (!restauranteRepository.existsById(id)) {
             throw new NotFoundException("Restaurante no encontrado");
@@ -181,7 +188,7 @@ public class PedidoServiceImpl{
      * @param estado el EstadoPedido por el que  hay que filtrar.
      * @throws NotFoundException si el Restaurante no se encuentra.
      */
-
+    @Override
     public Long cantidadPedidosXEstado(Long id, EstadoPedido estado) throws NotFoundException {
         if (!restauranteRepository.existsById(id)) {
             throw new NotFoundException("Restaurante no encontrado");

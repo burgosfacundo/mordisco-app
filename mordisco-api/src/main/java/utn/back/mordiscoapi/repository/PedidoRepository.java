@@ -15,18 +15,7 @@ import java.util.Optional;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido,Long> {
     @Query("""
-        SELECT
-             p,pp,pr
-        FROM Pedido p
-        JOIN ProductoPedido pp ON p.id = pp.pedido.id
-        JOIN Producto pr ON pp.producto.id = pr.id
-        WHERE p.id = :id
-        """) // Anotación para realizar una query personalizada JPQL
-    Optional<Pedido> findCompleteById(@Param("id") Long id);
-
-    @Query("""
-        SELECT
-             p,pp,pr
+        SELECT p
         FROM Pedido p
         JOIN ProductoPedido pp ON p.id = pp.pedido.id
         JOIN Producto pr ON pp.producto.id = pr.id

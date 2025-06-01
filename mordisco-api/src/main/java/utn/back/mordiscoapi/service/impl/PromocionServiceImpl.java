@@ -14,7 +14,7 @@ import utn.back.mordiscoapi.model.entity.Promocion;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.repository.PromocionRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
-import utn.back.mordiscoapi.service.CrudService;
+import utn.back.mordiscoapi.service.interf.IPromocionService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j // Anotación de Lombok para el registro de logs
 @Service // Anotación de servicio de Spring para indicar que esta clase es un servicio
 @RequiredArgsConstructor // Anotación de lombok para generar un constructor con los campos finales
-public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionProjection,Long> {
+public class PromocionServiceImpl implements IPromocionService {
     // Inyección de dependencias de PromocionRepository a través del constructor de lombok @RequiredArgsConstructor
     private final PromocionRepository repository;
     private final RestauranteRepository restauranteRepository;
@@ -30,7 +30,6 @@ public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionP
     /**
      * Guarda una promoción.
      * @param dto DTO de la promoción a guardar.
-     * @throws BadRequestException si hay un error al guardar la promoción.
      */
     @Override
     public void save(PromocionDTO dto) throws BadRequestException {
@@ -96,7 +95,7 @@ public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionP
      * @throws NotFoundException si la promoción no se encuentra.
      * @throws BadRequestException si hay un error al actualizar la promoción.
      */
-
+    @Override
     public void update(Long id, PromocionDTO dto) throws NotFoundException,BadRequestException {
         // Manejo de Optional
         // Obtenemos Optional<Promocion> usando el findById por defecto
@@ -120,26 +119,15 @@ public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionP
         var restaurante = restauranteRepository.findById(dto.restauranteId())
                 .orElseThrow(() -> new BadRequestException("El restaurante asociado no existe"));
 
-        try {
-            // Actualizar los campos de la promoción
-            promocion.setDescripcion(dto.descripcion());
-            promocion.setDescuento(dto.descuento());
-            promocion.setFechaInicio(dto.fechaInicio());
-            promocion.setFechaFin(dto.fechaFin());
-            promocion.setRestaurante(restaurante);
+        // Actualizar los campos de la promoción
+        promocion.setDescripcion(dto.descripcion());
+        promocion.setDescuento(dto.descuento());
+        promocion.setFechaInicio(dto.fechaInicio());
+        promocion.setFechaFin(dto.fechaFin());
+        promocion.setRestaurante(restaurante);
 
-            // Guardamos la promoción actualizada
-            repository.save(promocion);
-        } catch (DataIntegrityViolationException e) {
-            log.error(e.getMessage());
-            String mensaje = "Error al guardar la promoción";
-            if (e.getMessage() != null && e.getMessage().contains("restaurante_id")) {
-                mensaje = "El restaurante asociado no existe o es inválido";
-            } else if (e.getMessage() != null && e.getMessage().contains("UNIQUE")) {
-                mensaje = "Ya existe una promoción con los mismos datos únicos";
-            }
-            throw new BadRequestException(mensaje);
-        }
+        // Guardamos la promoción actualizada
+        repository.save(promocion);
     }
 
 
@@ -160,6 +148,13 @@ public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionP
         repository.deleteById(id);
     }
 
+    /**
+     * Lista las promociones por restaurante.
+     * @param idRestaurante el ID del restaurante para listar sus promociones.
+     * @return una lista de DTOs de promociones.
+     * @throws NotFoundException si el restaurante no se encuentra.
+     */
+    @Override
     public List<PromocionResponseDTO> listarPromoPorRestaurante (Long idRestaurante)throws NotFoundException {
         if(repository.findByRestauranteId(idRestaurante).isEmpty()){
             throw new NotFoundException("No se encontro el restaurante");
