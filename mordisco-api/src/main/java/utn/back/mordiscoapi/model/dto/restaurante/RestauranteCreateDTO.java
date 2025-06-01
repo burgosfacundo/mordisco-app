@@ -6,12 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import utn.back.mordiscoapi.model.dto.direccion.DireccionDTO;
-import utn.back.mordiscoapi.model.dto.imagen.ImagenDTO;
+import utn.back.mordiscoapi.model.dto.imagen.ImagenRequestDTO;
 
-public record RestauranteDTO(
-                            @Positive(message = "El id del restaurante debe ser positivo")
-                            @Schema(description = "Id del restaurante", example = "7")
-                            Long id,
+public record RestauranteCreateDTO(
                             @Size(message = "La razón social del restaurante debe tener máximo 50 caracteres", max = 50)
                             @NotBlank(message = "La razón social del restaurante es obligatoria")
                             @Schema(description = "Razón social del restaurante", example = "Mc Donald's")
@@ -20,7 +17,7 @@ public record RestauranteDTO(
                             @Schema(description = "Si el restaurante esta activo", example = "true")
                             Boolean activo,
                             @NotNull(message = "El logo del restaurante es obligatorio")
-                            ImagenDTO logo,
+                            ImagenRequestDTO logo,
                             @NotNull(message = "El id del usuario es obligatorio")
                             @Positive(message = "El id del usuario debe ser positivo")
                             @Schema(description = "Id del usuario dueño", example = "7")

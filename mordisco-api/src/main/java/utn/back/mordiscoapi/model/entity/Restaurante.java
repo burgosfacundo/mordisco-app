@@ -4,9 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name = "restaurantes")
+@Table(name = "restaurantes",
+uniqueConstraints = {
+                @UniqueConstraint(name = "UK_restaurante_razon_social", columnNames = "razon_social"),
+                @UniqueConstraint(name = "UK_restaurante_usuario", columnNames = "usuario_id"),
+                @UniqueConstraint(name = "UK_restaurante_imagen", columnNames = "imagen_id")
+})
 @Getter
 @Setter
 @AllArgsConstructor
@@ -31,11 +37,11 @@ public class Restaurante {
     private Imagen imagen;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<Promocion> promociones;
+    private Set<Promocion> promociones;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurante_id")
-    private List<HorarioAtencion> horariosAtencion;
+    private Set<HorarioAtencion> horariosAtencion;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<CalificacionRestaurante> calificaciones;

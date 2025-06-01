@@ -2,6 +2,7 @@ package utn.back.mordiscoapi.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.model.entity.Promocion;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
@@ -37,4 +38,11 @@ public interface PromocionRepository extends JpaRepository<Promocion,Long> {
         WHERE p.id = :id
         """) // Anotación para realizar una query personalizada JPQL
     Optional<PromocionProjection> findProjectById(Long id);
+
+    @Query("""
+             SELECT p
+                FROM Promocion p
+                WHERE p.restaurante.id = :restauranteId
+            """)
+    List<Promocion> findByRestauranteId(@Param("restauranteId") Long restauranteId);
 }

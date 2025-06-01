@@ -38,8 +38,4 @@ public class Direccion {
 
     @Column(nullable = false, length = 50)
     private String ciudad;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean esTemporal = false;
 }

@@ -9,6 +9,7 @@ import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.PromocionMapper;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
+import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.entity.Promocion;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.repository.PromocionRepository;
@@ -157,5 +158,13 @@ public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionP
 
         // Si existe, eliminamos la promoción usando el deleteById por defecto
         repository.deleteById(id);
+    }
+
+    public List<PromocionResponseDTO> listarPromoPorRestaurante (Long idRestaurante)throws NotFoundException {
+        if(repository.findByRestauranteId(idRestaurante).isEmpty()){
+            throw new NotFoundException("No se encontro el restaurante");
+        }
+        List<Promocion> lista = repository.findByRestauranteId(idRestaurante);
+        return lista.stream().map(PromocionMapper::toDTO).toList();
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
+import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.service.impl.PromocionServiceImpl;
 
@@ -132,4 +133,22 @@ public class PromocionController {
         // Devuelve una respuesta HTTP 200 OK con un mensaje de éxito
         return ResponseEntity.ok().body("Promoción eliminada exitosamente");
     }
+
+    @Operation(summary = "Listar promociones por restaurantes", description = "Recibe un ID y lista las promociones correspondiente") // Anotación para documentar la operación con Swagger
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Promociones listadas exitosamente"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("ListarPromoPorRestaurante/{idRestaurante}")
+    public ResponseEntity<List<PromocionResponseDTO>> listarPromoporRestaurante (@PathVariable
+                                                                                     Long idRestaurante) throws NotFoundException {
+        if(service.listarPromoPorRestaurante(idRestaurante).isEmpty()){
+            throw new NotFoundException("No se encontro el restaurante buscado");
+        }
+        List<PromocionResponseDTO> lista = service.listarPromoPorRestaurante(idRestaurante);
+        return ResponseEntity.ok(lista);
+    }
+
 }

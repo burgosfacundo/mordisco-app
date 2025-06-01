@@ -2,6 +2,7 @@ package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
+import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.entity.Promocion;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 
@@ -24,5 +25,12 @@ public class PromocionMapper {
                 .fechaFin(dto.fechaFin())
                 .restaurante(restaurante)
                 .build();
+    }
+    public static PromocionResponseDTO toDTO (Promocion promocion){
+        return new PromocionResponseDTO(promocion.getId(),
+                promocion.getDescripcion(),
+                promocion.getDescuento(),
+                promocion.getFechaInicio(),
+                promocion.getFechaFin());
     }
 }
