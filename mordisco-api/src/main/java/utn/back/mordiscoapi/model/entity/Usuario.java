@@ -5,13 +5,17 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_usuario_telefono", columnNames = "telefono"),
+                @UniqueConstraint(name = "UK_usuario_email", columnNames = "email")
+})
 @Getter
 @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Builder
 public class Usuario {
-    @Id @GeneratedValue (strategy = GenerationType.IDENTITY) //primary key auto_increments
+    @Id @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column (nullable = false)

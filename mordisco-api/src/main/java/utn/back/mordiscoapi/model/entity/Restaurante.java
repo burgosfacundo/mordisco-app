@@ -7,7 +7,12 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "restaurantes")
+@Table(name = "restaurantes",
+uniqueConstraints = {
+                @UniqueConstraint(name = "UK_restaurante_razon_social", columnNames = "razon_social"),
+                @UniqueConstraint(name = "UK_restaurante_usuario", columnNames = "usuario_id"),
+                @UniqueConstraint(name = "UK_restaurante_imagen", columnNames = "imagen_id")
+})
 @Getter
 @Setter
 @AllArgsConstructor
