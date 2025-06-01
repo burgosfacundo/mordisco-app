@@ -1,0 +1,186 @@
+.input {
+  -webkit-appearance: none;
+  /* remove default */
+  margin: 6px;
+  max-width: 15px;
+  min-width: 15px;
+  max-height: 30px;
+  border-radius: 12px;
+  cursor: pointer;
+  vertical-align: middle;
+  box-shadow: hsla(0, 0%, 100%, 0.15) 0 1px 1px,
+    inset hsla(0, 0%, 0%, 0.5) 0 0 0 1px;
+  background-color: hsla(0, 3%, 66%, 0.2);
+  background-repeat: no-repeat;
+  -webkit-transition: background-position 0.15s cubic-bezier(0.8, 0, 1, 1),
+    -webkit-transform 0.25s cubic-bezier(0.8, 0, 1, 1);
+  outline: none;
+}
+
+.input.yellow {
+  background-image: -webkit-radial-gradient(
+    hsla(50, 100%, 90%, 1) 0%,
+    hsla(50, 100%, 70%, 1) 15%,
+    hsla(50, 100%, 60%, 0.3) 28%,
+    hsla(50, 100%, 30%, 0) 70%
+  );
+}
+
+.input.red {
+  background-image: -webkit-radial-gradient(
+    hsla(0, 100%, 90%, 1) 0%,
+    hsla(0, 100%, 70%, 1) 15%,
+    hsla(0, 100%, 60%, 0.3) 28%,
+    hsla(0, 100%, 30%, 0) 70%
+  );
+}
+
+.input:checked {
+  -webkit-transition: background-position 0.2s 0.15s cubic-bezier(0, 0, 0.2, 1),
+    -webkit-transform 0.25s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.input:active {
+  -webkit-transform: scale(1.5);
+  -webkit-transition: -webkit-transform 0.1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* The up/down direction logic */
+
+.input,
+.input:active {
+  background-position: 24px 0;
+}
+
+.input:checked {
+  background-position: 0 0;
+}
+
+.input:checked ~ .input,
+.input:checked ~ .input:active {
+  background-position: -24px 0;
+}
+
+.title{
+    margin: 2rem 0px 0px 0px;
+}
+
+.containerTotal{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.containerSignUp{
+    background-color: #fffefc;
+    border-radius: 50px;
+    width: 65%;
+    height: 90%;
+}
+
+.containerSection{
+    display: flex;
+    width: 100%;
+    height: 90%;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.divText{
+    display: flex;
+    align-items: center;
+    width: 30%;
+    height: 100%;
+}
+
+.texto{
+    font-family: cursive;
+    font-size: 28px;
+    margin: 0;
+    line-height: 2.8;
+}
+
+.containerForm{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 45%;
+    height: 80%;
+}
+
+.radio-input {
+    display: flex;
+    justify-content: center;
+    width: 50%;
+    gap: 30px; 
+}
+
+.containerRadioButton {
+    display: flex;
+    align-items: center;
+    flex: 1;
+
+    max-width: 200px;
+    height: 2rem;
+}
+
+.formInfo{
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+
+
+label {
+    padding-bottom: 2%;
+}
+
+.input{
+    width: 100%;
+    height: 40%;
+}
+
+input:focus {
+  border-color: #e5b335;
+  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.2);
+  outline: none;
+}
+
+.error{
+    font-size: 12px;
+    color: red;
+}
+
+.containerInput{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 70%;
+    padding-bottom: 0.5rem;
+}
+
+.input-text{
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.cuenta{
+    font-size: 14px;
+    margin: 0;
+    padding-right: 1%;
+}
+
+.register-btn{
+    color: #373737;
+    padding-top: 0.2rem;
+}
+
+.containerRegistro{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+}
