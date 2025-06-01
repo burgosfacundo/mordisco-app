@@ -2,9 +2,7 @@ package utn.back.mordiscoapi.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.CalificacionRestauranteMapper;
 import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionRestauranteDTO;
@@ -13,43 +11,34 @@ import utn.back.mordiscoapi.model.projection.CalificacionRestauranteProjection;
 import utn.back.mordiscoapi.repository.CalificacionRestauranteRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
-import utn.back.mordiscoapi.service.CrudService;
+import utn.back.mordiscoapi.service.interf.ICalificacionRestaurante;
 
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CalificacionRestauranteImpl implements CrudService<CalificacionRestauranteDTO, CalificacionRestauranteProjection, Long> {
+public class CalificacionRestauranteImpl implements ICalificacionRestaurante {
     private final CalificacionRestauranteRepository repository;
     private final RestauranteRepository restauranteRepository;
     private final UsuarioRepository usuarioRepository;
 
     /**
-     * Guarda una calificacion de restaurante.
-     * @param dto DTO de la calificacion a guardar.
-     * @throws BadRequestException si hay un error al guardar la calificacion.
+     * Guarda una calificación de restaurante.
+     * @param dto DTO de la calificación a guardar.
+     * @throws NotFoundException si el restaurante o el usuario no existen.
      */
     @Override
-    public void save(CalificacionRestauranteDTO dto) throws BadRequestException, NotFoundException {
-        if (dto.fechaHora().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("La fecha de inicio no puede ser anterior a la fecha actual");
-        }
-        if(restauranteRepository.findById(dto.restauranteId()).isEmpty()){
+    public void save(CalificacionRestauranteDTO dto) throws  NotFoundException {
+        if(!restauranteRepository.existsById(dto.restauranteId())){
             throw new NotFoundException("El id del restaurante no existe");
         }
-        if(usuarioRepository.findById(dto.usuarioId()).isEmpty()){
+        if(!usuarioRepository.existsById(dto.calificacionDTO().idUsuario())){
             throw new NotFoundException("El id del usuario no existe");
         }
-        try{
-            CalificacionRestaurante calificacionRestaurante = CalificacionRestauranteMapper.toCalificacionRestaurante(dto);
-            repository.save(calificacionRestaurante);
-        }catch (DataIntegrityViolationException e) {
-            log.error(e.getMessage());
-            throw new BadRequestException("Error al guardar la calificacion de restaurante");
-        }
+
+        CalificacionRestaurante calificacionRestaurante = CalificacionRestauranteMapper.toCalificacionRestaurante(dto);
+        repository.save(calificacionRestaurante);
     }
 
     /**
@@ -61,15 +50,10 @@ public class CalificacionRestauranteImpl implements CrudService<CalificacionRest
         return  repository.findAllProjection();
     }
 
-    @Override
-    public CalificacionRestauranteProjection findById(Long Long) throws NotFoundException {
-        return null;
-    }
-
     /**
-     * Elimina un calificacion por id
-     * @param aLong id de la calificacion que se desea borrar
-     * @throws NotFoundException si no encuentra la calificacion que se desea borrar
+     * Elimina una calificación por ID
+     * @param aLong id de la calificación que se desea borrar
+     * @throws NotFoundException si no encuentra la calificación que se desea borrar
      */
     @Override
     public void delete(Long aLong) throws NotFoundException {
