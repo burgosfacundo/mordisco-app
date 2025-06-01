@@ -1,46 +1,52 @@
 package utn.back.mordiscoapi.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.mapper.DireccionMapper;
+import utn.back.mordiscoapi.mapper.ImagenMapper;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
-import utn.back.mordiscoapi.model.dto.restaurante.RestauranteDTO;
-import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseListarDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
-import utn.back.mordiscoapi.service.CrudService;
+import utn.back.mordiscoapi.service.interf.IRestauranteService;
+
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RestauranteServiceImpl implements CrudService<RestauranteDTO, RestauranteResponseListarDTO, Long> {
+public class RestauranteServiceImpl implements IRestauranteService {
     private final RestauranteRepository restauranteRepository;
     private final UsuarioRepository usuarioRepository;
 
+    /**
+     * Guarda un nuevo restaurante en la base de datos.
+     *
+     * @param restauranteCreateDTO DTO que contiene los detalles del restaurante a guardar.
+     */
+    @Transactional
     @Override
-    public void save(RestauranteDTO restauranteDTO) throws BadRequestException {
-        try{
-            Restaurante restaurante = RestauranteMapper.toEntity(restauranteDTO);
-            restauranteRepository.save(restaurante);
-        }catch (DataIntegrityViolationException e){
-            log.error(e.getMessage());
-            throw new BadRequestException("Error al guardar restaurante");
-        }
+    public void save(RestauranteCreateDTO restauranteCreateDTO) {
+        Restaurante restaurante = RestauranteMapper.toEntity(restauranteCreateDTO);
+        restauranteRepository.save(restaurante);
     }
 
+    /**
+     * Busca un restaurante por su ID.
+     *
+     * @param id del restaurante a buscar.
+     * @return RestauranteResponseDTO con los detalles del restaurante encontrado.
+     * @throws NotFoundException si no se encuentra el restaurante con el ID proporcionado.
+     */
     @Override
-    public List<RestauranteResponseListarDTO> findAll() {
-        List<Restaurante> restaurantes = restauranteRepository.findAll();
-        return restaurantes.stream().map(RestauranteMapper::toDTO).toList();
-    }
-
-    @Override
-    public RestauranteResponseListarDTO findById(Long id) throws NotFoundException {
+    public RestauranteResponseDTO findById(Long id) throws NotFoundException {
         Restaurante rest = restauranteRepository.findRestauranteById(id).orElseThrow(
                 () -> new NotFoundException("Restaurante no encontrada"));
 
@@ -48,12 +54,22 @@ public class RestauranteServiceImpl implements CrudService<RestauranteDTO, Resta
 
 
     }
-    public RestauranteResponseListarDTO findProjectByDuenio (Long idUsuario) throws NotFoundException, BadRequestException {
+
+    /**
+     * Busca un restaurante por el ID del usuario que lo posee.
+     *
+     * @param idUsuario ID del usuario dueño del restaurante.
+     * @return RestauranteResponseDTO con los detalles del restaurante encontrado.
+     * @throws NotFoundException si el usuario no existe.
+     * @throws BadRequestException si el usuario no tiene un restaurante asociado.
+     */
+    @Override
+    public RestauranteResponseDTO findByIdUsuario(Long idUsuario) throws NotFoundException, BadRequestException {
         if(!usuarioRepository.existsById(idUsuario)){
                 throw new NotFoundException("el usuario no fue encontrado!");
         }
 
-        var exist = restauranteRepository.findByDuenio(idUsuario);
+        var exist = restauranteRepository.findByIdUsuario(idUsuario);
         if(exist.isEmpty()){
             throw new BadRequestException("El dueño buscado no tiene ningun restaurante");
         }
@@ -61,6 +77,94 @@ public class RestauranteServiceImpl implements CrudService<RestauranteDTO, Resta
         return RestauranteMapper.toDTO(exist.get());
     }
 
+    /**
+     * Lista todos los restaurantes.
+     *
+     * @return Lista de RestauranteResponseDTO con todos los restaurantes.
+     */
+    @Override
+    public List<RestauranteResponseDTO> getAll() {
+        return restauranteRepository.findAllRestaurante().stream()
+                .map(RestauranteMapper::toDTO)
+                .toList();
+    }
+
+    /**
+     * Lista los restaurantes por su estado (activo o inactivo).
+     *
+     * @param estado Estado del restaurante (true para activo, false para inactivo).
+     * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por estado.
+     */
+    @Override
+    public List<RestauranteResponseDTO> getAllByEstado(Boolean estado){
+        return restauranteRepository.findAllByEstado(estado).stream()
+                .map(RestauranteMapper::toDTO)
+                .toList();
+    }
+
+    /**
+     * Lista los restaurantes por ciudad.
+     *
+     * @param ciudad Ciudad donde se encuentran los restaurantes.
+     * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por ciudad.
+     */
+    @Override
+    public List<RestauranteResponseDTO> getAllByCiudad(String ciudad){
+        return restauranteRepository.findAllByCiudad(ciudad).stream()
+                .map(RestauranteMapper::toDTO)
+                .toList();
+    }
+
+    /**
+     * Lista los restaurantes por nombre.
+     *
+     * @param nombre Nombre del restaurante a buscar.
+     * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por nombre.
+     */
+    @Override
+    public List<RestauranteResponseDTO> getAllByNombre(String nombre) {
+        return restauranteRepository.findAllByNombre(nombre).stream()
+                .map(RestauranteMapper::toDTO)
+                .toList();
+    }
+
+    /**
+     * Lista los restaurantes que tienen una promoción activa.
+     * @return Lista de RestauranteResponseDTO con los restaurantes que tienen una promoción activa.
+     */
+    @Override
+    public List<RestauranteResponseDTO> getAllByPromocionActiva() {
+        return restauranteRepository.findAllWithPromocionActiva().stream()
+                .map(RestauranteMapper::toDTO)
+                .toList();
+    }
+
+    /**
+     * Actualiza un restaurante existente.
+     *
+     * @param dto DTO que contiene los nuevos detalles del restaurante.
+     * @throws NotFoundException si el restaurante a actualizar no se encuentra.
+     */
+    @Transactional
+    @Override
+    public void update(RestauranteUpdateDTO dto) throws NotFoundException {
+        var restaurante = restauranteRepository.findRestauranteById(dto.id())
+                .orElseThrow(() -> new NotFoundException("El restaurante a actualizar no fue encontrado"));
+
+        restaurante.setActivo(dto.activo());
+        restaurante.setRazonSocial(dto.razonSocial());
+        restaurante.setImagen(ImagenMapper.toEntity(dto.logo()));
+        restaurante.setDireccion(DireccionMapper.toEntity(dto.direccion()));
+
+        restauranteRepository.save(restaurante);
+    }
+    /**
+     * Elimina un restaurante por su ID.
+     *
+     * @param id del restaurante a eliminar.
+     * @throws NotFoundException si no se encuentra el restaurante con el ID proporcionado.
+     */
+    @Transactional
     @Override
     public void delete(Long id) throws NotFoundException {
         if(!restauranteRepository.existsById(id)){
@@ -68,29 +172,4 @@ public class RestauranteServiceImpl implements CrudService<RestauranteDTO, Resta
         }
         restauranteRepository.deleteById(id);
     }
-    public List<RestauranteResponseListarDTO> listarTodos() throws NotFoundException {
-        if (restauranteRepository.findAllRestaurantes().isEmpty()){
-            throw new NotFoundException("No hay restaurantes en la lista");
-        }
-        List<Restaurante> list = restauranteRepository.findAllRestaurantes();
-        return list.stream().map(RestauranteMapper::toDTO).toList();
-    }
-    public List<RestauranteResponseListarDTO> listarPorEstado(Boolean estado) throws NotFoundException{
-        if(restauranteRepository.findAllActivosOno(estado).isEmpty()){
-            throw new NotFoundException("No se encontraron restaurantes en ese estado");
-        }
-        List<Restaurante> listaAcrtivosOnO = restauranteRepository.findAllActivosOno(estado);
-        return listaAcrtivosOnO.stream().map(RestauranteMapper::toDTO).toList();
-    }
-
-    public List<RestauranteResponseListarDTO> listarPorCiudad(String ciudad) throws NotFoundException {
-        if (restauranteRepository.findAllByCiudad(ciudad).isEmpty()){
-            throw new NotFoundException("No se encontro un restaurante en esa ciudad");
-        }
-        List<Restaurante> listaPorCiudad = restauranteRepository.findAllByCiudad(ciudad);
-        return listaPorCiudad.stream().map(RestauranteMapper::toDTO).toList();
-    }
-
-
-
 }

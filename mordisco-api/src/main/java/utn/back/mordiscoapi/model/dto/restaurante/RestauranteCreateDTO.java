@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import utn.back.mordiscoapi.model.dto.direccion.DireccionDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenRequestDTO;
 
-public record RestauranteDTO(
+public record RestauranteCreateDTO(
                             @Size(message = "La razón social del restaurante debe tener máximo 50 caracteres", max = 50)
                             @NotBlank(message = "La razón social del restaurante es obligatoria")
                             @Schema(description = "Razón social del restaurante", example = "Mc Donald's")

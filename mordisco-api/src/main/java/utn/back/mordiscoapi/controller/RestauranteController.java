@@ -10,8 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.restaurante.RestauranteDTO;
-import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseListarDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
 import utn.back.mordiscoapi.service.impl.RestauranteServiceImpl;
 
 import java.util.List;
@@ -22,12 +23,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RestauranteController {
     private final RestauranteServiceImpl restauranteService;
-
-
     /**
      * Función para obtener un restaurante por su ID.
      * @param id del restaurante a buscar.
-     * @return Respuesta HTTP con la proyección del restaurante encontrado.
+     * @return Respuesta HTTP con el DTO del restaurante encontrado.
      * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
      */
     @Operation(summary = "Obtener un restaurante por ID", description = "Recibe un ID y devuelve el restaurante correspondiente") // Anotación para documentar la operación con Swagger
@@ -37,55 +36,33 @@ public class RestauranteController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     }) // Anotación para documentar las posibles respuestas
-    @GetMapping("/buscar/{id}") // Anotación para indicar que esta función maneja las peticiones GET a la ruta /{id}
-    public ResponseEntity<RestauranteResponseListarDTO> findById(@PathVariable // Anotación para indicar que este parámetro se obtiene de la ruta
-                                                        Long id) throws NotFoundException {
+    @GetMapping("/{id}") // Anotación para indicar que esta función maneja las peticiones GET a la ruta /{id}
+    public ResponseEntity<RestauranteResponseDTO> findById(@PathVariable Long id) throws NotFoundException {
         // Llama al servicio para obtener una promoción por su ID
         // Devuelve una respuesta HTTP 200 OK con la promoción encontrada
         return ResponseEntity.ok(restauranteService.findById(id));
     }
     /**
-    * Función para obtener restaurante por su duenio.
-    * @param idUsuario del duenio de los restaurantes a buscar.
-    * @return Respuesta HTTP con la proyección de los restaurante encontrado.
+    * Función para obtener restaurante por su dueño.
+    * @param idUsuario del usuario con rol de dueño del restaurante a buscar.
+    * @return Respuesta HTTP con el DTO del restaurante encontrado.
     * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
     */
-    @Operation(summary = "Obtener restaurantes por ID del duenio", description = "Recibe un ID del duenio y devuelve los restaurantes correspondiente") // Anotación para documentar la operación con Swagger
+    @Operation(summary = "Obtener restaurantes por ID del dueño", description = "Recibe un ID del usuario con rol de dueño y devuelve los restaurantes correspondiente") // Anotación para documentar la operación con Swagger
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Devuelve los restaurantes correspondientes"),
-            @ApiResponse(responseCode = "404", description = "No se encontró el duenio con el ID proporcionado"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el usuario con rol de dueño con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     }) // Anotación para documentar las posibles respuestas
     @GetMapping("/usuario/{idUsuario}") // Anotación para indicar que esta función maneja las peticiones GET a la ruta /{idU}
-    public ResponseEntity<RestauranteResponseListarDTO> findByDuenio(@PathVariable // Anotación para indicar que este parámetro se obtiene de la ruta
-                                            Long idUsuario) throws NotFoundException, BadRequestException {
-    return ResponseEntity.ok(restauranteService.findProjectByDuenio(idUsuario));
-}
-    /**
-     * Función para eliminar restaurante por su id.
-     *
-     * @param id del restaurante  a eliminar.
-     * @return Respuesta HTTP con la proyección de los restaurante eliminado.
-     * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
-     */
-    @Operation(summary = "Eliminar restaurante por ID", description = "Recibe un id de un restaurante y lo borra")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Elimina el restaurante correspondiente"),
-            @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable // Anotación para indicar que este parámetro se obtiene de la ruta
-                                                          Long id) throws NotFoundException{
-        restauranteService.delete(id);
-        return ResponseEntity.ok("El restaurante se borro exitosamente!");
+    public ResponseEntity<RestauranteResponseDTO> findByUsuario(@PathVariable Long idUsuario) throws NotFoundException, BadRequestException {
+    return ResponseEntity.ok(restauranteService.findByIdUsuario(idUsuario));
     }
+
     /**
      * Función para crear restaurante.
-     * @return Respuesta HTTP con la proyección de los restaurante creado con exito.
-     * @throws NotFoundException Si ocurre un error a la hora de crear un restaurante.
+     * @return Respuesta HTTP con un mensaje de éxito.
      */
     @Operation(summary = "Crear un restaurante nuevo", description = "Recibe un restaurante y lo guarda en la base de datos")
     @ApiResponses(value = {
@@ -96,50 +73,122 @@ public class RestauranteController {
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody
                                        @Valid
-                                       RestauranteDTO dto) throws BadRequestException {
+                                       RestauranteCreateDTO dto) {
         restauranteService.save(dto);
         return ResponseEntity.ok("Restaurante guardado correctamente");
     }
 
     /**
      * Función para listar restaurantes.
-     * @return Respuesta HTTP con la proyección de los restaurante eliminado.
-     * @throws BadRequestException, NotFoundException Si ocurre un error.
+     * @return Respuesta HTTP con una lista de DTO de restaurantes.
      */
     @Operation(summary = "Listar restaurantes", description = "Lista los restaurantes de la base de datos")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Restaurantes listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping("/listarRestaurantes")
-    public ResponseEntity<List<RestauranteResponseListarDTO>>  listarTodos () throws BadRequestException, NotFoundException {
-        return ResponseEntity.ok(restauranteService.listarTodos());
+    @GetMapping
+    public ResponseEntity<List<RestauranteResponseDTO>> findAll() {
+        return ResponseEntity.ok(restauranteService.getAll());
     }
+
     /**
-        * Función para listar restaurantes.
-        * @return Respuesta HTTP con la proyección de los restaurante eliminado.
-         * @throws NotFoundException Si ocurre un error.
+        * Función para listar restaurantes por estado.
+        * @param estado Estado del restaurante (activo/inactivo) a filtrar.
+        * @return Respuesta HTTP con una lista de DTO de restaurantes.
      */
-    @Operation(summary = "Listar restaurantes por estado",description = "Lista los restaurantes segun su estado")
+    @Operation(summary = "Listar restaurantes por estado",description = "Lista los restaurantes según su estado")
     @ApiResponses (value = {
             @ApiResponse(responseCode = "200",description = "Restaurantes listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping("/listarByEstado/{estadoRestaurante}")
-    public ResponseEntity<List<RestauranteResponseListarDTO>> listarPorEstado(
-            @PathVariable Boolean estadoRestaurante) throws NotFoundException {
-        List<RestauranteResponseListarDTO> lista = restauranteService.listarPorEstado(estadoRestaurante);
+    @GetMapping("/estado")
+    public ResponseEntity<List<RestauranteResponseDTO>> getAllByEstado(@RequestParam Boolean estado) {
+        List<RestauranteResponseDTO> lista = restauranteService.getAllByEstado(estado);
         return ResponseEntity.ok(lista);
     }
-    @Operation(summary = "Listar restaurantes por ciudad",description = "Lista los restaurantes segun su ciudad")
+
+    /**
+     * Función para listar restaurantes por ciudad.
+     * @param ciudad Ciudad en la que se encuentran los restaurantes a filtrar.
+     * @return Respuesta HTTP con una lista de DTO de restaurantes.
+     */
+    @Operation(summary = "Listar restaurantes por ciudad",description = "Lista los restaurantes según su ciudad")
     @ApiResponses (value = {
             @ApiResponse(responseCode = "200",description = "Restaurantes listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping("/listarPorCiudad/")
-    public ResponseEntity<List<RestauranteResponseListarDTO>> listarPorCiudad(@RequestParam
-                                                                        String ciudad) throws NotFoundException {
-        List<RestauranteResponseListarDTO> lista = restauranteService.listarPorCiudad(ciudad);
-        return ResponseEntity.ok(lista);
+    @GetMapping("/ciudad")
+    public ResponseEntity<List<RestauranteResponseDTO>> getAllByCiudad(@RequestParam String ciudad) {
+        return ResponseEntity.ok(restauranteService.getAllByCiudad(ciudad));
+    }
+
+    /**
+     * Función para listar restaurantes por nombre.
+     * @param nombre Nombre del restaurante a filtrar.
+     * @return Respuesta HTTP con una lista de DTO de restaurantes.
+     */
+    @Operation(summary = "Listar restaurantes por nombre",description = "Lista los restaurantes según su nombre")
+    @ApiResponses (value = {
+            @ApiResponse(responseCode = "200",description = "Restaurantes listados exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/nombre")
+    public ResponseEntity<List<RestauranteResponseDTO>> getAllByNombre(@RequestParam String nombre) {
+        return ResponseEntity.ok(restauranteService.getAllByNombre(nombre));
+    }
+
+    /**
+     * Función para listar restaurantes con promociones activas.
+     * @return Respuesta HTTP con una lista de DTO de restaurantes con promociones activas.
+     */
+    @Operation(summary = "Listar restaurantes con promociones activas", description = "Lista los restaurantes que tienen una promoción activa")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Restaurantes con promociones activas listados exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/promocion")
+    public ResponseEntity<List<RestauranteResponseDTO>> getAllByPromocionActiva() {
+        return ResponseEntity.ok(restauranteService.getAllByPromocionActiva());
+    }
+
+    /**
+     * Función para actualizar un restaurante.
+     *
+     * @param dto DTO con los datos actualizados del restaurante.
+     * @return Respuesta HTTP con un mensaje de éxito.
+     * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
+     */
+    @Operation(summary = "Actualizar restaurante", description = "Recibe un DTO de restaurante y lo actualiza en la base de datos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Actualiza el restaurante correspondiente"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PutMapping("/update")
+    public ResponseEntity<String> update(@RequestBody @Valid RestauranteUpdateDTO dto) throws NotFoundException {
+        restauranteService.update(dto);
+        return ResponseEntity.ok("El restaurante se actualizo exitosamente");
+    }
+
+    /**
+     * Función para eliminar restaurante por su id.
+     *
+     * @param id del restaurante a eliminar.
+     * @return Respuesta HTTP con un mensaje de éxito.
+     * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
+     */
+    @Operation(summary = "Eliminar restaurante por ID", description = "Recibe un id de un restaurante y lo borra")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Elimina el restaurante correspondiente"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException{
+        restauranteService.delete(id);
+        return ResponseEntity.ok("El restaurante se borro exitosamente!");
     }
 }

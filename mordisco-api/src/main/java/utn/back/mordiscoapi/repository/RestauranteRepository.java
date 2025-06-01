@@ -35,7 +35,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN  r.direccion
                 WHERE r.usuario.id = :usuarioId
             """)
-    Optional<Restaurante> findByDuenio(@Param("usuarioId") Long usuarioId);
+    Optional<Restaurante> findByIdUsuario(@Param("usuarioId") Long usuarioId);
 
 
     @Query("""
@@ -47,7 +47,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN  r.calificaciones
                 LEFT JOIN  r.direccion
             """)
-    List<Restaurante> findAllRestaurantes();
+    List<Restaurante> findAllRestaurante();
 
     @Query ("""
                 SELECT DISTINCT r
@@ -59,7 +59,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN  r.direccion
                 WHERE r.activo = :estadoRestaurante
             """)
-    List<Restaurante> findAllActivosOno(@Param("estadoRestaurante") Boolean estadoRestaurante);
+    List<Restaurante> findAllByEstado(@Param("estadoRestaurante") Boolean estadoRestaurante);
 
     @Query("""
             SELECT DISTINCT r
@@ -71,6 +71,29 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             LEFT JOIN  r.direccion
             WHERE r.direccion.ciudad = :ciudad
             """)
-    List<Restaurante> findAllByCiudad(@Param("ciudad")String ciudad);
+    List<Restaurante> findAllByCiudad(@Param("ciudad") String ciudad);
 
+    @Query("""
+            SELECT DISTINCT r
+            FROM Restaurante r
+            LEFT JOIN  r.imagen
+            LEFT JOIN  r.promociones
+            LEFT JOIN  r.horariosAtencion
+            LEFT JOIN  r.calificaciones
+            LEFT JOIN  r.direccion
+            WHERE r.razonSocial LIKE %:nombre%
+            """)
+    List<Restaurante> findAllByNombre(@Param("nombre") String nombre);
+
+    @Query("""
+                SELECT DISTINCT r
+                FROM Restaurante r
+                LEFT JOIN r.imagen
+                LEFT JOIN r.promociones p
+                LEFT JOIN r.horariosAtencion
+                LEFT JOIN r.calificaciones
+                LEFT JOIN r.direccion
+                WHERE p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE
+                """)
+        List<Restaurante> findAllWithPromocionActiva();
 }
