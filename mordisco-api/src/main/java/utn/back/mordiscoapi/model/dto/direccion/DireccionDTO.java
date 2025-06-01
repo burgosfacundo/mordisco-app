@@ -36,8 +36,5 @@ public record DireccionDTO(
     @Size(message = "La ciudad no puede contener mas de 50 caracteres", max = 50)
     @NotBlank(message = "La ciudad es obligatoria")
     @Schema(description = "Ciudad de la dirección", example = "Mar del Plata")
-    String ciudad,
-    @NotNull(message = "Hay que aclarar si es temporal o no")
-    @Schema(description = "La direccion es temporal", example = "true")
-    Boolean esTemporal
+    String ciudad
 ) {}
