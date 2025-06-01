@@ -21,12 +21,14 @@ public class Pedido {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TipoEntrega tipoEntrega;
 
     @Column(nullable = false)
     private LocalDateTime fechaHora;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private EstadoPedido estado;
 
     @Column(nullable = false)

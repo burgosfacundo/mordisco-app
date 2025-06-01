@@ -27,5 +27,9 @@ public record PromocionDTO(
         LocalDate fechaInicio,
         @NotNull(message = "La fecha de fin de la promoción es obligatoria")
         @Schema(description = "Fecha de fin de la promoción", example = "2023-10-31")
-        LocalDate fechaFin) {
-}
+        LocalDate fechaFin,
+        @NotNull(message = "El ID del restaurante es obligatorio")
+        @Positive(message = "El ID del restaurante debe ser positivo")
+        @Schema(description = "ID del restaurante al que pertenece la promoción", example = "1")
+        Long restauranteId
+        ) { }

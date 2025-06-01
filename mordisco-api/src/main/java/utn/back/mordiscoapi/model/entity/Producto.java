@@ -34,9 +34,6 @@ public class Producto {
     @Column (nullable = false)
     private Boolean disponible;
 
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CalificacionProducto> calificaciones;
-
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "imagen_id", referencedColumnName = "id", unique = true)
     private Imagen imagen;

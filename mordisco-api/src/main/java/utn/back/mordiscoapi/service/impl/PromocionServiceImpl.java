@@ -13,6 +13,7 @@ import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.entity.Promocion;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.repository.PromocionRepository;
+import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.service.CrudService;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import java.util.List;
 public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionProjection,Long> {
     // Inyección de dependencias de PromocionRepository a través del constructor de lombok @RequiredArgsConstructor
     private final PromocionRepository repository;
+    private final RestauranteRepository restauranteRepository;
 
     /**
      * Guarda una promoción.
@@ -47,9 +49,14 @@ public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionP
             // Guardar la entidad en la base de datos
             repository.save(promocion);
         } catch (DataIntegrityViolationException e) {
-            // Manejar la excepción si hay un error de integridad de datos
             log.error(e.getMessage());
-            throw new BadRequestException("Error al guardar la promoción");
+            String mensaje = "Error al guardar la promoción";
+            if (e.getMessage() != null && e.getMessage().contains("restaurante_id")) {
+                mensaje = "El restaurante asociado no existe o es inválido";
+            } else if (e.getMessage() != null && e.getMessage().contains("UNIQUE")) {
+                mensaje = "Ya existe una promoción con los mismos datos únicos";
+            }
+            throw new BadRequestException(mensaje);
         }
     }
 
@@ -108,19 +115,30 @@ public class PromocionServiceImpl implements CrudService<PromocionDTO,PromocionP
             throw new BadRequestException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
 
+        // Verificamos si el restaurante existe usando el findById por defecto
+        // Si no existe, lanzamos una excepción BadRequestException
+        var restaurante = restauranteRepository.findById(dto.restauranteId())
+                .orElseThrow(() -> new BadRequestException("El restaurante asociado no existe"));
+
         try {
             // Actualizar los campos de la promoción
             promocion.setDescripcion(dto.descripcion());
             promocion.setDescuento(dto.descuento());
             promocion.setFechaInicio(dto.fechaInicio());
             promocion.setFechaFin(dto.fechaFin());
+            promocion.setRestaurante(restaurante);
 
             // Guardamos la promoción actualizada
             repository.save(promocion);
         } catch (DataIntegrityViolationException e) {
-            // Manejar la excepción si hay un error de integridad de datos
             log.error(e.getMessage());
-            throw new BadRequestException("Error al actualizar la promoción");
+            String mensaje = "Error al guardar la promoción";
+            if (e.getMessage() != null && e.getMessage().contains("restaurante_id")) {
+                mensaje = "El restaurante asociado no existe o es inválido";
+            } else if (e.getMessage() != null && e.getMessage().contains("UNIQUE")) {
+                mensaje = "Ya existe una promoción con los mismos datos únicos";
+            }
+            throw new BadRequestException(mensaje);
         }
     }
 
