@@ -14,6 +14,7 @@ public class HorarioAtencion {
     @Id @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DayOfWeek dia;
 
