@@ -1,0 +1,198 @@
+package utn.back.mordiscoapi.exception;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Manejador global de excepciones para la aplicación.
+ * Proporciona respuestas consistentes para diferentes tipos de errores.
+ */
+@RestControllerAdvice // Anotación que indica que esta clase es un manejador de excepciones global
+@Slf4j // Anotación de Lombok para el registro de logs
+public class GlobalExceptionHandler {
+
+
+    /**
+     * Maneja excepciones generales no capturadas.
+     *
+     * @param ex la excepción capturada
+     * @return una respuesta con un mensaje de error genérico y estado HTTP 500
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    public Map<String, String> handleGeneralException(Exception ex) {
+        log.error("Unexpected error: {}", ex.getMessage(), ex);
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Ocurrió un error inesperado");
+        errorResponse.put("message", ex.getMessage());
+        return errorResponse;
+    }
+
+
+
+    /**
+     * Maneja violaciones de integridad de datos, como claves únicas duplicadas.
+     *
+     * @param ex la excepción de violación de integridad de datos
+     * @return una respuesta con un mensaje de error y estado HTTP 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public Map<String, String> handleDataException(DataIntegrityViolationException ex) {
+        log.warn("Data integrity violation: {}", ex.getMessage());
+        Map<String, String> errorResponse = new HashMap<>();
+
+        errorResponse.put("error", "Integridad de datos violada");
+        errorResponse.put("message", ex.getMessage());
+
+        return errorResponse;
+    }
+
+    /**
+     * Maneja errores de validación en los parámetros en funciones de los controladores.
+     *
+     * @param ex la excepción de validación de la funciones del manejador
+     * @return una respuesta con los errores de validación y estado HTTP 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public Map<String, String> handleHandlerMethodValidation(HandlerMethodValidationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        String field = "error";
+        for (var error : ex.getAllErrors()) {
+            String message = error.getDefaultMessage();
+            errors.put(field, message);
+        }
+        return errors;
+    }
+
+    /**
+     * Maneja validaciones fallidas en los DTOs.
+     *
+     * @param ex la excepción de validación de argumentos de la función
+     * @return una respuesta con los errores de validación y estado HTTP 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
+
+    /**
+     * Maneja solicitudes JSON malformadas.
+     *
+     * @param ex la excepción de mensaje HTTP no legible
+     * @return una respuesta con un mensaje de error y estado HTTP 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Map<String, String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "JSON malformado");
+        errors.put("message", ex.getMessage());
+        return errors;
+    }
+
+    /**
+     * Maneja excepciones de recursos no encontrados.
+     *
+     * @param ex la excepción de recurso no encontrado
+     * @return una respuesta con un mensaje de error y estado HTTP 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NoResourceFoundException.class)
+    public Map<String, String> handleNoResourceFoundException(NoResourceFoundException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "No existe el recurso");
+        errors.put("message", ex.getMessage());
+        return errors;
+    }
+
+    /**
+     * Maneja métodos HTTP no soportados.
+     *
+     * @param ex la excepción de función no soportado
+     * @return una respuesta con un mensaje de error y estado HTTP 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public Map<String, String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "Método no soportado");
+        errors.put("message", ex.getMessage());
+        return errors;
+    }
+
+
+
+    /**
+     * Maneja parámetros faltantes en la solicitud.
+     *
+     * @param ex la excepción de parámetro de solicitud faltante
+     * @return una respuesta con un mensaje de error y estado HTTP 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public Map<String, String> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "Parámetro faltante");
+        errors.put("message", ex.getMessage());
+        return errors;
+    }
+
+    /**
+     * Maneja la excepción personalizada BadRequestException.
+     *
+     * @param e la excepción capturada
+     * @return una respuesta con el mensaje de error y estado HTTP 400
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    public String badRequest(BadRequestException e) {
+        return e.getMessage();
+    }
+
+    /**
+     * Maneja la excepción personalizada InternalServerErrorException.
+     *
+     * @param e la excepción capturada
+     * @return una respuesta con el mensaje de error y estado HTTP 500
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(InternalServerErrorException.class)
+    public String internalServerError(InternalServerErrorException e) {
+        return e.getMessage();
+    }
+
+    /**
+     * Maneja la excepción personalizada NotFoundException.
+     *
+     * @param e la excepción capturada
+     * @return una respuesta con el mensaje de error y estado HTTP 404
+     */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({NotFoundException.class})
+    public String notFound(NotFoundException e) {
+        return e.getMessage();
+    }
+}
