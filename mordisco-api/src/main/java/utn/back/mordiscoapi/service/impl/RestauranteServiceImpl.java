@@ -38,6 +38,7 @@ public class RestauranteServiceImpl implements IRestauranteService {
     @Override
     public void save(RestauranteCreateDTO restauranteCreateDTO) {
         Restaurante restaurante = RestauranteMapper.toEntity(restauranteCreateDTO);
+        restaurante.setActivo(false);
         restauranteRepository.save(restaurante);
     }
 

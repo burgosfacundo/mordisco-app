@@ -33,10 +33,9 @@ public class RestauranteMapper {
                 .build();
         return Restaurante.builder()
                 .razonSocial(dto.razonSocial())
-                .activo(dto.activo())
-                .imagen(imagen) //preguntar
-                .usuario(usuario) //preguntar
-                .direccion(direccion) //preguntar
+                .imagen(imagen)
+                .usuario(usuario)
+                .direccion(direccion)
                 .build();
     }
 

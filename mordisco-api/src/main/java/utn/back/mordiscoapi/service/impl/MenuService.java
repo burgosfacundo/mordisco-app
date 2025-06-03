@@ -83,6 +83,7 @@ public class MenuService implements IMenuService {
         menu.getProductos().clear();
         menu.getProductos().addAll(productos);
         if (dto.id() == null) {
+            restaurante.setActivo(true);
             restaurante.setMenu(menu);
             restauranteRepository.save(restaurante); // guarda all: restaurante -> menú -> productos
         } else {
@@ -123,6 +124,7 @@ public class MenuService implements IMenuService {
                 .orElseThrow(() -> new NotFoundException("Restaurante no encontrado"));
         Menu menu = restaurante.getMenu();
         restaurante.setMenu(null);
+        restaurante.setActivo(false);
         restauranteRepository.save(restaurante);
         if (menu != null) {
             menuRepository.deleteById(menu.getId());
