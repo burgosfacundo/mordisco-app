@@ -3,7 +3,6 @@ package utn.back.mordiscoapi.service.impl;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
@@ -42,21 +41,10 @@ public class PromocionServiceImpl implements IPromocionService {
             throw new BadRequestException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
 
-        try {
-            // Mapeo la DTO a la entidad
-            Promocion promocion = PromocionMapper.toEntity(dto);
-            // Guardar la entidad en la base de datos
-            repository.save(promocion);
-        } catch (DataIntegrityViolationException e) {
-            log.error(e.getMessage());
-            String mensaje = "Error al guardar la promoción";
-            if (e.getMessage() != null && e.getMessage().contains("restaurante_id")) {
-                mensaje = "El restaurante asociado no existe o es inválido";
-            } else if (e.getMessage() != null && e.getMessage().contains("UNIQUE")) {
-                mensaje = "Ya existe una promoción con los mismos datos únicos";
-            }
-            throw new BadRequestException(mensaje);
-        }
+        // Mapeo la DTO a la entidad
+        Promocion promocion = PromocionMapper.toEntity(dto);
+        // Guardar la entidad en la base de datos
+        repository.save(promocion);
     }
 
     /**
