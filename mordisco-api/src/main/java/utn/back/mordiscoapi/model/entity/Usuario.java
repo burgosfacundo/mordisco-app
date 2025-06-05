@@ -9,9 +9,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.List;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_usuario_telefono", columnNames = "telefono"),
+                @UniqueConstraint(name = "UK_usuario_email", columnNames = "email")
+})
 @Getter
 @Setter
 @AllArgsConstructor @NoArgsConstructor
@@ -29,7 +34,11 @@ public class Usuario  implements UserDetails {
     private String email;
     @Column (nullable = false)
     private String password;
-    //Relacion a Direcciones
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private List<Direccion> direcciones;
+
     @ManyToOne
     @JoinColumn(name = "rol_id",nullable = false)
     private Rol rol;
@@ -65,4 +74,11 @@ public class Usuario  implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Restaurante restaurante;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CalificacionRestaurante> calificacionesRestaurante;
+
 }
