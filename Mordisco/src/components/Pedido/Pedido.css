@@ -1,10 +1,10 @@
 .input {
   -webkit-appearance: none;
-  /* remove default */
   margin: 6px;
   max-width: 15px;
   min-width: 15px;
-  max-height: 30px;
+  min-height: 15px;
+  max-height: 15px;
   border-radius: 12px;
   cursor: pointer;
   vertical-align: middle;
@@ -59,55 +59,6 @@
   background-position: -24px 0;
 }
 
-.title{
-    margin: 2rem 0px 0px 0px;
-}
-
-.containerTotal{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.containerSignUp{
-    background-color: #fffefc;
-    border-radius: 50px;
-    width: 65%;
-    height: 90%;
-}
-
-.containerSection{
-    display: flex;
-    width: 100%;
-    height: 90%;
-    justify-content: space-evenly;
-    align-items: center;
-}
-
-.divText{
-    display: flex;
-    align-items: center;
-    width: 30%;
-    height: 100%;
-}
-
-.texto{
-    font-family: cursive;
-    font-size: 28px;
-    margin: 0;
-    line-height: 2.8;
-}
-
-.containerForm{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    width: 45%;
-    height: 80%;
-}
-
 .radio-input {
     display: flex;
     justify-content: center;
@@ -124,61 +75,64 @@
     height: 2rem;
 }
 
-.formInfo{
-    display: flex;
-    justify-content: space-evenly;
+.pedido-container {
+  padding: 1rem;
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.containerTotal{
     width: 100%;
+    height: 100%;
 }
 
-
-
-label {
-    padding-bottom: 2%;
-}
-
-.input{
+.containerInfo{
     width: 100%;
-    height: 40%;
-}
-
-input:focus {
-  border-color: #e5b335;
-  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.2);
-  outline: none;
-}
-
-.error{
-    font-size: 12px;
-    color: red;
-}
-
-.containerInput{
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 70%;
-    padding-bottom: 0.5rem;
 }
 
-.input-text{
+
+.productos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); 
+  gap: 1rem;
+}
+
+.producto-item {
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.cuenta{
-    font-size: 14px;
-    margin: 0;
-    padding-right: 1%;
+.producto-nombre {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }
 
-.register-btn{
-    color: #373737;
-    padding-top: 0.2rem;
+.contador {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.containerRegistro{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    justify-content: center;
+.contador button {
+  padding: 0.4rem 0.8rem;
+  font-size: 1rem;
+  border: none;
+  background-color: #ca6262;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
 }
+
+.contador span {
+  min-width: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+

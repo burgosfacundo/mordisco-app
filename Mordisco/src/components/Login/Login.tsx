@@ -2,55 +2,110 @@ import "./Login.css"
 import { Formik, Form, Field } from 'formik' ;       
 import * as Yup from 'yup' ;    
 import { Link } from 'react-router'; 
+import { useApi } from "../../hooks/useFetch";
+import { login } from "../../interceptors/axios/useApi";
+import { useNavigate } from "react-router-dom";
+import * as jwt_decode from "jwt-decode";
+
+interface LoginParams{
+    email: string,
+    password: string
+}
+
+interface TokenPayload {
+        role: {
+            id: number;
+            nombre: string;
+        };
+    }
+
+    interface UserLoginResponse {
+    jwt: string
+}
 
 const Login = () => {
+
+    const navigate = useNavigate();
+
+    const fetch = async (params: LoginParams): Promise<UserLoginResponse> => {
+        const { call } = login(params);
+        const response = await call;
+        return response.data;
+    };
+
     const SignupSchema = Yup.object().shape({
         email: Yup.string().email('email mal ingresado').required('Obligatorio'),
         password: Yup.string().required('Obligatorio')
-        });
+    });
 
     return (
         <section className='containerTotal'>
-            <div className='containerLogin'>
-                <h1>Login</h1>
-                    <Formik
-                    initialValues={{
-                        email: '',
-                        password: ''
-                    }}
-                    validationSchema={SignupSchema}
-                    onSubmit={values => {
-                        // same shape as initial values
-                        console.log(values);
-                    }}
-                    >
-                    {({ errors, touched }) => (
-                        <Form className='containerForm'>
-                            <div className='containerInput'>
-                                <label>Email*</label>
-                                <Field name="email" type="email" className="input" />
-                                {errors.email && touched.email ? <div className="error">{errors.email}</div> : null}
-                            </div>
-                            
-                            <div className='containerInput'>
-                                <label>Contraseña*</label>
-                                <Field name="password" className="input"/>
-                                {errors.password && touched.password ? <div className="error">{errors.password}</div> : null}
-                            </div>
-                            
-                        
-                            <button type="submit" className="btn btn-danger">Iniciar Sesión</button>
+        <div className='containerLogin'>
+            <h1>Login</h1>
+            <Formik
+            initialValues={{ email: '', password: '' }}
+            validationSchema={SignupSchema}
+            onSubmit={async (values, { setSubmitting }) => {
+                try {
+                    const result = await fetch({ email: values.email, password: values.password });
+                    
+                    if (result.jwt) {
+                    localStorage.setItem("token", result.jwt);
+                    const decoded = jwt_decode.jwtDecode<TokenPayload>(result.jwt);
+                    
+                    switch (decoded.role.id) {
+                        case 2:
+                        navigate("/dashboardUser");
+                        break;
+                        case 1:
+                        navigate("/dashboard");
+                        break;
+                        case 3:
+                        navigate("/homeLocales");
+                        break;
+                        default:
+                        navigate("/login");
+                        break;
+                    }
+                    } else {
+                    alert("Login incorrecto");
+                    }
+                } catch (error) {
+                    alert("Error en el login");
+                } finally {
+                    setSubmitting(false);
+                }
+                }}
 
-                            <div className="containerRegistro">
-                                <p className="cuenta">¿No tienes una cuenta?</p>
-                                <Link to='' className='register-btn'>Haz click para registrarte</Link>
-                            </div>
-                        </Form>
-                    )}
-                    </Formik>
-            </div>
+            >
+            {({ errors, touched, isSubmitting }) => (
+                <Form className='containerForm'>
+                <div className='containerInput'>
+                    <label>Email*</label>
+                    <Field name="email" type="email" className="inputLogin" />
+                    {errors.email && touched.email ? <div className="error">{errors.email}</div> : null}
+                </div>
+
+                <div className='containerInput'>
+                    <label>Contraseña*</label>
+                    <Field name="password" type="password" className="inputLogin" />
+                    {errors.password && touched.password ? <div className="error">{errors.password}</div> : null}
+                </div>
+
+                <button type="submit" className="btn btn-danger" disabled={isSubmitting}>
+                    {isSubmitting ? "Ingresando..." : "Iniciar Sesión"}
+                </button>
+
+                <div className="containerRegistro">
+                    <p className="cuenta">¿No tienes una cuenta?</p>
+                    <Link to="/registro" className='register-btn'>Haz click para registrarte</Link>
+                </div>
+                </Form>
+            )}
+            </Formik>
+        </div>
         </section>
-    )
-}
+    );
+};
 
-export default Login
+export default Login;

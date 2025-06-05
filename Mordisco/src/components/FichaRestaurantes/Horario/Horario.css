@@ -1,0 +1,10 @@
+.containerHorario{
+    display: flex;
+    width: 30%;
+    height:120px;
+    flex-direction: column;
+
+    border: 1px solid #ccc;
+    border-radius: 8px; 
+
+}
