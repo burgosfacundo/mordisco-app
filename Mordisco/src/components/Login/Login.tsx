@@ -2,7 +2,6 @@ import "./Login.css"
 import { Formik, Form, Field } from 'formik' ;       
 import * as Yup from 'yup' ;    
 import { Link } from 'react-router'; 
-import { useApi } from "../../hooks/useFetch";
 import { login } from "../../interceptors/axios/useApi";
 import { useNavigate } from "react-router-dom";
 import * as jwt_decode from "jwt-decode";
@@ -58,7 +57,7 @@ const Login = () => {
                         navigate("/dashboardUser");
                         break;
                         case 1:
-                        navigate("/dashboard");
+                        navigate("/dashboardUser");
                         break;
                         case 3:
                         navigate("/homeLocales");
@@ -79,14 +78,14 @@ const Login = () => {
 
             >
             {({ errors, touched, isSubmitting }) => (
-                <Form className='containerForm'>
-                <div className='containerInput'>
+                <Form className='containerForm-login'>
+                <div className='containerInput-login'>
                     <label>Email*</label>
                     <Field name="email" type="email" className="inputLogin" />
                     {errors.email && touched.email ? <div className="error">{errors.email}</div> : null}
                 </div>
 
-                <div className='containerInput'>
+                <div className='containerInput-login'>
                     <label>Contraseña*</label>
                     <Field name="password" type="password" className="inputLogin" />
                     {errors.password && touched.password ? <div className="error">{errors.password}</div> : null}
@@ -98,7 +97,7 @@ const Login = () => {
 
                 <div className="containerRegistro">
                     <p className="cuenta">¿No tienes una cuenta?</p>
-                    <Link to="/registro" className='register-btn'>Haz click para registrarte</Link>
+                    <Link to="/signUp" className='register-btn'>Haz click para registrarte</Link>
                 </div>
                 </Form>
             )}

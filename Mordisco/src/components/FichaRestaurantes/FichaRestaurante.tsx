@@ -29,7 +29,7 @@ const FichaRestaurante = () => {
 
     const navigate = useNavigate();
 
-    const handlePedidoClick = () => {
+    const handlePedidoClick = (restaurante:RestauranteResponse) => {
         if (restaurante && data) {
             navigate(`/pedido/${restaurante.id}`, { state: { restaurante, menu: data } });
         }
@@ -41,7 +41,7 @@ const FichaRestaurante = () => {
     if (!restaurante) return <p>Cargando restaurante...</p>;
 
     return (
-        <div className='containerTotal'>
+        <div className='containerTotal-ficha'>
             <div className="containerRestaurant">
                 <div className='containerWithFoto'>
                     <img src={restaurante.logo.url} className='imgRestaurant'/>

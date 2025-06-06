@@ -31,7 +31,7 @@ const Pedido = () => {
 
     console.log(menu)
     return (
-        <div className='containerTotal'>
+        <div className='containerTotal-resgistro'>
             <div className='containerInfo'>
                 <h4>Pedido en <strong>{restaurante.razonSocial}</strong></h4>
             

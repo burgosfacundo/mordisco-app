@@ -3,9 +3,29 @@ import './SignUp.css'
 import { Formik, Form, Field } from 'formik' ;       
 import * as Yup from 'yup' ;   
 import { Link } from 'react-router'; 
+import { useNavigate } from "react-router-dom";
+import { signUp } from '../../interceptors/axios/useApi';
+
+interface SignUpParams{
+    nombre:string,
+    apellido:string,
+    telefono: string,
+    email: string,
+    password: string,
+    rolId:number
+}
 
 const SignUp = () => {
         const [rol, setRol] = useState<number>(1);
+
+            const navigate = useNavigate();
+        
+            const fetch = async (params: SignUpParams): Promise<string> => {
+                const { call } = signUp(params);
+                const response = await call;
+                return response.data;
+            };
+
         const SignupSchema = Yup.object().shape({
             nombre: Yup.string().max(50, 'El nombre debe tener maximo 50 caracteres').required('Obligatorio'),
             apellido: Yup.string().max(50, 'El apellido debe tener maximo 50 caracteres').required('Obligatorio'),
@@ -29,9 +49,21 @@ const SignUp = () => {
                         rol: 1
                     }}
                     validationSchema={SignupSchema}
-                    onSubmit={values => {
-                        console.log('Valores enviados:', values);
-                    }}
+                                onSubmit={async (values, { setSubmitting }) => {
+                                    try {
+                                        const result = await fetch({ nombre: values.nombre, apellido: values.apellido, telefono: values.telefono, email: values.email, password: values.password, rolId: values.rol });
+
+                                        if (result) {
+                                            navigate("/login");
+                                        } else {
+                                        alert("Login incorrecto");
+                                        }
+                                    } catch (error) {
+                                        alert("Error en el login");
+                                    } finally {
+                                        setSubmitting(false);
+                                    }
+                                    }}
                     >
                     {({ errors, touched, setFieldValue, values }) => (
                         <section className='containerSection'>
@@ -42,7 +74,7 @@ const SignUp = () => {
                         
                         <Form className='containerForm'>
 
-                            <div className="radio-input">
+                            <div className="radio-input-signUp">
                                 <div className='containerRadioButton'>
                                     <label>Usuario</label>
                                     <input className="input yellow" type="radio" name="rol" value={1} checked={values.rol === 1}
@@ -100,7 +132,7 @@ const SignUp = () => {
 
                             <div className="containerRegistro">
                                 <p className="cuenta">¿Ya tenes una cuenta?</p>
-                                <Link to='' className='register-btn'>Haz click para volver atras</Link>
+                                <Link to='/login' className='register-btn'>Haz click para volver atras</Link>
                             </div>
                         </Form>
                         </section>
