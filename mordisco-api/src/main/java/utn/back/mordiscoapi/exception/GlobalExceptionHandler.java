@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
@@ -46,6 +48,11 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public String handleBadCredentials(BadCredentialsException ex) {
+        return "Credenciales inválidas: " + ex.getMessage();
+    }
 
 
     /**
@@ -102,6 +109,32 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
+        return errors;
+    }
+
+    /**
+     * Maneja errores de conversión de tipos de argumentos, especialmente para enumeraciones.
+     *
+     * @param ex la excepción de tipo de argumento no coincidente
+     * @return una respuesta con un mensaje de error y estado HTTP 400
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleEnumConversionError(MethodArgumentTypeMismatchException ex) {
+        Map<String, String> errors = new HashMap<>();
+        if (ex.getRequiredType() != null && ex.getRequiredType().isEnum()) {
+            Object[] enumConstants = ex.getRequiredType().getEnumConstants();
+            StringBuilder valores = new StringBuilder();
+            for (int i = 0; i < enumConstants.length; i++) {
+                valores.append(enumConstants[i]);
+                if (i < enumConstants.length - 1) valores.append(", ");
+            }
+            errors.put("error", "Valor de enumeración no válido");
+            errors.put("message", "El valor '" + ex.getValue() + "' no es válido para el parámetro '" + ex.getName() + "'. Valores permitidos: " + valores);
+            return errors;
+        }
+        errors.put("error", "Tipo de argumento no válido");
+        errors.put("message", ex.getMessage());
         return errors;
     }
 

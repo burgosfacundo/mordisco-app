@@ -21,7 +21,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class MenuService implements IMenuService {
+public class MenuServiceImpl implements IMenuService {
     private final MenuRepository menuRepository;
     private final RestauranteRepository restauranteRepository;
     private final ProductoRepository productoRepository;
@@ -83,7 +83,7 @@ public class MenuService implements IMenuService {
         menu.getProductos().clear();
         menu.getProductos().addAll(productos);
         if (dto.id() == null) {
-            restaurante.setActivo(true);
+            restaurante.setActivo(!productos.isEmpty());
             restaurante.setMenu(menu);
             restauranteRepository.save(restaurante); // guarda all: restaurante -> menú -> productos
         } else {

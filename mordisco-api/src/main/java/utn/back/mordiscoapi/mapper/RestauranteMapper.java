@@ -1,6 +1,7 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
+import utn.back.mordiscoapi.model.dto.pedido.RestaurantePedidoDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
@@ -39,6 +40,11 @@ public class RestauranteMapper {
                 .build();
     }
 
+    /**
+     * Convierte una entidad de restaurante a un DTO de respuesta de restaurante.
+     * @param r la entidad de restaurante a convertir
+     * @return el DTO de respuesta de restaurante con los datos de la entidad
+     */
     public static RestauranteResponseDTO toDTO (Restaurante r){
         var imagen = ImagenMapper.toDTO(r.getImagen());
         var direccion = DireccionMapper.toDTO(r.getDireccion());
@@ -54,5 +60,19 @@ public class RestauranteMapper {
                 r.getCalificaciones().stream().map(CalificacionRestauranteMapper::toDTO).toList(),
                 direccion
                 );
+    }
+
+    /**
+     * Convierte una entidad de restaurante a un DTO de respuesta de restaurante para pedidos.
+     * @param r la entidad de restaurante a convertir
+     * @return el DTO de respuesta de restaurante para pedidos con los datos de la entidad
+     */
+    public static RestaurantePedidoDTO toRestaurantePedidoDTO(Restaurante r) {
+        return new RestaurantePedidoDTO(
+                r.getId(),
+                r.getRazonSocial(),
+                DireccionMapper.toDTO(r.getDireccion()),
+                ImagenMapper.toDTO(r.getImagen())
+        );
     }
 }

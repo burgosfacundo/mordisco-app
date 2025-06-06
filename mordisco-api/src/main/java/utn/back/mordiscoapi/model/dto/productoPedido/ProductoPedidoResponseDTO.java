@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 
-public record ProductoPedidoDTOResponse(
+public record ProductoPedidoResponseDTO(
         @Schema(description = "ID del producto_pedido", example = "3")
         Long id,
         @Schema(description = "Cantidad del producto deseada", example = "5")
@@ -13,7 +13,7 @@ public record ProductoPedidoDTOResponse(
         BigDecimal precioUnitario,
         @Schema(description = "ID del producto", example = "1")
         Long idProducto,
-        @Schema(description = "ID del pedido", example = "2")
-        Long idPedido
+        @Schema(description = "Nombre del producto", example = "Hamburguesa con queso")
+        String nombreProducto
         ) {
         }

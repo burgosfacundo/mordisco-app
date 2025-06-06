@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.PromocionMapper;
-import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
+import utn.back.mordiscoapi.model.dto.promocion.PromocionRequestDTO;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.entity.Promocion;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
@@ -31,7 +31,7 @@ public class PromocionServiceImpl implements IPromocionService {
      * @param dto DTO de la promoción a guardar.
      */
     @Override
-    public void save(PromocionDTO dto) throws BadRequestException {
+    public void save(PromocionRequestDTO dto) throws BadRequestException {
         if (dto.fechaInicio().isBefore(LocalDate.now())) {
             // Si la fecha de inicio es anterior a la fecha actual, lanzamos una excepción BadRequestException
             throw new BadRequestException("La fecha de inicio no puede ser anterior a la fecha actual");
@@ -84,7 +84,7 @@ public class PromocionServiceImpl implements IPromocionService {
      * @throws BadRequestException si hay un error al actualizar la promoción.
      */
     @Override
-    public void update(Long id, PromocionDTO dto) throws NotFoundException,BadRequestException {
+    public void update(Long id, PromocionRequestDTO dto) throws NotFoundException,BadRequestException {
         // Manejo de Optional
         // Obtenemos Optional<Promocion> usando el findById por defecto
         // Si no existe, lanzamos una excepción NotFoundException
@@ -143,11 +143,11 @@ public class PromocionServiceImpl implements IPromocionService {
      * @throws NotFoundException si el restaurante no se encuentra.
      */
     @Override
-    public List<PromocionResponseDTO> listarPromoPorRestaurante (Long idRestaurante)throws NotFoundException {
-        if(repository.findByRestauranteId(idRestaurante).isEmpty()){
-            throw new NotFoundException("No se encontro el restaurante");
+    public List<PromocionResponseDTO> listarPromoPorRestaurante (Long idRestaurante) throws NotFoundException {
+        if (!restauranteRepository.existsById(idRestaurante)) {
+            throw new NotFoundException("Restaurante no encontrado");
         }
-        List<Promocion> lista = repository.findByRestauranteId(idRestaurante);
-        return lista.stream().map(PromocionMapper::toDTO).toList();
+        return repository.findByRestauranteId(idRestaurante).stream()
+                .map(PromocionMapper::toDTO).toList();
     }
 }

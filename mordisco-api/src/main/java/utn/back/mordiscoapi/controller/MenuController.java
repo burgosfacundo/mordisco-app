@@ -6,13 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.menu.MenuDTO;
-import utn.back.mordiscoapi.service.impl.MenuService;
+import utn.back.mordiscoapi.service.impl.MenuServiceImpl;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/menu")
 @RestController
 public class MenuController {
-    private final MenuService menuService;
+    private final MenuServiceImpl menuService;
 
     @PostMapping("/crear/{restauranteId}")
     public ResponseEntity<String> save(@PathVariable Long restauranteId, @RequestBody @Valid MenuDTO dto) throws NotFoundException {

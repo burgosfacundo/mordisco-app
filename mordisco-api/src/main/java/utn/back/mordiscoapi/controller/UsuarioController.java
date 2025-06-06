@@ -8,15 +8,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
-import utn.back.mordiscoapi.model.projection.UsuarioProjection;
 import utn.back.mordiscoapi.security.jwt.JwtUtil;
 import utn.back.mordiscoapi.security.jwt.model.AuthenticationRequest;
 import utn.back.mordiscoapi.security.jwt.model.AuthenticationResponse;
@@ -37,7 +35,7 @@ public class UsuarioController {
      * Función para guardar un nuevo usuario.
      * @param dto Objeto DTO que contiene los datos del usuario a crear.
      * @return Respuesta HTTP con un mensaje de éxito.
-     * @throws BadRequestException Si hay un error en los datos proporcionados.
+     * @throws NotFoundException Si no se encuentra el rol del usuario.
      */
     @Operation(summary = "Crear un usuario nuevo", description = "Recibe un usuario y lo guarda en la base de datos")
     @ApiResponses(value = {
@@ -48,7 +46,7 @@ public class UsuarioController {
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody
                                        @Valid
-                                       UsuarioDTO dto) throws BadRequestException {
+                                       UsuarioDTO dto) throws NotFoundException {
         service.save(dto);
         return ResponseEntity.ok("Usuario guardado correctamente");
     }
@@ -64,7 +62,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping
-    public ResponseEntity<List<UsuarioProjection>> findAll() {
+    public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
@@ -82,7 +80,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioProjection> findById(@PathVariable
+    public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable
                                                         Long id) throws NotFoundException {
         return ResponseEntity.ok(service.findById(id));
     }
@@ -93,7 +91,6 @@ public class UsuarioController {
      * @param dto Objeto DTO que contiene los nuevos datos del usuario.
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
-     * @throws BadRequestException Si hay un error en los datos proporcionados.
      */
     @Operation(summary = "Actualizar un usuario", description = "Recibe un ID y un usuario y actualiza el usuario correspondiente")
     @ApiResponses(value = {
@@ -107,7 +104,7 @@ public class UsuarioController {
                                          Long id,
                                          @RequestBody
                                          @Valid
-                                         UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
+                                         UsuarioUpdateDTO dto) throws NotFoundException {
         service.update(id,dto);
         return ResponseEntity.ok().body("Usuario actualizado exitosamente");
     }
@@ -139,7 +136,6 @@ public class UsuarioController {
      * @param newPassword contraseña nueva del usuario
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
-     * @throws BadRequestException Si hay un error en los datos proporcionados.
      */
     @Operation(summary = "Actualizar la contraseña de un usuario", description = "Recibe un ID, la vieja contraseña y la nueva contraseña y actualiza el usuario correspondiente")
     @ApiResponses(value = {
@@ -150,10 +146,13 @@ public class UsuarioController {
     })
     @PutMapping("/password/{id}")
     public ResponseEntity<String> changePassword(
-                                         @PathVariable Long id,
-                                         @RequestBody @Valid
+                                         @Valid
+                                         @PathVariable
+                                         Long id,
+                                         @RequestParam
                                          String oldPassword,
-                                         String newPassword) throws NotFoundException, BadRequestException {
+                                         @RequestParam
+                                         String newPassword) throws NotFoundException {
         service.changePassword(oldPassword,newPassword,id);
         return ResponseEntity.ok().body("Contraseña actualizada exitosamente");
     }
@@ -162,32 +161,30 @@ public class UsuarioController {
      * Función para obtener todos los usuarios por IDROL.
      * @param id del rol a buscar.
      * @return Respuesta HTTP con una lista de proyecciones de usuarios.
+     * @throws NotFoundException Si no se encuentra el rol con el ID proporcionado.
      */
     @Operation(summary = "Obtener todos los usuarios por rol", description = "Devuelve una lista con todos los usuarios")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Promoción creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el rol con el ID proporcionado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/rol/{id}")
-    public ResponseEntity<List<UsuarioProjection>> findAllByRol(
+    public ResponseEntity<List<UsuarioResponseDTO>> findByRolId(
                                                             @PathVariable
                                                             Long id
-    ) {
-        return ResponseEntity.ok(service.findByProjectRol(id));
+    ) throws NotFoundException {
+        return ResponseEntity.ok(service.findByRolId(id));
     }
 
     /**
-     * Función para logearme.
+     * Función para loguearme.
      * @return Devuelve un token.
      */
     @PostMapping("/login")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception{
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.email(), authenticationRequest.password()));
-        }catch (BadCredentialsException e) {
-            throw new Exception("Incorrect", e);
-        }
+    public ResponseEntity<AuthenticationResponse> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest){
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.email(), authenticationRequest.password()));
         final UserDetails userDetails = service.loadUserByUsername(authenticationRequest.email());
         final String jwt = jwtUtil.generateToken(userDetails);
 
