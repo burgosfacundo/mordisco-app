@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.pedido.PedidoDTORequest;
-import utn.back.mordiscoapi.model.projection.PedidoProjection;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.service.impl.PedidoServiceImpl;
 
 import java.util.List;
@@ -28,18 +28,18 @@ public class PedidoController {
      * Función para guardar un nuevo pedido.
      * @param dto Objeto DTO que contiene los datos del pedido a crear.
      * @return Respuesta HTTP con un mensaje de éxito.
-     * @throws BadRequestException Si hay un error en los datos proporcionados.
+     * @throws NotFoundException Si el restaurante, producto o la dirección no existen,
      */
     @Operation(summary = "Crear un pedido nuevo", description = "Recibe un pedido y lo guarda en la base de datos")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Pedido creado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "404", description = "Si el restaurante, producto o la dirección no existen"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody
                                        @Valid
-                                       PedidoDTORequest dto) throws BadRequestException {
+                                       PedidoRequestDTO dto) throws NotFoundException {
         pedidoService.save(dto);
         return ResponseEntity.ok().body("Pedido creado exitosamente");
     }
@@ -55,7 +55,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping
-    public ResponseEntity<List<PedidoProjection>> findAll() {
+    public ResponseEntity<List<PedidoResponseDTO>> findAll() {
         return ResponseEntity.ok(pedidoService.findAll());
     }
 
@@ -73,7 +73,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoProjection> findById(@PathVariable
+    public ResponseEntity<PedidoResponseDTO> findById(@PathVariable
                                                       Long id) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findById(id));
     }
@@ -92,8 +92,8 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/restaurante/{id}")
-    public ResponseEntity<List<PedidoProjection>> findAllCompleteByRestaurante(@PathVariable Long id) throws NotFoundException {
-        return ResponseEntity.ok(pedidoService.findAllCompleteByRestaurante(id));
+    public ResponseEntity<List<PedidoResponseDTO>> findAllByRestaurante_Id(@PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllByRestaurante_Id(id));
     }
 
     /**
@@ -133,11 +133,9 @@ public class PedidoController {
     })
     @PutMapping("/state/{id}")
     public ResponseEntity<String> changeState(
-            @RequestBody
-            @Valid
             @PathVariable
             Long id,
-            EstadoPedido nuevoEstado) throws NotFoundException, BadRequestException {
+            @RequestParam EstadoPedido nuevoEstado) throws NotFoundException, BadRequestException {
         pedidoService.changeState(id,nuevoEstado);
         return ResponseEntity.ok().body("Pedido actualizado exitosamente");
     }
@@ -152,13 +150,14 @@ public class PedidoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Pedidos encontrados exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el cliente con el ID proporcionado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
 
-    @GetMapping("/findByClientAndState/{id}/{estado}")
-    public ResponseEntity<List<PedidoProjection>> findAllXClientesXEstado(@PathVariable Long id,
-                                                                          @PathVariable  EstadoPedido estado) throws NotFoundException {
-        return ResponseEntity.ok(pedidoService.findAllXClientesXEstado(id, estado));
+    @GetMapping("/cliente/{id}/state")
+    public ResponseEntity<List<PedidoResponseDTO>> findAllByCliente_IdAndEstado(@PathVariable Long id,
+                                                                          @RequestParam EstadoPedido estado) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllByCliente_IdAndEstado(id, estado));
     }
 
     /**
@@ -173,9 +172,9 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
 
-    @GetMapping("/findByClient/{id}")
-    public ResponseEntity<List<PedidoProjection>> findAllXClientes(@PathVariable Long id) throws NotFoundException {
-        return ResponseEntity.ok(pedidoService.findAllXClientes(id));
+    @GetMapping("/cliente/{id}")
+    public ResponseEntity<List<PedidoResponseDTO>> findAllByCliente_Id(@PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllByCliente_Id(id));
     }
 
     /**
@@ -188,33 +187,14 @@ public class PedidoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Pedidos encontrados exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
 
-    @GetMapping("/findByRestauranteAndState/{id}/{estado}")
-    public ResponseEntity<List<PedidoProjection>> findAllXRestauranteXEstado(@PathVariable Long id,
-                                                                             @PathVariable EstadoPedido estado) throws NotFoundException {
-        return ResponseEntity.ok(pedidoService.findAllXRestauranteXEstado(id, estado));
+    @GetMapping("/restaurante/{id}/state")
+    public ResponseEntity<List<PedidoResponseDTO>> findAllByRestaurante_IdAndEstado(@PathVariable Long id,
+                                                                                    @RequestParam EstadoPedido estado) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllByRestaurante_IdAndEstado(id, estado));
     }
-
-    /**
-     * Función para obtener cantidad de pedidos de un restaurante por estado.
-     * @param id del restaurante a buscar.
-     * @param estado del pedido a buscar.
-     * @return Respuesta HTTP con la cantidad de pedidos.
-     */
-    @Operation(summary = "Obtener la cantidad de pedidos de un restaurante por estado", description = "Devuelve una Optional con la cantidad de pedidos del restaurante por estado")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Pedidos encontrados exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-
-    @GetMapping("/cantidadPedidosXEstado/{id}/{estado}")
-    public  ResponseEntity<Long> cantidadPedidosXEstado(@PathVariable Long id,
-                                                                  @PathVariable EstadoPedido estado) throws NotFoundException {
-        return ResponseEntity.ok(pedidoService.cantidadPedidosXEstado(id, estado));
-    }
-
 }
 

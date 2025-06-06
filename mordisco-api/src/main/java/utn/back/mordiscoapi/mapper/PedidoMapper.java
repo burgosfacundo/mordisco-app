@@ -1,10 +1,12 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
-import utn.back.mordiscoapi.model.dto.pedido.PedidoDTORequest;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
 
 import java.util.List;
+
 @UtilityClass
 public class PedidoMapper {
     /**
@@ -12,7 +14,7 @@ public class PedidoMapper {
      * @param dto el DTORequest de pedido a convertir
      * @return la entidad de pedido con los datos del DTORequest
      */
-    public static Pedido toEntity(PedidoDTORequest dto) {
+    public static Pedido toEntity(PedidoRequestDTO dto) {
         Usuario cliente = Usuario.builder()
                 .id(dto.idCliente()).build();
 
@@ -24,7 +26,7 @@ public class PedidoMapper {
 
         List<ProductoPedido> lista = dto.productos().stream().map(productoPedidoDTO -> {
             Producto producto = Producto.builder()
-                    .id(productoPedidoDTO.producto_id())
+                    .id(productoPedidoDTO.productoId())
                     .build();
 
             return ProductoPedido.builder()
@@ -42,4 +44,27 @@ public class PedidoMapper {
                 .build();
     }
 
+    /**
+     * Convierte una entidad de pedido a un DTOResponse de pedido.
+     * @param pedido la entidad de pedido a convertir
+     * @return el DTOResponse de pedido con los datos de la entidad
+     */
+    public static PedidoResponseDTO toDTO(Pedido pedido) {
+        var usuario = UsuarioMapper.toUsuarioPedidoDTO(pedido.getCliente());
+        var restaurante = RestauranteMapper.toRestaurantePedidoDTO(pedido.getRestaurante());
+        var productos = pedido.getItems().stream()
+                .map(ProductoPedidoMapper::toDTO)
+                .toList();
+        var direccionEntrega = DireccionMapper.toDTO(pedido.getDireccionEntrega());
+        return new PedidoResponseDTO(pedido.getId(),
+                usuario,
+                restaurante,
+                productos,
+                pedido.getTipoEntrega(),
+                pedido.getEstado(),
+                pedido.getFechaHora(),
+                pedido.getTotal(),
+                direccionEntrega
+                );
+    }
 }
