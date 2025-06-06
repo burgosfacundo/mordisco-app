@@ -1,5 +1,6 @@
 package utn.back.mordiscoapi.exception;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Manejador global de excepciones para la aplicación.
@@ -23,8 +25,10 @@ import java.util.Map;
  */
 @RestControllerAdvice // Anotación que indica que esta clase es un manejador de excepciones global
 @Slf4j // Anotación de Lombok para el registro de logs
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
+    private final ConstraintViolationMessageResolver messageResolver;
 
     /**
      * Maneja excepciones generales no capturadas.
@@ -42,22 +46,27 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
+
+
     /**
      * Maneja violaciones de integridad de datos, como claves únicas duplicadas.
      *
      * @param ex la excepción de violación de integridad de datos
      * @return una respuesta con un mensaje de error y estado HTTP 400
      */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public Map<String, String> handleDataException(DataIntegrityViolationException ex) {
-        log.warn("Data integrity violation: {}", ex.getMessage());
-        Map<String, String> errorResponse = new HashMap<>();
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        String rootMessage = Optional.ofNullable(ex.getRootCause())
+                .map(Throwable::getMessage)
+                .orElse("");
 
-        errorResponse.put("error", "Integridad de datos violada");
-        errorResponse.put("message", ex.getMessage());
+        String userMessage = messageResolver.resolveMessage(rootMessage);
 
-        return errorResponse;
+        return Map.of(
+                "error", "Violación de integridad de datos",
+                "message", userMessage
+        );
     }
 
     /**

@@ -2,7 +2,7 @@ package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import utn.back.mordiscoapi.model.dto.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioDTO;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
 
