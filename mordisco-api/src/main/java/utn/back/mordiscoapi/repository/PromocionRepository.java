@@ -41,8 +41,8 @@ public interface PromocionRepository extends JpaRepository<Promocion,Long> {
 
     @Query("""
              SELECT p
-                FROM Promocion p
-                WHERE p.restaurante.id = :restauranteId
+             FROM Promocion p
+             WHERE p.restaurante.id = :restauranteId
             """)
     List<Promocion> findByRestauranteId(@Param("restauranteId") Long restauranteId);
 }

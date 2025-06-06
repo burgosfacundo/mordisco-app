@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 // Data Transfer Object(DTO) para la entidad Promoción
-public record PromocionDTO(
+public record PromocionRequestDTO(
         // Anotación de Spring Validation que valida tamaño para el campo descripción
         @Size(message = "La descripción de la promoción debe tener máximo 255 caracteres", max = 255)
         @NotNull(message = "La descripción de la promoción es obligatoria")

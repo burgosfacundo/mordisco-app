@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.promocion.PromocionDTO;
+import utn.back.mordiscoapi.model.dto.promocion.PromocionRequestDTO;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.service.impl.PromocionServiceImpl;
@@ -40,7 +40,7 @@ public class PromocionController {
     @PostMapping("/save") // Anotación para indicar que esta función maneja las peticiones POST a la ruta /save
     public ResponseEntity<String> save(@RequestBody // Anotación para indicar que el cuerpo de la petición(JSON) se mapea a este parámetro
                                        @Valid // Anotación para validar el objeto DTO según las restricciones definidas en la clase DTO
-                                       PromocionDTO dto) throws BadRequestException {
+                                       PromocionRequestDTO dto) throws BadRequestException {
         // Llama al servicio para guardar la promoción
         service.save(dto);
         // Devuelve una respuesta HTTP 200 OK con un mensaje de éxito
@@ -105,7 +105,7 @@ public class PromocionController {
                                          Long id,
                                         @RequestBody // Anotación para indicar que el cuerpo de la petición(JSON) se mapea a este parámetro
                                         @Valid // Anotación para validar el objeto DTO según las restricciones definidas en la clase DTO
-                                        PromocionDTO dto) throws NotFoundException, BadRequestException {
+                                         PromocionRequestDTO dto) throws NotFoundException, BadRequestException {
         // Llama al servicio para actualizar la promoción
         service.update(id,dto);
         // Devuelve una respuesta HTTP 200 OK con un mensaje de éxito
@@ -141,14 +141,10 @@ public class PromocionController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping("ListarPromoPorRestaurante/{idRestaurante}")
-    public ResponseEntity<List<PromocionResponseDTO>> listarPromoporRestaurante (@PathVariable
+    @GetMapping("restaurante/{idRestaurante}")
+    public ResponseEntity<List<PromocionResponseDTO>> listarPromoByIdRestaurante (@PathVariable
                                                                                      Long idRestaurante) throws NotFoundException {
-        if(service.listarPromoPorRestaurante(idRestaurante).isEmpty()){
-            throw new NotFoundException("No se encontro el restaurante buscado");
-        }
-        List<PromocionResponseDTO> lista = service.listarPromoPorRestaurante(idRestaurante);
-        return ResponseEntity.ok(lista);
+        return ResponseEntity.ok(service.listarPromoPorRestaurante(idRestaurante));
     }
 
 }
