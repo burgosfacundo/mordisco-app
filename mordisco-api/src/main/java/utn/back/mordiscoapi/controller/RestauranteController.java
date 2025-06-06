@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
@@ -88,6 +89,7 @@ public class RestauranteController {
             @ApiResponse(responseCode = "200",description = "Restaurantes listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping
     public ResponseEntity<List<RestauranteResponseDTO>> findAll() {
         return ResponseEntity.ok(restauranteService.getAll());

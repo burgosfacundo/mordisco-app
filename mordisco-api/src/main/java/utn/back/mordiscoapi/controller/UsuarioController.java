@@ -150,10 +150,8 @@ public class UsuarioController {
     })
     @PutMapping("/password/{id}")
     public ResponseEntity<String> changePassword(
-                                         @RequestBody
-                                         @Valid
-                                         @PathVariable
-                                         Long id,
+                                         @PathVariable Long id,
+                                         @RequestBody @Valid
                                          String oldPassword,
                                          String newPassword) throws NotFoundException, BadRequestException {
         service.changePassword(oldPassword,newPassword,id);
