@@ -18,7 +18,7 @@ import java.util.List;
 
 @Tag(name = "CalificacionRestaurante", description = "Operaciones relacionadas con las calificaciones de los restaurantes")
 @RestController
-@RequestMapping("/api/calificacionRestaurante")
+@RequestMapping("/api/calificacion")
 @RequiredArgsConstructor
 public class CalificacionRestauranteController {
     private final CalificacionRestauranteImpl service;
@@ -29,9 +29,9 @@ public class CalificacionRestauranteController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws BadRequestException Si hay un error en los datos proporcionados.
      */
-    @Operation(summary = "Crear una calificacion restaurante nueva", description = "Recibe una calificacion restaurante y la guarda en la base de datos")
+    @Operation(summary = "Crear una calificación restaurante nueva", description = "Recibe una calificacion restaurante y la guarda en la base de datos")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Calificacion restaurante creada exitosamente"),
+            @ApiResponse(responseCode = "200",description = "Calificación restaurante creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
             @ApiResponse(responseCode = "404", description = "Id no encontrado")
@@ -41,7 +41,7 @@ public class CalificacionRestauranteController {
                                        @Valid
                                        CalificacionRestauranteDTO dto) throws BadRequestException, NotFoundException {
         service.save(dto);
-        return ResponseEntity.ok("Calificacion restaurante creada exitosamente");
+        return ResponseEntity.ok("Calificación restaurante creada exitosamente");
     }
 
     /**
@@ -57,16 +57,16 @@ public class CalificacionRestauranteController {
         return ResponseEntity.ok(service.findAll());
     }
 
-    @Operation(summary = "Borrar una calificacion", description = "Borra la calificacion que tenga el id que se le pasa")
+    @Operation(summary = "Borrar una calificación", description = "Borra la calificación que tenga el id que se le pasa")
     @ApiResponses(value ={
-            @ApiResponse(responseCode =  "200", description = "Elimina la calificacion"),
+            @ApiResponse(responseCode =  "200", description = "Elimina la calificación"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
-            @ApiResponse(responseCode = "404", description = "Calificacion no encontrada")})
+            @ApiResponse(responseCode = "404", description = "Calificación no encontrada")})
     @DeleteMapping ("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable
                                              Long id) throws NotFoundException {
         service.delete(id);
-        return ResponseEntity.ok("La calificacion fue eliminada correctamente!");
+        return ResponseEntity.ok("La calificación fue eliminada correctamente!");
     }
 
 
