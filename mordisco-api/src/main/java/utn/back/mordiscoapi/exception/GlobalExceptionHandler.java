@@ -53,24 +53,22 @@ public class GlobalExceptionHandler {
     /**
      * Maneja excepciones de credenciales incorrectas.
      *
-     * @param ex la excepción de credenciales incorrectas
      * @return una respuesta con un mensaje de error y estado HTTP 401
      */
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public String handleBadCredentials(BadCredentialsException ex) {
+    public String handleBadCredentials() {
         return "Email o contraseña incorrectos";
     }
 
     /**
      * Maneja excepciones de acceso denegado.
      *
-     * @param ex la excepción de acceso denegado
      * @return una respuesta con un mensaje de error y estado HTTP 403
      */
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public Map<String, String> handleAccessDeniedException(AccessDeniedException ex) {
+    public Map<String, String> handleAccessDeniedException() {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Acceso denegado");
         return errorResponse;
@@ -79,12 +77,11 @@ public class GlobalExceptionHandler {
     /**
      * Maneja excepciones de firma de token JWT inválido.
      *
-     * @param ex la excepción de firma de token JWT inválido
      * @return una respuesta con un mensaje de error y estado HTTP 401
      */
     @ExceptionHandler(SignatureException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public Map<String, String> handleJwtSignatureException(SignatureException ex) {
+    public Map<String, String> handleJwtSignatureException() {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Token inválido o modificado. Acceso no autorizado.");
         return errorResponse;
