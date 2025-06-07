@@ -29,5 +29,5 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
             """)
     void changeState(@Param("id") Long id, @Param("nuevoEstado") EstadoPedido nuevoEstado);
 
-    boolean existsByUsuarioIdAndRestauranteId(Long usuarioId, Long restauranteId);
+    boolean existsByCliente_IdAndRestaurante_Id(Long clienteId, Long restauranteId);
 }

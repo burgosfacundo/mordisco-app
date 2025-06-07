@@ -41,7 +41,7 @@ public class CalificacionRestauranteImpl implements ICalificacionRestaurante {
             throw new NotFoundException("El id del usuario no existe");
         }
 
-        boolean hizoPedido = pedidoRepository.existsByUsuarioIdAndRestauranteId(
+        boolean hizoPedido = pedidoRepository.existsByCliente_IdAndRestaurante_Id(
                 dto.calificacionDTO().idUsuario(),
                 dto.restauranteId()
         );
