@@ -11,25 +11,33 @@ export const initAxios = (baseURL: string = "http://localhost:8080/api") => {
     baseURL,
   });
 
-  axiosInstance.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
+axiosInstance.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const excludedPaths = ["/auth/login", "/usuario/save"];
+    const shouldExclude = excludedPaths.some(path => config.url?.includes(path));
+
+    if (!shouldExclude) {
       const token = localStorage.getItem("token");
       if (token) {
         config.headers = config.headers ?? {};
         config.headers['Authorization'] = `Bearer ${token}`;
       }
-      console.log(`Request made to: ${config.url}`);
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
+    }
+
+    /*console.log(`Request made to: ${config.url}`);*/
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+
 
   axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => {
-      console.log(`Response from: ${response.config.url}`, {
+      /*console.log(`Response from: ${response.config.url}`, {
         data: response.data,
         status: response.status,
-      });
+      });*/
       return response;
     },
     (error) => {

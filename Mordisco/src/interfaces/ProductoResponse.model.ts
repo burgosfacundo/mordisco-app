@@ -8,3 +8,8 @@ export interface ProductoResponse {
     disponible: boolean,
     imagen: ImagenResponse
 }
+
+export interface ProductoPedidoDTO{
+    cantidad: number,
+    productoId: number
+}

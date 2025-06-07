@@ -1,45 +1,51 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RestauranteResponse } from '../../interfaces/RestauranteResponse.model.ts'
-import { fetchRestaurants } from '../../interceptors/axios/useApi.ts'
-import Card from '../Card/Card.tsx'
-import { useApi } from '../../hooks/useFetch.ts'
-import './HomeRestaurante.css'
+import { RestauranteResponse } from '../../interfaces/RestauranteResponse.model';
+import { fetchRestaurants } from '../../interceptors/axios/useApi';
+import Card from '../Card/Card';
+import { useApi } from '../../hooks/useFetch';
+import './HomeRestaurante.css';
+import Filtros from './Filtros/Filtros';
 
 const HomeRestaurantes = () => {
-    const { data, loading, error, fetch } = useApi<RestauranteResponse[], void>(
-        fetchRestaurants,
-        { autoFetch: true, params: undefined }
-    );
+  const { data, loading, error } = useApi<RestauranteResponse[], void>(
+    fetchRestaurants,
+    { autoFetch: true, params: undefined }
+  );
 
-    const navigate = useNavigate();
+  // filtro puede ser null (sin filtro) o array de restaurantes filtrados
+  const [filtro, setFiltro] = useState<RestauranteResponse[] | null>(null);
 
-    if (loading) return <p>Cargando restaurantes...</p>;
-    if (error) return <p>Error al cargar: {error.message}</p>;
+  const navigate = useNavigate();
 
-    const handleCardClick = (restaurante: RestauranteResponse) => {
-        navigate(`/ficha/${restaurante.id}`, { state: { restaurante } });
-    };
+  if (loading) return <p>Cargando restaurantes...</p>;
+  if (error) return <p>Error al cargar: {error.message}</p>;
 
-    return (
-        <div className='containerCards'>
-        <div className="parent">
-            {data?.map((restaurante) => (
-            <div
-                key={restaurante.id}
-                onClick={() => handleCardClick(restaurante)}
-                style={{ cursor: 'pointer' }}
-            >
-                <Card
-                    nombre={restaurante.razonSocial}
-                    imagenUrl={restaurante.logo.url}
-                    direccion={`${restaurante.direccion.calle} ${restaurante.direccion.numero}`}
-                />
-            </div>
-            ))}
-        </div>
-        </div>
-    );
-    }
+  const handleCardClick = (restaurante: RestauranteResponse) => {
+    navigate(`/ficha/${restaurante.id}`, { state: { restaurante } });
+  };
 
-    export default HomeRestaurantes;
+  return (
+    <div className="containerCards">
+      {/* Pasamos data o [] para evitar undefined */}
+      <Filtros restaurante={data ?? []} onFilterChange={setFiltro} />
+      <div className="parent">
+        {(filtro ?? data ?? []).map((restaurante) => (
+          <div
+            key={restaurante.id}
+            onClick={() => handleCardClick(restaurante)}
+            style={{ cursor: 'pointer' }}
+          >
+            <Card
+              nombre={restaurante.razonSocial}
+              imagenUrl={restaurante.logo.url}
+              direccion={`${restaurante.direccion.calle} ${restaurante.direccion.numero}`}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
+export default HomeRestaurantes;

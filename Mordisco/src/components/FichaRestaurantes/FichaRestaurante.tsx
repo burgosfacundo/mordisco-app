@@ -47,7 +47,15 @@ const FichaRestaurante = () => {
                     <img src={restaurante.logo.url} className='imgRestaurant'/>
                     <div className="containerInfoRestaurant">
                         <h1>{restaurante.razonSocial}</h1>
-                        <p>{restaurante.direccion.calle} {restaurante.direccion.numero}</p>
+                        {/*<p>{restaurante.direccion.calle} {restaurante.direccion.numero}</p>*/}
+                        <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurante.direccion.calle + ' ' + restaurante.direccion.numero + ', ' + restaurante.direccion.ciudad)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="direccion-link">
+                            {restaurante.direccion.calle} {restaurante.direccion.numero}, {restaurante.direccion.ciudad}
+                        </a>
+
                     </div>
                 </div>
                     <Horario horarios={restaurante.hoariosDeAtencion}/>

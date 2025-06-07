@@ -78,3 +78,9 @@
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
     transform: scale(0.98);
 }
+
+.direccion-link {
+  color: rgb(123, 123, 125);
+  text-decoration: underline;
+  cursor: pointer;
+}

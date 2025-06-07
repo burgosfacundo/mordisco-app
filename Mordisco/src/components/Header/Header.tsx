@@ -1,8 +1,10 @@
 import './Header.css';
 import Logo from '../../assets/LogoHeader.png';
 import { useNavigate, useLocation } from "react-router-dom";
+import { useGlobalContext } from '../../context/global.context';
 
 const Header = () => {
+  const { setUser } = useGlobalContext();
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
@@ -14,6 +16,12 @@ const Header = () => {
   const goToSignUp = () => {
     navigate("/signUp");
   };
+
+const finalizarSesion = () => {
+  localStorage.removeItem('token');
+  setUser(null);
+  navigate("/");
+};
 
   return (
     <div className='containerHeader'>
@@ -32,7 +40,7 @@ const Header = () => {
           <button onClick={goToLogin}>Iniciar Sesión</button>
         )}
         {path !== "/" && path !== "/login" && path !== "/signUp" && (
-          <p className='mensajeRuta'></p>
+          <button onClick={finalizarSesion}>Cerrar Sesión</button>
         )}
       </section>
     </div>

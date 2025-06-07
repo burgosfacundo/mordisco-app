@@ -81,14 +81,23 @@
   overflow-y: auto;
 }
 
-.containerTotal-resgistro{
-    width: 100%;
-    height: 100%;
+.containerTotal-registro {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
-.containerInfo{
-    width: 100%;
+.containerInfo-Pedido{
+        width: 100%;
     display: flex;
+    height: 8%;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 2rem;
 }
 
 
@@ -96,6 +105,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr); 
   gap: 1rem;
+  margin-top: 1rem;
 }
 
 .producto-item {
@@ -134,5 +144,52 @@
   min-width: 20px;
   text-align: center;
   font-weight: bold;
+}
+
+.buttonPedido {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #ca6262;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(220, 53, 69, 0.4);
+}
+
+.buttonPedido:hover {
+  background-color: #b02a37;
+  box-shadow: 0 6px 10px rgba(176, 42, 55, 0.5);
+}
+
+.buttonPedido:active {
+  background-color: #842029;
+  box-shadow: none;
+  transform: translateY(2px);
+}
+
+.buttonPedido:disabled {
+  background-color: #f5c6cb;
+  cursor: not-allowed;
+  box-shadow: none;
+  color: #6c757d;
+}
+
+.containerFinal{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.containerFinal p{
+  margin: 0px
+}
+
+.mensajePrecio{
+  color: #842029;
+  font-size: 10px;
 }
 

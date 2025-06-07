@@ -1,0 +1,20 @@
+.containerTotal-Filters{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.radio-input-filtros{
+    display:flex;
+    align-items: center;
+}
+
+.containerRadioButton-filtros{
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.containerTotal-Filters div{
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
