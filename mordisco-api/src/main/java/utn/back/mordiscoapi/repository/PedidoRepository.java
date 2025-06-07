@@ -22,11 +22,12 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
 
     List<Pedido> findAllByRestaurante_IdAndEstado(@Param("id")Long id, @Param("estado") EstadoPedido estado);
 
-
     @Modifying
     @Transactional
     @Query("""
             UPDATE Pedido SET estado = :nuevoEstado WHERE id =:id
             """)
     void changeState(@Param("id") Long id, @Param("nuevoEstado") EstadoPedido nuevoEstado);
+
+    boolean existsByUsuarioIdAndRestauranteId(Long usuarioId, Long restauranteId);
 }
