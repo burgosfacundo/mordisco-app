@@ -1,6 +1,8 @@
 package utn.back.mordiscoapi.security.jwt;
 
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -18,8 +20,16 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    private final String secret = "clave-secreta-de-mas-de-32-caracteres-segura";
-    private final Key SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    @Value("${jwt.secret}")
+    private String secret;
+    private Key secretKey;
+
+
+    @PostConstruct
+    public void init() {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
 
     public String extractUserName(String token) {
         return extractClaim(token,Claims::getSubject);
@@ -36,7 +46,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -60,7 +70,8 @@ public class JwtUtil {
                 .claim("authorities",userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1)))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public Boolean isTokenValid(String token, UserDetails userDetails) {

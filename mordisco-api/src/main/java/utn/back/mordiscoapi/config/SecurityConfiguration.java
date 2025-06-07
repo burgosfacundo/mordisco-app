@@ -1,4 +1,4 @@
-package utn.back.mordiscoapi.security;
+package utn.back.mordiscoapi.config;
 
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import utn.back.mordiscoapi.security.jwt.JwtRequestFilter;
@@ -33,19 +33,18 @@ public class SecurityConfiguration {
             "/webjars/**",
 
             //
-            "/api/usuario/login",
             "/api/usuario/save",
 
             // Otros endpoints públicos opcionales
-            "/public/**",
-            "/auth/**"
+            "api/public/**",
+            "api/auth/**"
     };
 
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> corsConfiguration()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth

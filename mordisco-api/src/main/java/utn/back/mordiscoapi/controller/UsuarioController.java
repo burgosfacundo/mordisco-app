@@ -7,18 +7,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
-import utn.back.mordiscoapi.security.jwt.JwtUtil;
-import utn.back.mordiscoapi.security.jwt.model.AuthenticationRequest;
-import utn.back.mordiscoapi.security.jwt.model.AuthenticationResponse;
-import utn.back.mordiscoapi.service.impl.UsuarioServiceImpl;
+import utn.back.mordiscoapi.service.interf.IUsuarioService;
 
 import java.util.List;
 
@@ -27,9 +22,7 @@ import java.util.List;
 @RequestMapping("/api/usuario")
 @RequiredArgsConstructor
 public class UsuarioController {
-    private final UsuarioServiceImpl service;
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final IUsuarioService service;
 
     /**
      * Función para guardar un nuevo usuario.
@@ -61,6 +54,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("@usuarioSecurity.esAdmin()")
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
         return ResponseEntity.ok(service.findAll());
@@ -79,6 +73,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable
                                                         Long id) throws NotFoundException {
@@ -99,6 +94,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @PutMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable
                                          Long id,
@@ -122,6 +118,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable
                                          Long id) throws NotFoundException {
@@ -144,6 +141,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @PutMapping("/password/{id}")
     public ResponseEntity<String> changePassword(
                                          @Valid
@@ -158,7 +156,7 @@ public class UsuarioController {
     }
 
     /**
-     * Función para obtener todos los usuarios por IDROL.
+     * Función para obtener todos los usuarios por IDRol.
      * @param id del rol a buscar.
      * @return Respuesta HTTP con una lista de proyecciones de usuarios.
      * @throws NotFoundException Si no se encuentra el rol con el ID proporcionado.
@@ -170,24 +168,12 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "No se encontró el rol con el ID proporcionado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("@usuarioSecurity.esAdmin()")
     @GetMapping("/rol/{id}")
     public ResponseEntity<List<UsuarioResponseDTO>> findByRolId(
                                                             @PathVariable
                                                             Long id
     ) throws NotFoundException {
         return ResponseEntity.ok(service.findByRolId(id));
-    }
-
-    /**
-     * Función para loguearme.
-     * @return Devuelve un token.
-     */
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.email(), authenticationRequest.password()));
-        final UserDetails userDetails = service.loadUserByUsername(authenticationRequest.email());
-        final String jwt = jwtUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new AuthenticationResponse((jwt)));
     }
 }
