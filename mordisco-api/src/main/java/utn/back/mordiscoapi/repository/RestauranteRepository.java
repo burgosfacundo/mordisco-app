@@ -96,4 +96,8 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 WHERE p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE
                 """)
         List<Restaurante> findAllWithPromocionActiva();
+
+    boolean existsByIdAndImagen_Id(Long id, Long imagenId);
+
+    boolean existsByIdAndDireccion_Id(Long id, Long direccionId);
 }

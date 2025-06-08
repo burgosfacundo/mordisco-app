@@ -15,6 +15,7 @@ public class ConstraintViolationMessageResolver {
             Map.entry("UK_restaurante_usuario", "Ese usuario ya está asignado a un restaurante."),
             Map.entry("UK_restaurante_razon_social", "La razón social del restaurante ya está en uso."),
             Map.entry("UK_restaurante_imagen", "La imagen ya está en uso por otro restaurante."),
+            Map.entry("UK_restaurante_direccion", "La dirección ya está en uso por otro restaurante."),
 
             Map.entry("UK_producto_nombre", "El nombre del producto no puede ser mayor a 50 caracteres."),
             Map.entry("UK_producto_imagen", "La imagen ya está en uso por otro producto o restaurante."),

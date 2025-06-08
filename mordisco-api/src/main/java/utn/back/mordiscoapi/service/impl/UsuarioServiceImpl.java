@@ -6,16 +6,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.UsuarioMapper;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionUpdateDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
+import utn.back.mordiscoapi.model.entity.Direccion;
 import utn.back.mordiscoapi.model.entity.Usuario;
+import utn.back.mordiscoapi.repository.DireccionRepository;
 import utn.back.mordiscoapi.repository.RolRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,13 +30,15 @@ import java.util.Optional;
 public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     private final UsuarioRepository repository;
     private final RolRepository rolRepository;
+    private final DireccionRepository direccionRepository;
+
     /**
      * Guarda un usuario.
      * @param dto DTO del usuario a guardar.
      * @throws NotFoundException si el rol no se encuentra.
      */
     @Override
-    public void save(UsuarioDTO dto) throws NotFoundException {
+    public void save(UsuarioCreateDTO dto) throws NotFoundException {
         if (!rolRepository.existsById(dto.rolId())){
             throw new NotFoundException("Rol no encontrado");
         }
@@ -72,7 +79,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
      * @throws NotFoundException si el usuario no se encuentra.
      */
     @Override
-    public void update(Long id, UsuarioUpdateDTO dto) throws NotFoundException {
+    public void update(Long id, UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         Usuario usuario = repository.findById(id).orElseThrow(
                 () -> new NotFoundException("Usuario no encontrado")
         );
@@ -80,6 +87,37 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         usuario.setNombre(dto.nombre());
         usuario.setApellido(dto.apellido());
         usuario.setTelefono(dto.telefono());
+
+        List<Direccion> direcciones = new ArrayList<>();
+        for (DireccionUpdateDTO direccionDTO : dto.direcciones()) {
+            Direccion direccion;
+
+            if (direccionDTO.id() != null) {
+                direccion = direccionRepository.findById(direccionDTO.id())
+                        .orElseThrow(() -> new NotFoundException("Dirección con id " + direccionDTO.id() + " no encontrada"));
+
+                if (!usuario.getDirecciones().contains(direccion)){
+                    throw new BadRequestException("La dirección con id " + direccionDTO.id() + " no pertenece al usuario con id " + id);
+                }
+            } else {
+                direccion = new Direccion();
+            }
+
+            direccion.setCalle(direccionDTO.calle());
+            direccion.setNumero(direccionDTO.numero());
+            direccion.setPiso(direccionDTO.piso());
+            direccion.setDepto(direccionDTO.depto());
+            direccion.setCodigoPostal(direccionDTO.codigoPostal());
+            direccion.setReferencias(direccionDTO.referencias());
+            direccion.setLatitud(direccionDTO.latitud());
+            direccion.setLongitud(direccionDTO.longitud());
+            direccion.setCiudad(direccionDTO.ciudad());
+            direcciones.add(direccion);
+        }
+
+        usuario.getDirecciones().clear();
+        usuario.getDirecciones().addAll(direcciones);
+
         repository.save(usuario);
     }
 

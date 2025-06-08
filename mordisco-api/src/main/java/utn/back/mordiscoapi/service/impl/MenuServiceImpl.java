@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.MenuMapper;
 import utn.back.mordiscoapi.model.dto.menu.MenuDTO;
-import utn.back.mordiscoapi.model.dto.producto.ProductoRequestDTO;
+import utn.back.mordiscoapi.model.dto.producto.ProductoDTO;
 import utn.back.mordiscoapi.model.entity.Imagen;
 import utn.back.mordiscoapi.model.entity.Menu;
 import utn.back.mordiscoapi.model.entity.Producto;
@@ -16,8 +16,7 @@ import utn.back.mordiscoapi.repository.ProductoRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.service.interf.IMenuService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -47,6 +46,7 @@ public class MenuServiceImpl implements IMenuService {
             // Actualización de menú existente
             menu = menuRepository.findById(dto.id())
                     .orElseThrow(() -> new NotFoundException("Menú no encontrado"));
+
             menu.setNombre(dto.nombre());
         } else {
             // Creación de menú nuevo
@@ -55,33 +55,40 @@ public class MenuServiceImpl implements IMenuService {
         }
 
         List<Producto> productos = new ArrayList<>();
-        for (ProductoRequestDTO productoRequestDTO : dto.productos()) {
+        for (ProductoDTO productoDTO : dto.productos()) {
             Producto producto;
 
-            if (productoRequestDTO.id() != null) {
+            if (productoDTO.id() != null) {
                 // Editar producto existente
-                producto = productoRepository.findById(productoRequestDTO.id())
-                        .orElseThrow(() -> new NotFoundException("Producto con id " + productoRequestDTO.id() + " no encontrado"));
+                producto = productoRepository.findById(productoDTO.id())
+                        .orElseThrow(() -> new NotFoundException("Producto con id " + productoDTO.id() + " no encontrado"));
+
+                // Validar que el producto pertenece al menú actual
+                if (producto.getMenu() != null && !producto.getMenu().getId().equals(menu.getId())) {
+                    throw new NotFoundException("El producto con id " + productoDTO.id() + " no pertenece al menú actual");
+                }
             } else {
                 // Nuevo producto
                 producto = new Producto();
             }
 
-            producto.setNombre(productoRequestDTO.nombre());
-            producto.setDescripcion(productoRequestDTO.descripcion());
-            producto.setPrecio(productoRequestDTO.precio());
-            producto.setDisponible(productoRequestDTO.disponible());
+            producto.setNombre(productoDTO.nombre());
+            producto.setDescripcion(productoDTO.descripcion());
+            producto.setPrecio(productoDTO.precio());
+            producto.setDisponible(productoDTO.disponible());
             producto.setMenu(menu);
             producto.setImagen(Imagen.builder()
-                            .id(productoRequestDTO.imagen().id())
-                            .url(productoRequestDTO.imagen().url())
-                            .nombre(productoRequestDTO.imagen().nombre())
+                    .id(productoDTO.imagen().id())
+                    .url(productoDTO.imagen().url())
+                    .nombre(productoDTO.imagen().nombre())
                     .build());
             productos.add(producto);
         }
 
+        // Guardar productos
         menu.getProductos().clear();
         menu.getProductos().addAll(productos);
+
         if (dto.id() == null) {
             restaurante.setActivo(!productos.isEmpty());
             restaurante.setMenu(menu);

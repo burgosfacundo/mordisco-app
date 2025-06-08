@@ -28,5 +28,4 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
         INNER JOIN Menu m ON p.menu.id = m.id
         """)
     List<ProductoProjection> findAllComplete();
-
 }

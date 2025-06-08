@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record DireccionDTO(
+public record DireccionCreateDTO(
     @Size(message = "La calle no puede contener mas de 50 caracteres", max = 50)
     @NotBlank(message = "La calle es obligatoria")
     @Schema(description = "Calle de la dirección", example = "Alvarado")

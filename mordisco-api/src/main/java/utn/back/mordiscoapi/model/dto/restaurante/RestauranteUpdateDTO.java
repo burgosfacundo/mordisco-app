@@ -1,12 +1,13 @@
 package utn.back.mordiscoapi.model.dto.restaurante;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionResponseDTO;
-import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionUpdateDTO;
+import utn.back.mordiscoapi.model.dto.imagen.ImagenUpdateDTO;
 
 public record RestauranteUpdateDTO(
         @Positive(message = "El id del restaurante debe ser positivo")
@@ -21,7 +22,11 @@ public record RestauranteUpdateDTO(
         @Schema(description = "Si el restaurante esta activo", example = "true")
         Boolean activo,
         @NotNull(message = "El logo del restaurante es obligatorio")
-        ImagenResponseDTO logo,
+        @Schema(description = "Logo del restaurante")
+        @Valid
+        ImagenUpdateDTO logo,
         @NotNull(message = "La dirección del restaurante es obligatoria")
-        DireccionResponseDTO direccion) {
+        @Schema(description = "Dirección del restaurante")
+        @Valid
+        DireccionUpdateDTO direccion) {
 }

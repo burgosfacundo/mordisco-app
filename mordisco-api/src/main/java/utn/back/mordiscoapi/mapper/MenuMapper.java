@@ -12,7 +12,7 @@ public class MenuMapper {
                 menu.getId(),
                 menu.getNombre(),
                 menu.getProductos().stream()
-                        .map(ProductoMapper::toRequestDto)
+                        .map(ProductoMapper::toDto)
                         .toList()
         );
     }

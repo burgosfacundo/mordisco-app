@@ -11,7 +11,8 @@ import java.util.Set;
 uniqueConstraints = {
                 @UniqueConstraint(name = "UK_restaurante_razon_social", columnNames = "razon_social"),
                 @UniqueConstraint(name = "UK_restaurante_usuario", columnNames = "usuario_id"),
-                @UniqueConstraint(name = "UK_restaurante_imagen", columnNames = "imagen_id")
+                @UniqueConstraint(name = "UK_restaurante_imagen", columnNames = "imagen_id"),
+                @UniqueConstraint(name = "UK_restaurante_direccion", columnNames = "direccion_id")
 })
 @Getter
 @Setter

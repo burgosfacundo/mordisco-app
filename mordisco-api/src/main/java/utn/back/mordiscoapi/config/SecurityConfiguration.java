@@ -32,12 +32,22 @@ public class SecurityConfiguration {
             "/configuration/**",
             "/webjars/**",
 
-            //
+            // Endpoints públicos de autenticación
             "/api/usuario/save",
+            "/api/auth/login",
+
+            // Endpoints públicos de consulta (sin datos sensibles)
+            "/api/restaurante/{id}",
+            "/api/restaurante",
+            "/api/restaurante/estado",
+            "/api/restaurante/ciudad",
+            "/api/restaurante/nombre",
+            "/api/restaurante/promocion",
+            "/api/menu/{restauranteId}",
+            "/api/promocion/{id}",
 
             // Otros endpoints públicos opcionales
-            "api/public/**",
-            "api/auth/**"
+            "/api/public/**"
     };
 
 
@@ -71,5 +81,4 @@ public class SecurityConfiguration {
         corsConfiguration.setExposedHeaders(List.of("Authorization"));
         return corsConfiguration;
     }
-
 }

@@ -9,8 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
@@ -39,7 +40,7 @@ public class UsuarioController {
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody
                                        @Valid
-                                       UsuarioDTO dto) throws NotFoundException {
+                                       UsuarioCreateDTO dto) throws NotFoundException {
         service.save(dto);
         return ResponseEntity.ok("Usuario guardado correctamente");
     }
@@ -54,7 +55,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("@usuarioSecurity.esAdmin()")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
         return ResponseEntity.ok(service.findAll());
@@ -73,7 +74,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable
                                                         Long id) throws NotFoundException {
@@ -86,6 +87,7 @@ public class UsuarioController {
      * @param dto Objeto DTO que contiene los nuevos datos del usuario.
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
+     * @throws BadRequestException Si los datos proporcionados son inválidos.
      */
     @Operation(summary = "Actualizar un usuario", description = "Recibe un ID y un usuario y actualiza el usuario correspondiente")
     @ApiResponses(value = {
@@ -94,13 +96,13 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
     @PutMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable
                                          Long id,
                                          @RequestBody
                                          @Valid
-                                         UsuarioUpdateDTO dto) throws NotFoundException {
+                                         UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         service.update(id,dto);
         return ResponseEntity.ok().body("Usuario actualizado exitosamente");
     }
@@ -118,7 +120,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable
                                          Long id) throws NotFoundException {
@@ -141,7 +143,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
     @PutMapping("/password/{id}")
     public ResponseEntity<String> changePassword(
                                          @Valid
@@ -168,12 +170,10 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "No se encontró el rol con el ID proporcionado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("@usuarioSecurity.esAdmin()")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/rol/{id}")
-    public ResponseEntity<List<UsuarioResponseDTO>> findByRolId(
-                                                            @PathVariable
-                                                            Long id
-    ) throws NotFoundException {
+    public ResponseEntity<List<UsuarioResponseDTO>> findByRolId(@PathVariable Long id)
+            throws NotFoundException {
         return ResponseEntity.ok(service.findByRolId(id));
     }
 }

@@ -7,39 +7,39 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionRequestDTO;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
-import utn.back.mordiscoapi.service.impl.PromocionServiceImpl;
+import utn.back.mordiscoapi.service.interf.IPromocionService;
 
 import java.util.List;
 
 @Tag(name = "Promociones", description = "Operaciones relacionadas con las promociones de los restaurantes") // Anotación para documentar la API con Swagger
-@RestController // Anotación para indicar que esta clase es un controlador REST
-@RequestMapping("/api/promocion") // Ruta base para las peticiones a este controlador
-@RequiredArgsConstructor // Anotación de lombok para generar un constructor con los campos finales
+@RestController
+@RequestMapping("/api/promocion")
+@RequiredArgsConstructor
 public class PromocionController {
-    // Inyección de dependencias de PromocionService a través del constructor de lombok @RequiredArgsConstructor
-    private final PromocionServiceImpl service;
+    private final IPromocionService service;
 
     /**
      * Función para guardar una nueva promoción.
      * @param dto Objeto DTO que contiene los datos de la promoción a crear.
      * @return Respuesta HTTP con un mensaje de éxito.
-     * @throws BadRequestException Si hay un error en los datos proporcionados.
+     * @throws BadRequestException Sí hay un error en los datos proporcionados.
      */
     @Operation(summary = "Crear una promoción nueva", description = "Recibe una promoción y la guarda en la base de datos") // Anotación para documentar la operación con Swagger
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Promoción creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    }) // Anotación para documentar las posibles respuestas
-    @PostMapping("/save") // Anotación para indicar que esta función maneja las peticiones POST a la ruta /save
-    public ResponseEntity<String> save(@RequestBody // Anotación para indicar que el cuerpo de la petición(JSON) se mapea a este parámetro
-                                       @Valid // Anotación para validar el objeto DTO según las restricciones definidas en la clase DTO
+    })
+    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.restauranteId())")
+    @PostMapping("/save")
+    public ResponseEntity<String> save(@RequestBody @Valid
                                        PromocionRequestDTO dto) throws BadRequestException {
         // Llama al servicio para guardar la promoción
         service.save(dto);
@@ -56,11 +56,10 @@ public class PromocionController {
             @ApiResponse(responseCode = "200",description = "Devuelve una lista de promociones"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    }) // Anotación para documentar las posibles respuestas
-    @GetMapping // Anotación para indicar que esta función maneja las peticiones GET a la ruta base
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
     public ResponseEntity<List<PromocionProjection>> findAll() {
-        // Llama al servicio para obtener todas las promociones
-        // Devuelve una respuesta HTTP 200 OK con la lista de promociones
         return ResponseEntity.ok(service.findAll());
     }
 
@@ -76,12 +75,10 @@ public class PromocionController {
             @ApiResponse(responseCode = "404", description = "No se encontró la promoción con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    }) // Anotación para documentar las posibles respuestas
-    @GetMapping("/{id}") // Anotación para indicar que esta función maneja las peticiones GET a la ruta /{id}
-    public ResponseEntity<PromocionProjection> findById(@PathVariable // Anotación para indicar que este parámetro se obtiene de la ruta
-                                                        Long id) throws NotFoundException {
-        // Llama al servicio para obtener una promoción por su ID
-        // Devuelve una respuesta HTTP 200 OK con la promoción encontrada
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<PromocionProjection> findById(@PathVariable Long id)
+            throws NotFoundException {
         return ResponseEntity.ok(service.findById(id));
     }
 
@@ -91,7 +88,7 @@ public class PromocionController {
      * @param dto Objeto DTO que contiene los nuevos datos de la promoción.
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra la promoción con el ID proporcionado.
-     * @throws BadRequestException Si hay un error en los datos proporcionados.
+     * @throws BadRequestException Sí hay un error en los datos proporcionados.
      */
     @Operation(summary = "Actualizar una promoción", description = "Recibe un ID y una promoción y actualiza la promoción correspondiente") // Anotación para documentar la operación con Swagger
     @ApiResponses(value = {
@@ -99,16 +96,13 @@ public class PromocionController {
             @ApiResponse(responseCode = "404", description = "No se encontró la promoción con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    }) // Anotación para documentar las posibles respuestas
-    @PutMapping("/{id}") // Anotación para indicar que esta función maneja las peticiones PUT a la ruta /update
-    public ResponseEntity<String> update(@PathVariable // Anotación para indicar que este parámetro se obtiene de la ruta
-                                         Long id,
-                                        @RequestBody // Anotación para indicar que el cuerpo de la petición(JSON) se mapea a este parámetro
-                                        @Valid // Anotación para validar el objeto DTO según las restricciones definidas en la clase DTO
-                                         PromocionRequestDTO dto) throws NotFoundException, BadRequestException {
-        // Llama al servicio para actualizar la promoción
+    })
+    @PreAuthorize("hasRole('ADMIN') or @promocionSecurity.puedeAccederAPromocion(#id)")
+    @PutMapping("/{id}")
+    public ResponseEntity<String> update(@PathVariable Long id,
+                                        @RequestBody @Valid PromocionRequestDTO dto)
+            throws NotFoundException, BadRequestException {
         service.update(id,dto);
-        // Devuelve una respuesta HTTP 200 OK con un mensaje de éxito
         return ResponseEntity.ok().body("Promoción actualizada exitosamente");
     }
 
@@ -124,13 +118,11 @@ public class PromocionController {
             @ApiResponse(responseCode = "404", description = "No se encontró la promoción con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    }) // Anotación para documentar las posibles respuestas
-    @DeleteMapping("/{id}") // Anotación para indicar que esta función maneja las peticiones DELETE a la ruta /{id}
-    public ResponseEntity<String> delete(@PathVariable // Anotación para indicar que este parámetro se obtiene de la ruta
-                                         Long id) throws NotFoundException {
-        // Llama al servicio para eliminar la promoción
+    })
+    @PreAuthorize("hasRole('ADMIN') or @promocionSecurity.puedeAccederAPromocion(#id)")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException {
         service.delete(id);
-        // Devuelve una respuesta HTTP 200 OK con un mensaje de éxito
         return ResponseEntity.ok().body("Promoción eliminada exitosamente");
     }
 
@@ -141,8 +133,9 @@ public class PromocionController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante)")
     @GetMapping("restaurante/{idRestaurante}")
-    public ResponseEntity<List<PromocionResponseDTO>> listarPromoByIdRestaurante (@PathVariable
+    public ResponseEntity<List<PromocionResponseDTO>> listarPromoByIdRestaurante(@PathVariable
                                                                                      Long idRestaurante) throws NotFoundException {
         return ResponseEntity.ok(service.listarPromoPorRestaurante(idRestaurante));
     }

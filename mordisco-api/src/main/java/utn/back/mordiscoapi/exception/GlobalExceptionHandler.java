@@ -1,5 +1,6 @@
 package utn.back.mordiscoapi.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +89,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Maneja excepciones de token JWT expirado.
+     *
+     * @return una respuesta con un mensaje de error y estado HTTP 401
+     */
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleJwtExpiredException() {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Token expirado");
+        errorResponse.put("message", "El token JWT ha expirado. Por favor, inicie sesión nuevamente.");
+        return errorResponse;
+    }
+
+    /**
      * Maneja violaciones de integridad de datos, como claves únicas duplicadas.
      *
      * @param ex la excepción de violación de integridad de datos
@@ -104,7 +119,8 @@ public class GlobalExceptionHandler {
 
         return Map.of(
                 "error", "Violación de integridad de datos",
-                "message", userMessage
+                "message", userMessage,
+                "details", ex.getMessage()
         );
     }
 

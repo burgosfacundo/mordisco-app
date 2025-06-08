@@ -3,10 +3,13 @@ package utn.back.mordiscoapi.mapper;
 import lombok.experimental.UtilityClass;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import utn.back.mordiscoapi.model.dto.pedido.UsuarioPedidoDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
+import utn.back.mordiscoapi.model.entity.Direccion;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
+
+import java.util.List;
 
 @UtilityClass
 public class UsuarioMapper {
@@ -15,11 +18,15 @@ public class UsuarioMapper {
      * @param dto el DTO de usuario a convertir
      * @return la entidad de usuario con los datos del DTO
      */
-    public static Usuario toUsuario(UsuarioDTO dto) {
+    public static Usuario toUsuario(UsuarioCreateDTO dto) {
         final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         Rol rol = Rol.builder()
                 .id(dto.rolId())
                 .build();
+
+        List<Direccion> direcciones = dto.direcciones().stream()
+                .map(DireccionMapper::toEntity)
+                .toList();
 
         return Usuario.builder()
                 .nombre(dto.nombre())
@@ -28,6 +35,7 @@ public class UsuarioMapper {
                 .email(dto.email())
                 .password(passwordEncoder.encode(dto.password()))
                 .rol(rol)
+                .direcciones(direcciones)
                 .build();
     }
 

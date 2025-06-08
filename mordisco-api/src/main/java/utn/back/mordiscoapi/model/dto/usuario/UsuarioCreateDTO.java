@@ -1,10 +1,15 @@
 package utn.back.mordiscoapi.model.dto.usuario;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionCreateDTO;
 
-public record UsuarioDTO(
+import java.util.List;
+
+public record UsuarioCreateDTO(
         @Size(message = "El nombre del usuario debe tener máximo 50 caracteres", max = 50)
         @NotNull(message = "El nombre del usuario es obligatorio")
         String nombre,
@@ -27,6 +32,10 @@ public record UsuarioDTO(
         String password,
 
         @NotNull(message = "El rol del usuario es obligatorio")
-        Long rolId
+        Long rolId,
+        @NotNull(message = "Las direcciones del usuario son obligatorias")
+        @Schema(description = "Direcciones del usuario")
+        @Valid
+        List<DireccionCreateDTO> direcciones
 ) {
 }

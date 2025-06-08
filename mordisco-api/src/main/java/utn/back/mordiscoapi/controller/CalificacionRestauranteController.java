@@ -71,7 +71,7 @@ public class CalificacionRestauranteController {
             @ApiResponse(responseCode =  "200", description = "Elimina la calificación"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
             @ApiResponse(responseCode = "404", description = "Calificación no encontrada")})
-    @PreAuthorize("@calificacionSecurity.puedeEliminar(#id)")
+    @PreAuthorize("hasRole('ADMIN') or @calificacionSecurity.esAutorDeCalificacion(#id)")
     @DeleteMapping ("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable
                                              Long id) throws NotFoundException {

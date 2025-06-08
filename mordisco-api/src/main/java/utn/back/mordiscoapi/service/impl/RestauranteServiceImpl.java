@@ -151,17 +151,25 @@ public class RestauranteServiceImpl implements IRestauranteService {
      */
     @Transactional
     @Override
-    public void update(RestauranteUpdateDTO dto) throws NotFoundException {
+    public void update(RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException {
         var restaurante = restauranteRepository.findRestauranteById(dto.id())
                 .orElseThrow(() -> new NotFoundException("El restaurante a actualizar no fue encontrado"));
 
+        if (!restauranteRepository.existsByIdAndImagen_Id(dto.id(), dto.logo().id())) {
+            throw new BadRequestException("La imagen ya está asociada a otro restaurante");
+        }
+        if (!restauranteRepository.existsByIdAndDireccion_Id(dto.id(),dto.direccion().id())) {
+            throw new BadRequestException("La dirección ya está asociada a otro restaurante");
+        }
+
         restaurante.setActivo(dto.activo());
         restaurante.setRazonSocial(dto.razonSocial());
-        restaurante.setImagen(ImagenMapper.toEntity(dto.logo()));
-        restaurante.setDireccion(DireccionMapper.toEntity(dto.direccion()));
+        restaurante.setImagen(ImagenMapper.updateToEntity(dto.logo()));
+        restaurante.setDireccion(DireccionMapper.updateToEntity(dto.direccion()));
 
         restauranteRepository.save(restaurante);
     }
+
     /**
      * Elimina un restaurante por su ID.
      *

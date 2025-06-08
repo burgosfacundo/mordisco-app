@@ -1,12 +1,13 @@
 package utn.back.mordiscoapi.model.dto.restaurante;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionDTO;
-import utn.back.mordiscoapi.model.dto.imagen.ImagenRequestDTO;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionCreateDTO;
+import utn.back.mordiscoapi.model.dto.imagen.ImagenCreateDTO;
 
 public record RestauranteCreateDTO(
                             @Size(message = "La razón social del restaurante debe tener máximo 50 caracteres", max = 50)
@@ -17,12 +18,16 @@ public record RestauranteCreateDTO(
                             @Schema(description = "Si el restaurante esta activo", example = "true")
                             Boolean activo,
                             @NotNull(message = "El logo del restaurante es obligatorio")
-                            ImagenRequestDTO logo,
+                            @Schema(description = "Logo del restaurante")
+                            @Valid
+                            ImagenCreateDTO logo,
                             @NotNull(message = "El id del usuario es obligatorio")
                             @Positive(message = "El id del usuario debe ser positivo")
                             @Schema(description = "Id del usuario dueño", example = "7")
                             Long idUsuario,
                             @NotNull(message = "La dirección del restaurante es obligatoria")
-                            DireccionDTO direccion
+                            @Schema(description = "Dirección del restaurante")
+                            @Valid
+                            DireccionCreateDTO direccion
                             ){
 }

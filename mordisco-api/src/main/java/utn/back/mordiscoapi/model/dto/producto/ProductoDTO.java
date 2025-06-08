@@ -1,12 +1,13 @@
 package utn.back.mordiscoapi.model.dto.producto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
 
 import java.math.BigDecimal;
 
-public record ProductoRequestDTO(
+public record ProductoDTO(
         @Positive(message = "El id del producto debe ser positivo")
         @Schema(description = "Id del producto", example = "5")
         Long id,
@@ -26,6 +27,7 @@ public record ProductoRequestDTO(
         @Schema(description = "El producto esta disponible", example = "true")
         Boolean disponible,
         @NotNull(message = "La imagen es obligatoria")
+        @Valid
         ImagenResponseDTO imagen
 ) {
 

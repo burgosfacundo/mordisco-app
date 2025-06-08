@@ -15,7 +15,7 @@ import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
-import utn.back.mordiscoapi.service.impl.RestauranteServiceImpl;
+import utn.back.mordiscoapi.service.interf.IRestauranteService;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping("/api/restaurante")
 @RequiredArgsConstructor
 public class RestauranteController {
-    private final RestauranteServiceImpl restauranteService;
+    private final IRestauranteService restauranteService;
     /**
      * Función para obtener un restaurante por su ID.
      * @param id del restaurante a buscar.
@@ -37,11 +37,9 @@ public class RestauranteController {
             @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    }) // Anotación para documentar las posibles respuestas
-    @GetMapping("/{id}") // Anotación para indicar que esta función maneja las peticiones GET a la ruta /{id}
+    })
+    @GetMapping("/{id}")
     public ResponseEntity<RestauranteResponseDTO> findById(@PathVariable Long id) throws NotFoundException {
-        // Llama al servicio para obtener una promoción por su ID
-        // Devuelve una respuesta HTTP 200 OK con la promoción encontrada
         return ResponseEntity.ok(restauranteService.findById(id));
     }
     /**
@@ -56,8 +54,9 @@ public class RestauranteController {
             @ApiResponse(responseCode = "404", description = "No se encontró el usuario con rol de dueño con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    }) // Anotación para documentar las posibles respuestas
-    @GetMapping("/usuario/{idUsuario}") // Anotación para indicar que esta función maneja las peticiones GET a la ruta /{idU}
+    })
+    @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#idUsuario)")
+    @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<RestauranteResponseDTO> findByUsuario(@PathVariable Long idUsuario) throws NotFoundException, BadRequestException {
     return ResponseEntity.ok(restauranteService.findByIdUsuario(idUsuario));
     }
@@ -72,6 +71,7 @@ public class RestauranteController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('ADMIN','RESTAURANTE')")
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody
                                        @Valid
@@ -89,7 +89,6 @@ public class RestauranteController {
             @ApiResponse(responseCode = "200",description = "Restaurantes listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping
     public ResponseEntity<List<RestauranteResponseDTO>> findAll() {
         return ResponseEntity.ok(restauranteService.getAll());
@@ -161,6 +160,7 @@ public class RestauranteController {
      * @param dto DTO con los datos actualizados del restaurante.
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
+     * @throws BadRequestException Si los datos proporcionados son inválidos.
      */
     @Operation(summary = "Actualizar restaurante", description = "Recibe un DTO de restaurante y lo actualiza en la base de datos")
     @ApiResponses(value = {
@@ -169,8 +169,9 @@ public class RestauranteController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.id)")
     @PutMapping("/update")
-    public ResponseEntity<String> update(@RequestBody @Valid RestauranteUpdateDTO dto) throws NotFoundException {
+    public ResponseEntity<String> update(@RequestBody @Valid RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException {
         restauranteService.update(dto);
         return ResponseEntity.ok("El restaurante se actualizo exitosamente");
     }
@@ -189,6 +190,7 @@ public class RestauranteController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException{
         restauranteService.delete(id);
@@ -210,6 +212,7 @@ public class RestauranteController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
     @PutMapping("/{id}/horarios")
     public ResponseEntity<String> addHorarios(@PathVariable Long id,
                                               @Valid @RequestBody List<HorarioAtencionDTO> horarios)

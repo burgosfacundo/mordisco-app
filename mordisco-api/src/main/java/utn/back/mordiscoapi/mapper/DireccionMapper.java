@@ -1,7 +1,9 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionCreateDTO;
 import utn.back.mordiscoapi.model.dto.direccion.DireccionResponseDTO;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionUpdateDTO;
 import utn.back.mordiscoapi.model.entity.Direccion;
 
 @UtilityClass
@@ -29,16 +31,37 @@ public class DireccionMapper {
      * @param dto el DTO de dirección a convertir
      * @return la entidad de dirección con los datos del DTO
      */
-    public static Direccion toEntity(DireccionResponseDTO dto) {
-        return new Direccion(dto.id(), // ID será generado por la base de datos
-                dto.calle(),
-                dto.numero(),
-                dto.piso(),
-                dto.depto(),
-                dto.codigoPostal(),
-                dto.referencias(),
-                dto.latitud(),
-                dto.longitud(),
-                dto.ciudad());
+    public static Direccion toEntity(DireccionCreateDTO dto) {
+        return Direccion.builder()
+                .calle(dto.calle())
+                .numero(dto.numero())
+                .piso(dto.piso())
+                .depto(dto.depto())
+                .codigoPostal(dto.codigoPostal())
+                .referencias(dto.referencias())
+                .latitud(dto.latitud())
+                .longitud(dto.longitud())
+                .ciudad(dto.ciudad())
+                .build();
+    }
+
+    /**
+     * Convierte un DTO de dirección a una entidad de dirección.
+     * @param dto el DTO de dirección a convertir
+     * @return la entidad de dirección con los datos del DTO
+     */
+    public static Direccion updateToEntity(DireccionUpdateDTO dto) {
+        return Direccion.builder()
+                .id(dto.id())
+                .calle(dto.calle())
+                .numero(dto.numero())
+                .piso(dto.piso())
+                .depto(dto.depto())
+                .codigoPostal(dto.codigoPostal())
+                .referencias(dto.referencias())
+                .latitud(dto.latitud())
+                .longitud(dto.longitud())
+                .ciudad(dto.ciudad())
+                .build();
     }
 }
