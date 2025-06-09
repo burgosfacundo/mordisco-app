@@ -1,9 +1,9 @@
 USE mordisco;
 
 -- Insertar roles
-INSERT INTO roles (nombre) VALUES 
-('ADMIN'), 
-('CLIENTE'), 
+INSERT INTO roles (nombre) VALUES
+('ADMIN'),
+('CLIENTE'),
 ('RESTAURANTE');
 
 -- Insertar ADMIN
@@ -15,7 +15,7 @@ INSERT INTO usuarios (apellido, email, nombre, password, telefono, rol_id) VALUE
 ('Alvarez', 'cliente1@mordisco.com', 'Juan', '$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6', '3333333331', 2),
 ('Benítez', 'cliente2@mordisco.com', 'Carla', '$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6', '3333333332', 2),
 ('Cabrera', 'cliente3@mordisco.com', 'Pedro', '$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6', '3333333333', 2),
-('Castro', 'cliente4@mordisco.com', 'Ana', '$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6', '3333333334', 2),
+('Castro', 'cliente4@mordisco.com', 'Ana', '$2a$10$6w3FGuusuariosrolespromociones7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6', '3333333334', 2),
 ('González', 'cliente5@mordisco.com', 'Martín', '$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6', '3333333335', 2),
 ('Herrera', 'cliente6@mordisco.com', 'Sandra', '$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6', '3333333336', 2),
 ('Jiménez', 'cliente7@mordisco.com', 'Luis', '$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6', '3333333337', 2),
@@ -395,23 +395,240 @@ INSERT INTO promociones (descripcion, descuento, fecha_inicio, fecha_fin, restau
 ('15% descuento en platos especiales del día', 0.15, '2025-06-01', '2025-06-30', 15);
 
 -- Pedido 1 - En proceso, retiro por local, dirección del restaurante
-INSERT INTO pedidos (estado, fecha_hora, tipo_entrega, total, usuario_id, direccion_id, restaurante_id)
-VALUES ('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 2400, 2, 36, 6);
+INSERT INTO pedidos (estado, fecha_hora, tipo_entrega,total, usuario_id, direccion_id, restaurante_id)
+VALUES              ('PENDIENTE', NOW(), 'RETIRO_POR_LOCAL', 9800, 5, 31, 1),
+                	('RECIBIDO', '2025-06-01 21:00:00', 'DELIVERY', 3550, 6, 5, 1),
+               	 
+                	('EN_CAMINO', NOW(), 'RETIRO_POR_LOCAL', 5800, 7, 32, 2),
+                	('RECIBIDO', '2025-06-01 22:00:00', 'DELIVERY', 1500, 8, 7, 2),
+                	('RECIBIDO', '2025-06-01 21:40:00', 'DELIVERY', 12500, 9, 8, 2),
+               	 
+                	('CANCELADO', '2025-06-02 20:00:00', 'RETIRO_POR_LOCAL', 9870, 10, 33, 3),
+                	('PENDIENTE', NOW(), 'DELIVERY', 1500,11, 10, 3),
+                	('RECIBIDO', '2025-06-02 22:10:00', 'DELIVERY', 12500, 12, 13, 3),
+               	 
+                	('CANCELADO', '2025-06-02 20:45:00', 'RETIRO_POR_LOCAL', 9000, 13, 34, 4),
+                	('PENDIENTE', NOW(), 'DELIVERY', 1990,14, 13, 4),
+                	('RECIBIDO', '2025-06-02 23:15:00', 'DELIVERY', 4500, 15, 14, 4),
+                	('EN_PROCESO', NOW(), 'DELIVERY', 12500, 16, 15, 4),
+                	('RECIBIDO', '2025-06-02 20:00:00', 'DELIVERY', 9800, 17, 16, 4),
+               	 
+                	('RECIBIDO', '2025-06-03 18:20:00', 'DELIVERY', 1650, 18, 17, 5),
+                	('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 13600, 19, 35, 5),
+                	('RECIBIDO', '2025-06-03 19:56:45', 'DELIVERY', 9780, 20, 19, 5),
+                    
+               	    ('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 2400, 2, 36, 6),
+                	('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 3500, 3, 36, 6),
+                	('PENDIENTE', NOW(), 'DELIVERY', 4400, 4, 3, 6),
+                	('RECIBIDO', '2025-06-03 20:55:16', 'DELIVERY', 3550, 5, 4, 6),
+                
+					('CANCELADO', '2025-06-03 20:20:00', 'DELIVERY', 13600, 21, 20, 7),
+                	('RECIBIDO', '2025-06-03 22:20:00', 'RETIRO_POR_LOCAL', 9000, 22, 37, 7),
+               	 
+                	('RECIBIDO', '2025-06-04 23:20:00', 'DELIVERY', 1650, 23, 22, 8),
+                	('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 13600, 24, 38, 8),
+                	('RECIBIDO', '2025-06-04 22:00:00', 'DELIVERY', 9780, 25, 24, 8),
+               	 
+                	('RECIBIDO', '2025-06-04 19:24:50', 'RETIRO_POR_LOCAL', 9000, 26, 39, 9),
+                	('CANCELADO', '2025-06-05 22:23:00', 'DELIVERY', 1650, 27, 26, 9),
+                	('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 13600, 28, 39, 9),
+                	('RECIBIDO', '2025-06-03 23:10:30', 'DELIVERY', 9780, 29, 28, 9),
+               	 
+                	('RECIBIDO', '2025-06-03 23:14:33', 'RETIRO_POR_LOCAL', 9000, 1, 40, 10),
+                	('CANCELADO', '2025-06-03 23:15:36', 'DELIVERY', 1650, 2, 1, 10),
+                	('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 13600, 3, 40, 10),
+                	('RECIBIDO', '2025-06-03 23:25:53', 'DELIVERY', 9780, 4, 3, 10),
+               	 
+                	('RECIBIDO', '2025-06-07 15:25:00', 'RETIRO_POR_LOCAL', 9870, 5, 41, 11),
+               	 
+                	('CANCELADO', '2025-06-07 16:15:00', 'DELIVERY', 1650, 6, 5, 12),
+                	('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 13600, 7, 42, 12),
+                	('EN_CAMINO', NOW(), 'DELIVERY', 9780, 8, 7, 12),               	 
+               	 
+                	('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 136, 9, 43, 13),
+                	('EN_CAMINO', NOW(), 'DELIVERY', 9780, 10, 9, 13),               	 
+               	 
+                	('EN_CAMINO', NOW(), 'DELIVERY', 9780, 11, 10, 14),               	 
+                	('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 6980, 12, 44, 14),
+                	('EN_CAMINO', NOW(), 'DELIVERY', 10200, 13, 12, 14),               	 
+               	 
+                	('EN_CAMINO', NOW(), 'DELIVERY', 9780, 14, 13, 15),               	 
+                	('CANCELADO', '2025-06-08 22:17:23', 'DELIVERY', 9780, 15, 14, 15),
+                	('EN_PROCESO', NOW(), 'RETIRO_POR_LOCAL', 6980, 16, 45, 15),
+                	('EN_CAMINO', NOW(), 'DELIVERY', 10200, 17, 16, 15);
+               	 
+               	 
 
 INSERT INTO productos_pedidos (pedido_id, producto_id, precio_unitario, cantidad)
-VALUES (1, 15, 1200, 2);
-
--- Pedido 2 - Recibido, delivery, dirección del usuario en la misma ciudad
-INSERT INTO pedidos (estado, fecha_hora, tipo_entrega, total, usuario_id, direccion_id, restaurante_id)
-VALUES ('RECIBIDO', '2025-06-03 20:05:00', 'DELIVERY', 5000, 14, 13, 10);
-
-INSERT INTO productos_pedidos (pedido_id, producto_id, precio_unitario, cantidad)
-VALUES (2, 23, 1400, 1);
-
-INSERT INTO productos_pedidos (pedido_id, producto_id, precio_unitario, cantidad)
-VALUES (2, 24, 1800, 2);
-
+VALUES 				(1, 14, 253, 2),
+					(1, 15, 369, 1),
+                    (2, 15, 1000, 2),
+					(2, 14, 1200, 1),
+                    (3, 14, 369, 1),
+                    (4, 15, 300, 3),	
+                    (4, 14, 1000, 2),
+                    
+					(5, 1, 1200, 1),
+                    (5, 2, 200, 2),					
+                    (6, 3, 369, 3),
+                    (6, 43, 300, 3),	
+                    (6, 1, 1000, 2),
+					(6, 2, 1200, 1),
+                    
+                    (7, 4, 200, 1),					
+                    (7, 5, 369, 5),
+                    (8, 42, 300, 1),	
+                    (8, 4, 1000, 4),
+					(8, 5, 1200, 5),
+                    (9, 42, 200, 2),					
+                    (9, 4, 369, 4),
+                    (9, 5, 300, 5),	
+                    
+                    (10, 6, 1000, 2),
+					(10, 7, 1200, 7),
+                    (10, 8, 200, 2),					
+                    (11, 9, 369, 1),
+                    (12, 8, 300, 1),
+                    
+                    (13, 10, 1000, 2),
+					(14, 10, 1200, 3),
+                    (15, 10, 300, 6),	
+					(16, 10, 1200, 9),
+                    (17, 10, 200, 10),					
+                    
+                    (18, 11, 369, 1),
+                    (19, 12, 300, 3),	
+                    (19, 13, 1000, 2),
+					(20, 11, 1200, 1),
+                    (20, 12, 200, 3),					
+                    (20, 13, 369, 1),
+                    
+                    (21, 16, 300, 3),	
+                    (21, 17, 1000, 2),
+					(22, 18, 1200, 1),
+                    (22, 19, 200, 3),					
+                    (22, 17, 369, 1),
+                    
+                    (23, 20, 300, 3),	
+                    (23, 21, 1000, 2),
+					(23, 44, 1200, 1),
+                    (24, 20, 369, 1),
+                    (25, 21, 300, 3),	
+                    (25, 44, 1000, 2),
+					(25, 20, 1200, 1),
+					
+                    (26, 22, 369, 1),
+                    (26, 45, 300, 3),	
+					(27, 22, 1200, 1),
+                    (27, 45, 200, 3),                    
+                    (28, 22, 369, 1),
+                    (28, 45, 1000, 2),
+					(29, 22, 1200, 1),
+                    
+                    (30, 23, 300, 3),	
+                    (30, 24, 1000, 2),
+					(31, 25, 1200, 1),
+                    (31, 23, 200, 3),					
+                    (32, 24, 369, 1),
+                    (33, 25, 300, 3),	
+                    (33, 23, 1000, 2),
+					(33, 24, 1200, 1),
+                    (33, 25, 200, 3),	
+                    
+                    (34, 26, 369, 1),
+                    (34, 27, 300, 3),	
+                    
+                    (35, 28, 1000, 2),
+					(35, 29, 1200, 1),
+                    (35, 30, 200, 3),					
+                    (36, 28, 369, 1),
+                    (36, 29, 300, 3),	
+                    (37, 30, 1000, 2),
+					(37, 28, 1200, 1),
+                    
+                    (38, 31, 200, 3),					
+                    (38, 32, 369, 1),
+                    (39, 33, 300, 3),	
+                    (39, 31, 1000, 2),
+					(39, 32, 1200, 1),
+                    
+                    (40, 34, 200, 3),					
+                    (40, 35, 369, 1),
+                    (41, 36, 300, 3),	
+                    (41, 37, 1000, 2),
+					(41, 34, 1200, 1),
+                    (42, 35, 200, 3),
+					
+                    (43, 38, 369, 1),
+                    (43, 39, 300, 3),	
+                    (43, 40, 1000, 2),
+					(43, 41, 1200, 1),
+                    (44, 38, 200, 3),					
+                    (44, 39, 369, 1),
+                    (45, 40, 300, 3),	
+                    (46, 41, 1000, 2),
+					(46, 38, 1200, 1),
+                    (46, 39, 200, 3);
+                    
 -- Insertar calificaciones para los restaurantes
 INSERT INTO calificaciones_restaurante (comentario, fecha_hora, puntaje, restaurante_id, usuario_id) VALUES
-('El mejor restaurante de la ciudad. Siempre vuelvo.', NOW(), 5, 6, 2),
-('Excelente comida y muy rápido el delivery', '2025-06-03 20:45:00', 4, 10, 14);
+('Muy buena la comida, llegó calentita.', NOW(), 5, 1, 5),
+('Entrega rápida y sin errores.', NOW(), 5, 1, 6),
+
+('Todo en su punto, como siempre.', '2025-06-03 20:45:00', 4, 2, 7),
+('Tardo muchísimo en llegar', '2025-06-03 20:45:00', 2, 2, 8),
+('Todo fresco y sabroso.', '2025-06-03 20:45:00', 5, 2, 9),
+
+('Pedido fácil y entrega puntual.', '2025-06-03 20:45:00', 5, 3, 10),
+('Mal cerrado, se derramó todo.', '2025-06-03 20:45:00', 1, 3, 11),
+('Muy buena opción para pedir desde casa.', '2025-06-03 20:45:00', 3, 3, 12),
+
+('Faltaban cosas del pedido.', '2025-06-03 20:45:00', 1, 4, 13),
+('La comida llegó fría.', '2025-06-03 20:45:00', 2, 4, 14),
+('Me salvó la cena.', '2025-06-03 20:45:00', 4, 4, 15),
+('Llegó justo a tiempo.', '2025-06-03 20:45:00', 5, 4, 16),
+('Comida rica y bien embalada.', '2025-06-03 20:45:00', 5, 4, 17),
+
+('Muy poca cantidad para el precio.', '2025-06-03 20:45:00', 3, 5, 18),
+('No era lo que pedí.', '2025-06-03 20:45:00', 1, 5, 19),
+('Perfecto para un almuerzo rápido.', '2025-06-03 20:45:00', 5, 5, 20),
+
+('No venía con cubiertos.', '2025-06-03 20:45:00', 3, 6, 2),
+('Pedí sin picante y vino picante.', '2025-06-03 20:45:00', 1, 6, 3),
+('Llegó caliente y recién hecho.', '2025-06-03 20:45:00', 5, 6, 4),
+('Buena relación precio-calidad en delivery.', '2025-06-03 20:45:00', 5, 6, 5),
+
+('Se mantiene bien el sabor aunque sea para llevar.', '2025-06-03 20:45:00', 3, 7, 21),
+('Muy grasoso, no me gustó.', '2025-06-03 20:45:00', 1, 7, 22),
+
+('Sabor casero, ¡un 10!', '2025-06-03 20:45:00', 5, 8, 23),
+('Todo llegó completo, bien cerrado.', '2025-06-03 20:45:00', 5, 8, 24),
+('Me encantó, repetiría sin dudas.', '2025-06-03 20:45:00', 5, 8, 25),
+
+('Ideal para pedir en familia.', '2025-06-03 20:45:00', 5, 9, 26),
+('Nada fresco, parecía recalentado.', '2025-06-03 20:45:00', 2, 9, 27),
+('Se mezclaron los sabores.', '2025-06-03 20:45:00', 3, 9, 28),
+('Llegó antes de lo esperado.', '2025-06-03 20:45:00', 5, 9, 29),
+
+('El packaging conserva bien la comida','2025-06-03 20:45:00', 5, 10, 1),
+('Poca seriedad en la entrega.', '2025-06-03 20:45:00', 2, 10, 2),
+('Bien, repetiría', '2025-06-03 20:45:00', 3, 10, 3),
+('El pedido llegó incompleto.', '2025-06-03 20:45:00', 1, 10, 4),
+
+('Llegó caliente y recién hecho.','2025-06-03 20:45:00', 5, 11, 5),
+
+('Mucha demora, sin aviso.', '2025-06-03 20:45:00', 2, 12, 6),
+('No llegó en buen estado.','2025-06-03 20:45:00', 3, 12, 7),
+('El envase venía abierto.', '2025-06-03 20:45:00', 1, 12, 8),
+
+('Todo llegó tal como lo pedí.', '2025-06-03 20:45:00', 5, 13, 9),
+('Se nota que cuidan cada detalle.','2025-06-03 20:45:00', 5, 13, 10),
+
+('Todo revuelto dentro de la bolsa.', '2025-06-03 20:45:00', 1, 14, 11),
+('Ya es mi lugar de confianza para pedir.', '2025-06-03 20:45:00', 4, 14, 12),
+('Pedido rápido y comida deliciosa.', '2025-06-03 20:45:00', 5, 14, 13),
+
+('El pan llegó húmedo y feo.', '2025-06-03 20:45:00', 1, 15, 14),
+('¡Recién hecho, se notaba!', '2025-06-03 20:45:00', 4, 15, 15),
+('El mejor delivery de la zona.', '2025-06-03 20:45:00', 5, 15, 16),
+('Se nota que cuidan cada detalle.', '2025-06-03 20:45:00', 5, 15, 17);
