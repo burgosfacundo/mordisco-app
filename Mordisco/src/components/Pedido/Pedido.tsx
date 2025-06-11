@@ -18,7 +18,6 @@ const Pedido = () => {
 
     const userId = user?.id;
 
-    
   const navigate = useNavigate();
 
     const location = useLocation();
@@ -27,7 +26,8 @@ const Pedido = () => {
 
     const [cantidades, setCantidades] = useState<{ [id: number]: number }>({});
 
-    const seleccionados = Object.entries(cantidades)
+    const seleccionados = 
+    Object.entries(cantidades)
         .filter(([_, cantidad]) => cantidad > 0)
         .map(([id, cantidad]) => ({
             productoId: Number(id),

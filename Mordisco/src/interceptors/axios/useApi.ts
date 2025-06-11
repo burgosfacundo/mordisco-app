@@ -95,6 +95,7 @@ export const fetchUserById = (id:number): UseApiCall<UserResponse> =>{
 }
 
 export const sendPedido = (pedido: PedidoRequest): UseApiCall<string> => {
+    console.log(pedido)
     const controller = new AbortController();
     const axios = getAxios();
 

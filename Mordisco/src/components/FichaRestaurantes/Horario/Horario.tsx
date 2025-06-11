@@ -35,13 +35,14 @@ const Horario = ({ horarios }: HorarioProps) => {
 
     return (
         <div className="containerHorario">
+            <p style={{ paddingTop: '2%' }}>Horarios:</p>
         {diasEnOrden.map((dia) => {
             const horariosDia = agrupado[dia];
             if (!horariosDia) return null;
 
             return (
-            <div key={dia}>
-                <p style={{ paddingTop: '2%' }}>Horarios:</p>
+            <div className="divHorario" key={dia}>
+                
                 <strong>{traducirDia(dia)}:</strong>{" "}
                 {horariosDia.map((h, index) => (
                     <span key={index}>
@@ -49,6 +50,7 @@ const Horario = ({ horarios }: HorarioProps) => {
                         {index < horariosDia.length - 1 && ", "}
                     </span>
                 ))}
+                
             </div>
             );
         })}
