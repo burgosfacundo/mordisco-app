@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionUpdateDTO;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionUsuarioDTO;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public record UsuarioUpdateDTO(
         @NotNull(message = "Las direcciones del usuario son obligatorias")
         @Schema(description = "Direcciones del usuario")
         @Valid
-        List<DireccionUpdateDTO> direcciones
+        List<DireccionUsuarioDTO> direcciones
 
 ) {
 }

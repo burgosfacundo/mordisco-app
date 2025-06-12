@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.UsuarioMapper;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionUpdateDTO;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionUsuarioDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
@@ -91,7 +91,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         usuario.setTelefono(dto.telefono());
 
         List<Direccion> direcciones = new ArrayList<>();
-        for (DireccionUpdateDTO direccionDTO : dto.direcciones()) {
+        for (DireccionUsuarioDTO direccionDTO : dto.direcciones()) {
             Direccion direccion;
 
             if (direccionDTO.id() != null) {

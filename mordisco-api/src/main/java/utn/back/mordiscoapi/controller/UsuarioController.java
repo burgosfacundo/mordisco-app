@@ -96,7 +96,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @PutMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable
                                          Long id,
@@ -120,7 +120,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable
                                          Long id) throws NotFoundException {
@@ -143,7 +143,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @PutMapping("/password/{id}")
     public ResponseEntity<String> changePassword(
                                          @Valid

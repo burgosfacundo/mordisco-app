@@ -119,8 +119,7 @@ public class GlobalExceptionHandler {
 
         return Map.of(
                 "error", "Violación de integridad de datos",
-                "message", userMessage,
-                "details", ex.getMessage()
+                "message", userMessage
         );
     }
 
