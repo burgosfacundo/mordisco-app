@@ -8,73 +8,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.model.entity.Pedido;
-import utn.back.mordiscoapi.model.projection.PedidoProjection;
 
 import java.util.List;
-import java.util.Optional;
+
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido,Long> {
-    @Query("""
-        SELECT
-             p,pp,pr
-        FROM Pedido p
-        JOIN ProductoPedido pp ON p.id = pp.pedido.id
-        JOIN Producto pr ON pp.producto.id = pr.id
-        WHERE p.id = :id
-        """) // Anotación para realizar una query personalizada JPQL
-    Optional<Pedido> findCompleteById(@Param("id") Long id);
 
-    @Query("""
-        SELECT
-             p,pp,pr
-        FROM Pedido p
-        JOIN ProductoPedido pp ON p.id = pp.pedido.id
-        JOIN Producto pr ON pp.producto.id = pr.id
-        WHERE p.restaurante.id = :id
-        """)
-    List<PedidoProjection> findAllCompleteByRestaurante(@Param("id")Long id);
+    List<Pedido> findAllByRestaurante_Id(@Param("id")Long id);
 
+    List<Pedido> findAllByCliente_IdAndEstado(@Param("id") Long id, @Param("estado") EstadoPedido estado);
 
-    @Query("""
-    SELECT 
-        p.id AS id,
-        p.cliente.id AS clienteId,
-        p.restaurante.id AS restauranteId,
-        p.direccionEntrega.id AS direccionId,
-        p.tipoEntrega AS tipoEntrega,
-        p.fechaHora AS fechaHora,
-        p.estado AS estado,
-        p.total AS total,
-        pp.id AS productoPedidoId,
-        pp.cantidad AS cantidad,
-        pp.precioUnitario AS precioUnitario,
-        pr.id AS productoId
-    FROM Pedido p
-    JOIN p.items pp
-    JOIN pp.producto pr
-    """)
-    List<PedidoProjection> findAllDTO ();
+    List<Pedido> findAllByCliente_Id(Long id);
 
-    @Query("""
-       SELECT 
-            p.id AS id,
-            p.cliente.id AS clienteId,
-            p.restaurante.id AS restauranteId,
-            p.direccionEntrega.id AS direccionId,
-            p.tipoEntrega AS tipoEntrega,
-            p.fechaHora AS fechaHora,
-            p.estado AS estado,
-            p.total AS total,
-            pp.id AS productoPedidoId,
-            pp.cantidad AS cantidad,
-            pp.precioUnitario AS precioUnitario,
-            pr.id AS productoId
-        FROM Pedido p
-        JOIN p.items pp
-        JOIN pp.producto pr
-        WHERE p.id = :id
-        """)
-    List<PedidoProjection> findByProjectID(@Param("id") Long id);
+    List<Pedido> findAllByRestaurante_IdAndEstado(@Param("id")Long id, @Param("estado") EstadoPedido estado);
 
     @Modifying
     @Transactional
@@ -83,80 +29,7 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
             """)
     void changeState(@Param("id") Long id, @Param("nuevoEstado") EstadoPedido nuevoEstado);
 
-    @Query("""
-            SELECT 
-                p.id AS id,
-                p.cliente.id AS clienteId,
-                p.restaurante.id AS restauranteId,
-                p.direccionEntrega.id AS direccionId,
-                p.tipoEntrega AS tipoEntrega,
-                p.fechaHora AS fechaHora,
-                p.estado AS estado,
-                p.total AS total,
-                pp.id AS productoPedidoId,
-                pp.cantidad AS cantidad,
-                pp.precioUnitario AS precioUnitario,
-                pr.id AS productoId
-            FROM Pedido p
-            JOIN p.items pp
-            JOIN pp.producto pr
-            WHERE
-                p.cliente.id = :id AND p.estado = :estado    
-            """)
-    List<PedidoProjection> findAllXClientesXEstado(@Param("id") Long id, @Param("estado") EstadoPedido estado);
+    boolean existsByCliente_IdAndRestaurante_Id(Long clienteId, Long restauranteId);
 
-    @Query("""
-            SELECT 
-                p.id AS id,
-                p.cliente.id AS clienteId,
-                p.restaurante.id AS restauranteId,
-                p.direccionEntrega.id AS direccionId,
-                p.tipoEntrega AS tipoEntrega,
-                p.fechaHora AS fechaHora,
-                p.estado AS estado,
-                p.total AS total,
-                pp.id AS productoPedidoId,
-                pp.cantidad AS cantidad,
-                pp.precioUnitario AS precioUnitario,
-                pr.id AS productoId
-            FROM Pedido p
-            JOIN p.items pp
-            JOIN pp.producto pr
-            WHERE
-                p.cliente.id = :id    
-            """)
-    List<PedidoProjection> findAllXClientes(Long id);
-
-
-    @Query("""
-            SELECT 
-                p.id AS id,
-                p.cliente.id AS clienteId,
-                p.restaurante.id AS restauranteId,
-                p.direccionEntrega.id AS direccionId,
-                p.tipoEntrega AS tipoEntrega,
-                p.fechaHora AS fechaHora,
-                p.estado AS estado,
-                p.total AS total,
-                pp.id AS productoPedidoId,
-                pp.cantidad AS cantidad,
-                pp.precioUnitario AS precioUnitario,
-                pr.id AS productoId
-            FROM Pedido p
-            JOIN p.items pp
-            JOIN pp.producto pr
-            WHERE
-                p.restaurante.id = :id AND p.estado = :estado    
-            """)
-    List<PedidoProjection> findAllXRestauranteXEstado(@Param("id")Long id, @Param("estado") EstadoPedido estado);
-
-
-    @Query("""
-            SELECT 
-                count(p.id) AS cantidad_pedidos
-            FROM Pedido p
-            WHERE
-                p.restaurante.id = :id AND p.estado = :estado    
-            """)
-    Optional<Long> cantidadPedidosXEstado(Long id, EstadoPedido estado);
+    boolean existsByIdAndCliente_Id(Long id, Long clienteId);
 }

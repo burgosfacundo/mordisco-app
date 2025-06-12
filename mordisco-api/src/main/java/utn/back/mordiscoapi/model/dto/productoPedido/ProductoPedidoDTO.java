@@ -12,5 +12,5 @@ public record ProductoPedidoDTO(
                                  @NotNull(message = "El producto no puede ser nulo.")
                                  @Positive(message = "El id del producto no puede ser menor a 1")
                                  @Schema(description = "El id del producto", example = "5")
-                                 Long producto_id) {
+                                 Long productoId) {
 }

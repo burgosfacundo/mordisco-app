@@ -3,15 +3,25 @@ package utn.back.mordiscoapi.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_usuario_telefono", columnNames = "telefono"),
+                @UniqueConstraint(name = "UK_usuario_email", columnNames = "email")
+})
 @Getter
 @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Builder
-public class Usuario {
-    @Id @GeneratedValue (strategy = GenerationType.IDENTITY) //primary key auto_increments
+public class Usuario implements UserDetails {
+    @Id @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column (nullable = false)
@@ -37,13 +47,42 @@ public class Usuario {
     @JoinColumn(name = "rol_id",nullable = false)
     private Rol rol;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<CalificacionProducto> calificacionesProducto;
-
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Restaurante restaurante;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CalificacionRestaurante> calificacionesRestaurante;
 
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        var grantedAuthority = new SimpleGrantedAuthority(rol.getNombre());
+        return Collections.singletonList(grantedAuthority);
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+    @Override
+    public String getPassword(){ return this.password; }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

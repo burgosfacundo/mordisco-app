@@ -7,7 +7,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name = "productos")
+@Table(name = "productos",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_producto_nombre", columnNames = "nombre"),
+                @UniqueConstraint(name = "UK_producto_imagen", columnNames = "imagen_id")
+})
 @Getter
 @Setter
 @AllArgsConstructor
@@ -29,9 +33,6 @@ public class Producto {
 
     @Column (nullable = false)
     private Boolean disponible;
-
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CalificacionProducto> calificaciones;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "imagen_id", referencedColumnName = "id", unique = true)

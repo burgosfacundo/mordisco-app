@@ -1,9 +1,14 @@
 package utn.back.mordiscoapi.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,10 +17,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Manejador global de excepciones para la aplicación.
@@ -23,8 +30,10 @@ import java.util.Map;
  */
 @RestControllerAdvice // Anotación que indica que esta clase es un manejador de excepciones global
 @Slf4j // Anotación de Lombok para el registro de logs
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
+    private final ConstraintViolationMessageResolver messageResolver;
 
     /**
      * Maneja excepciones generales no capturadas.
@@ -42,7 +51,56 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
+    /**
+     * Maneja excepciones de credenciales incorrectas.
+     *
+     * @return una respuesta con un mensaje de error y estado HTTP 401
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public String handleBadCredentials() {
+        return "Email o contraseña incorrectos";
+    }
 
+    /**
+     * Maneja excepciones de acceso denegado.
+     *
+     * @return una respuesta con un mensaje de error y estado HTTP 403
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, String> handleAccessDeniedException() {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Acceso denegado");
+        return errorResponse;
+    }
+
+    /**
+     * Maneja excepciones de firma de token JWT inválido.
+     *
+     * @return una respuesta con un mensaje de error y estado HTTP 401
+     */
+    @ExceptionHandler(SignatureException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleJwtSignatureException() {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Token inválido o modificado. Acceso no autorizado.");
+        return errorResponse;
+    }
+
+    /**
+     * Maneja excepciones de token JWT expirado.
+     *
+     * @return una respuesta con un mensaje de error y estado HTTP 401
+     */
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleJwtExpiredException() {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Token expirado");
+        errorResponse.put("message", "El token JWT ha expirado. Por favor, inicie sesión nuevamente.");
+        return errorResponse;
+    }
 
     /**
      * Maneja violaciones de integridad de datos, como claves únicas duplicadas.
@@ -50,16 +108,20 @@ public class GlobalExceptionHandler {
      * @param ex la excepción de violación de integridad de datos
      * @return una respuesta con un mensaje de error y estado HTTP 400
      */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public Map<String, String> handleDataException(DataIntegrityViolationException ex) {
-        log.warn("Data integrity violation: {}", ex.getMessage());
-        Map<String, String> errorResponse = new HashMap<>();
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        String rootMessage = Optional.ofNullable(ex.getRootCause())
+                .map(Throwable::getMessage)
+                .orElse("");
 
-        errorResponse.put("error", "Integridad de datos violada");
-        errorResponse.put("message", ex.getMessage());
+        String userMessage = messageResolver.resolveMessage(rootMessage);
 
-        return errorResponse;
+        return Map.of(
+                "error", "Violación de integridad de datos",
+                "message", userMessage,
+                "details", ex.getMessage()
+        );
     }
 
     /**
@@ -95,6 +157,32 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
+        return errors;
+    }
+
+    /**
+     * Maneja errores de conversión de tipos de argumentos, especialmente para enumeraciones.
+     *
+     * @param ex la excepción de tipo de argumento no coincidente
+     * @return una respuesta con un mensaje de error y estado HTTP 400
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleEnumConversionError(MethodArgumentTypeMismatchException ex) {
+        Map<String, String> errors = new HashMap<>();
+        if (ex.getRequiredType() != null && ex.getRequiredType().isEnum()) {
+            Object[] enumConstants = ex.getRequiredType().getEnumConstants();
+            StringBuilder valores = new StringBuilder();
+            for (int i = 0; i < enumConstants.length; i++) {
+                valores.append(enumConstants[i]);
+                if (i < enumConstants.length - 1) valores.append(", ");
+            }
+            errors.put("error", "Valor de enumeración no válido");
+            errors.put("message", "El valor '" + ex.getValue() + "' no es válido para el parámetro '" + ex.getName() + "'. Valores permitidos: " + valores);
+            return errors;
+        }
+        errors.put("error", "Tipo de argumento no válido");
+        errors.put("message", ex.getMessage());
         return errors;
     }
 

@@ -10,13 +10,12 @@ import java.util.Optional;
 @Repository
 public interface MenuRepository extends JpaRepository<Menu,Long> {
     @Query("""
-               SELECT
-                    m.id AS id,
-                    m.nombre AS nombre,
-                    p AS producto
-               FROM Menu m
-               JOIN Producto p ON p.menu.id = m.id
-               WHERE m.id = :id
+              SELECT m
+              FROM Menu m
+              JOIN Restaurante r ON r.menu.id = m.id
+              JOIN FETCH Producto p ON p.menu.id = m.id
+              JOIN FETCH Imagen i ON i.id = p.imagen.id
+              WHERE r.id = :restauranteId
             """)
-    Optional<Menu> findWithProductosById(Long id);
+    Optional<Menu> findByRestauranteId(Long restauranteId);
 }

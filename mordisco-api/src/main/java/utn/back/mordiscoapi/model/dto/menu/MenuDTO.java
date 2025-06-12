@@ -1,8 +1,9 @@
 package utn.back.mordiscoapi.model.dto.menu;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import utn.back.mordiscoapi.model.dto.producto.ProductoRequestDTO;
+import utn.back.mordiscoapi.model.dto.producto.ProductoDTO;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public record MenuDTO(
         @Schema(description = "Nombre del menu", example = "Ricoricor")
         String nombre,
         @NotNull(message = "La lista de productos no debe ser nula")
-        List<ProductoRequestDTO> productos
+        @Valid
+        List<ProductoDTO> productos
 ) {
 }

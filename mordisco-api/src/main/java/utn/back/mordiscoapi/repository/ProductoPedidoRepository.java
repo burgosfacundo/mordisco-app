@@ -2,7 +2,6 @@ package utn.back.mordiscoapi.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import utn.back.mordiscoapi.model.entity.Producto;
 import utn.back.mordiscoapi.model.entity.ProductoPedido;
 import utn.back.mordiscoapi.model.projection.ProductoPedidoProjection;
 
@@ -17,7 +16,7 @@ public interface ProductoPedidoRepository extends CrudRepository<ProductoPedido,
                   pp.pedido.id AS pedidoId,
                   pp.producto.id AS productoId
             FROM ProductoPedido pp
-            WHERE pp.pedido.id = :idPedido 
+            WHERE pp.pedido.id = :idPedido
             """)
     List<ProductoPedidoProjection> findByIdPedido(Long idPedido);
 }

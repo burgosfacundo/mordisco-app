@@ -2,10 +2,8 @@ package utn.back.mordiscoapi.model.projection;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import utn.back.mordiscoapi.model.entity.Imagen;
-import utn.back.mordiscoapi.model.entity.Menu;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public interface ProductoProjection {
 
