@@ -1,50 +1,48 @@
-import { useEffect, useState } from "react";
+import { UseApiCall } from "../interfaces/useApi.model";
+import { useCallback, useEffect, useState } from "react";
 
-type Data<T> = T | null;
-type ErrorType = Error | null;
-
-interface Params<T> {
-  data: Data<T>;
-  loading: boolean;
-  error: ErrorType;
+type UseApiOptions<P> = {
+  autoFetch?: boolean;
+  params: P
 }
 
-export const useFetch = <T>(url: string): Params<T> => {
+
+type Data<T> = T | null;
+type CustomError = Error | null;
+
+interface UseApiResult<T, P> {
+  loading: boolean;
+  data: Data<T>;
+  error: CustomError;
+  fetch: (param: P) => void;
+}
+
+export const useApi = <T, P,>(apiCall: (param: P) => UseApiCall<T>, options?: UseApiOptions<P>): UseApiResult<T, P> => {
+  const [loading, setLoading] = useState<boolean>(false)
   const [data, setData] = useState<Data<T>>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<ErrorType>(null)
+  const [error, setError] = useState<CustomError>(null)
+
+  const fetch = useCallback((param: P) => {
+    const { call, controller } = apiCall(param);
+    setLoading(true);
+
+    call.then((response) => {
+      setData(response.data);
+      setError(null);
+    }).catch((err) => {
+      setError(err)
+    }).finally(() => {
+      setLoading(false)
+    })
+    return () => controller.abort()
+  }, [apiCall])
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    setLoading(true)
-
-    const fetchData = async () => {
-      try {
-        const response = await fetch(url, controller);
-
-        if (!response.ok) {
-          throw new Error("Error en la petición")
-        }
-
-        const jsonData: T = await response.json();
-
-        setData(jsonData)
-        setError(null);
-      } catch (err) {
-        setError(err as Error)
-      } finally {
-        setLoading(false)
-      }
+    if (options?.autoFetch) {
+      return fetch(options.params);
     }
 
-    fetchData();
+  }, [fetch, options?.autoFetch, options?.params])
 
-    return () => {
-      controller.abort();
-    }
-
-  }, [url])
-
-  return { data, loading, error }
+  return { loading, data, error, fetch }
 }

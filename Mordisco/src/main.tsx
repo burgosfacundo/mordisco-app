@@ -1,15 +1,16 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { AuthProvider } from "./context/AuthContext.tsx";
+import App from "./App.tsx";
+import "./index.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import { AxiosInterceptor } from './interceptors/axios.interceptor.tsx';
+import { initAxios } from './interceptors/axios.interceptor';
 
-AxiosInterceptor();
+initAxios();
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+createRoot(document.getElementById("root")!).render(
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+);

@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-icons/all-files": "^4.1.0",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.6",
     "formik": "^2.4.6",
+    "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.6.0",
+    "react-router-dom": "^7.6.1",
+    "react-select": "^5.10.1",
     "yup": "^1.6.1"
   },
   "devDependencies": {
