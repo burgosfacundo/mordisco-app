@@ -1,0 +1,1454 @@
+{
+	"info": {
+		"_postman_id": "7defc558-78ee-4764-ac2c-38504c23c800",
+		"name": "Mordisco API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23290285"
+	},
+	"item": [
+		{
+			"name": "Promocion",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiUGFyZWRlcyIsImlkIjozMiwidGVsZWZvbm8iOiIzMzMzMzMzMzE2Iiwibm9tYnJlIjoiQW5kcsOpcyIsImVtYWlsIjoiZHVlbm8xQG1vcmRpc2NvLmNvbSIsInN1YiI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJpYXQiOjE3NDk3Mzc4ODAsImV4cCI6MTc0OTc0MTQ4MH0.dhvVl93PCjScBpEFXzFLeX5456v-CHAAGw9rWhTBUJE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"descripcion\": \"Promocion barbara\",\r\n    \"descuento\":0.20,\r\n    \"fechaInicio\": \"2025-06-12\",\r\n    \"fechaFin\": \"2025-09-12\",\r\n    \"restauranteId\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/promocion/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"promocion",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNzk5NywiZXhwIjoxNzQ5NzQxNTk3fQ.GI6Z4b7iNRA1r9Zm-Qpc1NZqvBrnHT1OOqADzu9mNFE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/promocion",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"promocion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNzk5NywiZXhwIjoxNzQ5NzQxNTk3fQ.GI6Z4b7iNRA1r9Zm-Qpc1NZqvBrnHT1OOqADzu9mNFE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/promocion/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"promocion",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id Restaurante",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiUGFyZWRlcyIsImlkIjozMiwidGVsZWZvbm8iOiIzMzMzMzMzMzE2Iiwibm9tYnJlIjoiQW5kcsOpcyIsImVtYWlsIjoiZHVlbm8xQG1vcmRpc2NvLmNvbSIsInN1YiI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJpYXQiOjE3NDk3Mzc4ODAsImV4cCI6MTc0OTc0MTQ4MH0.dhvVl93PCjScBpEFXzFLeX5456v-CHAAGw9rWhTBUJE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/promocion/restaurante/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"promocion",
+								"restaurante",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiUGFyZWRlcyIsImlkIjozMiwidGVsZWZvbm8iOiIzMzMzMzMzMzE2Iiwibm9tYnJlIjoiQW5kcsOpcyIsImVtYWlsIjoiZHVlbm8xQG1vcmRpc2NvLmNvbSIsInN1YiI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJpYXQiOjE3NDk3Mzc4ODAsImV4cCI6MTc0OTc0MTQ4MH0.dhvVl93PCjScBpEFXzFLeX5456v-CHAAGw9rWhTBUJE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"descripcion\": \"Promocion barbara 8\",\r\n    \"descuento\":0.50,\r\n    \"fechaInicio\": \"2025-08-12\",\r\n    \"fechaFin\": \"2025-09-12\",\r\n    \"restauranteId\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/promocion/16",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"promocion",
+								"16"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiUGFyZWRlcyIsImlkIjozMiwidGVsZWZvbm8iOiIzMzMzMzMzMzE2Iiwibm9tYnJlIjoiQW5kcsOpcyIsImVtYWlsIjoiZHVlbm8xQG1vcmRpc2NvLmNvbSIsInN1YiI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJpYXQiOjE3NDk3Mzc4ODAsImV4cCI6MTc0OTc0MTQ4MH0.dhvVl93PCjScBpEFXzFLeX5456v-CHAAGw9rWhTBUJE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/promocion/16",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"promocion",
+								"16"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Menu",
+			"item": [
+				{
+					"name": "Post menu",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODM2NiwiZXhwIjoxNzQ5NzQxOTY2fQ.ehdaLh72vxdjEo9gPQDLoeSNZgY55PYB3VUhr__VGJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\":1,\r\n    \"nombre\": \"Menu Mc Donalds\",\r\n    \"productos\": [\r\n        {\r\n            \"id\":2,\r\n            \"nombre\": \"Big Mc 22\",\r\n            \"descripcion\": \"Hamburguesa BIG MC\",\r\n            \"precio\": 15000,\r\n            \"disponible\": true,\r\n            \"imagen\": {\r\n                \"id\":1,\r\n                \"url\": \"url BIG MC\",\r\n                \"nombre\": \"triple BIG MC\"\r\n            }\r\n        },\r\n        {\r\n            \"nombre\": \"Big Mc 2gsggggg\",\r\n            \"descripcion\": \"Hamburguesa BIG MC\",\r\n            \"precio\": 15000,\r\n            \"disponible\": true,\r\n            \"imagen\": {\r\n                \"url\": \"url BIG MfaaaaaaaaaaaC\",\r\n                \"nombre\": \"tripleafafafa BIG MC\"\r\n            }\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/menu/crear/16",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"menu",
+								"crear",
+								"16"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Restaurante Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODM2NiwiZXhwIjoxNzQ5NzQxOTY2fQ.ehdaLh72vxdjEo9gPQDLoeSNZgY55PYB3VUhr__VGJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/menu/16",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"menu",
+								"16"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Menu By Restaurante Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoyLCJub21icmUiOiJST0xFX0NMSUVOVEUifSwiYXBlbGxpZG8iOiJHb256w6FsZXoiLCJpZCI6NiwidGVsZWZvbm8iOiIzMzMzMzMzMzM1Iiwibm9tYnJlIjoiTWFydMOtbiIsImVtYWlsIjoiY2xpZW50ZTVAbW9yZGlzY28uY29tIiwic3ViIjoiY2xpZW50ZTVAbW9yZGlzY28uY29tIiwiYXV0aG9yaXRpZXMiOiJjbGllbnRlNUBtb3JkaXNjby5jb20iLCJpYXQiOjE3NDkzMzM2MzUsImV4cCI6MTc0OTMzNzIzNX0.tGMkws5IH4fm98S-HBTTi5Olx7ACS9IC1fPUk3S2mcs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/menu/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"menu",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Restaurante",
+			"item": [
+				{
+					"name": "Save Restaurante",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiQnVyZ29zIiwiaWQiOjUwLCJ0ZWxlZm9ubyI6IjIyMzYwMTk4OTIiLCJub21icmUiOiJGYWN1bmRvIiwiZW1haWwiOiJmYWN1QG1vcmRpc2NvLmNvbSIsInN1YiI6ImZhY3VAbW9yZGlzY28uY29tIiwiYXV0aG9yaXRpZXMiOiJmYWN1QG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODExOSwiZXhwIjoxNzQ5NzQxNzE5fQ.NSkIOrLpDw8TM-H9AIyhFtXZ5wyX8ks0U5PhWhng_vQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"razonSocial\":\"Mc donaldsffff\",\r\n    \"activo\": false,\r\n    \"logo\":{\r\n        \"url\":\"urlfafaf1\",\r\n        \"nombre\":\"mcdonafafaldaslogo\"\r\n    },\r\n    \"idUsuario\":50,\r\n    \"direccion\":{\r\n        \"calle\":\"sanjuajn\",\r\n        \"numero\":\"fafa\",\r\n        \"piso\":\"Faa\",\r\n        \"depto\":\"Faf\",\r\n        \"codigoPostal\":\"FAfa\",\r\n        \"referencias\":null,\r\n        \"latitud\":44455.20,\r\n        \"longitud\":64646.22,\r\n        \"ciudad\":\"Madrid\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Horarios a Restaurante",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiQnVyZ29zIiwiaWQiOjUwLCJ0ZWxlZm9ubyI6IjIyMzYwMTk4OTIiLCJub21icmUiOiJGYWN1bmRvIiwiZW1haWwiOiJmYWN1QG1vcmRpc2NvLmNvbSIsInN1YiI6ImZhY3VAbW9yZGlzY28uY29tIiwiYXV0aG9yaXRpZXMiOiJmYWN1QG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODExOSwiZXhwIjoxNzQ5NzQxNzE5fQ.NSkIOrLpDw8TM-H9AIyhFtXZ5wyX8ks0U5PhWhng_vQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"id\":16,\r\n        \"dia\":\"MONDAY\",\r\n        \"horaApertura\":\"09:00\",\r\n        \"horaCierre\":\"15:00\"\r\n    },\r\n    {\r\n        \"dia\":\"SUNDAY\",\r\n        \"horaApertura\":\"09:00\",\r\n        \"horaCierre\":\"19:00\"\r\n    }\r\n\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/16/horarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"16",
+								"horarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiQnVyZ29zIiwiaWQiOjUwLCJ0ZWxlZm9ubyI6IjIyMzYwMTk4OTIiLCJub21icmUiOiJGYWN1bmRvIiwiZW1haWwiOiJmYWN1QG1vcmRpc2NvLmNvbSIsInN1YiI6ImZhY3VAbW9yZGlzY28uY29tIiwiYXV0aG9yaXRpZXMiOiJmYWN1QG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODExOSwiZXhwIjoxNzQ5NzQxNzE5fQ.NSkIOrLpDw8TM-H9AIyhFtXZ5wyX8ks0U5PhWhng_vQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/16",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"16"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id Usuario",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiQnVyZ29zIiwiaWQiOjUwLCJ0ZWxlZm9ubyI6IjIyMzYwMTk4OTIiLCJub21icmUiOiJGYWN1bmRvIiwiZW1haWwiOiJmYWN1QG1vcmRpc2NvLmNvbSIsInN1YiI6ImZhY3VAbW9yZGlzY28uY29tIiwiYXV0aG9yaXRpZXMiOiJmYWN1QG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODExOSwiZXhwIjoxNzQ5NzQxNzE5fQ.NSkIOrLpDw8TM-H9AIyhFtXZ5wyX8ks0U5PhWhng_vQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/usuario/50",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"usuario",
+								"50"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODM2NiwiZXhwIjoxNzQ5NzQxOTY2fQ.ehdaLh72vxdjEo9gPQDLoeSNZgY55PYB3VUhr__VGJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All By Estado",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODM2NiwiZXhwIjoxNzQ5NzQxOTY2fQ.ehdaLh72vxdjEo9gPQDLoeSNZgY55PYB3VUhr__VGJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/estado?estado=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"estado"
+							],
+							"query": [
+								{
+									"key": "estado",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All By Promocion Activa",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODM2NiwiZXhwIjoxNzQ5NzQxOTY2fQ.ehdaLh72vxdjEo9gPQDLoeSNZgY55PYB3VUhr__VGJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/promocion",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"promocion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All By Ciudad",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODM2NiwiZXhwIjoxNzQ5NzQxOTY2fQ.ehdaLh72vxdjEo9gPQDLoeSNZgY55PYB3VUhr__VGJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/ciudad?ciudad=Mendoza",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"ciudad"
+							],
+							"query": [
+								{
+									"key": "ciudad",
+									"value": "Mendoza"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All By Nombre",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODM2NiwiZXhwIjoxNzQ5NzQxOTY2fQ.ehdaLh72vxdjEo9gPQDLoeSNZgY55PYB3VUhr__VGJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/nombre?nombre=mc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"nombre"
+							],
+							"query": [
+								{
+									"key": "nombre",
+									"value": "mc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Restaurante",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODM2NiwiZXhwIjoxNzQ5NzQxOTY2fQ.ehdaLh72vxdjEo9gPQDLoeSNZgY55PYB3VUhr__VGJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\":16,\r\n    \"razonSocial\":\"Mc burger\",\r\n    \"activo\": true,\r\n    \"logo\":{\r\n        \"id\":61,\r\n        \"url\":\"urlfafasfasfgsfafafagsf1\",\r\n        \"nombre\":\"mcdonafafffffffffffffffffffffffffffffaldaslogo\"\r\n    },\r\n    \"direccion\":{\r\n        \"id\":48,\r\n        \"calle\":\"sanjuhshshshshsajn\",\r\n        \"numero\":\"fafa\",\r\n        \"piso\":\"1\",\r\n        \"depto\":\"Faf\",\r\n        \"codigoPostal\":\"FAfa\",\r\n        \"referencias\":null,\r\n        \"latitud\":44455.20,\r\n        \"longitud\":64646.22,\r\n        \"ciudad\":\"Madrid\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczODM2NiwiZXhwIjoxNzQ5NzQxOTY2fQ.ehdaLh72vxdjEo9gPQDLoeSNZgY55PYB3VUhr__VGJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/restaurante/delete/16",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"restaurante",
+								"delete",
+								"16"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Calificaciones",
+			"item": [
+				{
+					"name": "Save Calificacion",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoyLCJub21icmUiOiJST0xFX0NMSUVOVEUifSwiYXBlbGxpZG8iOiJSb2RyaWd1ZXoiLCJpZCI6MiwidGVsZWZvbm8iOiIzMzMzMzMzMzI5MiIsIm5vbWJyZSI6Ik1hcnRhIiwiZW1haWwiOiJjbGllbnRlMUBtb3JkaXNjby5jb20iLCJzdWIiOiJjbGllbnRlMUBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNzY0NywiZXhwIjoxNzQ5NzQxMjQ3fQ.o2zpNyPCJ0RlomZnc5B7kEdR6zUG0opYa0GnSAUUAiI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"restauranteId\":1,\r\n    \"calificacionDTO\":{\r\n        \"idUsuario\":2,\r\n        \"puntaje\":3,\r\n        \"comentario\":\"Muy rico todo pero malas vistas\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/calificacion/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"calificacion",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNzcwNywiZXhwIjoxNzQ5NzQxMzA3fQ.MoUN1xBpF0a0hQa7nn2nyiboqh77ynlRJBELOWvvJF0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/calificacion/47",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"calificacion",
+								"47"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNzcwNywiZXhwIjoxNzQ5NzQxMzA3fQ.MoUN1xBpF0a0hQa7nn2nyiboqh77ynlRJBELOWvvJF0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/calificacion",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"calificacion"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Usuarios",
+			"item": [
+				{
+					"name": "Save Usuario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\":\"Facundo\",\r\n    \"apellido\":\"Burgos\",\r\n    \"telefono\":2236019892,\r\n    \"email\":\"facu@mordisco.com\",\r\n    \"password\":\"mordisco\",\r\n    \"rolId\":3,\r\n    \"direcciones\":[\r\n        {\r\n            \"calle\":\"sanjuajn\",\r\n            \"numero\":\"fafa\",\r\n            \"piso\":\"Faa\",\r\n            \"depto\":\"Faf\",\r\n            \"codigoPostal\":\"FAfa\",\r\n            \"referencias\":null,\r\n            \"latitud\":44455.20,\r\n            \"longitud\":64646.22,\r\n            \"ciudad\":\"Madrid\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/usuario/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuario",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNjgxMiwiZXhwIjoxNzQ5NzQwNDEyfQ.HGJMeRN_L0M70PPYWzxzLtL-EJSdooEh4TznvlB51b0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/usuario",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuario"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNjgxMiwiZXhwIjoxNzQ5NzQwNDEyfQ.HGJMeRN_L0M70PPYWzxzLtL-EJSdooEh4TznvlB51b0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/usuario/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuario",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNjgxMiwiZXhwIjoxNzQ5NzQwNDEyfQ.HGJMeRN_L0M70PPYWzxzLtL-EJSdooEh4TznvlB51b0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/usuario/49",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuario",
+								"49"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By IdRol",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNjgxMiwiZXhwIjoxNzQ5NzQwNDEyfQ.HGJMeRN_L0M70PPYWzxzLtL-EJSdooEh4TznvlB51b0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/usuario/rol/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuario",
+								"rol",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoyLCJub21icmUiOiJST0xFX0NMSUVOVEUifSwiYXBlbGxpZG8iOiJBbHZhcmV6IiwiaWQiOjIsInRlbGVmb25vIjoiMzMzMzMzMzMzMSIsIm5vbWJyZSI6Ikp1YW4iLCJlbWFpbCI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsInN1YiI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsImF1dGhvcml0aWVzIjoiY2xpZW50ZTFAbW9yZGlzY28uY29tIiwiaWF0IjoxNzQ5NzM3MzIzLCJleHAiOjE3NDk3NDA5MjN9.9EKBf1shLNI_lC0brpbvE9cSgtagwmzTHFb6SzOrxDw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/usuario/password/2?oldPassword=1234&newPassword=mordisco",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuario",
+								"password",
+								"2"
+							],
+							"query": [
+								{
+									"key": "oldPassword",
+									"value": "1234"
+								},
+								{
+									"key": "newPassword",
+									"value": "mordisco"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Usuario",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoyLCJub21icmUiOiJST0xFX0NMSUVOVEUifSwiYXBlbGxpZG8iOiJBbHZhcmV6IiwiaWQiOjIsInRlbGVmb25vIjoiMzMzMzMzMzMzMSIsIm5vbWJyZSI6Ikp1YW4iLCJlbWFpbCI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsInN1YiI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsImF1dGhvcml0aWVzIjoiY2xpZW50ZTFAbW9yZGlzY28uY29tIiwiaWF0IjoxNzQ5NzM3MzIzLCJleHAiOjE3NDk3NDA5MjN9.9EKBf1shLNI_lC0brpbvE9cSgtagwmzTHFb6SzOrxDw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\":\"Marta\",\r\n    \"apellido\":\"Rodriguez\",\r\n    \"telefono\":33333333292,\r\n    \"direcciones\":[\r\n        {\r\n            \"id\": 1,\r\n            \"calle\":\"sanjuajn\",\r\n            \"numero\":\"fafa\",\r\n            \"piso\":\"Faa\",\r\n            \"depto\":\"Faf\",\r\n            \"codigoPostal\":\"FAfa\",\r\n            \"referencias\":null,\r\n            \"latitud\":44455.20,\r\n            \"longitud\":64646.22,\r\n            \"ciudad\":\"Madrid\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/usuario/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuario",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Pedido",
+			"item": [
+				{
+					"name": "Save Pedido",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoyLCJub21icmUiOiJST0xFX0NMSUVOVEUifSwiYXBlbGxpZG8iOiJBbHZhcmV6IiwiaWQiOjIsInRlbGVmb25vIjoiMzMzMzMzMzMzMSIsIm5vbWJyZSI6Ikp1YW4iLCJlbWFpbCI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsInN1YiI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsImF1dGhvcml0aWVzIjoiY2xpZW50ZTFAbW9yZGlzY28uY29tIiwiaWF0IjoxNzQ5NzM2NzEzLCJleHAiOjE3NDk3NDAzMTN9.a-PvrQwmISCcGrI3xxJ0YNMPHK4OXOIKz54jVRDs2r4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idCliente\":5,\r\n    \"idRestaurante\":3,\r\n    \"idDireccion\":25,\r\n    \"tipoEntrega\":\"DELIVERY\",\r\n    \"productos\":[\r\n        {\r\n            \"cantidad\":1,\r\n            \"productoId\":32\r\n        }\r\n    ]\r\n\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/pedido/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"pedido",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiUGFyZWRlcyIsImlkIjozMiwidGVsZWZvbm8iOiIzMzMzMzMzMzE2Iiwibm9tYnJlIjoiQW5kcsOpcyIsImVtYWlsIjoiZHVlbm8xQG1vcmRpc2NvLmNvbSIsInN1YiI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJpYXQiOjE3NDk3MzY3NTksImV4cCI6MTc0OTc0MDM1OX0.doI8HfwHFuiLXx8Vj2AK-UeBe-Swjq04h8jYSddP-jM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/pedido/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"pedido",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By IdCliente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoyLCJub21icmUiOiJST0xFX0NMSUVOVEUifSwiYXBlbGxpZG8iOiJBbHZhcmV6IiwiaWQiOjIsInRlbGVmb25vIjoiMzMzMzMzMzMzMSIsIm5vbWJyZSI6Ikp1YW4iLCJlbWFpbCI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsInN1YiI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsImF1dGhvcml0aWVzIjoiY2xpZW50ZTFAbW9yZGlzY28uY29tIiwiaWF0IjoxNzQ5NzM2MjExLCJleHAiOjE3NDk3Mzk4MTF9.KNEAik6iAdJZHVqvG98RTJvSxtOCwC1vglmeIAel3cE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/pedido/cliente/8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"pedido",
+								"cliente",
+								"8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By IdCliente And Estado",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoyLCJub21icmUiOiJST0xFX0NMSUVOVEUifSwiYXBlbGxpZG8iOiJBbHZhcmV6IiwiaWQiOjIsInRlbGVmb25vIjoiMzMzMzMzMzMzMSIsIm5vbWJyZSI6Ikp1YW4iLCJlbWFpbCI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsInN1YiI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsImF1dGhvcml0aWVzIjoiY2xpZW50ZTFAbW9yZGlzY28uY29tIiwiaWF0IjoxNzQ5NzM2MjExLCJleHAiOjE3NDk3Mzk4MTF9.KNEAik6iAdJZHVqvG98RTJvSxtOCwC1vglmeIAel3cE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/pedido/cliente/2/state?estado=PENDIENTE",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"pedido",
+								"cliente",
+								"2",
+								"state"
+							],
+							"query": [
+								{
+									"key": "estado",
+									"value": "PENDIENTE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Pedido",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoyLCJub21icmUiOiJST0xFX0NMSUVOVEUifSwiYXBlbGxpZG8iOiJBbHZhcmV6IiwiaWQiOjIsInRlbGVmb25vIjoiMzMzMzMzMzMzMSIsIm5vbWJyZSI6Ikp1YW4iLCJlbWFpbCI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsInN1YiI6ImNsaWVudGUxQG1vcmRpc2NvLmNvbSIsImF1dGhvcml0aWVzIjoiY2xpZW50ZTFAbW9yZGlzY28uY29tIiwiaWF0IjoxNzQ5NzM2Mzg3LCJleHAiOjE3NDk3Mzk5ODd9._Px0yRNY1RQFmZ_Xx9YXSvpmkZbbMjhrLz24CVEcTh4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/pedido/48",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"pedido",
+								"48"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjoxLCJub21icmUiOiJST0xFX0FETUlOIn0sImFwZWxsaWRvIjoiUMOpcmV6IiwiaWQiOjEsInRlbGVmb25vIjoiMTExMTExMTExMSIsIm5vbWJyZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJzdWIiOiJhZG1pbkBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImFkbWluQG1vcmRpc2NvLmNvbSIsImlhdCI6MTc0OTczNjQ2NywiZXhwIjoxNzQ5NzQwMDY3fQ.Az93JCxSq6NRxZvHssGO2GE6RvgJiOoqB5cjxzoGRYU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/pedido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"pedido"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By IdRestaurante",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiUGFyZWRlcyIsImlkIjozMiwidGVsZWZvbm8iOiIzMzMzMzMzMzE2Iiwibm9tYnJlIjoiQW5kcsOpcyIsImVtYWlsIjoiZHVlbm8xQG1vcmRpc2NvLmNvbSIsInN1YiI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJpYXQiOjE3NDk3MzY1MzAsImV4cCI6MTc0OTc0MDEzMH0.GPUkDYqu7rsULNSGt_eGTqXM5aO8MeXrECmiO2qrBAA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/pedido/restaurante/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"pedido",
+								"restaurante",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By IdRestaurante And Estado",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiUGFyZWRlcyIsImlkIjozMiwidGVsZWZvbm8iOiIzMzMzMzMzMzE2Iiwibm9tYnJlIjoiQW5kcsOpcyIsImVtYWlsIjoiZHVlbm8xQG1vcmRpc2NvLmNvbSIsInN1YiI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJpYXQiOjE3NDk3MzY1MzAsImV4cCI6MTc0OTc0MDEzMH0.GPUkDYqu7rsULNSGt_eGTqXM5aO8MeXrECmiO2qrBAA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/pedido/restaurante/1/state?estado=PENDIENTE",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"pedido",
+								"restaurante",
+								"1",
+								"state"
+							],
+							"query": [
+								{
+									"key": "estado",
+									"value": "PENDIENTE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change State",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjp7ImlkIjozLCJub21icmUiOiJST0xFX1JFU1RBVVJBTlRFIn0sImFwZWxsaWRvIjoiUGFyZWRlcyIsImlkIjozMiwidGVsZWZvbm8iOiIzMzMzMzMzMzE2Iiwibm9tYnJlIjoiQW5kcsOpcyIsImVtYWlsIjoiZHVlbm8xQG1vcmRpc2NvLmNvbSIsInN1YiI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJhdXRob3JpdGllcyI6ImR1ZW5vMUBtb3JkaXNjby5jb20iLCJpYXQiOjE3NDk3MzY1MzAsImV4cCI6MTc0OTc0MDEzMH0.GPUkDYqu7rsULNSGt_eGTqXM5aO8MeXrECmiO2qrBAA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/pedido/state/1?nuevoEstado=EN_PROCESO",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"pedido",
+								"state",
+								"1"
+							],
+							"query": [
+								{
+									"key": "nuevoEstado",
+									"value": "EN_PROCESO"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"admin@mordisco.com\",\r\n    \"password\":\"mordisco\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"admin@mordisco.com\",\r\n    \"password\":\"mordisco\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

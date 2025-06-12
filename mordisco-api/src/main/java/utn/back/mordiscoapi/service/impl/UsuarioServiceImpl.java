@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
@@ -31,6 +32,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     private final UsuarioRepository repository;
     private final RolRepository rolRepository;
     private final DireccionRepository direccionRepository;
+    final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
      * Guarda un usuario.
@@ -147,12 +149,12 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
                 () -> new NotFoundException("Usuario no encontrado")
         );
 
-        if(!usuario.getPassword().equals(oldPassword)){
+        if (!passwordEncoder.matches(oldPassword, usuario.getPassword())) {
             throw new NotFoundException("Contraseña incorrecta");
         }
 
-        usuario.setPassword(newPassword);
-        repository.changePassword(newPassword, usuario.getId());
+        usuario.setPassword(passwordEncoder.encode(newPassword));
+        repository.changePassword(passwordEncoder.encode(newPassword), usuario.getId());
     }
 
     /**
