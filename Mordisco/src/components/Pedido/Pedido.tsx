@@ -87,13 +87,11 @@ const handleEnviarPedido = () => {
 
     call
         .then((res) => {
-            console.log('✅ Pedido enviado con éxito:', res.data);
             alert('Pedido enviado correctamente');
             navigate("/dashboardUser")
         })
         .catch((err) => {
             if (err.name !== 'CanceledError') {
-                console.error('Error al enviar el pedido:', err);
                 alert('Error al enviar el pedido');
             }
         });

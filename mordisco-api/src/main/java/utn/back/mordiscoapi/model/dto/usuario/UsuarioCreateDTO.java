@@ -33,7 +33,7 @@ public record UsuarioCreateDTO(
 
         @NotNull(message = "El rol del usuario es obligatorio")
         Long rolId,
-        @NotNull(message = "Las direcciones del usuario son obligatorias")
+
         @Schema(description = "Direcciones del usuario")
         @Valid
         List<DireccionCreateDTO> direcciones

@@ -9,6 +9,7 @@ import utn.back.mordiscoapi.model.entity.Direccion;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @UtilityClass
@@ -24,9 +25,11 @@ public class UsuarioMapper {
                 .id(dto.rolId())
                 .build();
 
-        List<Direccion> direcciones = dto.direcciones().stream()
+        List<Direccion> direcciones = dto.direcciones() != null
+                ? dto.direcciones().stream()
                 .map(DireccionMapper::toEntity)
-                .toList();
+                .toList()
+                : new ArrayList<>();
 
         return Usuario.builder()
                 .nombre(dto.nombre())

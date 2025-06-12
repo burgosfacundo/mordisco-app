@@ -18,7 +18,7 @@ axiosInstance.interceptors.request.use(
 
     if (!shouldExclude) {
       const token = localStorage.getItem("token");
-      console.log(token)
+      
       if (token) {
         config.headers = config.headers ?? {};
         config.headers['Authorization'] = `Bearer ${token}`;
