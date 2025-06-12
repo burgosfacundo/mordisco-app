@@ -14,7 +14,9 @@ import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
+import utn.back.mordiscoapi.model.entity.HorarioAtencion;
 import utn.back.mordiscoapi.model.entity.Restaurante;
+import utn.back.mordiscoapi.repository.HorarioAtencionRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.interf.IRestauranteService;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 public class RestauranteServiceImpl implements IRestauranteService {
     private final RestauranteRepository restauranteRepository;
     private final UsuarioRepository usuarioRepository;
+    private final HorarioAtencionRepository horarioAtencionRepository;
 
     /**
      * Guarda un nuevo restaurante en la base de datos.
@@ -52,7 +55,7 @@ public class RestauranteServiceImpl implements IRestauranteService {
     @Override
     public RestauranteResponseDTO findById(Long id) throws NotFoundException {
         Restaurante rest = restauranteRepository.findRestauranteById(id).orElseThrow(
-                () -> new NotFoundException("Restaurante no encontrada"));
+                () -> new NotFoundException("Restaurante no encontrado"));
 
         return RestauranteMapper.toDTO(rest);
 
@@ -70,12 +73,12 @@ public class RestauranteServiceImpl implements IRestauranteService {
     @Override
     public RestauranteResponseDTO findByIdUsuario(Long idUsuario) throws NotFoundException, BadRequestException {
         if(!usuarioRepository.existsById(idUsuario)){
-                throw new NotFoundException("el usuario no fue encontrado!");
+                throw new NotFoundException("El usuario no existe");
         }
 
         var exist = restauranteRepository.findByIdUsuario(idUsuario);
         if(exist.isEmpty()){
-            throw new BadRequestException("El dueño buscado no tiene ningun restaurante");
+            throw new BadRequestException("El usuario no tiene un restaurante asociado");
         }
 
         return RestauranteMapper.toDTO(exist.get());
@@ -194,9 +197,21 @@ public class RestauranteServiceImpl implements IRestauranteService {
      */
     @Transactional
     @Override
-    public void adHorariosAtencion(Long idRestaurante, List<HorarioAtencionDTO> horarios) throws NotFoundException {
+    public void adHorariosAtencion(Long idRestaurante, List<HorarioAtencionDTO> horarios) throws NotFoundException, BadRequestException {
         Restaurante restaurante = restauranteRepository.findRestauranteById(idRestaurante)
                 .orElseThrow(() -> new NotFoundException("El restaurante no fue encontrado"));
+
+        for (HorarioAtencionDTO dto : horarios) {
+            if (dto.id()!= null) {
+                HorarioAtencion original = horarioAtencionRepository.findById(dto.id())
+                        .orElseThrow(() -> new NotFoundException("Horario de atención con ID " + dto.id() + " no encontrado"));
+
+                // Verificamos que pertenezca al restaurante
+                if (!restaurante.getHorariosAtencion().contains(original)) {
+                    throw new BadRequestException("El horario con ID " + dto.id() + " no pertenece al restaurante con ID " + idRestaurante);
+                }
+            }
+        }
 
         var list = horarios.stream()
                 .map(HorarioAtencionMapper::toEntity)

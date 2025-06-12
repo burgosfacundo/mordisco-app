@@ -20,5 +20,5 @@ public interface IRestauranteService {
     List<RestauranteResponseDTO> getAllByPromocionActiva();
     void update(RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException;
     void delete(Long id) throws NotFoundException;
-    void adHorariosAtencion(Long idRestaurante, List<HorarioAtencionDTO> horarios) throws NotFoundException;
+    void adHorariosAtencion(Long idRestaurante, List<HorarioAtencionDTO> horarios) throws NotFoundException, BadRequestException;
 }
