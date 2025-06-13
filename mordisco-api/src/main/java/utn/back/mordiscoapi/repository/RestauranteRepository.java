@@ -100,4 +100,6 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     boolean existsByIdAndImagen_Id(Long id, Long imagenId);
 
     boolean existsByIdAndDireccion_Id(Long id, Long direccionId);
+
+    boolean existsByIdAndMenu_Id(Long id, Long menuId);
 }

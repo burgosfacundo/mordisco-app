@@ -3,6 +3,7 @@ package utn.back.mordiscoapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,14 +49,17 @@ public class RestauranteController {
     * @return Respuesta HTTP con el DTO del restaurante encontrado.
     * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
     */
-    @Operation(summary = "Obtener restaurantes por ID del dueño", description = "Recibe un ID del usuario con rol de dueño y devuelve los restaurantes correspondiente") // Anotación para documentar la operación con Swagger
+    @Operation(summary = "Obtener restaurantes por ID del dueño",
+            description = "Recibe un ID del usuario con rol de dueño y devuelve el restaurante correspondiente a ese usuario." +
+                    "**Rol necesario: ADMIN o El propio dueño del restaurante puede acceder a su restaurante**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Devuelve los restaurantes correspondientes"),
             @ApiResponse(responseCode = "404", description = "No se encontró el usuario con rol de dueño con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#idUsuario)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or (@usuarioSecurity.puedeAccederAUsuario(#idUsuario) and hasRole('RESTAURANTE'))")
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<RestauranteResponseDTO> findByUsuario(@PathVariable Long idUsuario) throws NotFoundException, BadRequestException {
     return ResponseEntity.ok(restauranteService.findByIdUsuario(idUsuario));
@@ -65,13 +69,15 @@ public class RestauranteController {
      * Función para crear restaurante.
      * @return Respuesta HTTP con un mensaje de éxito.
      */
-    @Operation(summary = "Crear un restaurante nuevo", description = "Recibe un restaurante y lo guarda en la base de datos")
+    @Operation(summary = "Crear un restaurante nuevo", description = "Recibe un restaurante y lo guarda en la base de datos. " +
+            "**El dueño del restaurante puede crear su propio restaurante**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Restaurante creado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasAnyRole('ADMIN','RESTAURANTE')")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @usuarioSecurity.puedeAccederAUsuario(#dto.idUsuario())")
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody
                                        @Valid
@@ -162,14 +168,16 @@ public class RestauranteController {
      * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
      * @throws BadRequestException Si los datos proporcionados son inválidos.
      */
-    @Operation(summary = "Actualizar restaurante", description = "Recibe un DTO de restaurante y lo actualiza en la base de datos")
+    @Operation(summary = "Actualizar restaurante", description = "Recibe un DTO de restaurante y lo actualiza en la base de datos. " +
+            "**El propio dueño del restaurante puede acceder a su restaurante para actualizarlo**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Actualiza el restaurante correspondiente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.id)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.id)")
     @PutMapping("/update")
     public ResponseEntity<String> update(@RequestBody @Valid RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException {
         restauranteService.update(dto);
@@ -183,18 +191,20 @@ public class RestauranteController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
      */
-    @Operation(summary = "Eliminar restaurante por ID", description = "Recibe un id de un restaurante y lo borra")
+    @Operation(summary = "Eliminar restaurante por ID", description = "Recibe un id de un restaurante y lo borra. " +
+            "**El propio dueño del restaurante puede acceder a su restaurante para eliminarlo**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Elimina el restaurante correspondiente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException{
         restauranteService.delete(id);
-        return ResponseEntity.ok("El restaurante se borro exitosamente!");
+        return ResponseEntity.ok("El restaurante se borro exitosamente");
     }
 
     /**
@@ -205,18 +215,20 @@ public class RestauranteController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
      */
-    @Operation(summary = "Agregar horarios de atención al restaurante", description = "Recibe un ID de restaurante y una lista de horarios para agregar")
+    @Operation(summary = "Agregar horarios de atención al restaurante", description = "Recibe un ID de restaurante y una lista de horarios para agregar. " +
+            "**El propio dueño del restaurante puede acceder a su restaurante para agregar horarios**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Horarios agregados exitosamente al restaurante"),
             @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
     @PutMapping("/{id}/horarios")
     public ResponseEntity<String> addHorarios(@PathVariable Long id,
                                               @Valid @RequestBody List<HorarioAtencionDTO> horarios)
-            throws NotFoundException {
+            throws NotFoundException, BadRequestException {
         restauranteService.adHorariosAtencion(id, horarios);
         return ResponseEntity.ok("Horarios agregados exitosamente al restaurante");
     }

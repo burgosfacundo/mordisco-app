@@ -3,11 +3,13 @@ package utn.back.mordiscoapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.menu.MenuDTO;
 import utn.back.mordiscoapi.service.interf.IMenuService;
@@ -27,16 +29,18 @@ public class MenuController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el restaurante o hay algún error al guardar el menú.
      */
-    @Operation(summary = "Crear un menú", description = "Crea un nuevo menú asociado a un restaurante")
+    @Operation(summary = "Crear un menú", description = "Crea un nuevo menú asociado a un restaurante." +
+            "**Rol necesario: RESTAURANTE y debe ser el dueño del restaurante**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Menú creado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "404", description = "Restaurante no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#restauranteId)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#restauranteId)")
     @PostMapping("/crear/{restauranteId}")
-    public ResponseEntity<String> save(@PathVariable Long restauranteId, @RequestBody @Valid MenuDTO dto) throws NotFoundException {
+    public ResponseEntity<String> save(@PathVariable Long restauranteId, @RequestBody @Valid MenuDTO dto) throws NotFoundException, BadRequestException {
         menuService.save(restauranteId, dto);
         return ResponseEntity.ok("Se ha creado el menu correctamente");
     }
@@ -70,14 +74,16 @@ public class MenuController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el menú asociado al restaurante.
      */
-    @Operation(summary = "Borrar menú", description = "Borra el menú asociado a un restaurante específico")
+    @Operation(summary = "Borrar menú", description = "Borra el menú asociado a un restaurante específico. " +
+            "**Rol necesario: RESTAURANTE y debe ser el dueño del restaurante**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Menú borrado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "404", description = "Menú no encontrado para el restaurante"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#restauranteId)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#restauranteId)")
     @DeleteMapping("/{restauranteId}")
     public ResponseEntity<String> deleteByRestauranteId(@PathVariable Long restauranteId) throws NotFoundException {
         menuService.deleteByIdRestaurante(restauranteId);

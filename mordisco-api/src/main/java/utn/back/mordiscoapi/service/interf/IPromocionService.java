@@ -13,6 +13,6 @@ public interface IPromocionService {
     List<PromocionProjection> findAll();
     PromocionProjection findById(Long id) throws NotFoundException;
     void update(Long id, PromocionRequestDTO dto) throws NotFoundException,BadRequestException;
-    void delete(Long id) throws NotFoundException;
+    void delete(Long idRestaurante,Long idPromocion) throws NotFoundException;
     List<PromocionResponseDTO> listarPromoPorRestaurante (Long idRestaurante)throws NotFoundException;
 }

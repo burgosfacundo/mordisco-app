@@ -3,6 +3,7 @@ package utn.back.mordiscoapi.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.MenuMapper;
 import utn.back.mordiscoapi.model.dto.menu.MenuDTO;
@@ -11,6 +12,7 @@ import utn.back.mordiscoapi.model.entity.Imagen;
 import utn.back.mordiscoapi.model.entity.Menu;
 import utn.back.mordiscoapi.model.entity.Producto;
 import utn.back.mordiscoapi.model.entity.Restaurante;
+import utn.back.mordiscoapi.repository.ImagenRepository;
 import utn.back.mordiscoapi.repository.MenuRepository;
 import utn.back.mordiscoapi.repository.ProductoRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
@@ -24,6 +26,7 @@ public class MenuServiceImpl implements IMenuService {
     private final MenuRepository menuRepository;
     private final RestauranteRepository restauranteRepository;
     private final ProductoRepository productoRepository;
+    private final ImagenRepository imagenRepository;
 
     /**
      * Guarda un menú asociado a un restaurante.
@@ -36,7 +39,7 @@ public class MenuServiceImpl implements IMenuService {
      */
     @Transactional
     @Override
-    public void save(Long restauranteId, MenuDTO dto) throws NotFoundException {
+    public void save(Long restauranteId, MenuDTO dto) throws NotFoundException, BadRequestException {
         Restaurante restaurante = restauranteRepository.findById(restauranteId)
                 .orElseThrow(() -> new NotFoundException("Restaurante no encontrado"));
 
@@ -47,9 +50,13 @@ public class MenuServiceImpl implements IMenuService {
             menu = menuRepository.findById(dto.id())
                     .orElseThrow(() -> new NotFoundException("Menú no encontrado"));
 
+            // Validar que el menú pertenece al restaurante actual
+           if(!restauranteRepository.existsByIdAndMenu_Id(restauranteId, dto.id())){
+                throw new BadRequestException("El menú con id " + dto.id() + " no pertenece al restaurante con id " + restauranteId);
+           }
+
             menu.setNombre(dto.nombre());
         } else {
-            // Creación de menú nuevo
             menu = new Menu();
             menu.setNombre(dto.nombre());
         }
@@ -67,9 +74,29 @@ public class MenuServiceImpl implements IMenuService {
                 if (producto.getMenu() != null && !producto.getMenu().getId().equals(menu.getId())) {
                     throw new NotFoundException("El producto con id " + productoDTO.id() + " no pertenece al menú actual");
                 }
+
+                // Validar que la imagen recibida le pertenece al producto
+                Long imagenDtoId = productoDTO.imagen().id();
+                if (producto.getImagen() != null && imagenDtoId != null && !producto.getImagen().getId().equals(imagenDtoId)) {
+                    throw new BadRequestException("La imagen con id " + imagenDtoId + " no le pertenece al producto con id " + producto.getId());
+                }
+
+                // Si la imagen no es nueva, buscarla por ID
+                var imagen = imagenRepository.findById(imagenDtoId)
+                        .orElseThrow(() -> new NotFoundException("Imagen con id " + imagenDtoId + " no encontrada"));
+
+                imagen.setNombre(productoDTO.imagen().nombre());
+                imagen.setUrl(productoDTO.imagen().url());
+                producto.setImagen(imagen);
             } else {
-                // Nuevo producto
+                if (productoDTO.imagen().id() != null) {
+                    throw new BadRequestException("Debes crear una nueva imagen para el producto, no puedes asignar una imagen existente");
+                }
                 producto = new Producto();
+                producto.setImagen(Imagen.builder()
+                        .nombre(productoDTO.imagen().nombre())
+                        .url(productoDTO.imagen().url())
+                        .build());
             }
 
             producto.setNombre(productoDTO.nombre());
@@ -77,15 +104,14 @@ public class MenuServiceImpl implements IMenuService {
             producto.setPrecio(productoDTO.precio());
             producto.setDisponible(productoDTO.disponible());
             producto.setMenu(menu);
-            producto.setImagen(Imagen.builder()
-                    .id(productoDTO.imagen().id())
-                    .url(productoDTO.imagen().url())
-                    .nombre(productoDTO.imagen().nombre())
-                    .build());
             productos.add(producto);
         }
 
         // Guardar productos
+        if (menu.getProductos() == null) {
+            menu.setProductos(new ArrayList<>());
+        }
+
         menu.getProductos().clear();
         menu.getProductos().addAll(productos);
 

@@ -3,6 +3,7 @@ package utn.back.mordiscoapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,8 @@ public class UsuarioController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el rol del usuario.
      */
-    @Operation(summary = "Crear un usuario nuevo", description = "Recibe un usuario y lo guarda en la base de datos")
+    @Operation(summary = "Crear un usuario nuevo",
+            description = "Recibe un usuario y lo guarda en la base de datos.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Promoción creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
@@ -49,12 +51,15 @@ public class UsuarioController {
      * Función para obtener todos los usuarios.
      * @return Respuesta HTTP con una lista de proyecciones de usuarios.
      */
-    @Operation(summary = "Obtener todos los usuarios", description = "Devuelve una lista con todos los usuarios")
+    @Operation(summary = "Obtener todos los usuarios",
+            description = "Devuelve una lista con todos los usuarios." +
+                    " **Requiere rol: ADMIN**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Usuarios encontrados exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
@@ -67,14 +72,17 @@ public class UsuarioController {
      * @return Respuesta HTTP con la proyección del usuario encontrado.
      * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
      */
-    @Operation(summary = "Obtener un usuario por ID", description = "Recibe un ID y devuelve el usuario correspondiente")
+    @Operation(summary = "Obtener un usuario por ID",
+            description = "Recibe un ID y devuelve el usuario correspondiente." +
+                    "** Requiere rol: ADMIN o el propio usuario autenticado puede acceder a su información**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Devuelve el usuario correspondiente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable
                                                         Long id) throws NotFoundException {
@@ -89,13 +97,16 @@ public class UsuarioController {
      * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
      * @throws BadRequestException Si los datos proporcionados son inválidos.
      */
-    @Operation(summary = "Actualizar un usuario", description = "Recibe un ID y un usuario y actualiza el usuario correspondiente")
+    @Operation(summary = "Actualizar un usuario",
+            description = "Recibe un ID y un usuario y actualiza el usuario correspondiente." +
+                    "** El propio usuario autenticado puede actualizar su información**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Usuario actualizada exitosamente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @PutMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable
@@ -113,13 +124,16 @@ public class UsuarioController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
      */
-    @Operation(summary = "Eliminar un usuario", description = "Recibe un ID y elimina el usuario correspondiente")
+    @Operation(summary = "Eliminar un usuario",
+            description = "Recibe un ID y elimina el usuario correspondiente." +
+                    "** El propio usuario autenticado puede borrar su información**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Usuario eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable
@@ -136,13 +150,16 @@ public class UsuarioController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
      */
-    @Operation(summary = "Actualizar la contraseña de un usuario", description = "Recibe un ID, la vieja contraseña y la nueva contraseña y actualiza el usuario correspondiente")
+    @Operation(summary = "Actualizar la contraseña de un usuario",
+            description = "Recibe un ID, la vieja contraseña y la nueva contraseña y actualiza el usuario correspondiente." +
+                    "** El propio usuario autenticado puede actualizar su contraseña**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Usuario actualizada exitosamente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @PutMapping("/password/{id}")
     public ResponseEntity<String> changePassword(
@@ -163,13 +180,16 @@ public class UsuarioController {
      * @return Respuesta HTTP con una lista de proyecciones de usuarios.
      * @throws NotFoundException Si no se encuentra el rol con el ID proporcionado.
      */
-    @Operation(summary = "Obtener todos los usuarios por rol", description = "Devuelve una lista con todos los usuarios")
+    @Operation(summary = "Obtener todos los usuarios por rol",
+            description = "Devuelve una lista con todos los usuarios que tienen el rol con el ID proporcionado." +
+                    "** Requiere rol: ADMIN**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Promoción creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "404", description = "No se encontró el rol con el ID proporcionado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/rol/{id}")
     public ResponseEntity<List<UsuarioResponseDTO>> findByRolId(@PathVariable Long id)

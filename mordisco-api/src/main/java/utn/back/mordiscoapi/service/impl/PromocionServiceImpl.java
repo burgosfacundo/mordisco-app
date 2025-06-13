@@ -107,6 +107,11 @@ public class PromocionServiceImpl implements IPromocionService {
         var restaurante = restauranteRepository.findById(dto.restauranteId())
                 .orElseThrow(() -> new BadRequestException("El restaurante asociado no existe"));
 
+        // Verificamos si el restaurante es el mismo que el de la promoción actual
+        if (!promocion.getRestaurante().getId().equals(dto.restauranteId())) {
+            throw new BadRequestException("No se puede actualizar la promoción a un restaurante diferente");
+        }
+
         // Actualizar los campos de la promoción
         promocion.setDescripcion(dto.descripcion());
         promocion.setDescuento(dto.descuento());
@@ -121,19 +126,27 @@ public class PromocionServiceImpl implements IPromocionService {
 
     /**
      * Elimina una promoción por su ID.
-     * @param id el ID de la promoción a eliminar.
+     * @param idPromocion el ID de la promoción a eliminar.
+     * @param idRestaurante el ID del restaurante al que pertenece la promoción.
      * @throws NotFoundException si la promoción no se encuentra.
      */
     @Override
-    public void delete(Long id) throws NotFoundException {
-        //Verificamos si existe la promoción usando el existsById por defecto
+    public void delete(Long idRestaurante,Long idPromocion) throws NotFoundException {
+        var promocion = repository.findById(idPromocion)
+                .orElseThrow(() -> new NotFoundException("Promoción no encontrada"));
+
+        // Verificamos si el restaurante existe usando el findById por defecto
         // Si no existe, lanzamos una excepción NotFoundException
-        if (!repository.existsById(id)) {
-            throw new NotFoundException("Promoción no encontrada");
+        if (!restauranteRepository.existsById(idRestaurante)) {
+            throw new NotFoundException("Restaurante no encontrado");
+        }
+        // Verificamos si el restaurante es el mismo que el de la promoción actual
+        if (!promocion.getRestaurante().getId().equals(idRestaurante)) {
+            throw new NotFoundException("No se puede eliminar la promoción de un restaurante diferente");
         }
 
         // Si existe, eliminamos la promoción usando el deleteById por defecto
-        repository.deleteById(id);
+        repository.deleteById(idPromocion);
     }
 
     /**

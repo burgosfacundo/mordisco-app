@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.enums.EstadoPedido;
+import utn.back.mordiscoapi.enums.TipoEntrega;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.PedidoMapper;
@@ -39,14 +40,12 @@ public class PedidoServiceImpl implements IPedidoService {
      */
     @Transactional
     @Override
-    public void save(PedidoRequestDTO dto) throws NotFoundException {
-        if (!restauranteRepository.existsById(dto.idRestaurante())) {
-            throw new NotFoundException("El restaurante no existe");
-        }
+    public void save(PedidoRequestDTO dto) throws NotFoundException, BadRequestException {
+       var restaurante = restauranteRepository.findById(dto.idRestaurante())
+                .orElseThrow(() -> new NotFoundException("El restaurante no existe"));
 
-        if (!usuarioRepository.existsById(dto.idCliente())){
-            throw new NotFoundException("El cliente no existe");
-        }
+        var usuario = usuarioRepository.findById(dto.idCliente())
+                .orElseThrow(() -> new NotFoundException("El cliente no existe"));
 
         Pedido pedido = PedidoMapper.toEntity(dto);
         pedido.setEstado(EstadoPedido.PENDIENTE);
@@ -71,8 +70,21 @@ public class PedidoServiceImpl implements IPedidoService {
         if (direccionOpt.isEmpty()) {
             throw new NotFoundException("La dirección no existe");
         }
+        var direccion = direccionOpt.get();
 
-        String ciudad = direccionOpt.get().getCiudad();
+        if (pedido.getTipoEntrega().equals(TipoEntrega.DELIVERY)){
+            if (!usuario.getDirecciones().contains(direccion)) {
+                throw new BadRequestException("La dirección no pertenece al cliente");
+            }
+            pedido.setDireccionEntrega(direccion);
+        } else if (pedido.getTipoEntrega().equals(TipoEntrega.RETIRO_POR_LOCAL)) {
+            if (!restaurante.getDireccion().equals(direccion)) {
+                throw new BadRequestException("La dirección no pertenece al restaurante");
+            }
+            pedido.setDireccionEntrega(direccion);
+        }
+
+        String ciudad = direccion.getCiudad();
 
         if (climaService.estaLloviendo(ciudad)) {
             total = total.multiply(BigDecimal.valueOf(1.10));
@@ -215,6 +227,26 @@ public class PedidoServiceImpl implements IPedidoService {
         return pedidoRepository.findAllByRestaurante_IdAndEstado(idRestaurante, estado).stream()
                 .map(PedidoMapper::toDTO)
                 .toList();
+    }
+
+    /**
+     * Cancela un pedido por su ID.
+     * @param id el ID del pedido a cancelar.
+     * @throws NotFoundException si el pedido no se encuentra.
+     */
+    @Override
+    public void cancelarPedido(Long id) throws NotFoundException, BadRequestException {
+        var pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
+
+        EstadoPedido estadoActual = pedido.getEstado();
+
+        if (!estadoActual.esCancelable()) {
+            throw new BadRequestException("No se puede cancelar un pedido en estado " + estadoActual);
+        }
+
+        pedido.setEstado(EstadoPedido.CANCELADO);
+        pedidoRepository.save(pedido);
     }
 }
 

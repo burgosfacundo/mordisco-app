@@ -3,6 +3,7 @@ package utn.back.mordiscoapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +31,17 @@ public class CalificacionRestauranteController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws BadRequestException Sí hay un error en los datos proporcionados.
      */
-    @Operation(summary = "Crear una calificación restaurante nueva", description = "Recibe una calificacion restaurante y la guarda en la base de datos")
+    @Operation(summary = "Crear una calificación restaurante nueva",
+            description = "Recibe una calificación restaurante y la guarda en la base de datos. " +
+                    "**Rol necesario: CLIENTE y debe haber realizado un pedido en el restaurante.**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Calificación restaurante creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
             @ApiResponse(responseCode = "404", description = "Id no encontrado")
     })
-    @PreAuthorize("hasRole('CLIENTE')")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('CLIENTE') and @calificacionSecurity.puedeAccederADtoConCalificacion(#dto)")
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody
                                        @Valid
@@ -50,32 +54,38 @@ public class CalificacionRestauranteController {
      * Función para obtener todas las calificaciones de restaurantes.
      * @return Respuesta HTTP con una lista de proyecciones de calificaciones de restaurante.
      */
-    @Operation(summary = "Obtener todas las promociones", description = "Devuelve una lista de todas las calificaciones de restaurante")
+    @Operation(summary = "Obtener todas las promociones",
+            description = "Devuelve una lista de todas las calificaciones de restaurante. " +
+                    "**Rol necesario: ADMIN**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Devuelve una lista de promociones"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")})
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<CalificacionRestauranteProjection>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
+
     /**
-     * Función para obtener una calificación de restaurante por su ID.
-     * @param id ID de la calificación del restaurante a buscar.
-     * @return Respuesta HTTP con la proyección de la calificación del restaurante encontrada.
-     * @throws NotFoundException Si no se encuentra la calificación del restaurante con el ID proporcionado.
+     * Función para borrar una calificación de restaurante por su ID.
+     * @param id ID de la calificación que se desea borrar.
+     * @throws NotFoundException Si la calificación con el ID proporcionado no existe.
      */
-    @Operation(summary = "Borrar una calificación", description = "Borra la calificación que tenga el id que se le pasa")
+    @Operation(summary = "Borrar una calificación",
+            description = "Borra la calificación que tenga el id que se le pasa. " +
+                    "**Rol necesario: CLIENTE y debe ser el autor de la calificación.**")
     @ApiResponses(value ={
             @ApiResponse(responseCode =  "200", description = "Elimina la calificación"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
             @ApiResponse(responseCode = "404", description = "Calificación no encontrada")})
-    @PreAuthorize("hasRole('ADMIN') or @calificacionSecurity.esAutorDeCalificacion(#id)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('CLIENTE') and @calificacionSecurity.esAutorDeCalificacion(#id)")
     @DeleteMapping ("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable
                                              Long id) throws NotFoundException {
         service.delete(id);
-        return ResponseEntity.ok("La calificación fue eliminada correctamente!");
+        return ResponseEntity.ok("La calificación fue eliminada correctamente");
     }
 }

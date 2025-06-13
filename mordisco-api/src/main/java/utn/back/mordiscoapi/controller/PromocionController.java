@@ -3,6 +3,7 @@ package utn.back.mordiscoapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +32,15 @@ public class PromocionController {
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws BadRequestException Sí hay un error en los datos proporcionados.
      */
-    @Operation(summary = "Crear una promoción nueva", description = "Recibe una promoción y la guarda en la base de datos") // Anotación para documentar la operación con Swagger
+    @Operation(summary = "Crear una promoción nueva", description = "Recibe una promoción y la guarda en la base de datos. " +
+            "***El propio dueño del restaurante puede crear promociones para su propio restaurante.***")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Promoción creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.restauranteId())")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.restauranteId())")
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody @Valid
                                        PromocionRequestDTO dto) throws BadRequestException {
@@ -51,12 +54,14 @@ public class PromocionController {
      * Función para obtener todas las promociones.
      * @return Respuesta HTTP con una lista de proyecciones de promociones.
      */
-    @Operation(summary = "Obtener todas las promociones", description = "Devuelve una lista de todas las promociones") // Anotación para documentar la operación con Swagger
+    @Operation(summary = "Obtener todas las promociones", description = "Devuelve una lista de todas las promociones. " +
+            "***Rol necesario: ADMIN.***")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Devuelve una lista de promociones"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<PromocionProjection>> findAll() {
@@ -90,14 +95,17 @@ public class PromocionController {
      * @throws NotFoundException Si no se encuentra la promoción con el ID proporcionado.
      * @throws BadRequestException Sí hay un error en los datos proporcionados.
      */
-    @Operation(summary = "Actualizar una promoción", description = "Recibe un ID y una promoción y actualiza la promoción correspondiente") // Anotación para documentar la operación con Swagger
+    @Operation(summary = "Actualizar una promoción",
+            description = "Recibe un ID y una promoción y actualiza la promoción correspondiente. " +
+                    "***El propio dueño del restaurante puede actualizar promociones de su propio restaurante.***")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Promoción actualizada exitosamente"),
             @ApiResponse(responseCode = "404", description = "No se encontró la promoción con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @promocionSecurity.puedeAccederAPromocion(#id)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.restauranteId())")
     @PutMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable Long id,
                                         @RequestBody @Valid PromocionRequestDTO dto)
@@ -108,32 +116,37 @@ public class PromocionController {
 
     /**
      * Función para eliminar una promoción por su ID.
-     * @param id de la promoción a eliminar.
+     * @param idPromocion de la promoción a eliminar.
+     * @param idRestaurante ID del restaurante al que pertenece la promoción.
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra la promoción con el ID proporcionado.
      */
-    @Operation(summary = "Eliminar una promoción", description = "Recibe un ID y elimina la promoción correspondiente") // Anotación para documentar la operación con Swagger
+    @Operation(summary = "Eliminar una promoción", description = "Recibe un ID y elimina la promoción correspondiente. " +
+            "***El propio dueño del restaurante puede eliminar promociones de su propio restaurante.***")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Promoción eliminada exitosamente"),
             @ApiResponse(responseCode = "404", description = "No se encontró la promoción con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @promocionSecurity.puedeAccederAPromocion(#id)")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException {
-        service.delete(id);
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante)")
+    @DeleteMapping("/{idRestaurante}/{idPromocion}")
+    public ResponseEntity<String> delete(@PathVariable Long idRestaurante,@PathVariable Long idPromocion) throws NotFoundException {
+        service.delete(idRestaurante,idPromocion);
         return ResponseEntity.ok().body("Promoción eliminada exitosamente");
     }
 
-    @Operation(summary = "Listar promociones por restaurantes", description = "Recibe un ID y lista las promociones correspondiente") // Anotación para documentar la operación con Swagger
+    @Operation(summary = "Listar promociones por restaurantes", description = "Recibe un ID y lista las promociones correspondiente. " +
+            "***Rol necesario: ADMIN o El propio dueño del restaurante puede listar promociones de su propio restaurante.***")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Promociones listadas exitosamente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante)")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante))")
     @GetMapping("restaurante/{idRestaurante}")
     public ResponseEntity<List<PromocionResponseDTO>> listarPromoByIdRestaurante(@PathVariable
                                                                                      Long idRestaurante) throws NotFoundException {
