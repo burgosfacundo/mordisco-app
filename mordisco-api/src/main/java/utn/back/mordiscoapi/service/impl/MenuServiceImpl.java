@@ -81,9 +81,14 @@ public class MenuServiceImpl implements IMenuService {
                     throw new BadRequestException("La imagen con id " + imagenDtoId + " no le pertenece al producto con id " + producto.getId());
                 }
 
-                // Si la imagen no es nueva, buscarla por ID
-                var imagen = imagenRepository.findById(imagenDtoId)
-                        .orElseThrow(() -> new NotFoundException("Imagen con id " + imagenDtoId + " no encontrada"));
+                Imagen imagen;
+
+                if(producto.getImagen() != null && imagenDtoId != null){
+                    imagen = imagenRepository.findById(imagenDtoId)
+                            .orElseThrow(() -> new NotFoundException("Imagen con id " + imagenDtoId + " no encontrada"));
+                }else{
+                    imagen = new Imagen();
+                }
 
                 imagen.setNombre(productoDTO.imagen().nombre());
                 imagen.setUrl(productoDTO.imagen().url());
