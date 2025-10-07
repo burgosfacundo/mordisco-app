@@ -1,0 +1,15 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mordisco
+      MYSQL_USER: mordisco_user
+      MYSQL_PASSWORD: mordisco_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/liv/mysql
+
+volumes:
+  mysql_data:
