@@ -1,0 +1,28 @@
+<form [formGroup]="formRegister" (ngSubmit)="manejarRegistro()">
+    <fieldset>
+        <label for="nombreID">Nombre </label>
+        <input type="text" id="nombreID" formControlName="nombre">
+    </fieldset>
+    <fieldset>
+        <label for="apellidoID">Apellido </label>
+        <input type="text" id="apellidoID" formControlName="apellido">
+    </fieldset>
+    <fieldset>
+        <label for="telefonoID">Telefono  </label>
+        <input type="text" id="telefonoID" formControlName="telefono">
+    </fieldset>
+    <fieldset>
+        <label for="emailID">Email  </label>
+        <input type="email" id="emailID" formControlName="email">
+    </fieldset>
+    <fieldset>
+        <label for="passwordID">Contraseña  </label>
+        <input type="password" id="passwordID" formControlName="password">
+    </fieldset>
+
+    <div formGroupName="direccion">
+        <app-form-direcciones></app-form-direcciones>
+    </div>
+    <button type="submit">Enviar</button>
+
+</form>
