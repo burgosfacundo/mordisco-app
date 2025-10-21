@@ -1,12 +1,12 @@
-import Direccion from "./Direccion";
+import Address from "./address";
 
-export default interface Usuario{
+export default interface User{
     nombre : string,
     apellido : string,
     telefono : string,
     email : string,
     password : string,
-    rol : number,
-    direccion: Direccion;
+    rolId : number,
+    direcciones: Address[];
 }
   

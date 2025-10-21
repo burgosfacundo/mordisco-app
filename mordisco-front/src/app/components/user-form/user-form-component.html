@@ -1,0 +1,86 @@
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <fieldset>
+        <label for="nombre">Nombre </label>
+        <input type="text" id="nombre" formControlName="nombre">
+    </fieldset>
+    <fieldset>
+        <label for="apellido">Apellido </label>
+        <input type="text" id="apellido" formControlName="apellido">
+    </fieldset>
+    <fieldset>
+        <label for="telefono">Telefono  </label>
+        <input type="text" id="telefono" formControlName="telefono">
+    </fieldset>
+    <fieldset>
+        <label for="email">Email  </label>
+        <input type="email" id="email" formControlName="email">
+    </fieldset>
+    <fieldset>
+        <label for="password">Contraseña  </label>
+        <input type="password" id="password" formControlName="password">
+    </fieldset>
+
+    <fieldset>
+        <label>Rol</label>
+        <select formControlName="rolId">
+            <option [value]="1">Cliente</option>
+            <option [value]="2">Dueño</option>
+            <option [value]="3">Repartidor</option>
+        </select>
+    </fieldset>
+
+    <h3>Direccion</h3>
+    
+    <div formArrayName="direcciones">
+        @for (dir of direccionesFA.controls; track $index) {
+            <fieldset [formGroupName]="$index">
+                <fieldset>
+                    <label for="calle">Calle</label>
+                    <input type="text" id="calle" formControlName="calle">
+                </fieldset>
+                <fieldset>
+                    <label for="numero">Número</label>
+                    <input type="text" id="numero" formControlName="numero">
+                </fieldset>
+                <fieldset>
+                    <label for="piso">Piso</label>
+                    <input type="text" id="piso" formControlName="piso">
+                </fieldset>
+                <fieldset>
+                    <label for="depto">Depto</label>
+                    <input type="text" id="depto" formControlName="depto">
+                </fieldset>
+                <fieldset>
+                    <label for="codigoPostal">Código Postal</label>
+                    <input type="text" id="codigoPostal" formControlName="codigoPostal">
+                </fieldset>
+                <fieldset>
+                    <label for="referencias">Referencias</label>
+                    <input type="text" id="referencias" formControlName="referencias">
+                </fieldset>
+                <fieldset>
+                    <label for="latitud">Latitud</label>
+                    <input type="number" id="latitud" formControlName="latitud">
+                </fieldset>
+                <fieldset>
+                    <label for="longitud">Longitud</label>
+                    <input type="number" id="longitud" formControlName="longitud">
+                </fieldset>
+                <fieldset>
+                    <label for="ciudad">Ciudad</label>
+                    <input type="text" id="ciudad" formControlName="ciudad">
+                </fieldset>
+
+                <button type="button" (click)="removeDireccion($index)" [disabled]="direccionesFA.length === 1">
+                    Quitar dirección
+                </button>
+            </fieldset>
+        }
+
+        <button type="button" (click)="addDireccion()">+ Agregar otra dirección</button>
+        
+    </div> 
+
+    <button [disabled]="userForm.invalid" type="submit">Registrarse</button>
+
+</form>

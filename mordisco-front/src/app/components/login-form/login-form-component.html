@@ -1,19 +1,18 @@
-<form [fromGroup]="inicio-sesion" (ngSubmit)="iniciarSesion()"> 
+<form [formGroup]="inicioSesion" (ngSubmit)="iniciarSesion()"> 
     <fieldset> 
         <label for="email">Email</label> 
         <input type="email" placeholder="Ingrese el mail" formControlName="email"> 
-        @if(inicio-sesion.controls['email'].errors?.['required'] && inicio-sesion.get('email')?.touched){ 
+        @if(inicioSesion.controls['email'].errors?.['required'] && inicioSesion.get('email')?.touched){ 
             <p>El email es obligatorio para ingresar</p> 
-        }@else if(inicio-sesion.controls['email'].errors?.['email'] && inicio-sesion.get('email')?.touched){ 
+        }@else if(inicioSesion.controls['email'].errors?.['email'] && inicioSesion.get('email')?.touched){ 
             <p>El email no esta en un formato valido</p> } 
         </fieldset> 
         <fieldset> 
             <label for="contraseña"></label> 
             <input type="text" placeholder="Ingrese la contraseña" formControlName="contraseña"> 
-            @if(inicio-sesion.controls['contraseña'].errors?.['required'] && inicio-sesion.get('contraseña')?.touched){ 
+            @if(inicioSesion.controls['contraseña'].errors?.['required'] && inicioSesion.get('contraseña')?.touched){ 
                 <p>La contraseña es obligatoria para ingresar</p> 
-            }@else if(inicio-sesion.controls['contraseña'].errors?.['pattern'] && inicio-sesion.get('contraseña')?.touched){ 
-                <p>La contraseña no cumple con el formato requerido</p> } 
+            }
             </fieldset> 
         <button type="submit" [disabled]="!inicioSesion.valid">Iniciar Sesion</button>
-        </form>
+</form>

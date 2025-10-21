@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EleccionRegistro } from './eleccion-registro';
+import { UserFormComponent } from './user-form-component';
 
-describe('EleccionRegistro', () => {
-  let component: EleccionRegistro;
-  let fixture: ComponentFixture<EleccionRegistro>;
+describe('UserFormComponent', () => {
+  let component: UserFormComponent;
+  let fixture: ComponentFixture<UserFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EleccionRegistro]
+      imports: [UserFormComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(EleccionRegistro);
+    fixture = TestBed.createComponent(UserFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
