@@ -2,22 +2,61 @@
     <fieldset>
         <label for="nombre">Nombre </label>
         <input type="text" id="nombre" formControlName="nombre">
+        @if (userForm.get('nombre')?.touched) {
+            @if(userForm.controls['nombre'].errors?.['required']){
+                <p>El nombre es obligatorio</p>
+            } @else if(userForm.controls['nombre'].errors?.['maxlength']){
+                <p>El nombre debe tener como maximo 50 caracteres</p>
+            }
+        }
     </fieldset>
     <fieldset>
         <label for="apellido">Apellido </label>
         <input type="text" id="apellido" formControlName="apellido">
+        @if (userForm.get('apellido')?.touched) {
+            @if(userForm.controls['nombre'].errors?.['required']){
+                <p>El nombre es obligatorio</p>
+            } @else if(userForm.controls['nombre'].errors?.['maxlength']){
+                <p>El nombre debe tener como maximo 50 caracteres</p>
+            }
+       | }
     </fieldset>
     <fieldset>
         <label for="telefono">Telefono  </label>
         <input type="text" id="telefono" formControlName="telefono">
+            @if (userForm.get('telefono')?.touched) {
+                @if(userForm.controls['telefono'].errors?.['required']){
+                    <p>El telefono es obligatorio</p>
+                } @else if(userForm.controls['telefono'].errors?.['maxlength']){
+                    <p>El telefono debe tener como maximo 50 numeros</p>
+                }@else if (userForm.controls['telefono'].errors?.['minlength']) {
+                    <p>El telefono debe tener como minimo 8 numeros</p>
+                }@else if (userForm.controls['telefono'].errors?.['pattern']) {
+                    <p>El telefono debe tener unicamente numeros</p>
+                }
+            }
     </fieldset>
     <fieldset>
         <label for="email">Email  </label>
         <input type="email" id="email" formControlName="email">
+            @if (userForm.get('email')?.touched) {
+                @if(userForm.controls['email'].errors?.['required']){
+                    <p>La contraseña es obligatoria</p>
+                }@else if(userForm.controls['email'].errors?.['maxlength']){
+                    <p>El email debe tener como maximo 100 caracteres</p>}
+                @else if(userForm.controls['email'].errors?.['email']){
+                    <p>El email debe contener @</p>}
+        }
     </fieldset>
     <fieldset>
         <label for="password">Contraseña  </label>
         <input type="password" id="password" formControlName="password">
+         @if (userForm.get('password')?.touched) {
+                @if(userForm.controls['password'].errors?.['required']){
+                    <p>La contraseña es obligatoria</p>
+                }@else if(userForm.controls['password'].errors?.['minlength']){
+                    <p>La contraseña debe tener como minimo 8 caracteres</p>}
+        }
     </fieldset>
 
     <fieldset>
@@ -37,26 +76,50 @@
                 <fieldset>
                     <label for="calle">Calle</label>
                     <input type="text" id="calle" formControlName="calle">
+                        @if(direccionesFA.at($index).get('calle')?.touched){
+                            @if (direccionesFA.at($index).get('calle')?.errors?.['required']){
+                            <p>La calle es obligatoria</p>
+                            }@else if(direccionesFA.at($index).get('calle')?.errors?.['maxlength']){
+                            <p>La calle debe tener como maximo 50 caracteres</p>}
+                        }
                 </fieldset>
                 <fieldset>
                     <label for="numero">Número</label>
                     <input type="text" id="numero" formControlName="numero">
+                         @if(direccionesFA.at($index).get('numero')?.touched){
+                            @if (direccionesFA.at($index).get('numero')?.errors?.['required']){
+                                <p>El numero es obligatorio</p>
+                            }@else if(direccionesFA.at($index).get('numero')?.errors?.['minlength']){
+                                <p>El numero debe tener como maximo 50 caracteres</p>}
+                        }
                 </fieldset>
                 <fieldset>
                     <label for="piso">Piso</label>
                     <input type="text" id="piso" formControlName="piso">
+                    @if(direccionesFA.at($index).get('piso')?.errors?.['maxlength']){
+                        <p>El piso debe tener como maximo 20 numeros</p>}
                 </fieldset>
                 <fieldset>
                     <label for="depto">Depto</label>
                     <input type="text" id="depto" formControlName="depto">
+                    @if(direccionesFA.at($index).get('depto')?.errors?.['maxlength']){
+                        <p>El depto debe tener como maximo 20 caracteres</p>}
                 </fieldset>
                 <fieldset>
                     <label for="codigoPostal">Código Postal</label>
                     <input type="text" id="codigoPostal" formControlName="codigoPostal">
+                     @if (direccionesFA.at($index).get('codigoPostal')?.touched) {
+                            @if(direccionesFA.at($index).get('codigoPostal')?.errors?.['required']){
+                                <p>El codigo postal es obligatorio</p>
+                            }@else if(direccionesFA.at($index).get('codigoPostal')?.errors?.['maxlength']){
+                                <p>El codigo postal debe tener como maximo 10 caracteres</p>}
+                    }
                 </fieldset>
                 <fieldset>
                     <label for="referencias">Referencias</label>
                     <input type="text" id="referencias" formControlName="referencias">
+                    @if(direccionesFA.at($index).get('referencias')?.errors?.['maxlength']){
+                                <p>Las referencias debe tener como maximo 255 caracteres</p>}
                 </fieldset>
                 <fieldset>
                     <label for="latitud">Latitud</label>
@@ -69,6 +132,12 @@
                 <fieldset>
                     <label for="ciudad">Ciudad</label>
                     <input type="text" id="ciudad" formControlName="ciudad">
+                        @if (direccionesFA.at($index).get('ciudad')?.touched) {
+                            @if(direccionesFA.at($index).get('ciudad')?.errors?.['required']){
+                                 <p>La ciudad es obligatoria</p>
+                            }@else if(direccionesFA.at($index).get('ciudad')?.errors?.['maxlength']){
+                            <p>La ciudad debe tener como maximo 50 caracteres</p>}
+                        }
                 </fieldset>
 
                 <button type="button" (click)="removeDireccion($index)" [disabled]="direccionesFA.length === 1">

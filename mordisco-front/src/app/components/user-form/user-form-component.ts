@@ -24,7 +24,7 @@ export class UserFormComponent implements OnInit{
      this.userForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(50)]],
       apellido: ['', [Validators.required, Validators.maxLength(50)]],
-      telefono: ['', [Validators.required, Validators.maxLength(50),Validators.pattern(/^[0-9]{8,15}$/)]],
+      telefono: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50),Validators.pattern(/^[0-9]{8,15}$/)]],
       email: ['', [Validators.required, Validators.email,Validators.maxLength(100)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       rolId: ['', Validators.required],
@@ -40,8 +40,8 @@ export class UserFormComponent implements OnInit{
       depto: ['',Validators.maxLength(20)],
       codigoPostal: ['', [Validators.required,Validators.maxLength(10)]],
       referencias: ['',Validators.maxLength(255)],
-      latitud: [null, Validators.required],
-      longitud: [null, Validators.required],
+      latitud: [null],
+      longitud: [null],
       ciudad: ['', [Validators.required,Validators.maxLength(50)]]
     })
   }
