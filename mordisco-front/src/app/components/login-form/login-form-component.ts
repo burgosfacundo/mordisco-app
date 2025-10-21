@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/services/auth-service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login-form',
@@ -16,6 +17,12 @@ export class LoginFormComponent implements OnInit{
   private service : AuthService = inject(AuthService)
   private router : Router = inject(Router)
   inicioSesion! : FormGroup 
+
+  private _snackBar = inject(MatSnackBar);
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action);
+  }
 
   errorMessage = signal('');
 
@@ -36,14 +43,13 @@ export class LoginFormComponent implements OnInit{
   iniciarSesion(){
   // 3️⃣ Llamar al servicio para iniciar sesión
   this.service.login(this.inicioSesion.value).subscribe({
-    next: user => {
-      console.log(user)
-      this.router.navigate(['/']);
+    next: () => {
+      this.router.navigate(['']);
     },
     error: e => {
       console.error(e);
       
-      alert('Email o contraseña incorrectos');
+      this.openSnackBar('❌ Email o contraseña incorrectos','Continuar')
     }
   });
   }

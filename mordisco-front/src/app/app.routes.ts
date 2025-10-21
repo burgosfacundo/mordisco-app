@@ -9,7 +9,7 @@ export const routes: Routes = [
   { path: 'registro', component: Registro },
 
   // página accesible a cualquier usuario logueado
-  { path: 'perfil', canMatch: [authGuard] },
+  //{ path: 'perfil', canMatch: [authGuard] },
 
   // página solo para dueños
   //{ path: 'owner', canMatch: [authGuard], data: { roles: ['ROLE_RESTAURANTE'] } },

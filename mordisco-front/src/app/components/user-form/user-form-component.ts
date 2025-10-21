@@ -3,6 +3,7 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { AuthService } from '../../auth/services/auth-service';
 import User from '../../models/user';
 import Address from '../../models/address';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-user-form',
@@ -15,6 +16,12 @@ export class UserFormComponent implements OnInit{
   private fb : FormBuilder = inject(FormBuilder)
   userForm! : FormGroup
 
+  private _snackBar = inject(MatSnackBar);
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action);
+  }
+
 
   ngOnInit(): void {
     this.inicializarFormulario()
@@ -24,7 +31,7 @@ export class UserFormComponent implements OnInit{
      this.userForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(50)]],
       apellido: ['', [Validators.required, Validators.maxLength(50)]],
-      telefono: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50),Validators.pattern(/^[0-9]{8,15}$/)]],
+      telefono: ['', [Validators.required, Validators.maxLength(50),Validators.pattern(/^[0-9]{8,15}$/)]],
       email: ['', [Validators.required, Validators.email,Validators.maxLength(100)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       rolId: ['', Validators.required],
@@ -40,8 +47,8 @@ export class UserFormComponent implements OnInit{
       depto: ['',Validators.maxLength(20)],
       codigoPostal: ['', [Validators.required,Validators.maxLength(10)]],
       referencias: ['',Validators.maxLength(255)],
-      latitud: [null],
-      longitud: [null],
+      latitud: [null, Validators.required],
+      longitud: [null, Validators.required],
       ciudad: ['', [Validators.required,Validators.maxLength(50)]]
     })
   }
@@ -87,8 +94,10 @@ export class UserFormComponent implements OnInit{
     console.log(user)
 
     this.service.register(user).subscribe({
-      next : (data) => console.log(data),
-      error:(e) => console.log(e)
+      next : () => {
+        this.openSnackBar('✅ Usuario registrado correctamente', 'Continuar')
+      },
+      error:() => this.openSnackBar('❌ Ocurrió un error. Intentelo en unos minutos', 'Continuar')
     })
   }
 

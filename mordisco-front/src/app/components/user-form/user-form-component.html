@@ -1,6 +1,6 @@
 <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
     <fieldset>
-        <label for="nombre">Nombre </label>
+        <label for="nombre">Nombre</label>
         <input type="text" id="nombre" formControlName="nombre">
         @if (userForm.get('nombre')?.touched) {
             @if(userForm.controls['nombre'].errors?.['required']){
@@ -11,15 +11,15 @@
         }
     </fieldset>
     <fieldset>
-        <label for="apellido">Apellido </label>
+        <label for="apellido">Apellido</label>
         <input type="text" id="apellido" formControlName="apellido">
         @if (userForm.get('apellido')?.touched) {
-            @if(userForm.controls['nombre'].errors?.['required']){
-                <p>El nombre es obligatorio</p>
-            } @else if(userForm.controls['nombre'].errors?.['maxlength']){
-                <p>El nombre debe tener como maximo 50 caracteres</p>
+            @if(userForm.controls['apellido'].errors?.['required']){
+                <p>El apellido es obligatorio</p>
+            } @else if(userForm.controls['apellido'].errors?.['maxlength']){
+                <p>El apellido debe tener como maximo 50 caracteres</p>
             }
-       | }
+        }
     </fieldset>
     <fieldset>
         <label for="telefono">Telefono  </label>
