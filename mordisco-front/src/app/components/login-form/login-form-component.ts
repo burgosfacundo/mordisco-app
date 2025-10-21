@@ -20,8 +20,8 @@ export class LoginFormComponent implements OnInit{
   errorMessage = signal('');
 
   constructor(){
-    this.email = new FormControl(['',[Validators.required,Validators.email]])
-    this.password = new FormControl(['',Validators.required])
+    this.email = new FormControl('',[Validators.required,Validators.email])
+    this.password = new FormControl('',Validators.required)
   }
 
 
