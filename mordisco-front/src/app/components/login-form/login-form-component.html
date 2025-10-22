@@ -1,18 +1,19 @@
 <form [formGroup]="inicioSesion" (ngSubmit)="iniciarSesion()"> 
+    <h1>Iniciar Sesión</h1>
     <fieldset> 
         <label for="email">Email</label> 
         <input type="email" placeholder="Ingrese el mail" formControlName="email"> 
         @if(inicioSesion.controls['email'].errors?.['required'] && inicioSesion.get('email')?.touched){ 
-            <p>El email es obligatorio para ingresar</p> 
+            <p class="error">El email es obligatorio para ingresar</p> 
         }@else if(inicioSesion.controls['email'].errors?.['email'] && inicioSesion.get('email')?.touched){ 
-            <p>El email no esta en un formato valido</p> } 
+            <p class="error">El email no esta en un formato valido</p> } 
     </fieldset> 
     <fieldset> 
         <label for="password">Contraseña</label> 
         <input type="password" placeholder="Ingrese la contraseña" formControlName="password"> 
         @if(inicioSesion.controls['password'].errors?.['required'] && inicioSesion.get('password')?.touched){ 
-            <p>La contraseña es obligatoria para ingresar</p> 
+            <p class="error">La contraseña es obligatoria para ingresar</p> 
         }
         </fieldset> 
-        <button type="submit" [disabled]="!inicioSesion.valid">Iniciar Sesion</button>
+        <button class="botonIniciarSesion" type="submit" [disabled]="!inicioSesion.valid">Iniciar Sesion</button>
 </form>

@@ -1,0 +1,66 @@
+<form [formGroup]="editarPerfil" (ngSubmit)="manejarModificacion()">
+    <h1>Editar Perfil</h1>
+    <fieldset>
+        <label for="nombreEditado">Nombre</label>
+        <input type="text" id="nombreEditado" placeholder="Ingrese el nuevo nombre" formControlName="nombre">
+        @if (editarPerfil.get('nombre')?.touched) {
+            @if(editarPerfil.controls['nombre'].errors?.['required']){
+                <p>El nombre es obligatorio</p>
+            } @else if(editarPerfil.controls['nombre'].errors?.['maxlength']){
+                <p>El nombre debe tener como maximo 50 caracteres</p>
+            }
+        }
+    </fieldset>    
+    <fieldset>
+        <label for="apellidoEditado">Apellido</label>
+        <input type="text" id="apellidoEditado" placeholder="Ingrese el nuevo apellido" formControlName="apellido">
+         @if (editarPerfil.get('apellido')?.touched) {
+            @if(editarPerfil.controls['apellido'].errors?.['required']){
+                <p>El apellido es obligatorio</p>
+            } @else if(editarPerfil.controls['apellido'].errors?.['maxlength']){
+                <p>El apellido debe tener como maximo 50 caracteres</p>
+            }
+        }
+    </fieldset>    
+    <fieldset>
+        <label for="telefonoEditado">Teléfono</label>
+        <input type="number"  id="telefonoEditado" placeholder="Ingrese el nuevo telefono" formControlName="telefono">
+     @if (editarPerfil.get('telefono')?.touched) {
+                @if(editarPerfil.controls['telefono'].errors?.['required']){
+                    <p>El telefono es obligatorio</p>
+                } @else if(editarPerfil.controls['telefono'].errors?.['maxlength']){
+                    <p>El telefono debe tener como maximo 50 numeros</p>
+                }@else if (editarPerfil.controls['telefono'].errors?.['minlength']) {
+                    <p>El telefono debe tener como minimo 8 numeros</p>
+                }@else if (editarPerfil.controls['telefono'].errors?.['pattern']) {
+                    <p>El telefono debe tener unicamente numeros</p>
+                }
+            }
+    </fieldset>
+    <fieldset>
+        <label for="emailEditado">Email</label>
+        <input type="email" id="emailEditado" placeholder="Ingrese el nuevo email" formControlName="email">
+         @if (editarPerfil.get('email')?.touched) {
+                @if(editarPerfil.controls['email'].errors?.['required']){
+                    <p>La contraseña es obligatoria</p>
+                }@else if(editarPerfil.controls['email'].errors?.['maxlength']){
+                    <p>El email debe tener como maximo 100 caracteres</p>}
+                @else if(editarPerfil.controls['email'].errors?.['email']){
+                    <p>El email debe contener @</p>}
+        }
+    </fieldset>
+    
+  <div class="botones">
+      <button class="boton-guardar" type="submit" [disabled]="editarPerfil.invalid">
+        💾 Guardar cambios
+      </button>
+
+      <button class="boton-eliminar" type="button"(click)="confirmarEliminacion()">
+        🗑️ Eliminar cuenta
+      </button>
+    <button class="boton-eliminar" type="button" (click)="cambiarContrasenia()">
+        🔑 Cambiar contraseña</button>
+  </div>
+
+</form>
+
