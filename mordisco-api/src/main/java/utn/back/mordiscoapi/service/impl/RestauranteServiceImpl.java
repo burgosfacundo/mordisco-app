@@ -12,6 +12,7 @@ import utn.back.mordiscoapi.mapper.ImagenMapper;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
 import utn.back.mordiscoapi.model.entity.HorarioAtencion;
@@ -116,9 +117,9 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por ciudad.
      */
     @Override
-    public List<RestauranteResponseDTO> getAllByCiudad(String ciudad){
+    public List<RestauranteResponseCardDTO> getAllByCiudad(String ciudad){
         return restauranteRepository.findAllByCiudad(ciudad).stream()
-                .map(RestauranteMapper::toDTO)
+                .map(RestauranteMapper::toCardDTO)
                 .toList();
     }
 
@@ -129,9 +130,9 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por nombre.
      */
     @Override
-    public List<RestauranteResponseDTO> getAllByNombre(String nombre) {
+    public List<RestauranteResponseCardDTO> getAllByNombre(String nombre) {
         return restauranteRepository.findAllByNombre(nombre).stream()
-                .map(RestauranteMapper::toDTO)
+                .map(RestauranteMapper::toCardDTO)
                 .toList();
     }
 
@@ -140,9 +141,9 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes que tienen una promoción activa.
      */
     @Override
-    public List<RestauranteResponseDTO> getAllByPromocionActiva() {
-        return restauranteRepository.findAllWithPromocionActiva().stream()
-                .map(RestauranteMapper::toDTO)
+    public List<RestauranteResponseCardDTO> findAllWithPromocionActivaAndCiudad(String ciudad) {
+        return restauranteRepository.findAllWithPromocionActivaAndCiudad(ciudad).stream()
+                .map(RestauranteMapper::toCardDTO)
                 .toList();
     }
 

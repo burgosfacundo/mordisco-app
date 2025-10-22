@@ -274,21 +274,21 @@ INSERT INTO `productos` VALUES
 
 -- 9) promociones (depende de restaurantes)
 INSERT INTO `promociones` VALUES 
-(1,'Descuento del 10% en todos los platos italianos',0.1,'2025-06-30','2025-06-01',1),
-(2,'Promoción 15% OFF en pizzas y pastas',0.15,'2025-06-25','2025-06-05',2),
-(3,'20% de descuento en ensaladas y platos frescos',0.2,'2025-07-10','2025-06-10',3),
-(4,'15% OFF en combos de hamburguesas',0.15,'2025-06-15','2025-05-25',4),
-(5,'10% descuento en sushi y productos del mar',0.1,'2025-06-20','2025-06-01',5),
-(6,'25% OFF en tacos al pastor',0.25,'2025-06-30','2025-06-07',6),
-(7,'Descuento del 5% en lasañas y pastas',0.05,'2025-07-05','2025-06-12',7),
-(8,'15% OFF en platos a la parrilla',0.15,'2025-06-30','2025-06-01',8),
-(9,'10% descuento en bocadillos y snacks',0.1,'2025-07-01','2025-06-10',9),
-(10,'20% OFF en comida rápida y delivery',0.2,'2025-06-30','2025-05-30',10),
-(11,'15% descuento en productos vegetarianos',0.15,'2025-06-25','2025-06-05',11),
-(12,'10% OFF en platos tradicionales',0.1,'2025-07-01','2025-06-01',12),
-(13,'5% de descuento en menús infantiles',0.05,'2025-07-10','2025-06-10',13),
-(14,'20% OFF en postres y tartas',0.2,'2025-07-15','2025-06-15',14),
-(15,'15% descuento en platos especiales del día',0.15,'2025-06-30','2025-06-01',15);
+(1,'Descuento del 10% en todos los platos italianos',0.1,'2025-11-30','2025-06-01',1),
+(2,'Promoción 15% OFF en pizzas y pastas',0.15,'2025-12-25','2025-06-05',2),
+(3,'20% de descuento en ensaladas y platos frescos',0.2,'2025-11-10','2025-06-10',3),
+(4,'15% OFF en combos de hamburguesas',0.15,'2025-12-15','2025-05-25',4),
+(5,'10% descuento en sushi y productos del mar',0.1,'2025-12-20','2025-06-01',5),
+(6,'25% OFF en tacos al pastor',0.25,'2025-12-30','2025-06-07',6),
+(7,'Descuento del 5% en lasañas y pastas',0.05,'2025-12-05','2025-06-12',7),
+(8,'15% OFF en platos a la parrilla',0.15,'2025-12-30','2025-06-01',8),
+(9,'10% descuento en bocadillos y snacks',0.1,'2025-11-01','2025-06-10',9),
+(10,'20% OFF en comida rápida y delivery',0.2,'2025-12-30','2025-05-30',10),
+(11,'15% descuento en productos vegetarianos',0.15,'2025-11-25','2025-06-05',11),
+(12,'10% OFF en platos tradicionales',0.1,'2025-12-01','2025-06-01',12),
+(13,'5% de descuento en menús infantiles',0.05,'2025-11-10','2025-06-10',13),
+(14,'20% OFF en postres y tartas',0.2,'2025-12-15','2025-06-15',14),
+(15,'15% descuento en platos especiales del día',0.15,'2025-11-30','2025-06-01',15);
 
 -- 10) pedidos (depende de usuarios, direcciones, restaurantes)
 INSERT INTO `pedidos` VALUES 

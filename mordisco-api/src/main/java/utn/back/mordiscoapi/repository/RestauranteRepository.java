@@ -70,6 +70,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             LEFT JOIN  r.calificaciones
             LEFT JOIN  r.direccion
             WHERE r.direccion.ciudad = :ciudad
+            AND r.activo = true
             """)
     List<Restaurante> findAllByCiudad(@Param("ciudad") String ciudad);
 
@@ -94,8 +95,9 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN r.calificaciones
                 LEFT JOIN r.direccion
                 WHERE p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE
+                AND r.direccion.ciudad = :ciudad
                 """)
-        List<Restaurante> findAllWithPromocionActiva();
+    List<Restaurante> findAllWithPromocionActivaAndCiudad(@Param("ciudad") String ciudad);
 
     boolean existsByIdAndImagen_Id(Long id, Long imagenId);
 

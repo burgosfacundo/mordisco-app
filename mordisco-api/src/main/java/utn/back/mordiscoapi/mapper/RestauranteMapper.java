@@ -3,6 +3,7 @@ package utn.back.mordiscoapi.mapper;
 import lombok.experimental.UtilityClass;
 import utn.back.mordiscoapi.model.dto.pedido.RestaurantePedidoDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
 
@@ -48,6 +49,14 @@ public class RestauranteMapper {
     public static RestauranteResponseDTO toDTO (Restaurante r){
         var imagen = ImagenMapper.toDTO(r.getImagen());
         var direccion = DireccionMapper.toDTO(r.getDireccion());
+        double estrellas = 0.0;
+        if (r.getCalificaciones() != null && !r.getCalificaciones().isEmpty()) {
+            estrellas = r.getCalificaciones()
+                    .stream()
+                    .mapToInt(CalificacionRestaurante::getPuntaje)
+                    .average()
+                    .orElse(0.0);
+        }
 
         return new RestauranteResponseDTO(
                 r.getId(),
@@ -58,9 +67,38 @@ public class RestauranteMapper {
                 r.getPromociones().stream().map(PromocionMapper::toDTO).toList(),
                 r.getHorariosAtencion().stream().map(HorarioAtencionMapper::toDTO).toList(),
                 r.getCalificaciones().stream().map(CalificacionRestauranteMapper::toDTO).toList(),
+                estrellas,
                 direccion
                 );
     }
+
+    /**
+     * Convierte una entidad de restaurante a un DTO de respuesta de restaurante.
+     * @param r la entidad de restaurante a convertir
+     * @return el DTO de respuesta de restaurante con los datos de la entidad
+     */
+    public static RestauranteResponseCardDTO toCardDTO(Restaurante r){
+        var imagen = ImagenMapper.toDTO(r.getImagen());
+        double estrellas = 0.0;
+        if (r.getCalificaciones() != null && !r.getCalificaciones().isEmpty()) {
+            estrellas = r.getCalificaciones()
+                    .stream()
+                    .mapToInt(CalificacionRestaurante::getPuntaje)
+                    .average()
+                    .orElse(0.0);
+        }
+
+        return new RestauranteResponseCardDTO(
+                r.getId(),
+                r.getRazonSocial(),
+                r.getActivo(),
+                imagen,
+                r.getHorariosAtencion().stream().map(HorarioAtencionMapper::toDTO).toList(),
+                estrellas
+        );
+    }
+
+
 
     /**
      * Convierte una entidad de restaurante a un DTO de respuesta de restaurante para pedidos.

@@ -56,18 +56,13 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role",((Usuario) userDetails).getRol());
         claims.put("id",((Usuario) userDetails).getId());
-        claims.put("nombre", ((Usuario) userDetails).getNombre());
-        claims.put("apellido", ((Usuario) userDetails).getApellido());
         claims.put("email",((Usuario) userDetails).getEmail());
-        claims.put("telefono",((Usuario) userDetails).getTelefono());
         return createToken(claims, userDetails);
     }
 
     private String createToken(Map<String, Object> claims, UserDetails userDetails) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(userDetails.getUsername())
-                .claim("authorities",userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1)))
                 .signWith(secretKey, SignatureAlgorithm.HS256)

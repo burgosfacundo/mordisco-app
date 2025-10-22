@@ -14,6 +14,7 @@ import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
 import utn.back.mordiscoapi.service.interf.IRestauranteService;
@@ -127,7 +128,7 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/ciudad")
-    public ResponseEntity<List<RestauranteResponseDTO>> getAllByCiudad(@RequestParam String ciudad) {
+    public ResponseEntity<List<RestauranteResponseCardDTO>> getAllByCiudad(@RequestParam String ciudad) {
         return ResponseEntity.ok(restauranteService.getAllByCiudad(ciudad));
     }
 
@@ -142,7 +143,7 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/nombre")
-    public ResponseEntity<List<RestauranteResponseDTO>> getAllByNombre(@RequestParam String nombre) {
+    public ResponseEntity<List<RestauranteResponseCardDTO>> getAllByNombre(@RequestParam String nombre) {
         return ResponseEntity.ok(restauranteService.getAllByNombre(nombre));
     }
 
@@ -150,14 +151,14 @@ public class RestauranteController {
      * Función para listar restaurantes con promociones activas.
      * @return Respuesta HTTP con una lista de DTO de restaurantes con promociones activas.
      */
-    @Operation(summary = "Listar restaurantes con promociones activas", description = "Lista los restaurantes que tienen una promoción activa")
+    @Operation(summary = "Listar restaurantes en una ciudad con promociones activas", description = "Lista los restaurantes en una ciudad que tienen una promoción activa")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Restaurantes con promociones activas listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/promocion")
-    public ResponseEntity<List<RestauranteResponseDTO>> getAllByPromocionActiva() {
-        return ResponseEntity.ok(restauranteService.getAllByPromocionActiva());
+    public ResponseEntity<List<RestauranteResponseCardDTO>> findAllWithPromocionActivaAndCiudad(@RequestParam String ciudad) {
+        return ResponseEntity.ok(restauranteService.findAllWithPromocionActivaAndCiudad(ciudad));
     }
 
     /**
