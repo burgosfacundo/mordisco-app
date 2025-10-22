@@ -1,19 +1,33 @@
-<form [formGroup]="inicioSesion" (ngSubmit)="iniciarSesion()"> 
-    <h1>Iniciar Sesión</h1>
-    <fieldset> 
-        <label for="email">Email</label> 
-        <input type="email" placeholder="Ingrese el mail" formControlName="email"> 
-        @if(inicioSesion.controls['email'].errors?.['required'] && inicioSesion.get('email')?.touched){ 
-            <p class="error">El email es obligatorio para ingresar</p> 
-        }@else if(inicioSesion.controls['email'].errors?.['email'] && inicioSesion.get('email')?.touched){ 
-            <p class="error">El email no esta en un formato valido</p> } 
-    </fieldset> 
-    <fieldset> 
-        <label for="password">Contraseña</label> 
-        <input type="password" placeholder="Ingrese la contraseña" formControlName="password"> 
-        @if(inicioSesion.controls['password'].errors?.['required'] && inicioSesion.get('password')?.touched){ 
-            <p class="error">La contraseña es obligatoria para ingresar</p> 
-        }
-        </fieldset> 
-        <button class="botonIniciarSesion" type="submit" [disabled]="!inicioSesion.valid">Iniciar Sesion</button>
-</form>
+<section class="contenedorLoginUsuario">
+    <div class="mitadLogin">
+         <img src="https://res.cloudinary.com/dyzhap5j4/image/upload/v1761055103/PHOTO-2025-10-21-10-57-39_hyomts.jpg" 
+            class="imagenLogin">
+   </div>
+    <div class="mitadLogin2" >
+            <h1 class="mordisco">MORDISCO</h1>        
+            <form [formGroup]="inicioSesion" (ngSubmit)="iniciarSesion()" class="formulario"> 
+                <fieldset> 
+                    <label for="email" class="labelForm">Email</label> 
+                    <input type="email" placeholder="Ingrese el mail" formControlName="email" class="inputForm">                    
+                    
+                    @if(inicioSesion.controls['email'].errors?.['required'] && inicioSesion.get('email')?.touched){ 
+                        <p class="mensajeError">El email es obligatorio para ingresar</p>                
+                    }@else if(inicioSesion.controls['email'].errors?.['email'] && inicioSesion.get('email')?.touched){ 
+                        <p class="mensajeError">El email no esta en un formato valido</p> } 
+                </fieldset> 
+                <fieldset> 
+                    <label for="password" class="labelForm">Contraseña</label> 
+                    <input type="password" placeholder="Ingrese la contraseña" formControlName="password" class="inputForm"> 
+                    @if(inicioSesion.controls['password'].errors?.['required'] && inicioSesion.get('password')?.touched){ 
+                        <p class="mensajeError">La contraseña es obligatoria para ingresar</p> 
+                    }
+                </fieldset> 
+                <div class="cajaBoton">
+                    <button type="submit" [disabled]="!inicioSesion.valid" class="boton">Iniciar Sesion</button>
+                </div>
+            </form>
+            <div>
+                <p class="redireccionRegistro"><a [routerLink]="['/registro']"> Todavia no tienes cuenta? Registrate aquí </a></p>  
+            </div>
+    </div>    
+</section>
