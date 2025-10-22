@@ -8,9 +8,9 @@
                 <input type="text" id="nombre" formControlName="nombre" class="inputForm">
                 @if (userForm.get('nombre')?.touched) {
                     @if(userForm.controls['nombre'].errors?.['required']){
-                        <p class="p-1 w-full bg-red-700 text-white rounded-md mb-4">El nombre es obligatorio</p>
+                        <p class="mensajeError">El nombre es obligatorio</p>
                     } @else if(userForm.controls['nombre'].errors?.['maxlength']){
-                        <p class="p-1 w-full bg-red-700 text-white rounded-md mb-4"> El nombre debe tener como maximo 50 caracteres</p>
+                        <p class="mensajeError"> El nombre debe tener como máximo 50 caracteres</p>
                     }
                 }
             </fieldset>
@@ -19,24 +19,24 @@
                 <input type="text" id="apellido" formControlName="apellido" class="inputForm">
                 @if (userForm.get('apellido')?.touched) {
                     @if(userForm.controls['apellido'].errors?.['required']){
-                        <p class="p-1 w-full bg-red-700 text-white rounded-md mb-4">El apellido es obligatorio</p>
+                        <p class="mensajeError">El apellido es obligatorio</p>
                     } @else if(userForm.controls['apellido'].errors?.['maxlength']){
-                        <p class="p-1 w-full bg-red-700 text-white rounded-md mb-4">El apellido debe tener como maximo 50 caracteres</p>
+                        <p class="mensajeError">El apellido debe tener como máximo 50 caracteres</p>
                     }
                 }
             </fieldset>
             <fieldset>
-                <label for="telefono" class="labelForm">Telefono  </label>
+                <label for="telefono" class="labelForm">Teléfono  </label>
                 <input type="text" id="telefono" formControlName="telefono" class="inputForm">
                     @if (userForm.get('telefono')?.touched) {
                         @if(userForm.controls['telefono'].errors?.['required']){
-                            <p class="p-1 w-full bg-red-700 text-white rounded-md mb-4">El telefono es obligatorio</p>
+                            <p class="mensajeError">El teléfono es obligatorio</p>
                         } @else if(userForm.controls['telefono'].errors?.['maxlength']){
-                            <p class="p-1 w-full bg-red-700 text-white rounded-md mb-4">El telefono debe tener como maximo 50 numeros</p>
+                            <p class="mensajeError">El teléfono debe tener como máximo 50 numeros</p>
                         }@else if (userForm.controls['telefono'].errors?.['minlength']) {
-                            <p class="p-1 w-full bg-red-700 text-white rounded-md mb-4">El telefono debe tener como minimo 8 numeros</p>
+                            <p class="mensajeError">El teléfono debe tener como mínimo 8 numeros</p>
                         }@else if (userForm.controls['telefono'].errors?.['pattern']) {
-                            <p class="p-1 w-full bg-red-700 text-white rounded-md mb-4">El telefono debe tener unicamente numeros</p>
+                            <p class="mensajeError">El teléfono debe tener únicamente numeros</p>
                         }
                     }
             </fieldset>
@@ -47,7 +47,7 @@
                         @if(userForm.controls['email'].errors?.['required']){
                             <p class="mensajeError">El email es obligatorio</p>
                         }@else if(userForm.controls['email'].errors?.['maxlength']){
-                            <p class="mensajeError">El email debe tener como maximo 100 caracteres</p>}
+                            <p class="mensajeError">El email debe tener como máximo 100 caracteres</p>}
                         @else if(userForm.controls['email'].errors?.['email']){
                             <p class="mensajeError">El email debe contener @</p>}
                 }
@@ -59,7 +59,7 @@
                         @if(userForm.controls['password'].errors?.['required']){
                             <p class="mensajeError">La contraseña es obligatoria</p>
                         }@else if(userForm.controls['password'].errors?.['minlength']){
-                            <p class="mensajeError">La contraseña debe tener como minimo 8 caracteres</p>}
+                            <p class="mensajeError">La contraseña debe tener como mínimo 8 caracteres</p>}
                 }
             </fieldset>
 

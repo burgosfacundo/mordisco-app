@@ -15,7 +15,7 @@ fieldset{
 
 /* Contenedor del formulario */
 .edit-profile-container {
-  background-color: #ffffff;
+  background-color: #fafaf9;
   padding: 2.5rem 3rem;
   border-radius: 16px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
@@ -25,12 +25,13 @@ fieldset{
 
 /* Título */
 h1 {
-  text-align: center;
-  color: #e3291d;
-  margin-bottom: 2rem;
   font-weight: 700;
-}
+  color: #E3291D;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
 
+}
 /* Etiquetas */
 label {
   display: block;
