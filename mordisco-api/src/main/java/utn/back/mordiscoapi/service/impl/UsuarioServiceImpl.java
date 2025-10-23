@@ -16,10 +16,10 @@ import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
 import utn.back.mordiscoapi.model.entity.Usuario;
-import utn.back.mordiscoapi.repository.DireccionRepository;
 import utn.back.mordiscoapi.repository.RolRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
+import utn.back.mordiscoapi.utils.AuthUtils;
 import utn.back.mordiscoapi.utils.Sanitize;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.Optional;
 public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     private final UsuarioRepository repository;
     private final RolRepository rolRepository;
-    private final DireccionRepository direccionRepository;
+    private final AuthUtils authUtils;
     final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
@@ -74,6 +74,17 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         return UsuarioMapper.toUsuarioResponseDTO(usuario.get());
     }
 
+    @Override
+    public UsuarioResponseDTO getMe() throws NotFoundException, BadRequestException {
+        var userAuthenticated = authUtils.getUsuarioAutenticado()
+                .orElseThrow(() -> new BadRequestException("No autenticado"));
+
+        var user = repository.findById(userAuthenticated.getId()).orElseThrow(
+                () -> new NotFoundException("Usuario no encontrado"));
+
+        return UsuarioMapper.toUsuarioResponseDTO(user);
+    }
+
     /**
      * Actualiza un usuario.
      * @param id el ID del usuario a actualizar.
@@ -92,6 +103,21 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         usuario.setTelefono(Sanitize.collapseSpaces(dto.telefono()));
     }
 
+    @Override
+    public UsuarioResponseDTO updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
+        var userAuthenticated = authUtils.getUsuarioAutenticado()
+                .orElseThrow(() -> new BadRequestException("No autenticado"));
+
+        var user = repository.findById(userAuthenticated.getId()).orElseThrow(
+                () -> new NotFoundException("Usuario no encontrado"));
+
+        user.setNombre(Sanitize.collapseSpaces(dto.nombre()));
+        user.setApellido(Sanitize.collapseSpaces(dto.apellido()));
+        user.setTelefono(Sanitize.collapseSpaces(dto.telefono()));
+
+        return UsuarioMapper.toUsuarioResponseDTO(user);
+    }
+
     /**
      * Elimina un usuario por su ID.
      * @param id el ID del usuario a eliminar.
@@ -103,6 +129,18 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
             throw new NotFoundException("Usuario no encontrado");
         }
         repository.deleteById(id);
+    }
+
+    @Override
+    public void deleteMe() throws NotFoundException, BadRequestException {
+        var userAuthenticated = authUtils.getUsuarioAutenticado()
+                .orElseThrow(() -> new BadRequestException("No autenticado"));
+
+        if(!repository.existsById(userAuthenticated.getId())){
+            throw new NotFoundException("Usuario no encontrado");
+        }
+
+        repository.deleteById(userAuthenticated.getId());
     }
 
     /**

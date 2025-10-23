@@ -76,7 +76,7 @@ public class UsuarioController {
      */
     @Operation(summary = "Obtener un usuario por ID",
             description = "Recibe un ID y devuelve el usuario correspondiente." +
-                    "** Requiere rol: ADMIN o el propio usuario autenticado puede acceder a su información**")
+                    "** Requiere rol: ADMIN**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Devuelve el usuario correspondiente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
@@ -84,11 +84,49 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable
                                                         Long id) throws NotFoundException {
         return ResponseEntity.ok(service.findById(id));
+    }
+
+    @Operation(summary = "Obtener usuario autenticado (me)",
+            description = "Devuelve el perfil del usuario autenticado. Requiere JWT válido.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "No autenticado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioResponseDTO> getMe() throws NotFoundException, BadRequestException {
+        return ResponseEntity.ok(service.getMe());
+    }
+
+    /**
+     * Función para actualizar usuario autenticado
+     * @return Respuesta HTTP con un mensaje de éxito.
+     * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
+     * @throws BadRequestException Si los datos proporcionados son inválidos.
+     */
+    @Operation(summary = "Actualizar usuario autenticado",
+            description = "Recibe un ID y un usuario y actualiza el usuario correspondiente." +
+            "** El propio usuario autenticado puede actualizar su información**")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Usuario actualizado exitosamente"),
+            @ApiResponse(responseCode = "401",description = "Usuario no autenticado"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/me")
+    public ResponseEntity<UsuarioResponseDTO> updateMe(@RequestBody @Valid UsuarioUpdateDTO dto)
+            throws NotFoundException, BadRequestException {
+        return ResponseEntity.ok(service.updateMe(dto));
     }
 
     /**
@@ -101,7 +139,7 @@ public class UsuarioController {
      */
     @Operation(summary = "Actualizar un usuario",
             description = "Recibe un ID y un usuario y actualiza el usuario correspondiente." +
-                    "** El propio usuario autenticado puede actualizar su información**")
+                    "** Necesita Rol Admin**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Usuario actualizada exitosamente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
@@ -109,13 +147,13 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("hasRole('ADMIN")
     @PatchMapping("/{id}")
     public ResponseEntity<String> updatePerfil(@PathVariable
-                                         Long id,
-                                         @RequestBody
-                                         @Valid
-                                         UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
+                                               Long id,
+                                               @RequestBody
+                                               @Valid
+                                               UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         service.update(id,dto);
         return ResponseEntity.ok().body("Usuario actualizado exitosamente");
     }
@@ -136,11 +174,34 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable
                                          Long id) throws NotFoundException {
         service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Función para eliminar un usuario autenticado
+     * @return Respuesta HTTP con un mensaje de éxito.
+     * @throws NotFoundException Si no se encuentra el usuario autenticado
+     * @throws BadRequestException si ocurre un error con el jwt.
+     */
+    @Operation(summary = "Eliminar un usuario autenticado",
+            description = "Elimina el usuario autenticado." +
+                    "** El propio usuario autenticado puede borrar su información**")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204",description = "Usuario eliminado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteMe() throws NotFoundException, BadRequestException {
+        service.deleteMe();
         return ResponseEntity.noContent().build();
     }
 
