@@ -145,14 +145,16 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
 
     /**
      * Cambia la contraseña del usuario.
-     * @param id el ID del usuario a actualizar.
      * @param dto con la contraseña actual y la nueva.
      * @throws NotFoundException si el usuario no se encuentra.
      */
     @Transactional
     @Override
-    public void changePassword(Long id, ChangePasswordDTO dto) throws NotFoundException {
-        Usuario usuario = repository.findById(id).orElseThrow(
+    public void changePassword(ChangePasswordDTO dto) throws NotFoundException, BadRequestException {
+        var userAuthenticated = authUtils.getUsuarioAutenticado()
+                .orElseThrow(() -> new BadRequestException("No autenticado"));
+
+        Usuario usuario = repository.findById(userAuthenticated.getId()).orElseThrow(
                 () -> new NotFoundException("Usuario no encontrado")
         );
 

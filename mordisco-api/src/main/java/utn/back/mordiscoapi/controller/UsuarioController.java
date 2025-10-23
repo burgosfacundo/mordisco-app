@@ -207,13 +207,12 @@ public class UsuarioController {
 
     /**
      * Función para actualizar la contraseña de un usuario por su ID.
-     * @param id del usuario a actualizar.
      * @param dto con la contraseña actual y la nueva.
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
      */
-    @Operation(summary = "Actualizar la contraseña de un usuario",
-            description = "Recibe un ID, la vieja contraseña y la nueva contraseña y actualiza el usuario correspondiente." +
+    @Operation(summary = "Actualizar la contraseña del usuario autenticado",
+            description = "Recibe la vieja contraseña y la nueva contraseña y actualiza el usuario autenticado." +
                     "** El propio usuario autenticado puede actualizar su contraseña**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Usuario actualizada exitosamente"),
@@ -222,15 +221,12 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
-    @PutMapping("/password/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/password")
     public ResponseEntity<String> changePassword(
-            @Valid
-            @PathVariable
-            Long id,
             @RequestBody @Valid
-            ChangePasswordDTO dto) throws NotFoundException {
-        service.changePassword(id,dto);
+            ChangePasswordDTO dto) throws NotFoundException, BadRequestException {
+        service.changePassword(dto);
         return ResponseEntity.ok().body("Contraseña actualizada exitosamente");
     }
 

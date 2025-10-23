@@ -16,7 +16,7 @@ public interface IUsuarioService {
     UsuarioResponseDTO getMe() throws NotFoundException, BadRequestException;
     void delete(Long id) throws NotFoundException;
     void deleteMe() throws NotFoundException, BadRequestException;
-    void changePassword(Long id, ChangePasswordDTO dto) throws NotFoundException;
+    void changePassword(ChangePasswordDTO dto) throws NotFoundException, BadRequestException;
     List<UsuarioResponseDTO> findByRolId(Long id) throws NotFoundException;
     void update(Long id, UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;
     UsuarioResponseDTO updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;
