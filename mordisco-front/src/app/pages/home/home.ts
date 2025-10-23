@@ -27,6 +27,7 @@ export class Home implements OnInit{
   ngOnInit(): void {
       this.jwt= this.auService.getCurrentUser()
       const idRestaurante = this.jwt?.id
+      
       if(idRestaurante){
         this.pService.getAllByRestaurante_IdAndEstado(idRestaurante, this.estadoDefault).subscribe({
         next: (pedidosLeidos) => this.pedidosPendientes = pedidosLeidos
