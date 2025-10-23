@@ -34,7 +34,7 @@ public record DireccionCreateDTO(
     @DecimalMin(value="-90") @DecimalMax(value="90")
     @Schema(description = "Latitud de la dirección", example = "-38.00965070799693")
     Double latitud,
-    @DecimalMin(value="-180") @DecimalMax(value="180", inclusive=true)
+    @DecimalMin(value="-180") @DecimalMax(value="180")
     @Schema(description = "Longitud de la dirección", example = "-57.55554272466376")
     Double longitud,
     @Size(message = "La ciudad no puede contener mas de 50 caracteres", max = 50)
