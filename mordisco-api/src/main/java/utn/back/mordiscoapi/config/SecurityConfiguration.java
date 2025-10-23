@@ -33,18 +33,18 @@ public class SecurityConfiguration {
             "/webjars/**",
 
             // Endpoints públicos de autenticación
-            "/api/usuario/save",
+            "/api/usuarios/save",
             "/api/auth/login",
 
             // Endpoints públicos de consulta (sin datos sensibles)
-            "/api/restaurante/{id}",
-            "/api/restaurante",
-            "/api/restaurante/estado",
-            "/api/restaurante/ciudad",
-            "/api/restaurante/nombre",
-            "/api/restaurante/promocion",
-            "/api/menu/{restauranteId}",
-            "/api/promocion/{id}",
+            "/api/restaurantes/{id}",
+            "/api/restaurantes",
+            "/api/restaurantes/estado",
+            "/api/restaurantes/ciudad",
+            "/api/restaurantes/nombre",
+            "/api/restaurantes/promociones",
+            "/api/menus/{restauranteId}",
+            "/api/promociones/{id}",
 
             // Otros endpoints públicos opcionales
             "/api/public/**"

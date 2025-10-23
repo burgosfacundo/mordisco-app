@@ -38,4 +38,7 @@ public class Direccion {
 
     @Column(nullable = false, length = 50)
     private String ciudad;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private Usuario usuario;
 }

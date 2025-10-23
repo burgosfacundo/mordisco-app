@@ -1,41 +1,38 @@
 package utn.back.mordiscoapi.model.dto.usuario;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionCreateDTO;
+import jakarta.validation.constraints.*;
 
-import java.util.List;
 
 public record UsuarioCreateDTO(
         @Size(message = "El nombre del usuario debe tener máximo 50 caracteres", max = 50)
-        @NotNull(message = "El nombre del usuario es obligatorio")
+        @NotBlank(message = "El nombre del usuario es obligatorio")
         String nombre,
 
         @Size(message = "El apellido del usuario debe tener máximo 50 caracteres", max = 50)
-        @NotNull(message = "El apellido del usuario es obligatorio")
+        @NotBlank(message = "El apellido del usuario es obligatorio")
         String apellido,
 
-        @Size(message = "El teléfono del usuario debe tener máximo 50 caracteres", max = 50)
-        @NotNull(message = "El teléfono del usuario es obligatorio")
+        @Pattern(
+                regexp = "^(?=.{6,25}$)[0-9+()\\- ]+$",
+                message = "Teléfono inválido. Permitidos dígitos, + ( ) - y espacios; 6 a 25 caracteres"
+        )
+        @NotBlank(message = "El teléfono del usuario es obligatorio")
         String telefono,
 
         @Size(message = "El email del usuario debe tener máximo 100 caracteres", max = 100)
-        @NotNull(message = "El email del usuario es obligatorio")
+        @NotBlank(message = "El email del usuario es obligatorio")
         @Email(message = "El email del usuario debe ser válido")
         String email,
 
-        @Size(message = "La contraseña del usuario debe tener mínimo 8 caracteres", min = 8)
-        @NotNull(message = "El contraseña del usuario es obligatorio")
+        @Size(message = "La contraseña del usuario debe tener mínimo 8 caracteres", min = 8,max = 72)
+        @Pattern(
+                regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,72}$",
+                message = "La contraseña debe tener 8-72 caracteres, con al menos una mayúscula, una minúscula, un número y un caracter especial"
+        )
+        @NotBlank(message = "El contraseña del usuario es obligatoria")
         String password,
 
         @NotNull(message = "El rol del usuario es obligatorio")
-        Long rolId,
-
-        @Schema(description = "Direcciones del usuario")
-        @Valid
-        List<DireccionCreateDTO> direcciones
+        Long rolId
 ) {
 }

@@ -6,6 +6,7 @@ import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
+import utn.back.mordiscoapi.utils.Sanitize;
 
 
 @UtilityClass
@@ -20,21 +21,22 @@ public class RestauranteMapper {
                 .id(dto.idUsuario())
                 .build();
         Imagen imagen = Imagen.builder()
-                .url(dto.logo().url())
-                .nombre(dto.logo().nombre())
+                .url(Sanitize.collapseSpaces(dto.logo().url()))
+                .nombre(Sanitize.collapseSpaces(dto.logo().nombre()))
                 .build();
         Direccion direccion = Direccion.builder()
-                .calle(dto.direccion().calle())
-                .numero(dto.direccion().numero())
-                .ciudad(dto.direccion().ciudad())
-                .codigoPostal(dto.direccion().codigoPostal())
-                .depto(dto.direccion().depto())
-                .referencias(dto.direccion().referencias())
+                .calle(Sanitize.collapseSpaces(dto.direccion().calle()))
+                .numero(Sanitize.trimToNull(dto.direccion().numero()))
+                .piso(Sanitize.trimToNull(dto.direccion().piso()))
+                .depto(Sanitize.trimToNull(dto.direccion().depto()))
+                .codigoPostal(Sanitize.trimToNull(dto.direccion().codigoPostal()))
+                .ciudad(Sanitize.collapseSpaces(dto.direccion().ciudad()))
+                .referencias(Sanitize.trimToNull(dto.direccion().referencias()))
                 .latitud(dto.direccion().latitud())
                 .longitud(dto.direccion().longitud())
                 .build();
         return Restaurante.builder()
-                .razonSocial(dto.razonSocial())
+                .razonSocial(Sanitize.trimToNull(dto.razonSocial()))
                 .imagen(imagen)
                 .usuario(usuario)
                 .direccion(direccion)

@@ -168,8 +168,8 @@ public class RestauranteServiceImpl implements IRestauranteService {
 
         restaurante.setActivo(dto.activo());
         restaurante.setRazonSocial(dto.razonSocial());
-        restaurante.setImagen(ImagenMapper.updateToEntity(dto.logo()));
-        restaurante.setDireccion(DireccionMapper.updateToEntity(dto.direccion()));
+        ImagenMapper.applyUpdate(dto.logo(),restaurante.getImagen());
+        DireccionMapper.applyUpdate(dto.direccion(),restaurante.getDireccion());
 
         restauranteRepository.save(restaurante);
     }

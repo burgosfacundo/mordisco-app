@@ -14,7 +14,7 @@ public class ProductoPedidoMapper {
      */
     public static ProductoPedidoResponseDTO toDTO(ProductoPedido productoPedido) {
         return new ProductoPedidoResponseDTO(
-                productoPedido.getProducto().getId(),
+                productoPedido.getId(),
                 productoPedido.getCantidad(),
                 productoPedido.getPrecioUnitario(),
                 productoPedido.getProducto().getId(),

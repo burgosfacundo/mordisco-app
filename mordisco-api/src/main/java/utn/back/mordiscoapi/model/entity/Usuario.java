@@ -39,7 +39,7 @@ public class Usuario implements UserDetails {
     @Column (nullable = false)
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private List<Direccion> direcciones;
 

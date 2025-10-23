@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ import java.util.List;
 
 @Tag(name = "Promociones", description = "Operaciones relacionadas con las promociones de los restaurantes") // Anotación para documentar la API con Swagger
 @RestController
-@RequestMapping("/api/promocion")
+@RequestMapping("/api/promociones")
 @RequiredArgsConstructor
 public class PromocionController {
     private final IPromocionService service;
@@ -35,7 +36,7 @@ public class PromocionController {
     @Operation(summary = "Crear una promoción nueva", description = "Recibe una promoción y la guarda en la base de datos. " +
             "***El propio dueño del restaurante puede crear promociones para su propio restaurante.***")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Promoción creada exitosamente"),
+            @ApiResponse(responseCode = "201",description = "Promoción creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
@@ -44,10 +45,8 @@ public class PromocionController {
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody @Valid
                                        PromocionRequestDTO dto) throws BadRequestException {
-        // Llama al servicio para guardar la promoción
         service.save(dto);
-        // Devuelve una respuesta HTTP 200 OK con un mensaje de éxito
-        return ResponseEntity.ok().body("Promoción creada exitosamente");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Promoción creada exitosamente");
     }
 
     /**
@@ -124,7 +123,7 @@ public class PromocionController {
     @Operation(summary = "Eliminar una promoción", description = "Recibe un ID y elimina la promoción correspondiente. " +
             "***El propio dueño del restaurante puede eliminar promociones de su propio restaurante.***")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Promoción eliminada exitosamente"),
+            @ApiResponse(responseCode = "204",description = "Promoción eliminada exitosamente"),
             @ApiResponse(responseCode = "404", description = "No se encontró la promoción con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
@@ -134,7 +133,7 @@ public class PromocionController {
     @DeleteMapping("/{idRestaurante}/{idPromocion}")
     public ResponseEntity<String> delete(@PathVariable Long idRestaurante,@PathVariable Long idPromocion) throws NotFoundException {
         service.delete(idRestaurante,idPromocion);
-        return ResponseEntity.ok().body("Promoción eliminada exitosamente");
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Listar promociones por restaurantes", description = "Recibe un ID y lista las promociones correspondiente. " +

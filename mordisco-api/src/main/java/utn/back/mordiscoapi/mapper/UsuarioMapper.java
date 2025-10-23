@@ -5,12 +5,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import utn.back.mordiscoapi.model.dto.pedido.UsuarioPedidoDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
-import utn.back.mordiscoapi.model.entity.Direccion;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
+import utn.back.mordiscoapi.utils.Sanitize;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @UtilityClass
 public class UsuarioMapper {
@@ -25,20 +23,13 @@ public class UsuarioMapper {
                 .id(dto.rolId())
                 .build();
 
-        List<Direccion> direcciones = dto.direcciones() != null
-                ? dto.direcciones().stream()
-                .map(DireccionMapper::toEntity)
-                .toList()
-                : new ArrayList<>();
-
         return Usuario.builder()
-                .nombre(dto.nombre())
-                .apellido(dto.apellido())
-                .telefono(dto.telefono())
-                .email(dto.email())
+                .nombre(Sanitize.collapseSpaces(dto.nombre()))
+                .apellido(Sanitize.collapseSpaces(dto.apellido()))
+                .telefono(Sanitize.trimToNull(dto.telefono()))
+                .email(Sanitize.trimToNull(dto.email()))
                 .password(passwordEncoder.encode(dto.password()))
                 .rol(rol)
-                .direcciones(direcciones)
                 .build();
     }
 
@@ -51,8 +42,8 @@ public class UsuarioMapper {
                 usuario.getId(),
                 usuario.getNombre(),
                 usuario.getApellido(),
-                usuario.getEmail(),
                 usuario.getTelefono(),
+                usuario.getEmail(),
                 rol,
                 direcciones
         );
