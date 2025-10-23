@@ -1,7 +1,6 @@
 import Address from "./address";
 
 export default interface User{
-    id: number, ///////BORRAR SI ME OLVIDO EN EL MERGE
     nombre : string,
     apellido : string,
     telefono? : string,

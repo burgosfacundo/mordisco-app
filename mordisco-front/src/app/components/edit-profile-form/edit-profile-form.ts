@@ -113,4 +113,7 @@ private fb = inject(FormBuilder);
     });
   */
 }
+verDirecciones(){
+  this.router.navigate(['/direcciones']);
+}
 }

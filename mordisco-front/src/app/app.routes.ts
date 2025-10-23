@@ -10,11 +10,12 @@ import { EditProfile } from './pages/edit-profile/edit-profile';
 export const routes: Routes = [
   // páginas publicas
   {path: 'home', component : Home},
-  { path: 'login', component: Login },
-  { path: 'registro', component: Registro },
+  {path: 'login', component: Login },
+  {path: 'registro', component: Registro },
   {path: 'profile/edit', component:EditProfile},
   {path: 'profile', component: Profile},
-  {path :'edit-password', component : EditPasswordComponent}
+  {path: 'edit-password', component : EditPasswordComponent}
+
 
   // página accesible a cualquier usuario logueado
   //{ path: 'perfil', canMatch: [authGuard] },

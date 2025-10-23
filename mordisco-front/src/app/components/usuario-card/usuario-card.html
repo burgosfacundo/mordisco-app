@@ -1,0 +1,21 @@
+<div class="infoUsuario">
+  <h1 class="estiloUsuario">{{ usuario.nombre }} {{ usuario.apellido }}</h1>
+  <h2 class="estiloUsuario">{{ usuario.email }}</h2>
+
+  <h2 class="estiloUsuario">
+    👤 Rol:
+    @switch (usuario.rolId) {
+      @case (1) { Cliente }
+      @case (2) { Dueño }
+      @case (3) { Repartidor }
+      @default { Desconocido }
+    }
+  </h2>
+
+  <div class="botonContainer">
+    <button class="botonDetalles" [routerLink]="['/detalle-user', usuario.id]">
+      Ver detalles
+    </button>
+  </div>
+</div>
+
