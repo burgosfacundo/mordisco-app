@@ -15,6 +15,14 @@
     text-align: center;
 }
 
+.mordiscoTexto{
+    font-size: 0.75rem /* 36px */;
+    color:  #e3291d;
+    letter-spacing: 0.1em;
+    margin-bottom: 3rem /* 48px */;
+    text-align: center;
+}
+
 .labelForm{
     --tw-text-opacity: 1;
     color: rgb(0 0 0 / var(--tw-text-opacity, 1)) 

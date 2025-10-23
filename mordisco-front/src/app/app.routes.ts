@@ -11,9 +11,10 @@ export const routes: Routes = [
   // páginas publicas
   { path: 'login', component: Login },
   { path: 'registro', component: Registro },
-  {path: 'profile', component : EditProfile},
+  {path: 'profile/edit', component : EditProfile},
   {path :'edit-password', component : EditPasswordComponent},
-  {path: 'home', component : Home}
+  {path: 'home', component : Home},
+  {path: 'profile', component:Profile}
 
   // página accesible a cualquier usuario logueado
   //{ path: 'perfil', canMatch: [authGuard] },

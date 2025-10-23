@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+.footer {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #fff7f6;
+  color: #1c1917;
+  display: flex;
+  flex-direction: column; /* Mordisco arriba, links abajo */
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-top: 2px solid #e3291d;
+  gap: 0.8rem;
+
+  /* 🔹 Fijo al fondo */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+
+  /* 🔹 Asegura que quede sobre otros elementos */
+  z-index: 1000;
+}
+
+.footer .empresa {
+  font-weight: 700;
+  color: #e3291d;
+  font-size: 1rem;
+}
+
+/* 🔹 Links de abajo en fila */
+.footer .footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footer .footer-links p {
+  margin: 0;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.footer .footer-links p:hover {
+  color: #e3291d;
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .footer {
+    padding: 0.3rem;
+  }
+
+  .footer .footer-links {
+    gap: 0.8rem;
+  }
+
+  .footer .footer-links p {
+    font-size: 0.85rem;
+  }
+}

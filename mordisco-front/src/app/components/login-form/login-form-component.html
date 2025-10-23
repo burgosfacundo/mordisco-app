@@ -8,7 +8,7 @@
             <form [formGroup]="inicioSesion" (ngSubmit)="iniciarSesion()" class="formulario"> 
                 <fieldset> 
                     <label for="email" class="labelForm">Email</label> 
-                    <input type="email" placeholder="Ingrese el mail" formControlName="email" class="inputForm">                    
+                    <input type="email" placeholder="Ingrese el email" formControlName="email" class="inputForm">                    
                     
                     @if(inicioSesion.controls['email'].errors?.['required'] && inicioSesion.get('email')?.touched){ 
                         <p class="mensajeError">El email es obligatorio para ingresar</p>                
@@ -23,11 +23,11 @@
                     }
                 </fieldset> 
                 <div class="cajaBoton">
-                    <button type="submit" [disabled]="!inicioSesion.valid" class="boton">Iniciar Sesion</button>
+                    <button type="submit" [disabled]="!inicioSesion.valid" class="boton">Iniciar Sesión</button>
                 </div>
             </form>
             <div>
-                <p class="redireccionRegistro"><a [routerLink]="['/registro']"> Todavia no tienes cuenta? Registrate aquí </a></p>  
+                <p class="redireccionRegistro"><a [routerLink]="['/registro']">¿Todavía no tienes cuenta? Registrate aquí </a></p>  
             </div>
     </div>    
 </section>
