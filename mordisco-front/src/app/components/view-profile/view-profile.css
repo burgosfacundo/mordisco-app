@@ -1,0 +1,29 @@
+.contenedorProfile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 2rem 1rem;
+  background:  #fafaf9;
+  box-sizing: border-box;
+  gap: 1rem 
+}
+.seccionDirecciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* más estrechas */
+  gap: 0.2rem;
+  width: 100%;
+  max-width: 700px; /* límite general */
+  list-style: none;
+  padding: 0;
+}
+.direccionCard {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  max-width: 220px;  /* límite ancho */
+  font-size: 0.9rem; /* textos un poco más pequeños */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}

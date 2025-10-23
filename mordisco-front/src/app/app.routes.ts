@@ -3,18 +3,18 @@ import { Login } from './pages/login/login/login';
 import { Registro } from './pages/registro/registro';
 import { authGuard } from './core/guards/auth/auth-guard';
 import { Profile } from './pages/profile/profile';
-import { EditProfile } from './components/edit-profile/edit-profile';
 import { EditPasswordComponent } from './components/edit-password/edit-password';
 import { Home } from './pages/home/home';
+import { EditProfile } from './pages/edit-profile/edit-profile';
 
 export const routes: Routes = [
   // páginas publicas
+  {path: 'home', component : Home},
   { path: 'login', component: Login },
   { path: 'registro', component: Registro },
-  {path: 'profile/edit', component : EditProfile},
-  {path :'edit-password', component : EditPasswordComponent},
-  {path: 'home', component : Home},
-  {path: 'profile', component:Profile}
+  {path: 'profile/edit', component:EditProfile},
+  {path: 'profile', component: Profile},
+  {path :'edit-password', component : EditPasswordComponent}
 
   // página accesible a cualquier usuario logueado
   //{ path: 'perfil', canMatch: [authGuard] },

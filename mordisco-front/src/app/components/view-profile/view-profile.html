@@ -1,0 +1,24 @@
+<section class="contenedorProfile">
+    @if (usuario) {
+        
+        <h3 class="mordisco">Mi pefil</h3>
+        <h2 class="mordiscoTexto">Nombre <span style="color:black">{{usuario.nombre}}</span></h2> 
+        <h2 class="mordiscoTexto">Apellido <span style="color:black">{{usuario.apellido}}</span></h2> 
+        <h2 class="mordiscoTexto">Telefono <span style="color:black">{{usuario.telefono}}</span></h2> 
+        <h2 class="mordiscoTexto">Email <span style="color:black">{{usuario.email}}</span></h2> 
+        <h2 class="mordiscoTexto">Direcciones</h2> 
+        <ul class="seccionDirecciones">
+            @for(direccion of usuario.direcciones; track $index){
+                <li class="direccionCard">
+                    <app-direccion-card [direccion]="direccion"></app-direccion-card>
+                </li>
+            }
+        </ul>
+        
+        <button (click)="cambiarContrasenia()" class="boton">Cambiar contraseña</button>
+        <button (click)="editarPerfil()" class="boton">Editar perfil</button>
+        <button (click)="eliminarCuenta()" class="boton">Eliminar cuenta</button>
+    }@else {
+        <p class="mordiscoSubtitulos">No existe usuario con este ID!</p>
+    }
+</section>

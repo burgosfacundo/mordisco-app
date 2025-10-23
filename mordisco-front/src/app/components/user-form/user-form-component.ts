@@ -82,6 +82,7 @@ export class UserFormComponent implements OnInit{
     }));
 
     const user: User = {
+      id: raw.id, ///////BORRAR SI ME OLVIDO EN EL MERGE
       nombre: raw.nombre,
       apellido: raw.apellido,
       telefono: raw.telefono,

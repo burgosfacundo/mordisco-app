@@ -1,20 +1,18 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../auth/services/auth-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import User from '../../models/user';
 import { Router } from '@angular/router';
-
+import User from '../../models/user';
 import ProfileUser from '../../models/profileUser';
 
 @Component({
-  selector: 'app-edit-profile',
+  selector: 'app-edit-profile-form',
   imports: [ReactiveFormsModule],
-  templateUrl: './edit-profile.html',
-  styleUrl: './edit-profile.css'
+  templateUrl: './edit-profile-form.html',
+  styleUrl: './edit-profile-form.css'
 })
-export class EditProfile implements OnInit {
-  private fb = inject(FormBuilder);
+export class EditProfileForm {
+private fb = inject(FormBuilder);
   private _snackBar = inject(MatSnackBar);
   private router = inject(Router);
 

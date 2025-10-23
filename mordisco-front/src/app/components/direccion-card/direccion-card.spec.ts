@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Profile } from './profile';
+import { DireccionCard } from './direccion-card';
 
-describe('Profile', () => {
-  let component: Profile;
-  let fixture: ComponentFixture<Profile>;
+describe('DireccionCard', () => {
+  let component: DireccionCard;
+  let fixture: ComponentFixture<DireccionCard>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Profile]
+      imports: [DireccionCard]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Profile);
+    fixture = TestBed.createComponent(DireccionCard);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

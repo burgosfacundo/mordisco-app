@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import User from '../../models/user';
 
 @Injectable({
@@ -7,8 +7,9 @@ import User from '../../models/user';
 })
 export class UserService {
 
-  readonly API_URL ="http://"
-  constructor(private http:HttpClient){}
+  http : HttpClient = inject(HttpClient)
+
+  readonly API_URL ="http://localhost:3000/usuario" /*JSON SERVER */
 
   getUserByID(id : number){
     return this.http.get<User>(`${this.API_URL}/${id}`)

@@ -12,10 +12,6 @@
   border-top: 2px solid #e3291d;
   gap: 0.8rem;
 
-  /* 🔹 Fijo al fondo */
-  position: fixed;
-  bottom: 0;
-  left: 0;
   width: 100%;
 
   /* 🔹 Asegura que quede sobre otros elementos */
