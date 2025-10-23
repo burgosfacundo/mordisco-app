@@ -4,6 +4,15 @@
     color:  #e3291d;
     letter-spacing: 0.1em;
     margin-bottom: 3rem /* 48px */;
+    text-align: center;
+}
+
+.mordiscoSubtitulos{
+    font-size: 1.2rem /* 36px */;
+    color:  #e3291d;
+    letter-spacing: 0.1em;
+    margin-bottom: 3rem /* 48px */;
+    text-align: center;
 }
 
 .labelForm{

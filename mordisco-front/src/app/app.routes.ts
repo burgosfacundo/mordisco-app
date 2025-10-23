@@ -5,13 +5,15 @@ import { authGuard } from './core/guards/auth/auth-guard';
 import { Profile } from './pages/profile/profile';
 import { EditProfile } from './components/edit-profile/edit-profile';
 import { EditPasswordComponent } from './components/edit-password/edit-password';
+import { Home } from './pages/home/home';
 
 export const routes: Routes = [
   // páginas publicas
   { path: 'login', component: Login },
   { path: 'registro', component: Registro },
   {path: 'profile', component : EditProfile},
-  {path :'edit-password', component : EditPasswordComponent}
+  {path :'edit-password', component : EditPasswordComponent},
+  {path: 'home', component : Home}
 
   // página accesible a cualquier usuario logueado
   //{ path: 'perfil', canMatch: [authGuard] },
