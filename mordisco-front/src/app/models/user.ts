@@ -1,6 +1,7 @@
 import Address from "./address";
 
 export default interface User{
+    id?: number,
     nombre : string,
     apellido : string,
     telefono? : string,

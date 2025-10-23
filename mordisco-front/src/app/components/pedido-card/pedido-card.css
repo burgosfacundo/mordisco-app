@@ -1,24 +1,66 @@
-.infoPedido{
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: flex-start;
-    padding: 0.5rem;
-}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
 
-.infoPedido a {
+:host {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  text-decoration: none; /* para sacar el subrayado */
-  color: inherit; /* mantiene el color del texto */
+  justify-content: center;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
 }
 
-
-.estiloPedido{
-    color: white;
+/* Contenedor principal */
+.infoUsuario {
+  background-color: #fff7f6;
+  border: 2px solid #e3291d34;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(227, 41, 29, 0.1);
+  padding: 24px;
+  width: 320px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-h1.estiloPedido{
-    font-size: 1.5rem;
+.infoUsuario:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(227, 41, 29, 0.2);
+}
+
+/* Texto del usuario */
+.estiloUsuario {
+  margin: 8px 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.estiloUsuario:first-of-type {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #E3291D;
+}
+
+/* Botón */
+.botonContainer {
+  margin-top: 20px;
+}
+
+.botonDetalles {
+  background-color: #E3291D;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.botonDetalles:hover {
+  background-color: #c52215;
+  transform: scale(1.03);
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .infoUsuario {
+    width: 90%;
+  }
 }

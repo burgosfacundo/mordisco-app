@@ -14,7 +14,7 @@ export const routes: Routes = [
   {path: 'profile/edit', component : EditProfile},
   {path :'edit-password', component : EditPasswordComponent},
   {path: 'home', component : Home},
-  {path: 'profile', component:Profile}
+  {path: 'profile', component:Profile},
 
   // página accesible a cualquier usuario logueado
   //{ path: 'perfil', canMatch: [authGuard] },

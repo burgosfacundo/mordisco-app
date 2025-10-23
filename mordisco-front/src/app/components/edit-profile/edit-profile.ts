@@ -115,4 +115,7 @@ export class EditProfile implements OnInit {
     });
   */
 }
+verDirecciones(){
+  this.router.navigate(['/direcciones']);
+}
 }

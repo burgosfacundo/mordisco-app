@@ -1,35 +1,83 @@
-.contenedorHome{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-height: 100vh;
-    justify-content: center;
-    align-items: center;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  background-color: #fff7f6;
+  font-family: 'Montserrat', sans-serif;
+  padding: 40px 20px;
+  box-sizing: border-box;
 }
 
-.seccionPedidos {
-    width: 80%;
-    padding: 1rem;
-    background-color: #fafaf9;
-    --tw-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-    --tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-    border-radius: 0.75rem /* 12px */;
-    color: black;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 10px;
-
-}
-.seccionPedidos h2 {
-  grid-column: 1 / -1; /* hace que el h2 se extienda por todas las columnas */
+/* Contenedor principal */
+.contenedorHome {
+  width: 100%;
+  max-width: 1200px;
   text-align: center;
-  margin-bottom: 15px;
 }
 
-.pedidoCard{
-  background: #efb43d;
-  border-radius: 12px;
-  padding: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* Título principal */
+.mordisco {
+  color: #E3291D;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 40px;
+  letter-spacing: 2px;
+}
+
+/* Subtítulos */
+.mordiscoSubtitulos {
+  color: #E3291D;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: left;
+  margin: 30px 0 20px 10px;
+}
+
+/* Secciones de pedidos y usuarios */
+.seccionPedidos {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 60px;
+}
+
+/* Cada card (pedido o usuario) */
+.pedidoCard {
+  display: inline-block;
+  margin: 10px;
+  transition: transform 0.2s ease;
+}
+
+.pedidoCard:hover {
+  transform: translateY(-4px);
+}
+
+/* Mensajes cuando no hay datos */
+p {
+  color: #555;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px 15px;
+  display: inline-block;
+  box-shadow: 0 3px 6px rgba(227, 41, 29, 0.15);
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .mordisco {
+    font-size: 2rem;
+  }
+
+  .mordiscoSubtitulos {
+    font-size: 1.3rem;
+  }
+
+  .pedidoCard {
+    display: block;
+    margin: 15px auto;
+  }
 }

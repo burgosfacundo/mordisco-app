@@ -14,4 +14,19 @@
                     <p>No hay pedidos pendientes. Todo al dia!</p>
                 }
             </ul>
+            <ul class="seccionPedidos">
+                <h2 class="mordiscoSubtitulos">Mis usuarios: </h2>
+                @if(arrayUsers){
+                    
+                    @for (user of arrayUsers; track user.id) {
+                        <li class="pedidoCard">
+                            <app-usuario-card [usuario]="user"></app-usuario-card>
+                        </li>
+                    }
+                }@else {
+                    <p>No hay usuarios!</p>
+                }
+            </ul>
 </section>
+
+

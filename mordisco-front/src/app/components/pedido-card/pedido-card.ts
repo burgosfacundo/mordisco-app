@@ -9,6 +9,5 @@ import { RouterLink } from "@angular/router";
   styleUrl: './pedido-card.css'
 })
 export class PedidoCard {
-
   @Input() pedido? : Pedido
 }
