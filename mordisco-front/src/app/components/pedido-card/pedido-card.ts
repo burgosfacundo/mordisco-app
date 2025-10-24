@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import Pedido from '../../models/pedido';
+import Pedido from '../../models/pedido/pedido';
 import { RouterLink } from "@angular/router";
 
 @Component({

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { AuthService } from '../../auth/services/auth-service';
 
 @Component({
   selector: 'app-edit-password',
@@ -10,14 +11,13 @@ import { Router } from '@angular/router';
   styleUrls: ['./edit-password.css']
 })
 export class EditPasswordComponent implements OnInit {
+  private fb : FormBuilder = inject(FormBuilder)
+  private snackBar : MatSnackBar = inject(MatSnackBar)
+  private router : Router = inject(Router)
+  private authService : AuthService = inject(AuthService)
 
   editarPassword!: FormGroup;
 
-  constructor(
-    private fb: FormBuilder,
-    private snackBar: MatSnackBar,
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
     this.editarPassword = this.fb.group({
@@ -37,8 +37,8 @@ export class EditPasswordComponent implements OnInit {
       return;
     }
 
-    /*
-    this.authService.actualizarPassword(passwordActual, passwordNueva).subscribe({
+
+    this.authService.updatePassword({passwordActual, passwordNueva}).subscribe({
       next: () => {
         this.snackBar.open('Contraseña actualizada correctamente', 'Cerrar', { duration: 3000 });
         this.router.navigate(['/perfil']);
@@ -48,6 +48,6 @@ export class EditPasswordComponent implements OnInit {
         this.snackBar.open('Error al actualizar la contraseña', 'Cerrar', { duration: 3000 });
       }
     });
-    */
+  
   }
 }

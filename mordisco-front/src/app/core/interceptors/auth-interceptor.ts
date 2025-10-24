@@ -1,48 +1,42 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { catchError, throwError } from 'rxjs';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { AuthService } from '../../auth/services/auth-service';
+import { SKIP_AUTH } from '../context/auth-context';
+import { environment } from '../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-  
-  // Rutas que no requieren token
-  const excludedRoutes = ['/login', '/register'];
-  const shouldExclude = excludedRoutes.some(route => req.url.includes(route));
-  
-  // Si la ruta está excluida, continuar sin modificar
-  if (shouldExclude) {
+  const auth  = inject(AuthService);
+
+  if (req.context.get(SKIP_AUTH)) {
     return next(req);
   }
 
-  // Obtener token del localStorage
-  const token = localStorage.getItem('accessToken');
-  
-  // Si no hay token, continuar sin modificar
-  if (!token) {
+  const isApiCall = req.url.startsWith(environment.apiUrl);
+  if (!isApiCall) {
     return next(req);
   }
 
-  // Clonar la request y agregar el header de autorización
+  const token = auth.getToken();
+  if (!token || auth.isTokenExpired()) {
+    auth.logout();                  
+    return next(req);
+  }
+
   const authReq = req.clone({
-    setHeaders: {
-      Authorization: `Bearer ${token}`
-    }
+    setHeaders: { Authorization: `Bearer ${token}` }
   });
 
-  // Continuar con la request modificada y manejar errores
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Si el error es 401 (No autorizado), el token expiró
       if (error.status === 401) {
-        // Eliminar token expirado
-        localStorage.removeItem('accessToken');
-        
-        // Redirigir al login
+        auth.logout();
         router.navigate(['/login']);
+      } else if (error.status === 403) {
+        router.navigate(['/forbidden']);
       }
-      
-      // Re-lanzar el error para que otros interceptors o servicios lo manejen
       return throwError(() => error);
     })
   );

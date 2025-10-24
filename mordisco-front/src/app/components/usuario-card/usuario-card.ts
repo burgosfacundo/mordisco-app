@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
-import User from '../../models/user';
 import { RouterLink } from "@angular/router";
+import UserProfile from '../../models/user/user-profile';
+import UserCard from '../../models/user/user-card';
 
 @Component({
   selector: 'app-usuario-card',
@@ -9,6 +10,5 @@ import { RouterLink } from "@angular/router";
   styleUrls: ['./usuario-card.css']
 })
 export class UsuarioCard {
-    @Input() usuario!: User;
-
+    @Input() usuario!: UserCard;
 }

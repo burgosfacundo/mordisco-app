@@ -1,8 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../auth/services/auth-service';
-import User from '../../models/user';
-import Address from '../../models/address';
+import User from '../../models/user/user-register';
+import Address from '../../models/direccion/direccion';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -87,8 +87,7 @@ export class UserFormComponent implements OnInit{
       telefono: raw.telefono,
       email: raw.email,
       password: raw.password,
-      rolId: Number(raw.rolId),
-      direcciones: direcciones,
+      rolId: Number(raw.rolId)
     };
 
     console.log(user)

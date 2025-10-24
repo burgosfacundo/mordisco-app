@@ -1,4 +1,4 @@
-export default interface Address{
+export default interface Direccion{
     calle : string,
     numero : string,
     piso?: string,

@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
-import User from '../../models/user';
-import { UserService } from '../../services/userService/user-service';
-import { AuthService } from '../../auth/services/auth-service';
-import { JwtUser } from '../../auth/models/jwt-user';
 import { DireccionCard } from "../direccion-card/direccion-card";
 import { Router } from '@angular/router';
+import UserProfile from '../../models/user/user-profile';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserService } from '../../services/user/user-service';
+import Direccion from '../../models/direccion/direccion';
 
 @Component({
   selector: 'app-view-profile',
@@ -13,25 +13,21 @@ import { Router } from '@angular/router';
   styleUrl: './view-profile.css'
 })
 export class ViewProfile {
+  private userService : UserService = inject(UserService)
+  private router : Router = inject(Router)
+  private _snackBar : MatSnackBar = inject(MatSnackBar)
+  usuario? : UserProfile
+  direcciones? : Direccion[]
 
-  usuario? : User
-  jwt? : JwtUser | null
-  IDUser? : number | null
-  private uService : UserService = inject(UserService);
-  private aus : AuthService = inject(AuthService)
-  private router :Router = inject(Router)
 
   ngOnInit(): void {
-   /* this.jwt = this.aus.getCurrentUser() PARA LA API*/
-   /* this.IDUser = this.jwt?.id PARA LA API */
-   this.IDUser=1 /*JSON SERVER */
-    if(this.IDUser){
-      this.uService.getUserByID(this.IDUser).subscribe({
-      next:(data) => this.usuario=data,
-      error: (e)=> console.log(e)
+    this.userService.getMe().subscribe({
+      next: u => this.usuario = u,
+      error: () => {
+        this.openSnackBar('❌ Ocurrió un error al cargar el perfil')
+        this.router.navigate(['/'])
+      }
     })
-    }
-    
   }
 
   eliminarCuenta(){
@@ -44,6 +40,10 @@ export class ViewProfile {
 
   editarPerfil(){
     this.router.navigate(['/profile/edit'])
+  }
+
+  private openSnackBar(message: string, action: string = 'Cerrar'): void {
+    this._snackBar.open(message, action, { duration: 3000 });
   }
 
 

@@ -8,7 +8,7 @@
         <h2 class="mordiscoTexto">Email <span style="color:black">{{usuario.email}}</span></h2> 
         <h2 class="mordiscoTexto">Direcciones</h2> 
         <ul class="seccionDirecciones">
-            @for(direccion of usuario.direcciones; track $index){
+            @for(direccion of direcciones; track $index){
                 <li class="direccionCard">
                     <app-direccion-card [direccion]="direccion"></app-direccion-card>
                 </li>

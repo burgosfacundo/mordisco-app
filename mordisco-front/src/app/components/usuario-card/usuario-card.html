@@ -4,7 +4,7 @@
 
   <h2 class="estiloUsuario">
     👤 Rol:
-    @switch (usuario.rolId) {
+    @switch (usuario.idRol) {
       @case (1) { Cliente }
       @case (2) { Dueño }
       @case (3) { Repartidor }
@@ -13,7 +13,7 @@
   </h2>
 
   <div class="botonContainer">
-    <button class="botonDetalles" [routerLink]="['/detalle-user']">///agregar id de forma  buena practica @facu sabe
+    <button class="botonDetalles" [routerLink]="['/detalle-user']">
       Ver detalles
     </button>
   </div>

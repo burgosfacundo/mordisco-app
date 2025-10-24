@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import Address from '../../models/address';
+import Direccion from '../../models/direccion/direccion';
 
 @Component({
   selector: 'app-direccion-card',
@@ -9,6 +9,6 @@ import Address from '../../models/address';
 })
 export class DireccionCard {
 
-  @Input() direccion? : Address
+  @Input() direccion? : Direccion
 
 }
