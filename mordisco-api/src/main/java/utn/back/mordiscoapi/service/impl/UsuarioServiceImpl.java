@@ -19,7 +19,7 @@ import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.RolRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
-import utn.back.mordiscoapi.utils.AuthUtils;
+import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 import utn.back.mordiscoapi.utils.Sanitize;
 
 import java.util.List;

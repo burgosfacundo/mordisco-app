@@ -1,11 +1,10 @@
 package utn.back.mordiscoapi.exception;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,6 +19,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -41,14 +41,15 @@ public class GlobalExceptionHandler {
      * @param ex la excepción capturada
      * @return una respuesta con un mensaje de error genérico y estado HTTP 500
      */
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public Map<String, String> handleGeneralException(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
         log.error("Unexpected error: {}", ex.getMessage(), ex);
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Ocurrió un error inesperado");
-        errorResponse.put("message", ex.getMessage());
-        return errorResponse;
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "Ocurrió un error inesperado",
+                        LocalDateTime.now()
+                ));
     }
 
     /**
@@ -57,9 +58,14 @@ public class GlobalExceptionHandler {
      * @return una respuesta con un mensaje de error y estado HTTP 401
      */
     @ExceptionHandler(BadCredentialsException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public String handleBadCredentials() {
-        return "Email o contraseña incorrectos";
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+        log.warn("Login fallido: credenciales inválidas");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(
+                        HttpStatus.UNAUTHORIZED.value(),
+                        "Credenciales inválidas",
+                        LocalDateTime.now()
+                ));
     }
 
     /**
@@ -68,38 +74,30 @@ public class GlobalExceptionHandler {
      * @return una respuesta con un mensaje de error y estado HTTP 403
      */
     @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public Map<String, String> handleAccessDeniedException() {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Acceso denegado");
-        return errorResponse;
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        log.warn("Acceso denegado: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(
+                        HttpStatus.FORBIDDEN.value(),
+                        "Acceso denegado",
+                        LocalDateTime.now()
+                ));
     }
 
     /**
-     * Maneja excepciones de firma de token JWT inválido.
+     * Maneja excepciones de seguridad
      *
      * @return una respuesta con un mensaje de error y estado HTTP 401
      */
-    @ExceptionHandler(SignatureException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public Map<String, String> handleJwtSignatureException() {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Token inválido o modificado. Acceso no autorizado.");
-        return errorResponse;
-    }
-
-    /**
-     * Maneja excepciones de token JWT expirado.
-     *
-     * @return una respuesta con un mensaje de error y estado HTTP 401
-     */
-    @ExceptionHandler(ExpiredJwtException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public Map<String, String> handleJwtExpiredException() {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Token expirado");
-        errorResponse.put("message", "El token JWT ha expirado. Por favor, inicie sesión nuevamente.");
-        return errorResponse;
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ErrorResponse> handleSecurity(SecurityException ex) {
+        log.error("Error de seguridad: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(
+                        HttpStatus.UNAUTHORIZED.value(),
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
     }
 
     /**
@@ -253,10 +251,14 @@ public class GlobalExceptionHandler {
      * @param e la excepción capturada
      * @return una respuesta con el mensaje de error y estado HTTP 400
      */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadRequestException.class)
-    public String badRequest(BadRequestException e) {
-        return e.getMessage();
+    public ResponseEntity<ErrorResponse> badRequest(BadRequestException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(
+                        HttpStatus.BAD_REQUEST.value(),
+                        e.getMessage(),
+                        LocalDateTime.now()
+                ));
     }
 
     /**
@@ -267,19 +269,31 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(InternalServerErrorException.class)
-    public String internalServerError(InternalServerErrorException e) {
-        return e.getMessage();
+    public ResponseEntity<ErrorResponse> internalServerError(InternalServerErrorException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        e.getMessage(),
+                        LocalDateTime.now()
+                ));
     }
 
     /**
      * Maneja la excepción personalizada NotFoundException.
      *
-     * @param e la excepción capturada
      * @return una respuesta con el mensaje de error y estado HTTP 404
      */
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({NotFoundException.class})
-    public String notFound(NotFoundException e) {
-        return e.getMessage();
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        HttpStatus.NOT_FOUND.value(),
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
     }
+
+
+
+    public record ErrorResponse(int status, String message, LocalDateTime timestamp) {}
 }

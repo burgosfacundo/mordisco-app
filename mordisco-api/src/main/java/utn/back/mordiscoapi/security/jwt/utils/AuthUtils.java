@@ -1,4 +1,4 @@
-package utn.back.mordiscoapi.utils;
+package utn.back.mordiscoapi.security.jwt.utils;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
