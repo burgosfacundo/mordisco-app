@@ -83,8 +83,6 @@ public class PedidoServiceImpl implements IPedidoService {
             pedido.setDireccionEntrega(direccion);
         }
 
-        String ciudad = direccion.getCiudad();
-
         pedido.setTotal(total);
         pedidoRepository.save(pedido);
     }
