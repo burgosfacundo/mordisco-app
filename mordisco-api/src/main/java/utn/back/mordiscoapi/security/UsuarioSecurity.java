@@ -2,7 +2,7 @@ package utn.back.mordiscoapi.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import utn.back.mordiscoapi.utils.AuthUtils;
+import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 
 @Component("usuarioSecurity")
 @RequiredArgsConstructor

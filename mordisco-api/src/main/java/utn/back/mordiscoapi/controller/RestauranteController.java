@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
+import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
 import utn.back.mordiscoapi.service.interf.IRestauranteService;
@@ -22,7 +24,7 @@ import java.util.List;
 
 @Tag(name = "Restaurante", description = "Operaciones relacionadas con los restaurantes")
 @RestController
-@RequestMapping("/api/restaurante")
+@RequestMapping("/api/restaurantes")
 @RequiredArgsConstructor
 public class RestauranteController {
     private final IRestauranteService restauranteService;
@@ -60,7 +62,7 @@ public class RestauranteController {
     })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or (@usuarioSecurity.puedeAccederAUsuario(#idUsuario) and hasRole('RESTAURANTE'))")
-    @GetMapping("/usuario/{idUsuario}")
+    @GetMapping("/usuarios/{idUsuario}")
     public ResponseEntity<RestauranteResponseDTO> findByUsuario(@PathVariable Long idUsuario) throws NotFoundException, BadRequestException {
     return ResponseEntity.ok(restauranteService.findByIdUsuario(idUsuario));
     }
@@ -72,7 +74,7 @@ public class RestauranteController {
     @Operation(summary = "Crear un restaurante nuevo", description = "Recibe un restaurante y lo guarda en la base de datos. " +
             "**El dueño del restaurante puede crear su propio restaurante**")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Restaurante creado exitosamente"),
+            @ApiResponse(responseCode = "201",description = "Restaurante creado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
@@ -83,7 +85,7 @@ public class RestauranteController {
                                        @Valid
                                        RestauranteCreateDTO dto) {
         restauranteService.save(dto);
-        return ResponseEntity.ok("Restaurante guardado correctamente");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Restaurante guardado correctamente");
     }
 
     /**
@@ -126,8 +128,8 @@ public class RestauranteController {
             @ApiResponse(responseCode = "200",description = "Restaurantes listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping("/ciudad")
-    public ResponseEntity<List<RestauranteResponseDTO>> getAllByCiudad(@RequestParam String ciudad) {
+    @GetMapping("/ciudades")
+    public ResponseEntity<List<RestauranteResponseCardDTO>> getAllByCiudad(@RequestParam String ciudad) {
         return ResponseEntity.ok(restauranteService.getAllByCiudad(ciudad));
     }
 
@@ -142,22 +144,22 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/nombre")
-    public ResponseEntity<List<RestauranteResponseDTO>> getAllByNombre(@RequestParam String nombre) {
-        return ResponseEntity.ok(restauranteService.getAllByNombre(nombre));
+    public ResponseEntity<List<RestauranteResponseCardDTO>> getAllByNombre(@RequestParam String nombre) {
+        return ResponseEntity.ok().body(restauranteService.getAllByNombre(nombre));
     }
 
     /**
      * Función para listar restaurantes con promociones activas.
      * @return Respuesta HTTP con una lista de DTO de restaurantes con promociones activas.
      */
-    @Operation(summary = "Listar restaurantes con promociones activas", description = "Lista los restaurantes que tienen una promoción activa")
+    @Operation(summary = "Listar restaurantes en una ciudad con promociones activas", description = "Lista los restaurantes en una ciudad que tienen una promoción activa")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Restaurantes con promociones activas listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping("/promocion")
-    public ResponseEntity<List<RestauranteResponseDTO>> getAllByPromocionActiva() {
-        return ResponseEntity.ok(restauranteService.getAllByPromocionActiva());
+    @GetMapping("/promociones")
+    public ResponseEntity<List<RestauranteResponseCardDTO>> findAllWithPromocionActivaAndCiudad(@RequestParam String ciudad) {
+        return ResponseEntity.ok(restauranteService.findAllWithPromocionActivaAndCiudad(ciudad));
     }
 
     /**
@@ -194,7 +196,7 @@ public class RestauranteController {
     @Operation(summary = "Eliminar restaurante por ID", description = "Recibe un id de un restaurante y lo borra. " +
             "**El propio dueño del restaurante puede acceder a su restaurante para eliminarlo**")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Elimina el restaurante correspondiente"),
+            @ApiResponse(responseCode = "204", description = "Elimina el restaurante correspondiente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
@@ -204,7 +206,7 @@ public class RestauranteController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException{
         restauranteService.delete(id);
-        return ResponseEntity.ok("El restaurante se borro exitosamente");
+        return ResponseEntity.noContent().build();
     }
 
     /**

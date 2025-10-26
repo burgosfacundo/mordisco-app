@@ -1,0 +1,83 @@
+<section class="contenedorRegistroUsuario">
+    <h1 class="text-4xl text-[#E3291D] font-black tracking-widest mb-12 mt-10">Registro</h1>        
+
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="formularioRegistro">
+        <div class="campos-grid">
+            <fieldset>
+                <label for="nombre" class="labelForm">Nombre</label>
+                <input type="text" id="nombre" formControlName="nombre" class="inputForm">
+                @if (userForm.get('nombre')?.touched) {
+                    @if(userForm.controls['nombre'].errors?.['required']){
+                        <p class="mensajeError">El nombre es obligatorio</p>
+                    } @else if(userForm.controls['nombre'].errors?.['maxlength']){
+                        <p class="mensajeError"> El nombre debe tener como maximo 50 caracteres</p>
+                    }
+                }
+            </fieldset>
+            <fieldset>
+                <label for="apellido" class="labelForm">Apellido</label>
+                <input type="text" id="apellido" formControlName="apellido" class="inputForm">
+                @if (userForm.get('apellido')?.touched) {
+                    @if(userForm.controls['apellido'].errors?.['required']){
+                       <p class="mensajeError">El apellido es obligatorio</p>
+                    } @else if(userForm.controls['apellido'].errors?.['maxlength']){
+                        <p class="mensajeError">El apellido debe tener como maximo 50 caracteres</p>
+
+                    }
+                }
+            </fieldset>
+            <fieldset>
+                <label for="telefono" class="labelForm">Teléfono  </label>
+                <input type="text" id="telefono" formControlName="telefono" class="inputForm">
+                    @if (userForm.get('telefono')?.touched) {
+                        @if(userForm.controls['telefono'].errors?.['required']){
+                            <p class="mensajeError">El teléfono es obligatorio</p>
+                        } @else if(userForm.controls['telefono'].errors?.['maxlength']){
+                            <p class="mensajeError">El teléfono debe tener como máximo 50 numeros</p>
+                        }@else if (userForm.controls['telefono'].errors?.['minlength']) {
+                            <p class="mensajeError">El teléfono debe tener como mínimo 8 numeros</p>
+                        }@else if (userForm.controls['telefono'].errors?.['pattern']) {
+                            <p class="mensajeError">El teléfono debe tener únicamente numeros</p>
+                        }
+                    }
+            </fieldset>
+            <fieldset class="span-2-columns">
+                <label for="email" class="labelForm">Email  </label>
+                <input type="email" id="email" formControlName="email" class="inputForm">
+                    @if (userForm.get('email')?.touched) {
+                        @if(userForm.controls['email'].errors?.['required']){
+                            <p class="mensajeError">El email es obligatorio</p>
+                        }@else if(userForm.controls['email'].errors?.['maxlength']){
+                            <p class="mensajeError">El email debe tener como máximo 100 caracteres</p>}
+                        @else if(userForm.controls['email'].errors?.['email']){
+                            <p class="mensajeError">El email debe contener @</p>}
+                }
+            </fieldset>
+            <fieldset clas="span-2-columns">
+                <label for="password" class="labelForm">Contraseña  </label>
+                <input type="password" id="password" formControlName="password" class="inputForm">
+                @if (userForm.get('password')?.touched) {
+                        @if(userForm.controls['password'].errors?.['required']){
+                            <p class="mensajeError">La contraseña es obligatoria</p>
+                        }@else if(userForm.controls['password'].errors?.['minlength']){
+                            <p class="mensajeError">La contraseña debe tener como mínimo 8 caracteres</p>}
+                }
+            </fieldset>
+
+            <fieldset>
+                <label class="labelForm">Rol</label>
+                
+                <select formControlName="rolId" 
+                        class="bg-white p-2 w-full rounded-lg text-gray-800 border-none appearance-none">
+                    <option [value]="1">Cliente</option>
+                    <option [value]="2">Dueño</option>
+                    <option [value]="3">Repartidor</option>
+                </select>
+            </fieldset>
+        </div>
+
+        <div class="cajaBoton">
+            <button [disabled]="!userForm.invalid" type="submit" class="boton">Registrarse</button>
+        </div>
+    </form>
+</section>

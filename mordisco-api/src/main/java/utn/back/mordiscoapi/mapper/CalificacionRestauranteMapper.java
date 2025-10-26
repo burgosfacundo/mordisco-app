@@ -7,6 +7,7 @@ import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionRestau
 import utn.back.mordiscoapi.model.entity.CalificacionRestaurante;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 import utn.back.mordiscoapi.model.entity.Usuario;
+import utn.back.mordiscoapi.utils.Sanitize;
 
 import java.time.LocalDateTime;
 
@@ -28,7 +29,7 @@ public class CalificacionRestauranteMapper {
 
         return CalificacionRestaurante.builder()
                 .puntaje(dto.calificacionDTO().puntaje())
-                .comentario(dto.calificacionDTO().comentario())
+                .comentario(Sanitize.trimToNull(dto.calificacionDTO().comentario()))
                 .fechaHora(LocalDateTime.now())
                 .restaurante(restaurante)
                 .usuario(usuario)

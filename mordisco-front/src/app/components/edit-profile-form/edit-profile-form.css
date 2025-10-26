@@ -1,0 +1,117 @@
+/* Fuente moderna */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #fafaf9;
+  font-family: 'Montserrat', sans-serif;
+}
+fieldset{
+    border: none;
+}
+
+/* Contenedor del formulario */
+.edit-profile-container {
+  background-color: #fafaf9;
+  padding: 2.5rem 3rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Título */
+h1 {
+  font-weight: 700;
+  color: #E3291D;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+
+}
+/* Etiquetas */
+label {
+  display: block;
+  font-weight: 600;
+  color: #e3291d;
+  margin-bottom: 0.4rem;
+}
+
+/* Inputs */
+input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  margin-bottom: 1.2rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 15px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #e3291d;
+  box-shadow: 0 0 0 3px rgba(227, 41, 29, 0.2);
+}
+
+/* Botones */
+.botones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+/* Botón principal */
+.boton-guardar {
+  background-color: #e3291d;
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.boton-guardar:hover {
+  background-color: #b01b11;
+  transform: scale(1.03);
+}
+
+/* Botón eliminar */
+.boton-eliminar {
+  background-color: #e3291d;
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin:10px;
+  transition: background-color 0.3s ease, transform 0.1s ease;}
+
+.boton-eliminar:hover {
+  background-color: #b01b11;
+  transform: scale(1.03);
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .edit-profile-container {
+    padding: 2rem;
+  }
+
+  .botones {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .boton-guardar,
+  .boton-eliminar {
+    width: 100%;
+  }
+}

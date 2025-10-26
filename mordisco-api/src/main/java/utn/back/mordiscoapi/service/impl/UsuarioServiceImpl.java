@@ -1,5 +1,6 @@
 package utn.back.mordiscoapi.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,18 +11,17 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.UsuarioMapper;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionUsuarioDTO;
+import utn.back.mordiscoapi.model.dto.usuario.ChangePasswordDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
-import utn.back.mordiscoapi.model.entity.Direccion;
 import utn.back.mordiscoapi.model.entity.Usuario;
-import utn.back.mordiscoapi.repository.DireccionRepository;
 import utn.back.mordiscoapi.repository.RolRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
+import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
+import utn.back.mordiscoapi.utils.Sanitize;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +31,7 @@ import java.util.Optional;
 public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     private final UsuarioRepository repository;
     private final RolRepository rolRepository;
-    private final DireccionRepository direccionRepository;
+    private final AuthUtils authUtils;
     final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
@@ -74,53 +74,48 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         return UsuarioMapper.toUsuarioResponseDTO(usuario.get());
     }
 
+    @Override
+    public UsuarioResponseDTO getMe() throws NotFoundException, BadRequestException {
+        var userAuthenticated = authUtils.getUsuarioAutenticado()
+                .orElseThrow(() -> new BadRequestException("No autenticado"));
+
+        var user = repository.findById(userAuthenticated.getId()).orElseThrow(
+                () -> new NotFoundException("Usuario no encontrado"));
+
+        return UsuarioMapper.toUsuarioResponseDTO(user);
+    }
+
     /**
      * Actualiza un usuario.
      * @param id el ID del usuario a actualizar.
      * @param dto DTO del usuario a actualizar.
      * @throws NotFoundException si el usuario no se encuentra.
      */
+    @Transactional
     @Override
     public void update(Long id, UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         Usuario usuario = repository.findById(id).orElseThrow(
                 () -> new NotFoundException("Usuario no encontrado")
         );
 
-        usuario.setNombre(dto.nombre());
-        usuario.setApellido(dto.apellido());
-        usuario.setTelefono(dto.telefono());
+        usuario.setNombre(Sanitize.collapseSpaces(dto.nombre()));
+        usuario.setApellido(Sanitize.collapseSpaces(dto.apellido()));
+        usuario.setTelefono(Sanitize.collapseSpaces(dto.telefono()));
+    }
 
-        List<Direccion> direcciones = new ArrayList<>();
-        for (DireccionUsuarioDTO direccionDTO : dto.direcciones()) {
-            Direccion direccion;
+    @Override
+    public UsuarioResponseDTO updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
+        var userAuthenticated = authUtils.getUsuarioAutenticado()
+                .orElseThrow(() -> new BadRequestException("No autenticado"));
 
-            if (direccionDTO.id() != null) {
-                direccion = direccionRepository.findById(direccionDTO.id())
-                        .orElseThrow(() -> new NotFoundException("Dirección con id " + direccionDTO.id() + " no encontrada"));
+        var user = repository.findById(userAuthenticated.getId()).orElseThrow(
+                () -> new NotFoundException("Usuario no encontrado"));
 
-                if (!usuario.getDirecciones().contains(direccion)){
-                    throw new BadRequestException("La dirección con id " + direccionDTO.id() + " no pertenece al usuario con id " + id);
-                }
-            } else {
-                direccion = new Direccion();
-            }
+        user.setNombre(Sanitize.collapseSpaces(dto.nombre()));
+        user.setApellido(Sanitize.collapseSpaces(dto.apellido()));
+        user.setTelefono(Sanitize.collapseSpaces(dto.telefono()));
 
-            direccion.setCalle(direccionDTO.calle());
-            direccion.setNumero(direccionDTO.numero());
-            direccion.setPiso(direccionDTO.piso());
-            direccion.setDepto(direccionDTO.depto());
-            direccion.setCodigoPostal(direccionDTO.codigoPostal());
-            direccion.setReferencias(direccionDTO.referencias());
-            direccion.setLatitud(direccionDTO.latitud());
-            direccion.setLongitud(direccionDTO.longitud());
-            direccion.setCiudad(direccionDTO.ciudad());
-            direcciones.add(direccion);
-        }
-
-        usuario.getDirecciones().clear();
-        usuario.getDirecciones().addAll(direcciones);
-
-        repository.save(usuario);
+        return UsuarioMapper.toUsuarioResponseDTO(user);
     }
 
     /**
@@ -136,25 +131,38 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         repository.deleteById(id);
     }
 
+    @Override
+    public void deleteMe() throws NotFoundException, BadRequestException {
+        var userAuthenticated = authUtils.getUsuarioAutenticado()
+                .orElseThrow(() -> new BadRequestException("No autenticado"));
+
+        if(!repository.existsById(userAuthenticated.getId())){
+            throw new NotFoundException("Usuario no encontrado");
+        }
+
+        repository.deleteById(userAuthenticated.getId());
+    }
+
     /**
      * Cambia la contraseña del usuario.
-     * @param id el ID del usuario a actualizar.
-     * @param oldPassword vieja contraseña.
-     * @param newPassword nueva contraseña.
+     * @param dto con la contraseña actual y la nueva.
      * @throws NotFoundException si el usuario no se encuentra.
      */
+    @Transactional
     @Override
-    public void changePassword(String oldPassword, String newPassword, Long id) throws NotFoundException {
-        Usuario usuario = repository.findById(id).orElseThrow(
+    public void changePassword(ChangePasswordDTO dto) throws NotFoundException, BadRequestException {
+        var userAuthenticated = authUtils.getUsuarioAutenticado()
+                .orElseThrow(() -> new BadRequestException("No autenticado"));
+
+        Usuario usuario = repository.findById(userAuthenticated.getId()).orElseThrow(
                 () -> new NotFoundException("Usuario no encontrado")
         );
 
-        if (!passwordEncoder.matches(oldPassword, usuario.getPassword())) {
-            throw new NotFoundException("Contraseña incorrecta");
+        if (!passwordEncoder.matches(dto.currentPassword(), usuario.getPassword())) {
+            throw new NotFoundException("Contraseña actual incorrecta");
         }
 
-        usuario.setPassword(passwordEncoder.encode(newPassword));
-        repository.changePassword(passwordEncoder.encode(newPassword), usuario.getId());
+        usuario.setPassword(passwordEncoder.encode(dto.newPassword()));
     }
 
     /**

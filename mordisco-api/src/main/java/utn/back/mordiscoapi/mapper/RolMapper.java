@@ -3,10 +3,11 @@ package utn.back.mordiscoapi.mapper;
 import lombok.experimental.UtilityClass;
 import utn.back.mordiscoapi.model.dto.usuario.RolDTO;
 import utn.back.mordiscoapi.model.entity.Rol;
+import utn.back.mordiscoapi.utils.Sanitize;
 
 @UtilityClass
 public class RolMapper {
     public static RolDTO toDto(Rol rol) {
-        return new RolDTO(rol.getId(), rol.getNombre());
+        return new RolDTO(rol.getId(), Sanitize.collapseSpaces(rol.getNombre()));
     }
 }

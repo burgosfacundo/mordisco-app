@@ -26,7 +26,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PedidoServiceImpl implements IPedidoService {
-    private final ClimaService climaService;
     private final DireccionRepository direccionRepository;
     private final PedidoRepository pedidoRepository;
     private final RestauranteRepository restauranteRepository;
@@ -82,12 +81,6 @@ public class PedidoServiceImpl implements IPedidoService {
                 throw new BadRequestException("La dirección no pertenece al restaurante");
             }
             pedido.setDireccionEntrega(direccion);
-        }
-
-        String ciudad = direccion.getCiudad();
-
-        if (climaService.estaLloviendo(ciudad)) {
-            total = total.multiply(BigDecimal.valueOf(1.10));
         }
 
         pedido.setTotal(total);

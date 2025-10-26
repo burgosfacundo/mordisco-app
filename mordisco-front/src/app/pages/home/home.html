@@ -1,0 +1,32 @@
+<section class="contenedorHome">
+        <h1 class="mordisco">¡Bienvenido a Mordisco!</h1>
+    
+            <ul class="seccionPedidos">
+                <h2 class="mordiscoSubtitulos">Mis pedidos pendientes: </h2>
+                @if(pedidosPendientes){
+                    
+                    @for (pedido of pedidosPendientes; track pedido.id) {
+                        <li class="pedidoCard">
+                            <app-pedido-card [pedido]="pedido" ></app-pedido-card>
+                        </li>
+                    }
+                }@else {
+                    <p>No hay pedidos pendientes. Todo al dia!</p>
+                }
+            </ul>
+  <!--       <ul class="seccionPedidos">
+                <h2 class="mordiscoSubtitulos">Mis usuarios: </h2>
+                @if(arrayUsers){
+                    
+                    @for (user of arrayUsers; track user) { 
+                        <li class="pedidoCard">
+                            <app-usuario-card [usuario]="user"></app-usuario-card>
+                        </li>
+                    }
+                }@else {
+                    <p>No hay usuarios!</p>
+                }
+            </ul> -->  
+</section>
+
+

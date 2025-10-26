@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenUpdateDTO;
 import utn.back.mordiscoapi.model.entity.Imagen;
+import utn.back.mordiscoapi.utils.Sanitize;
 
 @UtilityClass
 public class ImagenMapper {
@@ -21,13 +22,9 @@ public class ImagenMapper {
     /**
      * Convierte un DTO update de imagen a una entidad de imagen.
      * @param dto el DTO de imagen a convertir
-     * @return la entidad de imagen con los datos del DTO
      */
-    public static Imagen updateToEntity(ImagenUpdateDTO dto) {
-        return Imagen.builder()
-                .id(dto.id())
-                .url(dto.url())
-                .nombre(dto.nombre())
-                .build();
+    public static void applyUpdate(ImagenUpdateDTO dto, Imagen target) {
+        target.setUrl(Sanitize.trimToNull(dto.url()));
+        target.setNombre(Sanitize.collapseSpaces(dto.nombre()));
     }
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ import java.util.List;
 
 @Tag(name = "Pedidos", description = "Operaciones relacionadas con los pedidos de los restaurantes")
 @RestController
-@RequestMapping("/api/pedido")
+@RequestMapping("/api/pedidos")
 @RequiredArgsConstructor
 public class PedidoController {
     private final IPedidoService pedidoService;
@@ -35,7 +36,7 @@ public class PedidoController {
     @Operation(summary = "Crear un pedido nuevo", description = "Recibe un pedido y lo guarda en la base de datos. " +
             "**Rol necesario: CLIENTE y puedo guardar un pedido para mi propio usuario**")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Pedido creado exitosamente"),
+            @ApiResponse(responseCode = "201",description = "Pedido creado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Si el restaurante, producto o la dirección no existen"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
@@ -46,7 +47,7 @@ public class PedidoController {
                                        @Valid
                                        PedidoRequestDTO dto) throws NotFoundException, BadRequestException {
         pedidoService.save(dto);
-        return ResponseEntity.ok().body("Pedido creado exitosamente");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Pedido creado exitosamente");
     }
 
     /**
@@ -105,7 +106,7 @@ public class PedidoController {
     })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
-    @GetMapping("/restaurante/{id}")
+    @GetMapping("/restaurantes/{id}")
     public ResponseEntity<List<PedidoResponseDTO>> findAllByRestaurante_Id(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllByRestaurante_Id(id));
     }
@@ -119,7 +120,7 @@ public class PedidoController {
     @Operation(summary = "Eliminar un pedido", description = "Recibe un ID y elimina el pedido correspondiente. " +
             "**Rol necesario: ser el propietario del pedido**")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Pedido eliminado exitosamente"),
+            @ApiResponse(responseCode = "204",description = "Pedido eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "No se encontró el pedido con el ID proporcionado"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
@@ -130,7 +131,7 @@ public class PedidoController {
     public ResponseEntity<String> delete(@PathVariable
                                          Long id) throws NotFoundException {
         pedidoService.delete(id);
-        return ResponseEntity.ok().body("Pedido eliminado exitosamente");
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -204,7 +205,7 @@ public class PedidoController {
     })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
-    @GetMapping("/cliente/{id}/state")
+    @GetMapping("/clientes/{id}/state")
     public ResponseEntity<List<PedidoResponseDTO>> findAllByCliente_IdAndEstado(@PathVariable Long id,
                                                                           @RequestParam EstadoPedido estado) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllByCliente_IdAndEstado(id, estado));
@@ -224,7 +225,7 @@ public class PedidoController {
     })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
-    @GetMapping("/cliente/{id}")
+    @GetMapping("/clientes/{id}")
     public ResponseEntity<List<PedidoResponseDTO>> findAllByCliente_Id(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllByCliente_Id(id));
     }
@@ -244,7 +245,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
-    @GetMapping("/restaurante/{id}/state")
+    @GetMapping("/restaurantes/{id}/state")
     public ResponseEntity<List<PedidoResponseDTO>> findAllByRestaurante_IdAndEstado(@PathVariable Long id,
                                                                                     @RequestParam EstadoPedido estado) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllByRestaurante_IdAndEstado(id, estado));

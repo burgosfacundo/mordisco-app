@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ import java.util.List;
 
 @Tag(name = "CalificacionRestaurante", description = "Operaciones relacionadas con las calificaciones de los restaurantes")
 @RestController
-@RequestMapping("/api/calificacion")
+@RequestMapping("/api/calificaciones")
 @RequiredArgsConstructor
 public class CalificacionRestauranteController {
     private final ICalificacionRestaurante service;
@@ -35,7 +36,7 @@ public class CalificacionRestauranteController {
             description = "Recibe una calificación restaurante y la guarda en la base de datos. " +
                     "**Rol necesario: CLIENTE y debe haber realizado un pedido en el restaurante.**")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Calificación restaurante creada exitosamente"),
+            @ApiResponse(responseCode = "201",description = "Calificación restaurante creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
             @ApiResponse(responseCode = "404", description = "Id no encontrado")
@@ -47,7 +48,7 @@ public class CalificacionRestauranteController {
                                        @Valid
                                        CalificacionRestauranteDTO dto) throws BadRequestException, NotFoundException {
         service.save(dto);
-        return ResponseEntity.ok("Calificación restaurante creada exitosamente");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Calificación restaurante creada exitosamente");
     }
 
     /**
@@ -77,7 +78,7 @@ public class CalificacionRestauranteController {
             description = "Borra la calificación que tenga el id que se le pasa. " +
                     "**Rol necesario: CLIENTE y debe ser el autor de la calificación.**")
     @ApiResponses(value ={
-            @ApiResponse(responseCode =  "200", description = "Elimina la calificación"),
+            @ApiResponse(responseCode =  "204", description = "Elimina la calificación"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
             @ApiResponse(responseCode = "404", description = "Calificación no encontrada")})
     @SecurityRequirement(name = "bearerAuth")
@@ -86,6 +87,6 @@ public class CalificacionRestauranteController {
     public ResponseEntity<String> deleteById(@PathVariable
                                              Long id) throws NotFoundException {
         service.delete(id);
-        return ResponseEntity.ok("La calificación fue eliminada correctamente");
+        return ResponseEntity.noContent().build();
     }
 }

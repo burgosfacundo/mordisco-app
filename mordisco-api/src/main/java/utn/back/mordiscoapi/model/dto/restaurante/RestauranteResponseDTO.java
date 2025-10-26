@@ -25,6 +25,8 @@ public record RestauranteResponseDTO (
         List<HorarioAtencionResponseDTO> hoariosDeAtencion,
         @Schema(description = "Calificaciones del restaurante")
         List<CalificacionRestauranteResponseDTO> calificacionRestaurante,
+        @Schema(description = "Estrellas del restaurante")
+        Double estrellas,
         @Schema(description = "Direccion del restaurante", example = "Alvear 2328")
         DireccionResponseDTO direccion
     ){
