@@ -37,19 +37,7 @@
                 }
             }
     </fieldset>
-    <fieldset>
-        <label for="emailEditado">Email</label>
-        <input type="email" id="emailEditado" placeholder="Ingrese el nuevo email" formControlName="email">
-         @if (editarPerfil.get('email')?.touched) {
-                @if(editarPerfil.controls['email'].errors?.['required']){
-                    <p>La contraseña es obligatoria</p>
-                }@else if(editarPerfil.controls['email'].errors?.['maxlength']){
-                    <p>El email debe tener como máximo 100 caracteres</p>}
-                @else if(editarPerfil.controls['email'].errors?.['email']){
-                    <p>El email debe contener @</p>}
-        }
-    </fieldset>
-    
+
   <div class="botones">
       <button class="boton-guardar" type="submit" [disabled]="editarPerfil.invalid">Guardar cambios </button>
       <button class="boton-eliminar" type="button" (click)="cambiarContrasenia()"> Cambiar contraseña</button>

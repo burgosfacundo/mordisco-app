@@ -1,66 +1,36 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, map } from 'rxjs';
-import { LoginRequestDto } from '../models/login-request-dto';
-import { LoginResponseDto } from '../models/login-response-dto';
+import { inject, Injectable, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { AuthResponse } from '../models/auth-response';
+import { LoginRequest } from '../models/login-request';
+import UserRegister from '../../models/user/user-register';
 import { environment } from '../../../environments/environment';
-import { JwtUser } from '../models/jwt-user';
-import { AuthUtilsService } from './auth-utils-service';
-import { SKIP_AUTH } from '../../core/context/auth-context';
-import User from '../../models/user/user-register';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private http  = inject(HttpClient);
-  private utils = inject(AuthUtilsService);
-
-  private _currentUser = new BehaviorSubject<JwtUser | null>(this.restoreUserFromStorage());
-  currentUser$ = this._currentUser.asObservable();
-
-  private restoreUserFromStorage(): JwtUser | null {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return null;
+  private http = inject(HttpClient)
+  private router = inject(Router)
   
-    try {
-      return this.utils.decodeJwtToUser(token);
-    } catch {
-      localStorage.removeItem('accessToken');
-      return null;
-    }
+  private readonly API_URL = `${environment.apiUrl}/auth`;
+  private readonly ACCESS_TOKEN_KEY = 'access_token'
+  
+  // Signals para reactividad
+  currentUser = signal<AuthResponse | null>(null)
+  isAuthenticated = signal(false)
+  
+  // Timer para renovar token antes de que expire
+  private refreshTimer?: ReturnType<typeof setTimeout>
+
+  constructor() {
+    this.loadStoredToken()
   }
 
-  get currentUserValue(): JwtUser | null {
-    return this._currentUser.value;
-  }
 
-  login(credentials: LoginRequestDto): Observable<JwtUser> {
-    return this.http.post<LoginResponseDto>(
-      `${environment.apiUrl}/auth/login`,
-       credentials,
-       { context: new HttpContext().set(SKIP_AUTH, true) }
-      ).pipe(
-      map(res => {
-        if (!res.jwt) throw new Error('No se recibió token JWT');
-        localStorage.setItem('accessToken', res.jwt);
-        const user = this.utils.decodeJwtToUser(res.jwt);
-        this._currentUser.next(user);
-        return user;
-      })
-    );
-  }
-
-  logout(): void {
-    localStorage.removeItem('accessToken');
-    this._currentUser.next(null);
-  }
-
-  register(userData : User) : Observable<string>{
+  register(userData : UserRegister) : Observable<string>{
     return this.http.post(
-      `${environment.apiUrl}/usuario/save`,
-       userData, {
-        context: new HttpContext().set(SKIP_AUTH,true),
-        responseType: 'text' as const
-      }
+      `${environment.apiUrl}/usuarios/save`,
+       userData, { responseType: 'text' as const }
     )
   }
 
@@ -68,26 +38,92 @@ export class AuthService {
     return this.http.patch<void>(`${environment.apiUrl}/usuarios/password`,dto)
   }
 
-  getToken(): string | null { return localStorage.getItem('accessToken'); }
-
-  isAuthenticated(): boolean { return !!this.getToken() && !this.isTokenExpired(); }
-
-  isTokenExpired(): boolean {
-    const token = this.getToken();
-    if (!token) return true;
-    try {
-      const claims = this.utils.decodeJwt(token);
-      const now = Math.floor(Date.now() / 1000);
-      return (claims.exp ?? 0) < now;
-    } catch { return true; }
+  login(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials, {
+      withCredentials: true
+    }).pipe(
+      tap(response => this.handleAuthResponse(response))
+    )
   }
 
-  hasRole(roleName: string): boolean {
-    const role = this._currentUser.value?.role?.nombre;
-    return !!role && role === roleName;
-}
+  refreshToken(): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {}, {
+      withCredentials: true
+    }).pipe(
+      tap(response => this.handleAuthResponse(response))
+    )
+  }
 
-  isAdmin(): boolean  { return this.hasRole('ROLE_ADMIN'); }
-  isClient(): boolean { return this.hasRole('ROLE_CLIENT'); }
-  isOwner(): boolean  { return this.hasRole('ROLE_OWNER'); }
+  logout(): void {
+    this.http.post(`${this.API_URL}/logout`, {}, {
+      withCredentials: true
+    }).subscribe({
+      complete: () => this.clearAuth()
+    });
+  }
+
+  logoutAllDevices(): void {
+    this.http.post(`${this.API_URL}/logout-all`, {}, {
+      withCredentials: true
+    }).subscribe({
+      complete: () => this.clearAuth()
+    });
+  }
+
+  getAccessToken(): string | null {
+    return sessionStorage.getItem(this.ACCESS_TOKEN_KEY);
+  }
+
+  getCurrentUser(): AuthResponse | null {
+    return this.currentUser();
+  }
+
+  private handleAuthResponse(response: AuthResponse): void {
+    // Guardar access token en sessionStorage (NO localStorage)
+    sessionStorage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken)
+    
+    this.currentUser.set(response)
+    this.isAuthenticated.set(true)
+    
+    // Programar renovación automática 1 minuto antes de expirar
+    this.scheduleTokenRefresh(response.expiresIn)
+  }
+
+  private scheduleTokenRefresh(expiresIn: number): void {
+    // Limpiar timer anterior si existe
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer)
+    }
+
+    // Renovar 60 segundos antes de expirar
+    const refreshTime = (expiresIn - 60) * 1000;
+    
+    this.refreshTimer = setTimeout(() => {
+      this.refreshToken().subscribe({
+        error: () => this.clearAuth()
+      });
+    }, refreshTime)
+  }
+
+  private loadStoredToken(): void {
+    const token = this.getAccessToken();
+    if (token) {
+      // Verificar si el token es válido haciendo un request
+      this.refreshToken().subscribe({
+        error: () => this.clearAuth()
+      })
+    }
+  }
+
+  private clearAuth(): void {
+    sessionStorage.removeItem(this.ACCESS_TOKEN_KEY)
+    this.currentUser.set(null)
+    this.isAuthenticated.set(false)
+    
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer)
+    }
+    
+    this.router.navigate(['/login'])
+  }
 }

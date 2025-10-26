@@ -1,43 +1,49 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { catchError, throwError } from 'rxjs';
+import { HttpInterceptorFn } from '@angular/common/http';
+import { catchError, switchMap, throwError } from 'rxjs';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthService } from '../../auth/services/auth-service';
-import { SKIP_AUTH } from '../context/auth-context';
-import { environment } from '../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const router = inject(Router);
-  const auth  = inject(AuthService);
-
-  if (req.context.get(SKIP_AUTH)) {
-    return next(req);
+  const authService  = inject(AuthService)
+// No agregar token a endpoints públicos
+  if (req.url.includes('/api/auth/login') || 
+      req.url.includes('/api/auth/refresh')) {
+    return next(req)
   }
 
-  const isApiCall = req.url.startsWith(environment.apiUrl);
-  if (!isApiCall) {
-    return next(req);
-  }
-
-  const token = auth.getToken();
-  if (!token || auth.isTokenExpired()) {
-    auth.logout();                  
-    return next(req);
-  }
-
-  const authReq = req.clone({
-    setHeaders: { Authorization: `Bearer ${token}` }
-  });
-
-  return next(authReq).pipe(
-    catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        auth.logout();
-        router.navigate(['/login']);
-      } else if (error.status === 403) {
-        router.navigate(['/forbidden']);
-      }
-      return throwError(() => error);
+  const token = authService.getAccessToken()
+  
+  if (token) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      },
+      withCredentials: true // CRÍTICO: envía cookies httpOnly
     })
-  );
-};
+  }
+
+  return next(req).pipe(
+    catchError(error => {
+      // Si es 401, intentar renovar el token
+      if (error.status === 401 && !req.url.includes('/api/auth/refresh')) {
+        return authService.refreshToken().pipe(
+          switchMap(response => {
+            // Reintentar request original con nuevo token
+            const clonedReq = req.clone({
+              setHeaders: {
+                Authorization: `Bearer ${response.accessToken}`
+              }
+            })
+            return next(clonedReq)
+          }),
+          catchError(refreshError => {
+            // Refresh falló - logout y redirigir a login
+            authService.logout()
+            return throwError(() => refreshError)
+          })
+        );
+      }
+      return throwError(() => error)
+    })
+  )
+}

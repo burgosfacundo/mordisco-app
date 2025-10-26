@@ -77,7 +77,7 @@
         </div>
 
         <div class="cajaBoton">
-            <button [disabled]="userForm.invalid" type="submit" class="boton">Registrarse</button>
+            <button [disabled]="!userForm.invalid" type="submit" class="boton">Registrarse</button>
         </div>
     </form>
 </section>

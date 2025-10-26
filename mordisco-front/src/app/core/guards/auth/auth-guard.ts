@@ -1,21 +1,26 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { Router, CanActivateFn, ActivatedRouteSnapshot } from '@angular/router';
+import { map, catchError, of } from 'rxjs';
 import { AuthService } from '../../../auth/services/auth-service';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const auth = inject(AuthService);
+  const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (!auth.isAuthenticated()) {
-    return router.parseUrl('/login');
+  // Si ya está autenticado, permitir acceso
+  if (authService.isAuthenticated()) {
+    return true;
   }
 
-  const requiredRoles = route.data?.['roles'] as string[] | undefined;
-  if (requiredRoles?.length) {
-    const userRole = auth.currentUserValue?.role?.nombre;
-    if (!userRole || !requiredRoles.includes(userRole)) {
-      return router.parseUrl('/forbidden');
-    }
-  }
-  return true;
+  // Si no, intentar refrescar el token
+  return authService.refreshToken().pipe(
+    map(() => true),
+    catchError(() => {
+      // Si falla el refresh, redirigir a login con returnUrl
+      router.navigate(['/login'], { 
+        queryParams: { returnUrl: state.url } 
+      });
+      return of(false);
+    })
+  );
 };
