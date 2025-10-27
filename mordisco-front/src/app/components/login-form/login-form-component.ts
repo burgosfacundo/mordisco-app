@@ -44,7 +44,7 @@ export class LoginFormComponent implements OnInit{
   // 3️⃣ Llamar al servicio para iniciar sesión
   this.service.login(this.inicioSesion.value).subscribe({
     next: () => {
-      this.router.navigate(['/home']);
+      this.router.navigate(['/']);
     },
     error: e => {
       console.error(e);

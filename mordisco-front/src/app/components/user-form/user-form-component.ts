@@ -68,7 +68,7 @@ export class UserFormComponent implements OnInit{
   }
 
   onSubmit(){
-    if (this.userForm.invalid) {
+    if (!this.userForm.invalid) {
       this.userForm.markAllAsTouched();
       return;
     }
@@ -87,7 +87,7 @@ export class UserFormComponent implements OnInit{
       telefono: raw.telefono,
       email: raw.email,
       password: raw.password,
-      rolId: Number(raw.rolId)
+      rolId: 1
     };
 
     console.log(user)
@@ -96,7 +96,11 @@ export class UserFormComponent implements OnInit{
       next : () => {
         this.openSnackBar('✅ Usuario registrado correctamente', 'Continuar')
       },
-      error:() => this.openSnackBar('❌ Ocurrió un error. Intentelo en unos minutos', 'Continuar')
+      error:(e) => {
+        console.error(e);
+        
+        this.openSnackBar('❌ Ocurrió un error. Intentelo en unos minutos', 'Continuar')
+      }
     })
   }
 

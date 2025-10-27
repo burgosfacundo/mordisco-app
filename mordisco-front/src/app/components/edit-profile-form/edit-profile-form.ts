@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import UserProfile from '../../models/user/user-profile';
 import { UserService } from '../../services/user/user-service';
+import UserProfileEdit from '../../models/user/user-profile-edit';
 
 @Component({
   selector: 'app-edit-profile-form',
@@ -16,7 +16,7 @@ private fb = inject(FormBuilder);
   private _snackBar = inject(MatSnackBar);
   private router = inject(Router);
   private userService = inject(UserService)
-  private user? : UserProfile
+  private user? : UserProfileEdit
 
   editarPerfil!: FormGroup;
 
@@ -33,11 +33,6 @@ private fb = inject(FormBuilder);
         Validators.required,
         Validators.maxLength(15),
         Validators.pattern(/^[0-9]{8,15}$/)
-      ]],
-      email: ['', [
-        Validators.required,
-        Validators.email,
-        Validators.maxLength(100)
       ]]
     });
   }
@@ -54,8 +49,7 @@ private fb = inject(FormBuilder);
       this.editarPerfil.patchValue({
         nombre: this.user.nombre || '',
         apellido: this.user.apellido || '',
-        telefono: this.user.telefono || '',
-        email: this.user.email || '',
+        telefono: this.user.telefono || ''
       });
     }
   }
@@ -72,11 +66,10 @@ private fb = inject(FormBuilder);
 
     const raw = this.editarPerfil.getRawValue();
 
-    const userActualizado : UserProfile =  {
+    const userActualizado : UserProfileEdit =  {
       nombre: raw.nombre,
       apellido: raw.apellido,
-      telefono: raw.telefono,
-      email: raw.email
+      telefono: raw.telefono
     };
 
     this.userService.updateMe(userActualizado).subscribe({

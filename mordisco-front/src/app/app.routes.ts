@@ -6,29 +6,22 @@ import { Profile } from './pages/profile/profile';
 import { EditPasswordComponent } from './components/edit-password/edit-password';
 import { Home } from './pages/home/home';
 import { EditProfile } from './pages/edit-profile/edit-profile';
+import { publicOnlyGuard } from './core/guards/public-only-guard';
 
 export const routes: Routes = [
-  // páginas publicas
-  {path: 'home', component : Home},
-  {path: 'login', component: Login },
-  {path: 'registro', component: Registro },
-  {path: 'profile/edit', component:EditProfile},
-  {path: 'profile', component: Profile},
-  {path: 'edit-password', component : EditPasswordComponent}
+ // Páginas públicas 
+  { path: 'login', component: Login, canActivate: [publicOnlyGuard]},
+  { path: 'registro', component: Registro, canActivate: [publicOnlyGuard]},
 
+  // Rutas protegidas con authGuard
+  {path : '', component: Home, canActivate: [authGuard]},
+  {path: 'profile', component: Profile, canActivate: [authGuard]},
+  {path: 'profile/edit', component:EditProfile, canActivate: [authGuard]},
+  {path: 'edit-password', component : EditPasswordComponent, canActivate: [authGuard]},
 
-  // página accesible a cualquier usuario logueado
-  //{ path: 'perfil', canMatch: [authGuard] },
-
-  // página solo para dueños
-  //{ path: 'owner', canMatch: [authGuard], data: { roles: ['ROLE_RESTAURANTE'] } },
-
-  // página solo para administrador
-  //{ path: 'admin', canMatch: [authGuard], data: { roles: ['ROLE_ADMIN'] } },
-
-    // página solo para clientes
-  //{ path: 'client', canMatch: [authGuard], data: { roles: ['ROLE_CLIENTE'] } },
-
-    // página solo para repartidores
-  //{ path: 'delivery', canMatch: [authGuard], data: { roles: ['ROLE_REPARTIDOR'] } },
+  // Rutas con autorización por roles
+  {path: 'admin', canMatch: [authGuard], data: { roles: ['ROLE_ADMIN'] } },
+  {path: 'owner', canMatch: [authGuard], data: { roles: ['ROLE_RESTAURANTE'] } },
+  {path: 'client', canMatch: [authGuard], data: { roles: ['ROLE_CLIENTE'] } },
+  {path: '**', redirectTo: ''}  // Ruta comodín para redirigir a la página principal en caso de ruta no encontrada
 ];

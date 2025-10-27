@@ -4,6 +4,7 @@ import User from '../../models/user/user-register';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import UserProfile from '../../models/user/user-profile';
+import UserProfileEdit from '../../models/user/user-profile-edit';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class UserService {
     return this.http.get<UserProfile>(`${environment.apiUrl}/usuarios/me`)
   }
 
-  updateMe(user : UserProfile) : Observable<UserProfile>{
+  updateMe(user : UserProfileEdit) : Observable<UserProfile>{
     return this.http.patch<UserProfile>(`${environment.apiUrl}/usuarios/me`, user)
   }
 
