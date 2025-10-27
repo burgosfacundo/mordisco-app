@@ -5,11 +5,12 @@ import { PedidoCard } from '../../components/pedido-card/pedido-card';
 import { AuthService } from '../../auth/services/auth-service';
 import { RestauranteService } from '../../services/restaurante/restaurante-service';
 import Restaurante from '../../models/restaurante/restaurante';
+import { RestarutanteCard } from "../../components/restaurante-card/restarutante-card";
 
 
 @Component({
   selector: 'app-home',
-  imports: [PedidoCard],
+  imports: [PedidoCard, RestarutanteCard],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
@@ -23,7 +24,7 @@ export class Home implements OnInit{
   restauranteService : RestauranteService = inject(RestauranteService)
 
   ngOnInit(): void {
-      const id = this.authService.currentUserValue?.id
+      const id = this.authService.currentUser()?.userId
 
       if(id){
         this.restauranteService.getByUsuario(id).subscribe({

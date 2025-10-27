@@ -4,7 +4,7 @@ import User from '../../models/user/user-register';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import UserProfile from '../../models/user/user-profile';
-import UserProfileEdit from '../../models/user/user-profile-edit';
+import UserProfileEdit from '../../models/user/user-profile-edit.ts';
 
 @Injectable({
   providedIn: 'root'

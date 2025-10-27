@@ -1,0 +1,16 @@
+<div class="restaurante-card">
+  <img [src]="restaurante.imagen" alt="{{ restaurante.nombre }}" class="restaurante-img">
+
+  <div class="restaurante-info">
+    <h2 class="restaurante-nombre">{{ restaurante.nombre }}</h2>
+
+    <div class="restaurante-calificacion">
+      ⭐ {{ restaurante.calificacion.toFixed(1) }}
+    </div>
+
+    <div class="restaurante-horario">
+      <p><strong>{{ restaurante.horario.dia }}</strong></p>
+      <p>{{ restaurante.horario.horaApertura }} - {{ restaurante.horario.horaCierre }}</p>
+    </div>
+  </div>
+</div>
