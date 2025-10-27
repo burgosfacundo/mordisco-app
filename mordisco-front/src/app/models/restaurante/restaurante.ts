@@ -1,3 +1,3 @@
-export default interface Restaurante{
-    id : number
+export default interface Restaurante {
+    id: number
 }

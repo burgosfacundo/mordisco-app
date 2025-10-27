@@ -1,0 +1,133 @@
+<!-- core/layout/navbar/navbar.component.html -->
+<mat-toolbar class="navbar" color="primary">
+  <div class="navbar-container">
+
+   
+
+    <div class="navbar-brand" (click)="goToHome()" matTooltip="Ir al inicio">
+      <div class="navbar-brand" (click)="goToHome()">
+        <img srcset="https://res.cloudinary.com/dyzhap5j4/image/upload/v1761055103/PHOTO-2025-10-21-10-57-39_hyomts.jpg" alt="Mordisco" class="logo">
+      </div>
+    </div>
+
+    <div class="navbar-spacer"></div>
+
+    <!-- Buscador (solo clientes) -->
+    @if (config().showSearch) {
+      <div class="navbar-search">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix>search</mat-icon>
+          <input 
+            matInput 
+            placeholder="Buscar restaurantes..." 
+            [(ngModel)]="searchTerm"
+            (input)="onSearchInput($any($event.target).value)"
+            maxlength="50"
+          >
+          @if (searchTerm) {
+            <button 
+              matSuffix 
+              mat-icon-button 
+              (click)="onSearchClear()"
+              matTooltip="Limpiar búsqueda"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+      </div>
+    }
+
+    <!-- Selector de Ciudad -->
+    @if (config().showCitySelector) {
+      <div class="navbar-city">
+        <mat-form-field appearance="outline" class="city-field">
+          <mat-icon matPrefix>location_on</mat-icon>
+          <mat-select 
+            [value]="ciudadSeleccionada()"
+            (selectionChange)="onCiudadChange($event.value)"
+            [compareWith]="compareCiudades"
+          >
+            @for (ciudad of ciudades(); track ciudad.id) {
+              <mat-option [value]="ciudad">
+                <span class="ciudad-option">
+                  {{ ciudad.nombre }}
+                  @if (ciudad.provincia) {
+                    <span class="provincia">({{ ciudad.provincia }})</span>
+                  }
+                </span>
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+
+    <div class="navbar-spacer"></div>
+
+
+
+<!-- Menú de Perfil -->
+    @if (config().showProfileMenu) {
+      <div class="navbar-profile">
+        <button 
+          mat-button
+          [matMenuTriggerFor]="profileMenu"
+          class="profile-button"
+        >
+          <mat-icon class="profile-avatar-icon">
+              {{ getUserInitials() }}
+            </mat-icon>
+         
+        </button>
+
+        <mat-menu #profileMenu="matMenu" xPosition="before" class="profile-menu">
+          <!-- Header del menú -->
+          <div class="profile-menu-header">
+            <div class="user-info">
+              <div class="user-avatar-large">
+                {{ getUserInitials() }}
+              </div>
+              <div class="user-details">
+                <span class="user-email">{{ currentUser()?.email }}</span>
+              </div>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Opciones del menú -->
+          @for (item of config().profileMenuItems; track item.label) {
+            @if (item.label === 'Cerrar Sesión') {
+              <mat-divider></mat-divider>
+            }
+            
+            <button 
+              mat-menu-item 
+              (click)="onMenuItemClick(item)"
+              [class.logout-item]="item.action === logout"
+            >
+              <mat-icon [class.logout-icon]="item.action === logout">
+                {{ item.icon }}
+              </mat-icon>
+              <span>{{ item.label }}</span>
+            </button>
+          }
+        </mat-menu>
+      </div>
+    }
+
+    <!-- Botón de Login (no autenticados) -->
+    @if (config().showLoginButton) {
+      <button 
+        mat-raised-button 
+        color="accent" 
+        (click)="goToLogin()"
+        class="login-button"
+      >
+        <mat-icon>login</mat-icon>
+        <span>Iniciar Sesión</span>
+      </button>
+    }
+  </div>
+</mat-toolbar>

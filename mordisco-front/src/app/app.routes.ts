@@ -4,25 +4,31 @@ import { Registro } from './pages/registro/registro';
 import { authGuard } from './core/guards/auth/auth-guard';
 import { Profile } from './pages/profile/profile';
 import { EditPasswordComponent } from './components/edit-password/edit-password';
-import { Home } from './pages/home/home';
 import { EditProfile } from './pages/edit-profile/edit-profile';
-import { publicOnlyGuard } from './core/guards/public-only-guard';
 import { MyAddress } from './pages/my-address/my-address';
 import { FormAddress } from './pages/form-address/form-address';
+import { Home } from './pages/home/redirect-home';
+import { publicOnlyGuard } from './core/guards/public-only-guard';
 
 export const routes: Routes = [
  // Páginas públicas 
+  {path : 'home', component: Home},
   { path: 'login', component: Login, canActivate: [publicOnlyGuard]},
   { path: 'registro', component: Registro, canActivate: [publicOnlyGuard]},
 
   // Rutas protegidas con authGuard
-  {path : '', component: Home, canActivate: [authGuard]},
   {path: 'profile', component: Profile, canActivate: [authGuard]},
   {path: 'profile/edit', component:EditProfile, canActivate: [authGuard]},
   {path: 'profile/my-address', component: MyAddress/*, canActivate : [authGuard]*/},
   {path: 'profile/my-address/form-address', component: FormAddress/*, canActivate : [authGuard]*/},
   {path: 'edit-password', component : EditPasswordComponent, canActivate: [authGuard]},
  
+
+  // Ruta por defecto
+  {path : '', redirectTo: 'home', pathMatch: 'full'},
+
+  // Ruta comodín
+  {path: '**', redirectTo: 'home'}
 /*
   // Rutas con autorización por roles
   {path: 'admin', canMatch: [authGuard], data: { roles: ['ROLE_ADMIN'] } },

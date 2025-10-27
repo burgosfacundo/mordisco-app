@@ -1,7 +1,7 @@
 import Producto from "../producto/producto"
-import Restaurante from "../restaurante/restaurante"
 import Address from "../direccion/direccion"
 import User from "../user/user-register"
+import Restaurante from "../restaurante/restaurante"
 
 export default interface Pedido{
     id : number,

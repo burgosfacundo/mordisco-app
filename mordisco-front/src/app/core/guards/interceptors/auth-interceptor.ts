@@ -1,11 +1,11 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { inject } from '@angular/core';
-import { AuthService } from '../../auth/services/auth-service';
+import { AuthService } from '../../../auth/services/auth-service';
+import { environment } from '../../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService  = inject(AuthService)
-// No agregar token a endpoints públicos
   if (req.url.includes('/api/auth/login') || 
       req.url.includes('/api/auth/refresh')) {
     return next(req)
@@ -13,14 +13,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const token = authService.getAccessToken()
   
-  if (token) {
+  if (token && req.url.startsWith(environment.apiUrl)) {
     req = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      },
-      withCredentials: true // CRÍTICO: envía cookies httpOnly
-    })
+      setHeaders: { Authorization: `Bearer ${token}` },
+      withCredentials: true
+    });
+  } else if (token) {
+    req = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` },
+      withCredentials: false
+    });
   }
+
 
   return next(req).pipe(
     catchError(error => {

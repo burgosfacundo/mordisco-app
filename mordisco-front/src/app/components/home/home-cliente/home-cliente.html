@@ -1,0 +1,32 @@
+<h1 class="titulo">¡Bienvenido a Mordisco!</h1>
+@if (isLoading) {
+    <div class="loading">
+        <p>Cargando...</p>
+    </div>
+}@else{
+    <ul class="seccion">            
+        <h2 class="subtitulo">Bienvenido a Mordisco! Dónde vas a pedir hoy?</h2>
+        @if(restaurantes && restaurantes.length > 0) {                    
+            @for (r of restaurantes; track r.id) {
+                <li class="card">
+                    <app-restaurante-card [restaurante]="r" ></app-restaurante-card>
+                </li>
+            }
+        }@else {
+            <p>No hay restaurantes con esas características.</p>
+        }
+    </ul>
+
+       <ul class="seccion">            
+        <h2 class="subtitulo">No te pierdas estas promociones</h2>
+        @if(restaurantesPromociones && restaurantesPromociones.length > 0) {                    
+            @for (r of restaurantesPromociones; track r.id) {
+                <li class="card">
+                    <app-restaurante-card [restaurante]="r" ></app-restaurante-card>
+                </li>
+            }
+        }@else {
+            <p>No hay restaurantes con esas características.</p>
+        }
+    </ul>
+}

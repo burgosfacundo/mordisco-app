@@ -1,0 +1,16 @@
+<div class="principal">
+  <img [src]="restaurante.logo.url" alt="{{ restaurante.logo.nombre }}" class="img">
+
+
+  <div class="restaurante-info">
+    <h2 class="restaurante-nombre">{{ restaurante.razonSocial }}</h2>
+    <div class="restaurante-calificacion">
+      ⭐ {{ restaurante.estrellas }}
+    </div>
+
+    <div class="restaurante-horario">
+      <p><strong>{{ restaurante.horariosDeAtencion.dia }}</strong></p>
+      <p>{{ restaurante.horariosDeAtencion.horaApertura }} - {{ restaurante.horariosDeAtencion.horaCierre }}</p>
+    </div>
+  </div>
+</div>

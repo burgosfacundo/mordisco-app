@@ -1,0 +1,62 @@
+/* Título principal */
+.titulo {
+  color: #E3291D;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 40px;
+  letter-spacing: 2px;
+}
+
+.subtitulo {
+  color: #E3291D;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: left;
+  margin: 30px 0 20px 10px;
+}
+
+/* Secciones de pedidos y usuarios */
+.seccion{
+  list-style: none;
+  padding: 0;
+  margin-bottom: 60px;
+}
+
+/* Cada card (pedido o usuario) */
+.card {
+  display: inline-block;
+  margin: 10px;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+/* Mensajes cuando no hay datos */
+p {
+  color: #555;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px 15px;
+  display: inline-block;
+  box-shadow: 0 3px 6px rgba(227, 41, 29, 0.15);
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .titulo {
+    font-size: 2rem;
+  }
+
+  .subtitulo {
+    font-size: 1.3rem;
+  }
+
+  .card {
+    display: block;
+    margin: 15px auto;
+  }
+}

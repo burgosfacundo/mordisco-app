@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { Footer } from "../../components/footer/footer";
 
 @Component({
   selector: 'app-edit-password',
-  imports: [Footer],
+  imports: [],
   templateUrl: './edit-password.html',
   styleUrl: './edit-password.css'
 })
