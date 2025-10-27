@@ -1,4 +1,5 @@
 export default interface Direccion{
+    id? : number,
     calle : string,
     numero : string,
     piso?: string,

@@ -5,12 +5,12 @@ import { PedidoCard } from '../../components/pedido-card/pedido-card';
 import { AuthService } from '../../auth/services/auth-service';
 import { RestauranteService } from '../../services/restaurante/restaurante-service';
 import Restaurante from '../../models/restaurante/restaurante';
-import { RestarutanteCard } from "../../components/restaurante-card/restarutante-card";
+import { RestarutanteCard } from '../../components/restaurtante-card/restarutante-card';
 
 
 @Component({
   selector: 'app-home',
-  imports: [PedidoCard, RestarutanteCard],
+  imports: [PedidoCard],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })

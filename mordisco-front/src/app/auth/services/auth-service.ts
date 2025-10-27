@@ -75,7 +75,7 @@ export class AuthService {
   }
 
   getCurrentUser(): AuthResponse | null {
-    return this.currentUser();
+   return this.currentUser();
   }
 
   private handleAuthResponse(response: AuthResponse): void {

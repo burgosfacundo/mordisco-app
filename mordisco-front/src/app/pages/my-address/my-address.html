@@ -1,0 +1,11 @@
+<h3 class="mordisco">Mis direcciones</h3>
+    <button (click)="crearDireccion()">Agregar nueva direccion</button>
+    <ul class="seccionDirecciones">
+            @for(direccion of arrDirecciones; track $index){
+                <li class="direccionCard">
+                    <app-direccion-card [direccion]="direccion"></app-direccion-card>
+                    <button (click)="modificarDireccion(direccion)">Editar</button>
+                    <button (click)="eliminarDireccion(direccion.id)">Eliminar</button>
+                </li>
+            }
+    </ul>

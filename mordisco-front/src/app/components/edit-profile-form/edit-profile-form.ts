@@ -27,8 +27,8 @@ private fb = inject(FormBuilder);
 
  private inicializarFormulario(): void {
     this.editarPerfil = this.fb.group({
-      nombre: ['', [Validators.required, Validators.maxLength(50)]],
-      apellido: ['', [Validators.required, Validators.maxLength(50)]],
+      nombre: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
+      apellido: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
       telefono: ['', [
         Validators.required,
         Validators.maxLength(15),
