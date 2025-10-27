@@ -41,6 +41,16 @@
                         }
                     }
             </fieldset>
+            <fieldset>
+                <label class="labelForm">Como queres registrarte?</label>
+                
+                <select formControlName="rolId" 
+                        class="bg-white p-2 w-full rounded-lg text-gray-800 border-none appearance-none">
+                    <option [value]="1">Cliente</option>
+                    <option [value]="2">Dueño</option>
+                    <option [value]="3">Repartidor</option>
+                </select>
+            </fieldset>
             <fieldset class="span-2-columns">
                 <label for="email" class="labelForm">Email  </label>
                 <input type="email" id="email" formControlName="email" class="inputForm">
@@ -62,17 +72,6 @@
                         }@else if(userForm.controls['password'].errors?.['minlength']){
                             <p class="mensajeError">La contraseña debe tener como mínimo 8 caracteres</p>}
                 }
-            </fieldset>
-
-            <fieldset>
-                <label class="labelForm">Rol</label>
-                
-                <select formControlName="rolId" 
-                        class="bg-white p-2 w-full rounded-lg text-gray-800 border-none appearance-none">
-                    <option [value]="1">Cliente</option>
-                    <option [value]="2">Dueño</option>
-                    <option [value]="3">Repartidor</option>
-                </select>
             </fieldset>
         </div>
 
