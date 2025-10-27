@@ -15,7 +15,7 @@ public record RestauranteResponseCardDTO(
         Boolean activo,
         ImagenResponseDTO logo,
         @Schema(description = "Horarios de atencion del restaurante")
-        List<HorarioAtencionResponseDTO> hoariosDeAtencion,
+        List<HorarioAtencionResponseDTO> horariosDeAtencion,
         @Schema(description = "Estrellas del restaurante")
         Double estrellas
         ) {}

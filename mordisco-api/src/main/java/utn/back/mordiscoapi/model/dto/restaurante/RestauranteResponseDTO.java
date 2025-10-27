@@ -22,7 +22,7 @@ public record RestauranteResponseDTO (
         @Schema(description = "Promociones del restaurante")
         List<PromocionResponseDTO> promociones,
         @Schema(description = "Horarios de atencion del restaurante")
-        List<HorarioAtencionResponseDTO> hoariosDeAtencion,
+        List<HorarioAtencionResponseDTO> horariosDeAtencion,
         @Schema(description = "Calificaciones del restaurante")
         List<CalificacionRestauranteResponseDTO> calificacionRestaurante,
         @Schema(description = "Estrellas del restaurante")
