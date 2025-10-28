@@ -20,10 +20,6 @@ export class LoginFormComponent implements OnInit{
 
   private _snackBar = inject(MatSnackBar);
 
-  openSnackBar(message: string, action: string) {
-    this._snackBar.open(message, action);
-  }
-
   errorMessage = signal('');
 
   constructor(){
@@ -39,18 +35,16 @@ export class LoginFormComponent implements OnInit{
     })
   }
 
-  ///metodo iniciar sesion y validador si esta bien, redirige a la pagina principal
   iniciarSesion(){
-  // 3️⃣ Llamar al servicio para iniciar sesión
-  this.service.login(this.inicioSesion.value).subscribe({
-    next: () => {
-      this.router.navigate(['/']);
-    },
-    error: e => {
-      console.error(e);
-      
-      this.openSnackBar('❌ Email o contraseña incorrectos','Continuar')
-    }
-  });
+    this.service.login(this.inicioSesion.value).subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: e => {
+        console.error(e);
+        
+        this._snackBar.open('❌ Email o contraseña incorrectos','' , { duration: 3000 });
+      }
+    });
   }
 }

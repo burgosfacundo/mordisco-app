@@ -5,38 +5,79 @@
                 <fieldset>
                     <label for="calleID" class="labelForm">Calle</label>
                     <input type="text" id="calleID" formControlName="calle">
+                        @if (formDirecciones.get('calle')?.touched) {
+                            @if (formDirecciones.controls['calle'].errors?.['required']) {
+                                <p class="error">*Obligatorio</p>
+                            }@else if(formDirecciones.controls['calle'].errors?.['maxLength']){
+                                <p class="mensajeError">*Debe tener como máximo 50 caracteres</p>
+                            }@else if(formDirecciones.controls['calle'].errors?.['pattern']){
+                                <p class="mensajeError">*No debe tener solo números</p>
+                            }
+                        }
                 </fieldset>
                 <fieldset>
                     <label for="numeroID"  class="labelForm">Número</label>
                     <input type="text" id="numeroID" formControlName="numero">
+                    @if (formDirecciones.get('numero')?.touched) {
+                        @if (formDirecciones.controls['numero'].errors?.['required']) {
+                            <p class="error">*Obligatorio</p>
+                        }@else if(formDirecciones.controls['numero'].errors?.['maxLength']){
+                            <p class="mensajeError">*Debe tener como máximo 50 caracteres</p>
+                        }@else if(formDirecciones.controls['numero'].errors?.['pattern']){
+                            <p class="mensajeError">*Debe contener solo números</p>
+                        }
+                    }
                 </fieldset>
                 <fieldset>
                     <label for="pisoID"  class="labelForm">Piso</label>
                     <input type="text" id="pisoID" formControlName="piso">
+                    @if (formDirecciones.get('piso')?.touched) {
+                       @if(formDirecciones.controls['piso'].errors?.['maxLength']){
+                            <p class="mensajeError">*Debe tener como máximo 15 caracteres</p>
+                        }@else if(formDirecciones.controls['piso'].errors?.['pattern']){
+                            <p class="mensajeError">*Debe contener solo números</p>
+                        }
+                    }
                 </fieldset>
                 <fieldset>
                     <label for="deptoID"  class="labelForm">Depto</label>
                     <input type="text" id="deptoID" formControlName="depto">
+                    @if (formDirecciones.get('depto')?.touched &&
+                            formDirecciones.controls['depto'].errors?.['maxLength']) {
+                        <p class="mensajeError">*Debe tener como máximo 15 caracteres</p>
+                    }
                 </fieldset>
                 <fieldset>
                     <label for="codigoPostalID"  class="labelForm">Código Postal</label>
                     <input type="text" id="codigoPostalID" formControlName="codigoPostal">
+                    @if (formDirecciones.get('codigoPostal')?.touched) {
+                        @if (formDirecciones.controls['codigoPostal'].errors?.['required']) {
+                            <p class="error">*Obligatorio</p>
+                        }@else if(formDirecciones.controls['codigoPostal'].errors?.['maxLength']){
+                            <p class="mensajeError">*Debe tener como máximo 15 caracteres</p>
+                        }
+                    }
                 </fieldset>
                 <fieldset>
                     <label for="referenciasID"  class="labelForm">Referencias</label>
                     <input type="text" id="referenciasID" formControlName="referencias">
-                </fieldset>
-                <fieldset>
-                    <label for="latitudID"  class="labelForm">Latitud</label>
-                    <input type="number" id="latitudID" formControlName="latitud">
-                </fieldset>
-                <fieldset>
-                    <label for="longitudID"  class="labelForm">Longitud</label>
-                    <input type="number" id="longitudID" formControlName="longitud">
+                     @if (formDirecciones.get('referencias')?.touched &&
+                            formDirecciones.controls['referencias'].errors?.['maxLength']) {
+                        <p class="mensajeError">*Debe tener como máximo 250 caracteres</p>
+                    }
                 </fieldset>
                 <fieldset>
                     <label for="ciudadID"  class="labelForm">Ciudad</label>
                     <input type="text" id="ciudadID" formControlName="ciudad">
+                    @if (formDirecciones.get('ciudad')?.touched) {
+                        @if (formDirecciones.controls['ciudad'].errors?.['required']) {
+                            <p class="error">*Obligatorio</p>
+                        }@else if(formDirecciones.controls['ciudad'].errors?.['maxLength']){
+                            <p class="mensajeError">*Debe tener como máximo 50 caracteres</p>
+                        }@else if(formDirecciones.controls['ciudad'].errors?.['pattern']){
+                            <p class="mensajeError">*No debe tener solo números</p>
+                        }
+                    }
                 </fieldset>
          <div class="cajaBoton">
             <button type="submit" class="boton">{{modoEdicion ? 'Modificar' : 'Crear'}}</button>

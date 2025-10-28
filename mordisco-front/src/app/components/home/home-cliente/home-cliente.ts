@@ -3,10 +3,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { RestauranteService } from '../../../services/restaurante/restaurante-service';
 import RestauranteForCard from '../../../models/restaurante/restaurante-for-card';
 import { RestauranteCard } from '../../restaurante-card/restaurante-card';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-home-cliente',
-  imports: [RestauranteCard],
+  imports: [RestauranteCard, MatPaginator],
   templateUrl: './home-cliente.html',
   styleUrl: './home-cliente.css'
 })
@@ -17,12 +18,24 @@ export class HomeCliente  implements OnInit , OnDestroy{
   private originalRestaurantes?: RestauranteForCard[];
   restaurantes?: RestauranteForCard[];
   restaurantesPromociones?: RestauranteForCard[];
+  ciudadSeleccionada?: string = 'Mar del Plata';
 
-  isLoading = true;
+
+  sizePromocion : number = 10;
+  pagePromocion : number = 0;
+  lengthPromocion : number = 10;
+
+  sizeRestaurantes : number = 10;
+  pageRestaurantes : number = 0;
+  lengthRestaurantes : number = 10;
+
+  isLoadingRestaurantes = true;
+  isLoadingPromocion = true;
 
   ngOnInit(): void {
     this.setupEventListeners();
     this.loadRestaurantesData('Mar del Plata');
+    this.loadRestaurantesPromocionesData('Mar del Plata');
   }
 
     ngOnDestroy(): void {
@@ -32,10 +45,10 @@ export class HomeCliente  implements OnInit , OnDestroy{
   private setupEventListeners(): void {
     const ciudadListener = (event: Event) => {
       const { detail } = event as CustomEvent<any>;
-      console.log('Ciudad cambiada:', detail);
-      const ciudadNombre = typeof detail === 'string' ? detail : detail?.nombre;
-      if (ciudadNombre) {
-        this.loadRestaurantesData(ciudadNombre);
+      this.ciudadSeleccionada = typeof detail === 'string' ? detail : detail?.nombre;
+      if (this.ciudadSeleccionada) {
+        this.loadRestaurantesData(this.ciudadSeleccionada);
+        this.loadRestaurantesPromocionesData(this.ciudadSeleccionada);
       }
     };
 
@@ -70,32 +83,47 @@ export class HomeCliente  implements OnInit , OnDestroy{
 
 
   private loadRestaurantesData(ciudad : string): void {
-    this.restauranteService.getAllActivosByCiudad(ciudad).subscribe({
+    this.restauranteService.getAllActivosByCiudad(ciudad,this.pageRestaurantes,this.sizeRestaurantes).subscribe({
       next: data => { 
-        this.originalRestaurantes = data;
-        this.restaurantes = [...data];
-        this.isLoading = false;
+        this.originalRestaurantes = data.content;
+        this.restaurantes = [...data.content];
+        this.lengthRestaurantes = data.totalElements;
+        this.isLoadingRestaurantes = false;
+        
       },
-      error: (err) => {
-        console.error('Error al cargar los restaurantes:', err);
-        this.openSnackBar('❌ Error al cargar los restaurantes');
-        this.isLoading = false;
+      error: () => {
+        this._snackBar.open('❌ Error al cargar los restaurantes','Cerrar' , { duration: 3000 });
       }
     });
+  }
 
-    this.restauranteService.getAllWithPromocionActivaByCiudad(ciudad).subscribe({
+  private loadRestaurantesPromocionesData(ciudad : string): void {
+    this.restauranteService.getAllWithPromocionActivaByCiudad(ciudad,this.pagePromocion,this.sizePromocion).subscribe({
       next: data => {
-       this.restaurantesPromociones = data
+       this.restaurantesPromociones = data.content
+        this.lengthPromocion = data.totalElements;
+        this.isLoadingPromocion = false;
       },
-      error: (err) => {
-        console.error('Error al cargar los restaurantes con promociones:', err);
-        this.openSnackBar('❌ Error al cargar los restaurantes con promociones');
+      error: () => {
+        this._snackBar.open('❌ Error al cargar los restaurantes con promociones', 'Cerrar' , { duration: 3000 });
       }
     });
   }
 
-  private openSnackBar(message: string, action: string = 'Cerrar'): void {
-    this._snackBar.open(message, action, { duration: 3000 });
+
+  onPageChangeRestaurante(event: PageEvent): void {
+    this.pageRestaurantes = event.pageIndex
+    this.sizeRestaurantes = event.pageSize;
+    if (this.ciudadSeleccionada){
+      this.loadRestaurantesData(this.ciudadSeleccionada);
+    }
   }
 
+    onPageChangePromocion(event: PageEvent): void {
+    this.pagePromocion = event.pageIndex
+    this.sizePromocion = event.pageSize;
+    if (this.ciudadSeleccionada){
+      this.loadRestaurantesPromocionesData(this.ciudadSeleccionada);
+    }
+  }
 }

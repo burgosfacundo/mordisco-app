@@ -8,7 +8,7 @@
 }
 
 /* Contenedor principal */
-.infoUsuario {
+.principal {
   background-color: #fff7f6;
   border: 2px solid #e3291d34;
   border-radius: 16px;
@@ -19,19 +19,27 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.infoUsuario:hover {
+.principal:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 16px rgba(227, 41, 29, 0.2);
 }
 
+.img {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  width: 100%;
+  height: auto;
+}
+
 /* Texto del usuario */
-.estiloUsuario {
+.estiloText {
   margin: 8px 0;
   color: #333;
   font-weight: 500;
 }
 
-.estiloUsuario:first-of-type {
+.estiloText:first-of-type {
   font-size: 1.5rem;
   font-weight: 700;
   color: #E3291D;
@@ -60,7 +68,7 @@
 
 /* Responsive */
 @media (max-width: 500px) {
-  .infoUsuario {
+  .principal {
     width: 90%;
   }
 }

@@ -1,5 +1,5 @@
 /* Título principal */
-.mordisco {
+.principal {
   color: #E3291D;
   font-size: 2.5rem;
   font-weight: 800;
@@ -8,7 +8,7 @@
 }
 
 /* Subtítulos */
-.mordiscoSubtitulos {
+.subtitulo {
   color: #E3291D;
   font-size: 1.6rem;
   font-weight: 700;
@@ -17,20 +17,20 @@
 }
 
 /* Secciones de pedidos y usuarios */
-.seccionPedidos {
+.seccion {
   list-style: none;
   padding: 0;
   margin-bottom: 60px;
 }
 
 /* Cada card (pedido o usuario) */
-.pedidoCard {
+.card {
   display: inline-block;
   margin: 10px;
   transition: transform 0.2s ease;
 }
 
-.pedidoCard:hover {
+.card:hover {
   transform: translateY(-4px);
 }
 
@@ -48,15 +48,15 @@ p {
 
 /* Responsividad */
 @media (max-width: 768px) {
-  .mordisco {
+  .seccion {
     font-size: 2rem;
   }
 
-  .mordiscoSubtitulos {
+  .subtitulo {
     font-size: 1.3rem;
   }
 
-  .pedidoCard {
+  .card {
     display: block;
     margin: 15px auto;
   }

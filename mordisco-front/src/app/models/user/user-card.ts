@@ -4,5 +4,5 @@ export default interface UserCard{
     nombre : string,
     apellido : string,
     email : string,
-    idRol: number
+    rol: string
 }

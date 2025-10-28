@@ -1,12 +1,12 @@
-<div class="infoPedido">
+<div class="principal">
     <a [routerLink]="['/detallePedido/', pedido?.id]">
-    <h1 class="estiloPedido">ID pedido {{pedido?.id}}</h1>
-    <h2 class="estiloPedido">Nombre del cliente {{pedido?.cliente?.nombre}} {{pedido?.cliente?.apellido}}</h2>
-    <h2 class="estiloPedido">Direccion de Entrega {{pedido?.direccionEntrega?.calle}} {{pedido?.direccionEntrega?.numero}}  
+    <h1 class="estiloText">ID pedido {{pedido?.id}}</h1>
+    <p class="estiloText">Nombre del cliente {{pedido?.cliente?.nombre}} {{pedido?.cliente?.apellido}}</p>
+    <p class="estiloText">Direccion de Entrega {{pedido?.direccionEntrega?.calle}} {{pedido?.direccionEntrega?.numero}}  
         @if(pedido?.direccionEntrega?.depto && pedido?.direccionEntrega?.piso){
-        Depto {{pedido?.direccionEntrega?.piso}} {{pedido?.direccionEntrega?.depto}}} </h2>
-    <h2 class="estiloPedido">Estado {{pedido?.estado}}</h2>
-    <h2 class="estiloPedido">Tipo de entrega {{pedido?.tipoEntrega}}</h2>
-    <h2 class="estiloPedido">Total ${{pedido?.total}}</h2>
+        Depto {{pedido?.direccionEntrega?.piso}} {{pedido?.direccionEntrega?.depto}}} </p>
+    <p class="estiloText">Estado {{pedido?.estado}}</p>
+    <p class="estiloText">Tipo de entrega {{pedido?.tipoEntrega}}</p>
+    <p class="estiloText">Total ${{pedido?.total}}</p>
     </a>
 </div>

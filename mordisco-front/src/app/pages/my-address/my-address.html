@@ -1,11 +1,18 @@
-<h3 class="mordisco">Mis direcciones</h3>
-    <button (click)="crearDireccion()">Agregar nueva direccion</button>
-    <ul class="seccionDirecciones">
-            @for(direccion of arrDirecciones; track $index){
-                <li class="direccionCard">
-                    <app-direccion-card [direccion]="direccion"></app-direccion-card>
-                    <button (click)="modificarDireccion(direccion)">Editar</button>
-                    <button (click)="eliminarDireccion(direccion.id)">Eliminar</button>
-                </li>
+
+<section>
+    <h3 class="mordisco">Mis direcciones</h3>
+        <ul class="seccionDirecciones">
+            @if (arrDirecciones) {
+                @for(direccion of arrDirecciones; track $index){
+                    <li class="direccionCard">
+                        <app-direccion-card [direccion]="direccion"></app-direccion-card>
+                        <button (click)="modificarDireccion(direccion)">Editar</button>
+                        <button (click)="eliminarDireccion(direccion.id)">Eliminar</button>
+                    </li>
+                }
+            }@else{
+                <p>No tiene direcciones cargadas aun!</p>
             }
-    </ul>
+        </ul>
+        <button (click)="crearDireccion()">Agregar nueva direccion</button>
+</section>

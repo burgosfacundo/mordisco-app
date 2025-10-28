@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../auth/services/auth-service';
 import User from '../../models/user/user-register';
-import Address from '../../models/direccion/direccion';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-form',
@@ -12,16 +12,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrl: './user-form-component.css'
 })
 export class UserFormComponent implements OnInit{
+  private router = inject(Router)
   private service : AuthService = inject(AuthService)
   private fb : FormBuilder = inject(FormBuilder)
   userForm! : FormGroup
-
   private _snackBar = inject(MatSnackBar);
-
-  openSnackBar(message: string, action: string) {
-    this._snackBar.open(message, action);
-  }
-
 
   ngOnInit(): void {
     this.inicializarFormulario()
@@ -29,57 +24,23 @@ export class UserFormComponent implements OnInit{
 
   inicializarFormulario(){
      this.userForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.maxLength(50)]],
-      apellido: ['', [Validators.required, Validators.maxLength(50)]],
-      telefono: ['', [Validators.required, Validators.maxLength(50),Validators.pattern(/^[0-9]{8,15}$/)]],
+      nombre: ['', [Validators.required, Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]],
+      apellido: ['', [Validators.required, Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]],
+      telefono: ['', [Validators.required, Validators.maxLength(50),Validators.pattern(/^\+\d{1,3}(?:\s?\d){6,14}$/)]],
       email: ['', [Validators.required, Validators.email,Validators.maxLength(100)]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      rolId: ['', Validators.required],
-      direcciones: this.fb.array([this.buildAddressGroup()])
+      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]],
+      rolId: ['', Validators.required]
     });
   }
 
-  private buildAddressGroup(): FormGroup {
-    return this.fb.group({
-      calle: ['', [Validators.required,Validators.maxLength(50)]],
-      numero: ['', [Validators.required,Validators.maxLength(50)]],
-      piso: ['',Validators.maxLength(20)],
-      depto: ['',Validators.maxLength(20)],
-      codigoPostal: ['', [Validators.required,Validators.maxLength(10)]],
-      referencias: ['',Validators.maxLength(255)],
-      latitud: [null, Validators.required],
-      longitud: [null, Validators.required],
-      ciudad: ['', [Validators.required,Validators.maxLength(50)]]
-    })
-  }
-
-  get direccionesFA(): FormArray {
-    return this.userForm.get('direcciones') as FormArray;
-  }
-
-  addDireccion(): void {
-    this.direccionesFA.push(this.buildAddressGroup());
-  }
-
-  removeDireccion(index: number): void {
-    if (this.direccionesFA.length > 1) {
-      this.direccionesFA.removeAt(index);
-    }
-  }
-
   onSubmit(){
-    if (!this.userForm.invalid) {
+    if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
       return;
     }
 
     const raw = this.userForm.getRawValue();
 
-    const direcciones: Address[] = raw.direcciones.map((d: any) => ({
-      ...d,
-      latitud: Number(d.latitud),
-      longitud: Number(d.longitud),
-    }));
 
     const user: User = {
       nombre: raw.nombre,
@@ -87,21 +48,21 @@ export class UserFormComponent implements OnInit{
       telefono: raw.telefono,
       email: raw.email,
       password: raw.password,
-      rolId: 1
+      rolId: raw.rolId
     };
 
     console.log(user)
 
     this.service.register(user).subscribe({
       next : () => {
-        this.openSnackBar('✅ Usuario registrado correctamente', 'Continuar')
+        this._snackBar.open('✅ Usuario registrado correctamente', '',{duration: 3000})
+        this.router.navigate(['/login']);
       },
       error:(e) => {
         console.error(e);
         
-        this.openSnackBar('❌ Ocurrió un error. Intentelo en unos minutos', 'Continuar')
+        this._snackBar.open('❌ Ocurrió un error. Intentelo en unos minutos', '',{duration: 3000})
       }
     })
   }
-
 }

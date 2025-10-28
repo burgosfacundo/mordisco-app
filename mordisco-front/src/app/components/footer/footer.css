@@ -14,7 +14,6 @@
 
   width: 100%;
 
-  /* 🔹 Asegura que quede sobre otros elementos */
   z-index: 1000;
 }
 

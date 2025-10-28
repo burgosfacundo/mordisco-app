@@ -1,24 +1,33 @@
-<section class="contenedorProfile">
+
     @if (usuario) {
-        
-        <h3 class="mordisco">Mi pefil</h3>
-        <h2 class="mordiscoTexto">Nombre <span style="color:black">{{usuario.nombre}}</span></h2> 
-        <h2 class="mordiscoTexto">Apellido <span style="color:black">{{usuario.apellido}}</span></h2> 
-        <h2 class="mordiscoTexto">Telefono <span style="color:black">{{usuario.telefono}}</span></h2> 
-        <h2 class="mordiscoTexto">Email <span style="color:black">{{usuario.email}}</span></h2> 
-        <h2 class="mordiscoTexto">Direcciones</h2> 
-        <ul class="seccionDirecciones">
-            @for(direccion of direcciones; track $index){
-                <li class="direccionCard">
-                    <app-direccion-card [direccion]="direccion"></app-direccion-card>
-                </li>
+        <section class="contenedorProfile">
+
+            <h3 class="mordisco">Mi perfil</h3>
+            <h2 class="mordiscoTexto">Nombre <span style="color:black">{{usuario.nombre}}</span></h2> 
+            <h2 class="mordiscoTexto">Apellido <span style="color:black">{{usuario.apellido}}</span></h2> 
+            <h2 class="mordiscoTexto">Telefono <span style="color:black">{{usuario.telefono}}</span></h2> 
+            <h2 class="mordiscoTexto">Email <span style="color:black">{{usuario.email}}</span></h2> 
+            <h2 class="mordiscoTexto">Direcciones</h2> 
+
+            @if(direcciones){
+                <ul class="seccionDirecciones">
+                    @for(direccion of direcciones; track $index){
+                        <li class="direccionCard">
+                            <app-direccion-card [direccion]="direccion"></app-direccion-card>
+                        </li>
+                    }
+                </ul>
+            }@else {
+                <p>No tiene direcciones cargadas aun!</p>
             }
-        </ul>
-        
-        <button (click)="cambiarContrasenia()" class="boton">Cambiar contraseña</button>
-        <button (click)="editarPerfil()" class="boton">Editar perfil</button>
-        <button (click)="eliminarCuenta()" class="boton">Eliminar cuenta</button>
+
+            <section>
+                <button (click)="cambiarContrasenia()" class="boton">Cambiar contraseña</button>
+                <button (click)="editarPerfil()" class="boton">Editar perfil</button>
+                <button (click)="eliminarCuenta()" class="boton">Eliminar cuenta</button>
+            </section>
+            
+        </section>
     }@else {
         <p class="mordiscoSubtitulos">No existe usuario con este ID!</p>
     }
-</section>

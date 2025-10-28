@@ -12,6 +12,15 @@
                     <app-pedido-card [pedido]="pedido" ></app-pedido-card>
                 </li>
             }
+
+
+        <mat-paginator
+            [length]="10"
+            [pageSize]="sizePedidos"
+            [pageIndex]="pagePedidos"
+            [pageSizeOptions]="[5, 10, 20]"
+            (page)="onPageChangePedidos($event)">
+        </mat-paginator>
         }@else {
             <p>No hay pedidos pendientes. Todo al dia!</p>
         }

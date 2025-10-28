@@ -3,13 +3,7 @@
   <h2 class="estiloUsuario">{{ usuario.email }}</h2>
 
   <h2 class="estiloUsuario">
-    👤 Rol:
-    @switch (usuario.idRol) {
-      @case (1) { Cliente }
-      @case (2) { Dueño }
-      @case (3) { Repartidor }
-      @default { Desconocido }
-    }
+    👤 Rol: {{usuario.rol.replace('ROLE_', '')}}
   </h2>
 
   <div class="botonContainer">

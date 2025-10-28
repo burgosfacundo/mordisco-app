@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import Direccion from '../../models/direccion/direccion';
 import { environment } from '../../../environments/environment';
@@ -8,8 +8,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class DireccionService {
-
-  private http : HttpClient = Inject(HttpClient)
+  private http : HttpClient = inject(HttpClient)
   private direccionObservable = new BehaviorSubject<Direccion | null>(null)
   currentDir = this.direccionObservable.asObservable()
 

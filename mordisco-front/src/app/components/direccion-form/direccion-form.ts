@@ -21,39 +21,35 @@ export class DireccionForm implements OnInit{
   private router : Router = inject(Router)
 
   formDirecciones! : FormGroup 
-  private subscription : Subscription = new Subscription() //para obtener el observable de edicion
+  private subscription : Subscription = new Subscription()
   modoEdicion = false
   idCurrUser ?: number 
 
   ngOnInit(): void {
     this.formDirecciones = this.fb.group({
       id : [null],
-      calle : ['', [Validators.required, Validators.maxLength(50)]],
+      calle : ['', [Validators.required, Validators.maxLength(50),Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
       numero : ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[0-9]+$/)]],
-      piso: ['',[Validators.required, Validators.maxLength(15), Validators.pattern(/^[0-9]+$/)]],
-      depto: ['',[Validators.required, Validators.maxLength(15), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
+      piso: ['',[Validators.maxLength(15), Validators.pattern(/^[0-9]+$/)]],
+      depto: ['',Validators.maxLength(15)],
       codigoPostal: ['',[Validators.required, Validators.maxLength(15)]],
       referencias : ['', Validators.maxLength(250)],
-      latitud: [''],
-      longitud :[''],
       ciudad:['', [Validators.required, Validators.maxLength(50),Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]]
     })
 
     const resp = this.auS.currentUser()
     this.idCurrUser= resp?.userId 
+    
     this.subscription.add(
       this.dService.currentDir.subscribe(d => {
         if(d){
-          // Modo Edición: Hay una dirección para cargar
-          this.modoEdicion=true
+          this.modoEdicion = true
           this.formDirecciones.patchValue(d)
         }else{
-          // Modo Creación
           this.formDirecciones.reset({id : null})
         }
       })
     )
-
   }
 
   manejarEnvio(){
@@ -64,29 +60,25 @@ export class DireccionForm implements OnInit{
       if(this.modoEdicion){
         this.dService.updateDireccion(this.idCurrUser,direccionLeida).subscribe({
           next: (data) => {console.log(data),
-            this.openSnackBar("Direccion editada correctamente")
+            this._snackbar.open("✅ Direccion editada correctamente",'',{duration: 3000})
             this.router.navigate(['/profile/my-address'])
           },error: (e) => {console.log(e),
-            this.openSnackBar("No se ha podido editar la direccion")
+            this._snackbar.open("❌ No se ha podido editar la direccion",'',{duration: 3000})
             this.router.navigate(['/profile/my-address'])
           }
         })
       }else{
         this.dService.createDireccion(this.idCurrUser, direccionLeida).subscribe({
           next: (data) => {console.log(data),
-            this.openSnackBar("Direccion creada exitosamente")
+            this._snackbar.open("✅ Direccion creada exitosamente", "Continuar",{ duration: 3000 })
             this.router.navigate(['/profile/my-address'])
           },error:(e)=>{ console.log(e),
-            this.openSnackBar("No se ha podido crear la direccion")
+            this._snackbar.open("❌ No se ha podido crear la direccion", "Continuar", { duration: 3000 })
             this.router.navigate(['/profile/my-address'])
           }
         })
       }     
     }
-  }
-
-  private openSnackBar(message: string, action: string = 'Cerrar'): void {
-    this._snackbar.open(message, action, { duration: 3000 });
   }
 
 }

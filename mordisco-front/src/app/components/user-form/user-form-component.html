@@ -8,9 +8,11 @@
                 <input type="text" id="nombre" formControlName="nombre" class="inputForm">
                 @if (userForm.get('nombre')?.touched) {
                     @if(userForm.controls['nombre'].errors?.['required']){
-                        <p class="mensajeError">El nombre es obligatorio</p>
+                        <p class="mensajeError">*Obligatorio</p>
                     } @else if(userForm.controls['nombre'].errors?.['maxlength']){
-                        <p class="mensajeError"> El nombre debe tener como maximo 50 caracteres</p>
+                        <p class="mensajeError">*Debe tener como maximo 50 caracteres</p>
+                    }@else if (userForm.controls['nombre'].errors?.['pattern']) {
+                        <p class="mensajeError">*No debe tener números</p>
                     }
                 }
             </fieldset>
@@ -19,10 +21,11 @@
                 <input type="text" id="apellido" formControlName="apellido" class="inputForm">
                 @if (userForm.get('apellido')?.touched) {
                     @if(userForm.controls['apellido'].errors?.['required']){
-                       <p class="mensajeError">El apellido es obligatorio</p>
+                       <p class="mensajeError">*Obligatorio</p>
                     } @else if(userForm.controls['apellido'].errors?.['maxlength']){
-                        <p class="mensajeError">El apellido debe tener como maximo 50 caracteres</p>
-
+                        <p class="mensajeError">*Debe tener como maximo 50 caracteres</p>
+                    }@else if (userForm.controls['apellido'].errors?.['pattern']) {
+                        <p class="mensajeError">*No debe tener números</p>
                     }
                 }
             </fieldset>
@@ -31,14 +34,11 @@
                 <input type="text" id="telefono" formControlName="telefono" class="inputForm">
                     @if (userForm.get('telefono')?.touched) {
                         @if(userForm.controls['telefono'].errors?.['required']){
-                            <p class="mensajeError">El teléfono es obligatorio</p>
-                        } @else if(userForm.controls['telefono'].errors?.['maxlength']){
-                            <p class="mensajeError">El teléfono debe tener como máximo 50 numeros</p>
-                        }@else if (userForm.controls['telefono'].errors?.['minlength']) {
-                            <p class="mensajeError">El teléfono debe tener como mínimo 8 numeros</p>
-                        }@else if (userForm.controls['telefono'].errors?.['pattern']) {
-                            <p class="mensajeError">El teléfono debe tener únicamente numeros</p>
+                            <p class="mensajeError">*Obligatorio</p>
+                        } @else if(userForm.controls['telefono'].errors?.['pattern']){
+                            <p class="mensajeError">*Ingrese un teléfono válidp (ej. +54 9 223 123456).</p>
                         }
+
                     }
             </fieldset>
             <fieldset>
@@ -46,21 +46,26 @@
                 
                 <select formControlName="rolId" 
                         class="bg-white p-2 w-full rounded-lg text-gray-800 border-none appearance-none">
-                    <option [value]="1">Cliente</option>
-                    <option [value]="2">Dueño</option>
-                    <option [value]="3">Repartidor</option>
+                    <option [value]="2">Cliente</option>
+                    <option [value]="3">Restaurante</option>
                 </select>
+                @if (userForm.get('rolId')?.touched) {
+                        @if(userForm.controls['rolId'].errors?.['required']){
+                            <p class="mensajeError">*Obligatorio</p>
+                        } 
+                    }
             </fieldset>
             <fieldset class="span-2-columns">
                 <label for="email" class="labelForm">Email  </label>
                 <input type="email" id="email" formControlName="email" class="inputForm">
                     @if (userForm.get('email')?.touched) {
                         @if(userForm.controls['email'].errors?.['required']){
-                            <p class="mensajeError">El email es obligatorio</p>
+                            <p class="mensajeError">*Obligatorio</p>
                         }@else if(userForm.controls['email'].errors?.['maxlength']){
-                            <p class="mensajeError">El email debe tener como máximo 100 caracteres</p>}
+                            <p class="mensajeError">*Debe tener como máximo 100 caracteres</p>}
                         @else if(userForm.controls['email'].errors?.['email']){
-                            <p class="mensajeError">El email debe contener @</p>}
+                            <p class="mensajeError">*Debe contener @</p>
+                        }
                 }
             </fieldset>
             <fieldset clas="span-2-columns">
@@ -68,15 +73,18 @@
                 <input type="password" id="password" formControlName="password" class="inputForm">
                 @if (userForm.get('password')?.touched) {
                         @if(userForm.controls['password'].errors?.['required']){
-                            <p class="mensajeError">La contraseña es obligatoria</p>
+                            <p class="mensajeError">*Obligatoria</p>
                         }@else if(userForm.controls['password'].errors?.['minlength']){
-                            <p class="mensajeError">La contraseña debe tener como mínimo 8 caracteres</p>}
+                            <p class="mensajeError">*Debe tener como mínimo 8 caracteres</p>
+                        }@else if(userForm.controls['password'].errors?.['pattern']){
+                            <p class="mensajeError">*Debe tener una minúscula, una mayúscula, un número y un caracter especial</p>
+                        }
                 }
             </fieldset>
         </div>
 
         <div class="cajaBoton">
-            <button [disabled]="!userForm.invalid" type="submit" class="boton">Registrarse</button>
+            <button [disabled]="userForm.invalid" type="submit" class="boton">Registrarse</button>
         </div>
     </form>
 </section>

@@ -1,10 +1,12 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import User from '../../models/user/user-register';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import UserProfile from '../../models/user/user-profile';
 import UserProfileEdit from '../../models/user/user-profile-edit';
+import UserCard from '../../models/user/user-card';
+import PaginationResponse from '../../models/pagination/pagination-response';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +14,9 @@ import UserProfileEdit from '../../models/user/user-profile-edit';
 export class UserService {
   private http : HttpClient = inject(HttpClient)
 
-  getAll() : Observable<User[]>{
-    return this.http.get<User[]>(`${environment.apiUrl}/usuarios`)
+  getAll(page : number, size : number) : Observable<PaginationResponse<UserCard>>{
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<PaginationResponse<UserCard>>(`${environment.apiUrl}/usuarios`, { params });
   }
 
   getMe() : Observable<UserProfile>{

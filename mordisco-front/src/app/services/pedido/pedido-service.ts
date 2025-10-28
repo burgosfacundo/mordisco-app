@@ -1,23 +1,23 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 import Pedido from '../../models/pedido/pedido';
+import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
+import PaginationResponse from '../../models/pagination/pagination-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PedidoService {
+  private http: HttpClient = inject(HttpClient);
 
-  /**  readonly API_URL ="http://localhost:3000/api/pedido" /*API */
-
-  readonly API_URL ="http://localhost:3000/pedido" /*JSON SERVER */
-
-  constructor(private http:HttpClient){}
-
-  getAllByRestaurante_IdAndEstado(idRest : number, estado : string){
-   /* return this.http.get<Pedido[]>(`${this.API_URL}/${idRest}/${estado}`) API*/
-   
-  const url = `${this.API_URL}?estado=${estado}&restaurante.id=${idRest}`; /*JSON SERVER */
-    return this.http.get<Pedido[]>(url);
+  getAll(page : number, size : number): Observable<PaginationResponse<Pedido>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<PaginationResponse<Pedido>>(`${environment.apiUrl}/pedidos`, { params });
   }
-  
+
+  getAllByRestaurante_IdAndEstado(idRest : number, estado : string, page : number,size : number) : Observable<PaginationResponse<Pedido>> {
+    const params = new HttpParams().set('estado',estado).set('page', page).set('size', size);
+    return this.http.get<PaginationResponse<Pedido>>(`${environment.apiUrl}/pedidos/restaurantes/${idRest}/state`, { params });
+  }
 }

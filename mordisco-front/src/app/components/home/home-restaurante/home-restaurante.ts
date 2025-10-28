@@ -7,11 +7,12 @@ import { RestauranteService } from '../../../services/restaurante/restaurante-se
 import { MatSnackBar } from '@angular/material/snack-bar';
 import Pedido from '../../../models/pedido/pedido';
 import Restaurante from '../../../models/restaurante/restaurante';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-home-restaurante',
   standalone: true,
-  imports: [CommonModule, PedidoCard],
+  imports: [CommonModule, PedidoCard,MatPaginator],
   templateUrl: './home-restaurante.html',
   styleUrl: './home-restaurante.css'
 })
@@ -22,8 +23,15 @@ export class HomeRestaurante implements OnInit {
   private restauranteService = inject(RestauranteService);
 
   pedidosPendientes?: Pedido[];
-  restaurante?: Restaurante;
+
+  sizePedidos : number = 10;
+  pagePedidos : number = 0;
+  length : number = 10;
+  sizeOptions : number[] = [5,10,20];
+  
   isLoading = true;
+
+  restaurante?: Restaurante;
 
   ngOnInit(): void {
     this.loadRestauranteData();
@@ -33,40 +41,42 @@ export class HomeRestaurante implements OnInit {
     const user = this.authService.currentUser();
     
     if (!user?.userId) {
-      this.openSnackBar('❌ No se encontró información del usuario');
+      this._snackBar.open('❌ No se encontró información del usuario', 'Cerrar' , { duration: 3000 });
       this.authService.logout();
       return;
     }
 
     this.restauranteService.getByUsuario(user.userId).subscribe({
-      next: (restaurante) => {
-        this.restaurante = restaurante;
-        this.loadPedidosPendientes(restaurante.id);
+      next: (r) => {
+        this.restaurante = r;
+        this.loadPedidosPendientes(r.id);
       },
-      error: (e) => {
-        console.error('Error al cargar restaurante:', e);
-        this.openSnackBar('❌ Error al cargar el restaurante');
+      error: () => {
+        this._snackBar.open('❌ Error al cargar el restaurante', 'Cerrar' , { duration: 3000 });
         this.isLoading = false;
       }
     });
   }
 
   private loadPedidosPendientes(restauranteId: number): void {
-    this.pedidoService.getAllByRestaurante_IdAndEstado(restauranteId, 'PENDIENTE')
+    this.pedidoService.getAllByRestaurante_IdAndEstado(restauranteId, 'PENDIENTE',this.pagePedidos,this.sizePedidos)
       .subscribe({
-        next: (pedidos) => {
-          this.pedidosPendientes = pedidos;
+        next: (data) => {
+          this.pedidosPendientes = data.content;
+          this.length = data.totalElements;
           this.isLoading = false;
         },
-        error: (err) => {
-          console.error('Error al cargar pedidos:', err);
-          this.openSnackBar('❌ Error al cargar los pedidos pendientes');
+        error: () => {
+          this._snackBar.open('❌ Error al cargar los pedidos pendientes', 'Cerrar' , { duration: 3000 });
           this.isLoading = false;
         }
       });
   }
 
-  private openSnackBar(message: string, action: string = 'Cerrar'): void {
-    this._snackBar.open(message, action, { duration: 3000 });
+
+    onPageChangePedidos(event: PageEvent): void {
+    this.pagePedidos = event.pageIndex
+    this.sizePedidos = event.pageSize;
+    this.loadRestauranteData();
   }
 }

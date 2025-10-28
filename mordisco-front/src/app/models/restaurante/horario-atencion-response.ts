@@ -1,4 +1,4 @@
-export default interface HorarioAtencion{
+export default interface HorarioAtencionResponse {
     id? : number,
     dia: string,
     horaApertura : string,

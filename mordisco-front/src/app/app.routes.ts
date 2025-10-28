@@ -19,8 +19,8 @@ export const routes: Routes = [
   // Rutas protegidas con authGuard
   {path: 'profile', component: Profile, canActivate: [authGuard]},
   {path: 'profile/edit', component:EditProfile, canActivate: [authGuard]},
-  {path: 'profile/my-address', component: MyAddress/*, canActivate : [authGuard]*/},
-  {path: 'profile/my-address/form-address', component: FormAddress/*, canActivate : [authGuard]*/},
+  {path: 'profile/my-address', component: MyAddress, canActivate : [authGuard]},
+  {path: 'profile/my-address/form-address', component: FormAddress, canActivate : [authGuard]},
   {path: 'edit-password', component : EditPasswordComponent, canActivate: [authGuard]},
  
 

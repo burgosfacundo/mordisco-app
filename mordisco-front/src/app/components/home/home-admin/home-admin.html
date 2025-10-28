@@ -1,1 +1,80 @@
-<p>home-admin works!</p>
+<h1 class="principal">¡Bienvenido a Mordisco!</h1>
+
+@if (isLoadingRestaurantes) {
+    <div class="loading">
+        <p>Cargando...</p>
+    </div>
+}@else{
+    <ul class="seccion">            
+        <h3 class="subtitulo">Restaurantes:</h3>
+        @if(restaurantes && restaurantes.length > 0) {                    
+            @for (r of restaurantes; track r.id) {
+                <li class="card">
+                    <app-restaurante-card [restaurante]="r" ></app-restaurante-card>
+                </li>
+            }
+        <mat-paginator
+            [length]="lengthRestaurantes"
+            [pageSize]="sizeRestaurantes"
+            [pageIndex]="pageRestaurantes"
+            [pageSizeOptions]="[5, 10, 20]"
+            (page)="onPageChangeRestaurantes($event)">
+        </mat-paginator>
+        }@else {
+            <p>No hay restaurantes</p>
+        }
+    </ul>
+}
+
+@if (isLoadingUsuarios) {
+    <div class="loading">
+        <p>Cargando...</p>
+    </div>
+}@else{
+    <ul class="seccion">            
+        <h2 class="subtitulo">Usuarios</h2>
+        @if(usuarios && usuarios.length > 0) {                    
+            @for (u of usuarios; track u.id) {
+                <li class="card">
+                    <app-usuario-card [usuario]="u" ></app-usuario-card>
+                </li>
+            }
+        <mat-paginator
+            [length]="lengthUsuarios"
+            [pageSize]="sizeUsuarios"
+            [pageIndex]="pageUsuarios"
+            [pageSizeOptions]="[5, 10, 20]"
+            (page)="onPageChangeUsuarios($event)">
+        </mat-paginator>
+        }@else {
+            <p>No hay usuarios</p>
+        }
+    </ul>
+}
+
+@if (isLoadingPedidos) {
+    <div class="loading">
+        <p>Cargando...</p>
+    </div>
+}@else{
+    <ul class="seccion">            
+        <h2 class="subtitulo">Pedidos</h2>
+        @if(pedidos && pedidos.length > 0) {                    
+            @for (p of pedidos; track p.id) {
+                <li class="card">
+                    <app-pedido-card [pedido]="p" ></app-pedido-card>
+                </li>
+            }
+
+        <mat-paginator
+            [length]="lengthPedidos"
+            [pageSize]="sizePedidos"
+            [pageIndex]="pagePedidos"
+            [pageSizeOptions]="[5, 10, 20]"
+            (page)="onPageChangePedidos($event)">
+        </mat-paginator>
+        }@else {
+            <p>No hay usuarios</p>
+        }
+    </ul>
+}

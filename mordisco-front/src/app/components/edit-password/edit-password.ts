@@ -22,7 +22,7 @@ export class EditPasswordComponent implements OnInit {
   ngOnInit(): void {
     this.editarPassword = this.fb.group({
       passwordActual: ['', Validators.required],
-      passwordNueva: ['', [Validators.required, Validators.minLength(8)]],
+      passwordNueva: ['', [Validators.required, Validators.minLength(8)],Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)],
       confirmarPasswordNueva: ['', Validators.required]
     });
   }

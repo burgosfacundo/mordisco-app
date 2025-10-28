@@ -32,7 +32,7 @@ private fb = inject(FormBuilder);
       telefono: ['', [
         Validators.required,
         Validators.maxLength(15),
-        Validators.pattern(/^[0-9]{8,15}$/)
+        Validators.pattern(/^\+\d{1,3}(?:\s?\d){6,14}$/)
       ]]
     });
   }
@@ -41,7 +41,7 @@ private fb = inject(FormBuilder);
     this.userService.getMe().subscribe({
       next: u => this.user = u ,
       error: () => {
-        this.openSnackBar('❌ Ocurrió un error al cargar los datos del perfil')
+        this._snackBar.open('❌ Ocurrió un error al cargar los datos del perfil','',{duration: 3000})
         this.router.navigate(['/'])
       }
     })
@@ -52,10 +52,6 @@ private fb = inject(FormBuilder);
         telefono: this.user.telefono || ''
       });
     }
-  }
-
-  private openSnackBar(message: string, action: string = 'Cerrar'): void {
-    this._snackBar.open(message, action, { duration: 3000 });
   }
 
   manejarModificacion(): void {
@@ -74,11 +70,11 @@ private fb = inject(FormBuilder);
 
     this.userService.updateMe(userActualizado).subscribe({
       next: () => {
-        this.openSnackBar('✅ Perfil actualizado correctamente');
+        this._snackBar.open('✅ Perfil actualizado correctamente','',{duration: 3000});
       },
       error: () => {
         console.error();
-        this.openSnackBar('❌ Ocurrió un error al actualizar el perfil');
+        this._snackBar.open('❌ Ocurrió un error al actualizar el perfil','',{duration: 3000});
       }
     });
   }
@@ -92,6 +88,7 @@ private fb = inject(FormBuilder);
       this.eliminarCuenta();
     }
   }
+  
   cambiarContrasenia() {
     this.router.navigate(['/edit-password']);
   }
@@ -99,18 +96,18 @@ private fb = inject(FormBuilder);
   eliminarCuenta(): void {
     this.userService.deleteMe().subscribe({
       next: () => {
-        this.openSnackBar('🗑️ Cuenta eliminada correctamente');
+        this._snackBar.open('🗑️ Cuenta eliminada correctamente','',{duration: 3000});
         localStorage.removeItem('user');
         this.router.navigate(['/home']);
       },
       error: () => {
         console.error();
-        this.openSnackBar('❌ No se pudo eliminar la cuenta');
+        this._snackBar.open('❌ No se pudo eliminar la cuenta','',{duration: 3000});
       }
     });
 }
 
 verDirecciones(){
-  this.router.navigate(['/direcciones']);
+  this.router.navigate(['/profile/my-address']);
 }
 }

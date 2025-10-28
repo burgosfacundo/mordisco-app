@@ -8,6 +8,8 @@
                 <p>El nombre es obligatorio</p>
             } @else if(editarPerfil.controls['nombre'].errors?.['maxlength']){
                 <p>El nombre debe tener como máximo 50 caracteres</p>
+            }@else if(editarPerfil.controls['nombre'].errors?.['pattern']){
+                <p>El nombre no puede tener números</p>
             }
         }
     </fieldset>    
@@ -19,6 +21,8 @@
                 <p>El apellido es obligatorio</p>
             } @else if(editarPerfil.controls['apellido'].errors?.['maxlength']){
                 <p>El apellido debe tener como máximo 50 caracteres</p>
+            }@else if(editarPerfil.controls['apellido'].errors?.['pattern']){
+                <p>El apellido no puede tener números</p>
             }
         }
     </fieldset>    
@@ -32,8 +36,8 @@
                     <p>El teléfono debe tener como máximo 50 numeros</p>
                 }@else if (editarPerfil.controls['telefono'].errors?.['minlength']) {
                     <p>El teléfono debe tener como mínimo 8 números</p>
-                }@else if (editarPerfil.controls['telefono'].errors?.['pattern']) {
-                    <p>El teléfono debe tener únicamente números</p>
+                }@else if(editarPerfil.controls['telefono'].errors?.['pattern']){
+                    <p class="mensajeError"> Ingrese un teléfono válid (ej. +54 9 223 123456).</p>
                 }
             }
     </fieldset>
