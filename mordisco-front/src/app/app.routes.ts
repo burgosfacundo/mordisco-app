@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { Login } from './pages/login/login/login';
 import { Registro } from './pages/registro/registro';
 import { authGuard } from './core/guards/auth/auth-guard';
 import { Profile } from './pages/profile/profile';
@@ -9,11 +8,12 @@ import { MyAddress } from './pages/my-address/my-address';
 import { FormAddress } from './pages/form-address/form-address';
 import { Home } from './pages/home/redirect-home';
 import { publicOnlyGuard } from './core/guards/public-only-guard';
+import { LoginPage } from './features/login/pages/login/login-page';
 
 export const routes: Routes = [
  // Páginas públicas 
   {path : 'home', component: Home},
-  { path: 'login', component: Login, canActivate: [publicOnlyGuard]},
+  { path: 'login', component: LoginPage, canActivate: [publicOnlyGuard]},
   { path: 'registro', component: Registro, canActivate: [publicOnlyGuard]},
 
   // Rutas protegidas con authGuard

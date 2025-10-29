@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { DireccionCard } from "../direccion-card/direccion-card";
+import { DireccionCardComponent } from "../direccion-card/direccion-card-component";
 import { Router } from '@angular/router';
 import UserProfile from '../../models/user/user-profile';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,7 +8,7 @@ import Direccion from '../../models/direccion/direccion';
 
 @Component({
   selector: 'app-view-profile',
-  imports: [DireccionCard],
+  imports: [DireccionCardComponent],
   templateUrl: './view-profile.html',
   styleUrl: './view-profile.css'
 })

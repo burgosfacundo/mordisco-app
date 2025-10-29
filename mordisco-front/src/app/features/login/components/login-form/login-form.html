@@ -1,0 +1,83 @@
+<form 
+  [formGroup]="loginForm" 
+  (ngSubmit)="iniciarSesion()" 
+  class="form-container"
+>
+  <!-- Campo Email -->
+  <fieldset class="form-field">
+    <label for="email" class="form-label">
+      Email
+    </label>
+    
+    <input 
+      id="email"
+      type="email" 
+      placeholder="Ingrese el email" 
+      formControlName="email" 
+      class="form-input"
+      [class.border-red-500]="emailErrors"
+      [class.focus:ring-red-500]="emailErrors"
+    >
+    
+    @if (emailErrors) {
+      <p class="form-error">
+        {{ emailErrors }}
+      </p>
+    }
+  </fieldset>
+
+  <!-- Campo Contraseña -->
+  <fieldset class="form-field">
+    <label for="password" class="form-label">
+      Contraseña
+    </label>
+    
+    <input 
+      id="password"
+      type="password" 
+      placeholder="Ingrese la contraseña" 
+      formControlName="password" 
+      class="form-input"
+      [class.border-red-500]="passwordErrors"
+      [class.focus:ring-red-500]="passwordErrors"
+    >
+    
+    @if (passwordErrors) {
+      <p class="form-error">
+        {{ passwordErrors }}
+      </p>
+    }
+  </fieldset>
+
+  <!-- Botón Submit -->
+  <div style="margin-top: 32px;">
+    <button 
+      type="submit" 
+      [disabled]="loginForm.invalid || isSubmitting()" 
+      class="form-button"
+    >
+      @if (isSubmitting()) {
+        <span class="inline-flex items-center justify-center gap-2">
+          <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          Iniciando...
+        </span>
+      } @else {
+        Iniciar Sesión
+      }
+    </button>
+  </div>
+
+  <!-- Link a Registro -->
+  <div class="text-center" style="margin-top: 24px;">
+    <p class="text-stone-700" style="font-size: 14px;">
+      ¿Todavía no tienes cuenta? 
+      <a 
+        [routerLink]="['/registro']" 
+        class="font-semibold hover:underline transition-colors"
+        style="color: #E3291D;"
+      >
+        Regístrate aquí
+      </a>
+    </p>
+  </div>
+</form>
