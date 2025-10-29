@@ -1,6 +1,6 @@
 import Producto from "../producto/producto"
 import Address from "../direccion/direccion"
-import User from "../user/user-register"
+import User from "../../features/registro/model/user-register"
 import Restaurante from "../restaurante/restaurante"
 
 export default interface Pedido{

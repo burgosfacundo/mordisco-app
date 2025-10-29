@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { UserService } from '../../services/user/user-service';
+import { UserService } from '../../features/registro/services/user-service';
 import UserProfileEdit from '../../models/user/user-profile-edit';
 
 @Component({

@@ -1,15 +1,15 @@
 import { Component, inject, Inject, OnInit } from '@angular/core';
-import { DireccionCard } from "../../components/direccion-card/direccion-card";
-import { AuthService } from '../../auth/services/auth-service';
-import { AuthResponse } from '../../auth/models/auth-response';
+import { AuthResponse } from '../../features/auth/models/auth-response';
 import { DireccionService } from '../../services/direccion/direccion-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import Direccion from '../../models/direccion/direccion';
+import { DireccionCardComponent } from '../../components/direccion-card/direccion-card-component';
+import { AuthService } from '../../shared/services/auth-service';
 
 @Component({
   selector: 'app-my-address',
-  imports: [DireccionCard],
+  imports: [DireccionCardComponent],
   templateUrl: './my-address.html',
   styleUrl: './my-address.css'
 })

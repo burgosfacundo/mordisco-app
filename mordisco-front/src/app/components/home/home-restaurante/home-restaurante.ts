@@ -2,12 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PedidoCard } from "../../pedido-card/pedido-card";
 import { PedidoService } from '../../../services/pedido/pedido-service';
-import { AuthService } from '../../../auth/services/auth-service';
 import { RestauranteService } from '../../../services/restaurante/restaurante-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import Pedido from '../../../models/pedido/pedido';
 import Restaurante from '../../../models/restaurante/restaurante';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { AuthService } from '../../../shared/services/auth-service';
 
 @Component({
   selector: 'app-home-restaurante',

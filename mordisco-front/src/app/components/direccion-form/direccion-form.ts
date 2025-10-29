@@ -2,9 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DireccionService } from '../../services/direccion/direccion-service';
-import { AuthService } from '../../auth/services/auth-service';
+
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { AuthService } from '../../shared/services/auth-service';
 
 @Component({
   selector: 'app-direccion-form',

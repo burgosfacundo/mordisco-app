@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../auth/services/auth-service';
 import { HomeRestaurante } from "../../components/home/home-restaurante/home-restaurante";
 import { HomeCliente } from "../../components/home/home-cliente/home-cliente";
 import { HomeAdmin } from "../../components/home/home-admin/home-admin";
+import { AuthService } from '../../shared/services/auth-service';
 
 @Component({
   selector: 'app-home',

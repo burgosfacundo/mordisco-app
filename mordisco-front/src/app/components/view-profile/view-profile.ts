@@ -3,7 +3,7 @@ import { DireccionCardComponent } from "../direccion-card/direccion-card-compone
 import { Router } from '@angular/router';
 import UserProfile from '../../models/user/user-profile';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { UserService } from '../../services/user/user-service';
+import { UserService } from '../../features/registro/services/user-service';
 import Direccion from '../../models/direccion/direccion';
 
 @Component({

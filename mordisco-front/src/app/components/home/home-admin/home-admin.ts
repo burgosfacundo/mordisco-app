@@ -5,7 +5,7 @@ import { PedidoCard } from "../../pedido-card/pedido-card";
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RestauranteService } from '../../../services/restaurante/restaurante-service';
 import { PedidoService } from '../../../services/pedido/pedido-service';
-import { UserService } from '../../../services/user/user-service';
+import { UserService } from '../../../features/registro/services/user-service';
 import RestauranteForCard from '../../../models/restaurante/restaurante-for-card';
 import Pedido from '../../../models/pedido/pedido';
 import UserCard from '../../../models/user/user-card';

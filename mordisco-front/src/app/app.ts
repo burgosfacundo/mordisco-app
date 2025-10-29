@@ -1,8 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { Footer } from "./components/footer/footer";
-import { NavbarComponent } from "./components/navbar/navbar";
-import { AuthService } from './auth/services/auth-service';
+import { Footer } from "./shared/components/footer/footer";
+import { AuthService } from './shared/services/auth-service';
+import { NavbarComponent } from './shared/components/navbar/navbar';
  
 @Component({
   selector: 'app-root',

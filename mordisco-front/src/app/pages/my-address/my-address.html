@@ -5,7 +5,7 @@
             @if (arrDirecciones) {
                 @for(direccion of arrDirecciones; track $index){
                     <li class="direccionCard">
-                        <app-direccion-card [direccion]="direccion"></app-direccion-card>
+                        <app-direccion-card-component [direccion]="direccion"></app-direccion-card-component>
                         <button (click)="modificarDireccion(direccion)">Editar</button>
                         <button (click)="eliminarDireccion(direccion.id)">Eliminar</button>
                     </li>
