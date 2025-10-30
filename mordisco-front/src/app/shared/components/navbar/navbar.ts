@@ -13,7 +13,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { NavBarConfigFactory } from './navbar-config';
-import { CiudadService } from '../../../services/ciudad/ciudad-service';
+import { CiudadService } from '../../services/ciudad/ciudad-service';
 import { NavbarConfig, NavbarMenuItem } from '../../../models/nav/navbar-config';
 import { Ciudad } from '../../models/ciudad/ciudad';
 import { AuthService } from '../../services/auth-service';

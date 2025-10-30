@@ -1,0 +1,28 @@
+<h1 class="titulo">¡Bienvenido a Mordisco!</h1>
+@if (isLoading) {
+    <div class="loading">
+        <p>Cargando...</p>
+    </div>
+}@else{
+    <ul class="seccion">            
+    <h2 class="subtitulo">Mis pedidos pendientes: </h2>
+        @if(pedidosPendientes){                    
+            @for (pedido of pedidosPendientes; track pedido.id) {
+                <li class="card">
+                    <app-pedido-card-component [pedido]="pedido" ></app-pedido-card-component>
+                </li>
+            }
+
+
+        <mat-paginator
+            [length]="10"
+            [pageSize]="sizePedidos"
+            [pageIndex]="pagePedidos"
+            [pageSizeOptions]="[5, 10, 20]"
+            (page)="onPageChangePedidos($event)">
+        </mat-paginator>
+        }@else {
+            <p>No hay pedidos pendientes. Todo al dia!</p>
+        }
+    </ul>
+}

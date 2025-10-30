@@ -1,5 +1,5 @@
 import Producto from "../producto/producto"
-import Address from "../direccion/direccion"
+import Address from "../../features/direccion/models/direccion"
 import User from "../../features/registro/model/user-register"
 import Restaurante from "../restaurante/restaurante"
 

@@ -1,5 +1,5 @@
 import CalificacionRestauranteReponse from "../calificacion/calificacion-restaurante-response"
-import Direccion from "../direccion/direccion"
+import Direccion from "../../features/direccion/models/direccion"
 import ImagenResponse from "../imagen/imagen-response"
 import HorarioAtencionResponse from "./horario-atencion-response"
 import PromocionResponse from "./promocion-response"

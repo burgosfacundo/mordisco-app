@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth/auth-guard';
-import { Profile } from './pages/profile/profile';
-import { EditPasswordComponent } from './components/edit-password/edit-password';
-import { EditProfile } from './pages/edit-profile/edit-profile';
-import { MyAddress } from './pages/my-address/my-address';
-import { FormAddress } from './pages/form-address/form-address';
-import { Home } from './pages/home/redirect-home';
+import { Profile } from './features/profile/components/profile-page/profile-page';
+import { EditPasswordComponent } from './features/profile/components/edit-password-component/edit-password-component';
+import { EditProfile } from './features/profile/components/edit-profile-page/edit-profile-page';
+import { MyAddress } from './features/direccion/components/my-address-page/my-address-page';
+import { FormAddress } from './features/direccion/components/form-address-page/form-address-page';
+import { Home } from './features/home/components/home-page/redirect-home-page';
 import { publicOnlyGuard } from './core/guards/public-only-guard';
 import { LoginPage } from './features/auth/components/login-page/login-page';
 import { RegistroPage } from './features/registro/components/registro-page/registro-page';
