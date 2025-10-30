@@ -1,13 +1,13 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { RestauranteService } from '../../../../services/restaurante/restaurante-service';
 import RestauranteForCard from '../../../../models/restaurante/restaurante-for-card';
-import { RestauranteCard } from '../../../../shared/components/restaurante-card-component/restaurante-card-component';
+import { RestauranteCardComponent } from '../../../../shared/components/restaurante-card-component/restaurante-card-component';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 
 @Component({
   selector: 'app-home-cliente-component',
-  imports: [RestauranteCard, MatPaginator],
+  imports: [RestauranteCardComponent, MatPaginator, RestauranteCardComponent],
   templateUrl: './home-cliente-component.html',
   styleUrl: './home-cliente-component.css'
 })

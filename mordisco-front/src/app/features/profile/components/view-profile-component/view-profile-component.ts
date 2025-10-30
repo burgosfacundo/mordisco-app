@@ -1,16 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import UserProfile from '../../models/user/user-profile';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { UserService } from '../../features/registro/services/user-service';
-import Direccion from '../../features/direccion/models/direccion';
-import { DireccionCardComponent } from '../../features/direccion/components/direccion-card-component/direccion-card-component';
+import { UserService } from '../../../registro/services/user-service';
+import UserProfile from '../../../../models/user/user-profile';
+import Direccion from '../../../direccion/models/direccion';
+import { DireccionCardComponent } from "../../../direccion/components/direccion-card-component/direccion-card-component";
 
 @Component({
   selector: 'app-view-profile',
   imports: [DireccionCardComponent],
-  templateUrl: './view-profile.html',
-  styleUrl: './view-profile.css'
+  templateUrl: './view-profile-component.html',
+  styleUrl: './view-profile-component.css'
 })
 export class ViewProfileComponent {
   private userService : UserService = inject(UserService)

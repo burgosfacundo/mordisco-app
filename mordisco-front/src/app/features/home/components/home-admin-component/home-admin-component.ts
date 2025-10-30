@@ -1,15 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { RestauranteService } from '../../../../services/restaurante/restaurante-service';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import { UserService } from '../../../registro/services/user-service';
 import RestauranteForCard from '../../../../models/restaurante/restaurante-for-card';
 import Pedido from '../../../../models/pedido/pedido';
 import UserCard from '../../../../models/user/user-card';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { UsuarioCard, UsuarioCardComponent } from '../../../../shared/components/usuario-card-component/usuario-card-component';
-import { RestauranteCard, RestauranteCardComponent } from '../../../../shared/components/restaurante-card-component/restaurante-card-component';
-import { PedidoCard, PedidoCardComponent } from '../../../../shared/components/pedido-card-component/pedido-card-component';
+import { UsuarioCardComponent } from '../../../../shared/components/usuario-card-component/usuario-card-component';
+import { RestauranteCardComponent } from '../../../../shared/components/restaurante-card-component/restaurante-card-component';
+import { PedidoCardComponent } from '../../../../shared/components/pedido-card-component/pedido-card-component';
+import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 
 @Component({
   selector: 'app-home-admin-component',

@@ -8,5 +8,6 @@ import { DireccionFormComponent } from "../direccion-form-component/direccion-fo
   styleUrl: './form-address-page.css'
 })
 export class FormAddressPage {
+  modoEdicion = false;
 
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DireccionService } from '../../services/direccion-service';
@@ -6,12 +6,12 @@ import { DireccionService } from '../../services/direccion-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../shared/services/auth-service';
+import { FormValidationService } from '../../../../shared/services/form-validation-service';
 
 @Component({
   selector: 'app-direccion-form-component',
   imports: [ReactiveFormsModule],
   templateUrl: './direccion-form-component.html',
-  styleUrl: './direccion-form-component.css'
 })
 export class DireccionFormComponent implements OnInit{
 
@@ -20,10 +20,15 @@ export class DireccionFormComponent implements OnInit{
   private auS : AuthService = inject(AuthService)
   private _snackbar : MatSnackBar = inject(MatSnackBar)
   private router : Router = inject(Router)
-
+  private validationService = inject(FormValidationService)
+  
   formDirecciones! : FormGroup 
   private subscription : Subscription = new Subscription()
-  modoEdicion = false
+
+  @Input() modoEdicion: boolean = false; // valor inicial por defecto
+  @Output() modoEdicionChange = new EventEmitter<boolean>(); 
+  
+  isSubmitting = signal(false)
   idCurrUser ?: number 
 
   ngOnInit(): void {
@@ -45,6 +50,7 @@ export class DireccionFormComponent implements OnInit{
       this.dService.currentDir.subscribe(d => {
         if(d){
           this.modoEdicion = true
+          this.modoEdicionChange.emit(this.modoEdicion)
           this.formDirecciones.patchValue(d)
         }else{
           this.formDirecciones.reset({id : null})
@@ -55,6 +61,9 @@ export class DireccionFormComponent implements OnInit{
 
   manejarEnvio(){
     if(this.formDirecciones.invalid) return;
+    
+    this.isSubmitting.set(true);
+    
     if(this.idCurrUser){
       const direccionLeida = this.formDirecciones.value
 
@@ -82,4 +91,9 @@ export class DireccionFormComponent implements OnInit{
     }
   }
 
+  getError(fieldName: string): string | null {
+    return this.validationService.getErrorMessage(
+      this.formDirecciones.get(fieldName),
+      fieldName);
+    }
 }

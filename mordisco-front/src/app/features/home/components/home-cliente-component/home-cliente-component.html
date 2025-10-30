@@ -11,7 +11,7 @@
     @if(restaurantes && restaurantes.length > 0) {                    
         @for (r of restaurantes; track r.id) {
             <li class="card">
-                <app-restaurante-card [restaurante]="r" ></app-restaurante-card>
+                <app-restaurante-card-component [restaurante]="r" ></app-restaurante-card-component>
             </li>
         }
         <mat-paginator
@@ -38,7 +38,7 @@
     @if(restaurantesPromociones && restaurantesPromociones.length > 0) {                    
         @for (r of restaurantesPromociones; track r.id) {
             <li class="card">
-                <app-restaurante-card [restaurante]="r" ></app-restaurante-card>
+                <app-restaurante-card-component [restaurante]="r" ></app-restaurante-card-component>
             </li>
         }
 

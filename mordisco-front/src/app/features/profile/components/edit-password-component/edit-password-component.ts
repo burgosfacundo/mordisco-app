@@ -7,8 +7,8 @@ import { AuthService } from '../../../../shared/services/auth-service';
 @Component({
   selector: 'app-edit-password',
   imports: [ReactiveFormsModule],
-  templateUrl: './edit-password.html',
-  styleUrls: ['./edit-password.css']
+  templateUrl: './edit-password-component.html',
+  styleUrls: ['./edit-password-component.css']
 })
 export class EditPasswordComponent implements OnInit {
   private fb : FormBuilder = inject(FormBuilder)
