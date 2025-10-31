@@ -1,9 +1,9 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import RestauranteForCard from '../../../../models/restaurante/restaurante-for-card';
 import { RestauranteCardComponent } from '../../../../shared/components/restaurante-card-component/restaurante-card-component';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
+import RestauranteForCard from '../../../../shared/models/restaurante/restaurante-for-card';
 
 @Component({
   selector: 'app-home-cliente-component',

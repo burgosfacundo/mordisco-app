@@ -3,7 +3,7 @@ import { AuthResponse } from '../../../auth/models/auth-response';
 import { DireccionService } from '../../services/direccion-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import Direccion from '../../models/direccion';
+import Direccion from '../../../../shared/models/direccion/direccion-response';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { DireccionCardComponent } from '../direccion-card-component/direccion-card-component';
 

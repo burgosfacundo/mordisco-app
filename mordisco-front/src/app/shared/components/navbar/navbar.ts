@@ -14,9 +14,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { NavBarConfigFactory } from './navbar-config';
 import { CiudadService } from '../../services/ciudad/ciudad-service';
-import { NavbarConfig, NavbarMenuItem } from '../../../models/nav/navbar-config';
 import { Ciudad } from '../../models/ciudad/ciudad';
 import { AuthService } from '../../services/auth-service';
+import { NavbarConfig, NavbarMenuItem } from './navbar-models';
 
 @Component({
   selector: 'app-navbar',
@@ -60,7 +60,7 @@ export class NavbarComponent {
 
   constructor() {
     const currentUrl = this.router.url;
-    this.isHomePage = currentUrl === '/home' || currentUrl === '/' || currentUrl === '/cliente/home';
+    this.isHomePage = currentUrl === '/home' || currentUrl === '/';
 
     effect(() => {
       const user = this.currentUser();
@@ -86,7 +86,7 @@ export class NavbarComponent {
       if (event instanceof NavigationEnd) {
         const url = this.router.url;
         const wasHome = this.isHomePage;
-        this.isHomePage = url === '/home' || url === '/' || url === '/cliente/home';
+        this.isHomePage = url === '/home' || url === '/';
 
 
         if (this.isHomePage !== wasHome) {
@@ -164,6 +164,7 @@ export class NavbarComponent {
   logout(): void {
     if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
       this.authService.logout();
+      this.router.navigate(['/login'])
     }
   }
 

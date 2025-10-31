@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import RestauranteForCard from '../../../models/restaurante/restaurante-for-card';
+import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
+
 
 @Component({
   selector: 'app-restaurante-card-component',

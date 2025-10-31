@@ -2,12 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import Pedido from '../../../../models/pedido/pedido';
-import Restaurante from '../../../../models/restaurante/restaurante';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { PedidoCardComponent } from '../../../../shared/components/pedido-card-component/pedido-card-component';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
+import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
+import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 
 @Component({
   selector: 'app-home-restaurante-component',
@@ -22,7 +22,7 @@ export class HomeRestauranteComponent implements OnInit {
   private authService = inject(AuthService);
   private restauranteService = inject(RestauranteService);
 
-  pedidosPendientes?: Pedido[];
+  pedidosPendientes?: PedidoResponse[];
 
   sizePedidos : number = 5;
   pagePedidos : number = 0;
@@ -30,7 +30,7 @@ export class HomeRestauranteComponent implements OnInit {
   
   isLoading = true;
 
-  restaurante?: Restaurante;
+  restaurante?: RestauranteResponse;
 
   ngOnInit(): void {
     this.loadRestauranteData();

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import Pedido from '../../../models/pedido/pedido';
 import { RouterLink } from "@angular/router";
+import PedidoResponse from '../../models/pedido/pedido-response';
 
 @Component({
   selector: 'app-pedido-card-component',
@@ -9,5 +9,5 @@ import { RouterLink } from "@angular/router";
   styleUrl: './pedido-card-component.css'
 })
 export class PedidoCardComponent {
-  @Input() pedido? : Pedido
+  @Input() pedido? : PedidoResponse
 }

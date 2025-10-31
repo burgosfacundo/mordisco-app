@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from "@angular/router";
-import UserProfile from '../../../models/user/user-profile';
-import UserCard from '../../../models/user/user-card';
+import UserProfile from '../../models/user/user-profile';
+import UserCard from '../../models/user/user-card';
 
 @Component({
   selector: 'app-usuario-card-component',

@@ -1,5 +1,5 @@
-export default interface HorarioAtencionResponse {
-    id? : number,
+export default interface HorarioAtencion {
+    id?: number,
     dia: string,
     horaApertura : string,
     horaCierre : string

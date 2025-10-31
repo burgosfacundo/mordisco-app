@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../../registro/services/user-service';
-import UserProfile from '../../../../models/user/user-profile';
+import UserProfile from '../../../../shared/models/user/user-profile';
 
 @Component({
   selector: 'app-view-profile',

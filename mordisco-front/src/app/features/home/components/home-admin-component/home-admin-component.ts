@@ -2,14 +2,14 @@ import { Component, inject, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import { UserService } from '../../../registro/services/user-service';
-import RestauranteForCard from '../../../../models/restaurante/restaurante-for-card';
-import Pedido from '../../../../models/pedido/pedido';
-import UserCard from '../../../../models/user/user-card';
+import UserCard from '../../../../shared/models/user/user-card';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { UsuarioCardComponent } from '../../../../shared/components/usuario-card-component/usuario-card-component';
 import { RestauranteCardComponent } from '../../../../shared/components/restaurante-card-component/restaurante-card-component';
 import { PedidoCardComponent } from '../../../../shared/components/pedido-card-component/pedido-card-component';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
+import RestauranteForCard from '../../../../shared/models/restaurante/restaurante-for-card';
+import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 
 @Component({
   selector: 'app-home-admin-component',
@@ -24,7 +24,7 @@ export class HomeAdminComponent implements OnInit {
   private usuarioService = inject(UserService);
 
   protected restaurantes? : RestauranteForCard[];
-  protected pedidos? : Pedido[];
+  protected pedidos? : PedidoResponse[];
   protected usuarios? : UserCard[];
 
   sizeUsuarios : number = 5;

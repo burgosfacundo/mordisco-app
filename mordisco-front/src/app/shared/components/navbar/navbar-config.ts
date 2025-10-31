@@ -1,4 +1,5 @@
-import { NavbarConfig } from "../../../models/nav/navbar-config";
+import { NavbarConfig } from "./navbar-models";
+
 
 
 

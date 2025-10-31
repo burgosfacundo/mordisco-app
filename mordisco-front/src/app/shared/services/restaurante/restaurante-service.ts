@@ -1,10 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import PaginationResponse from '../../../models/pagination/pagination-response';
-import RestauranteForCard from '../../../models/restaurante/restaurante-for-card';
+import PaginationResponse from '../../models/pagination/pagination-response';
 import { environment } from '../../../../environments/environment';
-import Restaurante from '../../../models/restaurante/restaurante';
+import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
+import RestauranteResponse from '../../models/restaurante/restaurante-response';
+import RestauranteRequest from '../../models/restaurante/restaurante-request';
+import HorarioAtencion from '../../models/restaurante/horario-atencion';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +29,23 @@ export class RestauranteService {
     return this.http.get<PaginationResponse<RestauranteForCard>>(`${environment.apiUrl}/restaurantes/promociones`, {params})
   }
 
-  getByUsuario(idUsuario : number): Observable<Restaurante> {
-    return this.http.get<Restaurante>(`${environment.apiUrl}/restaurantes/usuarios/${idUsuario}`)
+  getByUsuario(idUsuario : number): Observable<RestauranteResponse> {
+    return this.http.get<RestauranteResponse>(`${environment.apiUrl}/restaurantes/usuarios/${idUsuario}`)
+  }
+
+  save(restaurante : RestauranteRequest) : Observable<string>{
+    return this.http.post<string>(`${environment.apiUrl}/restaurantes/save`,restaurante)
+  }
+
+  put(restaurante : RestauranteRequest) : Observable<string>{
+    return this.http.put<string>(`${environment.apiUrl}/restaurantes/update`,restaurante)
+  }
+
+  delete(id : number) : Observable<string>{
+    return this.http.delete<string>(`${environment.apiUrl}/restaurantes/delete/${id}`)
+  }
+
+  putHorarios(id : number, horarios : HorarioAtencion[]) : Observable<string>{
+    return this.http.put<string>(`${environment.apiUrl}/restaurantes/${id}/horarios`,horarios)
   }
 }

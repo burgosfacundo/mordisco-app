@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { UserService } from '../../../registro/services/user-service';
-import UserProfileEdit from '../../../../models/user/user-profile-edit';
+import UserProfileEdit from '../../../../shared/models/user/user-profile-edit';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 
 @Component({

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import Direccion from '../../models/direccion';
+import Direccion from '../../../../shared/models/direccion/direccion-response';
 
 @Component({
   selector: 'app-direccion-card-component',

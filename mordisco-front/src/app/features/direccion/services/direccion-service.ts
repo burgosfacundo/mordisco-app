@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import Direccion from '../models/direccion';
+import Direccion from '../../../shared/models/direccion/direccion-response';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({

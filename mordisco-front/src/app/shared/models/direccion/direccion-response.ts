@@ -1,5 +1,5 @@
-export default interface Direccion{
-    id? : number,
+export default interface DireccionResponse{
+    id : number,
     calle : string,
     numero : string,
     piso?: string,

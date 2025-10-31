@@ -2,10 +2,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
-import UserProfile from '../../../models/user/user-profile';
-import UserProfileEdit from '../../../models/user/user-profile-edit';
-import UserCard from '../../../models/user/user-card';
-import PaginationResponse from '../../../models/pagination/pagination-response';
+import UserProfile from '../../../shared/models/user/user-profile';
+import UserProfileEdit from '../../../shared/models/user/user-profile-edit';
+import UserCard from '../../../shared/models/user/user-card';
+import PaginationResponse from '../../../shared/models/pagination/pagination-response';
 import UserRegister from '../model/user-register';
 
 @Injectable({
