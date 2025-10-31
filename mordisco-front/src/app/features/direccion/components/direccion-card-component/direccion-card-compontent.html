@@ -1,11 +1,16 @@
-<div class="infoDireccion">
-    <h1 class="estiloDireccion">{{direccion?.calle}}</h1>
-    <h1 class="estiloDireccion">{{direccion?.numero}} </h1>
+<div class="flex flex-col gap-1 text-gray-700 font-poppins break-words">
+    
+    <h1 class="text-base m-0 text-black font-montserrat">{{direccion?.calle}}</h1>
+    <h1 class="text-base m-0 text-black font-montserrat">{{direccion?.numero}} </h1>
+
     @if (direccion?.piso) {
-        <h2 class="estiloDireccion"> {{direccion?.piso}} {{direccion?.depto}} </h2> }
-    <h2 class="estiloDireccion">Codigo postal {{direccion?.codigoPostal}}</h2>
-    <h2 class="estiloDireccion">Ciudad {{direccion?.ciudad}}</h2>
+        <h2 class="text-base m-0 text-black font-montserrat"> {{direccion?.piso}} {{direccion?.depto}} </h2>
+    }
+    
+    <h2 class="text-base m-0 text-black font-montserrat">Codigo postal {{direccion?.codigoPostal}}</h2>
+    <h2 class="text-base m-0 text-black font-montserrat">Ciudad {{direccion?.ciudad}}</h2>
+
     @if(direccion?.referencias){
-        <h3>Referencias: {{direccion?.referencias}}</h3>
+        <h3 class="text-sm text-gray-600 mt-2 italic">Referencias: {{direccion?.referencias}}</h3>
     }
 </div>

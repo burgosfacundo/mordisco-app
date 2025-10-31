@@ -5,7 +5,6 @@ import { EditProfileFormComponent } from "../edit-profile-form-component/edit-pr
   selector: 'app-edit-profile-page',
   imports: [EditProfileFormComponent],
   templateUrl: './edit-profile-page.html',
-  styleUrl: './edit-profile-page.css'
 })
 export class EditProfilePage {
 

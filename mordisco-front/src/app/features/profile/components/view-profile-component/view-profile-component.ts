@@ -3,21 +3,17 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../../registro/services/user-service';
 import UserProfile from '../../../../models/user/user-profile';
-import Direccion from '../../../direccion/models/direccion';
-import { DireccionCardComponent } from "../../../direccion/components/direccion-card-component/direccion-card-component";
 
 @Component({
   selector: 'app-view-profile',
-  imports: [DireccionCardComponent],
+  imports: [],
   templateUrl: './view-profile-component.html',
-  styleUrl: './view-profile-component.css'
 })
 export class ViewProfileComponent {
   private userService : UserService = inject(UserService)
   private router : Router = inject(Router)
   private _snackBar : MatSnackBar = inject(MatSnackBar)
   usuario? : UserProfile
-  direcciones? : Direccion[]
 
 
   ngOnInit(): void {
@@ -30,13 +26,29 @@ export class ViewProfileComponent {
     })
   }
 
-  eliminarCuenta(){
-    /*this.uService.eliminarUusuario*/
-  }
+ confirmarEliminacion(): void {
+    const confirmado = confirm(
+      '⚠️ ¿Estás segura/o de que querés eliminar tu cuenta? Esta acción no se puede deshacer.'
+    );
 
-  cambiarContrasenia(){
-    this.router.navigate(['/edit-password'])
+    if (confirmado) {
+      this.eliminarCuenta();
+    }
   }
+  
+  eliminarCuenta(): void {
+    this.userService.deleteMe().subscribe({
+      next: () => {
+        this._snackBar.open('Cuenta eliminada correctamente','',{duration: 3000});
+        localStorage.removeItem('user');
+        this.router.navigate(['/home']);
+      },
+      error: () => {
+        console.error();
+        this._snackBar.open('❌ No se pudo eliminar la cuenta','',{duration: 3000});
+      }
+    });
+}
 
   editarPerfil(){
     this.router.navigate(['/profile/edit'])

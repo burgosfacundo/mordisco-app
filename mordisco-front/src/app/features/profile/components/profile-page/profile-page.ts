@@ -5,7 +5,6 @@ import { ViewProfileComponent } from '../view-profile-component/view-profile-com
   selector: 'app-profile-page',
   imports: [ViewProfileComponent],
   templateUrl: './profile-page.html',
-  styleUrl: './profile-page.css'
 })
 export class ProfilePage {
 

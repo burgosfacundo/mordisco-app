@@ -1,52 +1,50 @@
-<form [formGroup]="editarPerfil" (ngSubmit)="manejarModificacion()">
-    <h1>Editar Perfil</h1>
-    <fieldset>
-        <label for="nombreEditado">Nombre</label>
-        <input type="text" id="nombreEditado" placeholder="Ingrese el nuevo nombre" formControlName="nombre">
-        @if (editarPerfil.get('nombre')?.touched) {
-            @if(editarPerfil.controls['nombre'].errors?.['required']){
-                <p>El nombre es obligatorio</p>
-            } @else if(editarPerfil.controls['nombre'].errors?.['maxlength']){
-                <p>El nombre debe tener como máximo 50 caracteres</p>
-            }@else if(editarPerfil.controls['nombre'].errors?.['pattern']){
-                <p>El nombre no puede tener números</p>
+<form [formGroup]="editarPerfil" (ngSubmit)="manejarModificacion()" class="form-container">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 form-field">
+        <fieldset class="form-field">
+            <label for="nombreEditado" class="form-label">Nombre</label>
+            <input type="text" id="nombreEditado" placeholder="Ingrese el nuevo nombre" formControlName="nombre" class="form-input"
+                    [class.border-red-500]="getError"
+                    [class.focus:ring-red-500]="getError">
+                        @if (getError('nombre')){
+                            <p class="form-error">{{ getError('nombre') }}</p>
+                        }
+        </fieldset>    
+        <fieldset class="form-field">
+            <label for="apellidoEditado" class="form-label">Apellido</label>
+            <input type="text" id="apellidoEditado" placeholder="Ingrese el nuevo apellido" formControlName="apellido" class="form-input"
+                    [class.border-red-500]="getError"
+                    [class.focus:ring-red-500]="getError">
+                        @if (getError('apellido')){
+                            <p class="form-error">{{ getError('apellido') }}</p>
+                        }
+        </fieldset> 
+    </div>
+       
+        <fieldset class="form-field">
+            <label for="telefonoEditado" class="form-label">Teléfono</label>
+            <input type="number"  id="telefonoEditado" placeholder="Ingrese el nuevo teléfono" formControlName="telefono"  class="form-input"
+                    [class.border-red-500]="getError"
+                    [class.focus:ring-red-500]="getError">
+                        @if (getError('telefono')){
+                            <p class="form-error">{{ getError('telefono') }}</p>
+                        }
+        </fieldset>
+    
+    <div style="margin-top: 24px;">
+        <button 
+            type="submit" 
+            [disabled]="editarPerfil.invalid || isSubmitting()" 
+            class="form-button">
+            @if (isSubmitting()) {
+                <span class="inline-flex items-center justify-center gap-2">
+                    <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    Editando...
+                </span>
+            } @else {
+                    Editar
             }
-        }
-    </fieldset>    
-    <fieldset>
-        <label for="apellidoEditado">Apellido</label>
-        <input type="text" id="apellidoEditado" placeholder="Ingrese el nuevo apellido" formControlName="apellido">
-         @if (editarPerfil.get('apellido')?.touched) {
-            @if(editarPerfil.controls['apellido'].errors?.['required']){
-                <p>El apellido es obligatorio</p>
-            } @else if(editarPerfil.controls['apellido'].errors?.['maxlength']){
-                <p>El apellido debe tener como máximo 50 caracteres</p>
-            }@else if(editarPerfil.controls['apellido'].errors?.['pattern']){
-                <p>El apellido no puede tener números</p>
-            }
-        }
-    </fieldset>    
-    <fieldset>
-        <label for="telefonoEditado">Teléfono</label>
-        <input type="number"  id="telefonoEditado" placeholder="Ingrese el nuevo teléfono" formControlName="telefono">
-     @if (editarPerfil.get('telefono')?.touched) {
-                @if(editarPerfil.controls['telefono'].errors?.['required']){
-                    <p>El teléfono es obligatorio</p>
-                } @else if(editarPerfil.controls['telefono'].errors?.['maxlength']){
-                    <p>El teléfono debe tener como máximo 50 numeros</p>
-                }@else if (editarPerfil.controls['telefono'].errors?.['minlength']) {
-                    <p>El teléfono debe tener como mínimo 8 números</p>
-                }@else if(editarPerfil.controls['telefono'].errors?.['pattern']){
-                    <p class="mensajeError"> Ingrese un teléfono válid (ej. +54 9 223 123456).</p>
-                }
-            }
-    </fieldset>
-
-  <div class="botones">
-      <button class="boton-guardar" type="submit" [disabled]="editarPerfil.invalid">Guardar cambios </button>
-      <button class="boton-eliminar" type="button" (click)="cambiarContrasenia()"> Cambiar contraseña</button>
-      <button class="boton-guardar" type="button" (click)="verDirecciones()">Administrar Direcciones</button>
-  </div>
+        </button>
+    </div> 
 
 </form>
 

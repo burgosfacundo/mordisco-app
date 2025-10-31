@@ -1,4 +1,6 @@
-<section class="w-full lg:w-1/2 flex flex-col items-center justify-center px-4 py-12 lg:py-16">
-<h1 class="font-display text-5xl md:text-6xl font-bold mb-12 tracking-tight" style="color: #E3291D;"> {{modoEdicion ? 'Modificar direccion' : 'Crear nueva direccion'}}</h1>
-<app-direccion-form-component [(modoEdicion)]="modoEdicion"></app-direccion-form-component>
+<section class="contenedorGrande">
+    <div class="contenedorPrincipal"> 
+        <h1 class="subtitulo"> {{modoEdicion ? 'Modificar direccion' : 'Crear nueva direccion'}}</h1>
+        <app-direccion-form-component [modoEdicion]="modoEdicion"></app-direccion-form-component>
+    </div>
 </section>

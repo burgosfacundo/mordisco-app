@@ -1,23 +1,25 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { UserService } from '../../../registro/services/user-service';
 import UserProfileEdit from '../../../../models/user/user-profile-edit';
+import { FormValidationService } from '../../../../shared/services/form-validation-service';
 
 @Component({
   selector: 'app-edit-profile-form-component',
   imports: [ReactiveFormsModule],
   templateUrl: './edit-profile-form-component.html',
-  styleUrl: './edit-profile-form-component.css'
 })
 export class EditProfileFormComponent {
-private fb = inject(FormBuilder);
+  private fb = inject(FormBuilder);
+  private validationService : FormValidationService = inject(FormValidationService)
   private _snackBar = inject(MatSnackBar);
   private router = inject(Router);
   private userService = inject(UserService)
   private user? : UserProfileEdit
 
+  isSubmitting = signal(false)
   editarPerfil!: FormGroup;
 
    ngOnInit(): void {
@@ -60,6 +62,7 @@ private fb = inject(FormBuilder);
       return;
     }
 
+    this.isSubmitting.set(true)
     const raw = this.editarPerfil.getRawValue();
 
     const userActualizado : UserProfileEdit =  {
@@ -78,36 +81,19 @@ private fb = inject(FormBuilder);
       }
     });
   }
-
- confirmarEliminacion(): void {
-    const confirmado = confirm(
-      '⚠️ ¿Estás segura/o de que querés eliminar tu cuenta? Esta acción no se puede deshacer.'
-    );
-
-    if (confirmado) {
-      this.eliminarCuenta();
-    }
-  }
   
   cambiarContrasenia() {
     this.router.navigate(['/edit-password']);
   }
 
-  eliminarCuenta(): void {
-    this.userService.deleteMe().subscribe({
-      next: () => {
-        this._snackBar.open('🗑️ Cuenta eliminada correctamente','',{duration: 3000});
-        localStorage.removeItem('user');
-        this.router.navigate(['/home']);
-      },
-      error: () => {
-        console.error();
-        this._snackBar.open('❌ No se pudo eliminar la cuenta','',{duration: 3000});
-      }
-    });
+  verDirecciones(){
+    this.router.navigate(['/profile/my-address']);
+  }
+
+getError(fieldName: string): string | null {
+    return this.validationService.getErrorMessage(
+    this.editarPerfil.get(fieldName),
+    fieldName);
 }
 
-verDirecciones(){
-  this.router.navigate(['/profile/my-address']);
-}
 }

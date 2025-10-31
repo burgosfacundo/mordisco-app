@@ -5,7 +5,6 @@ import Direccion from '../../models/direccion';
   selector: 'app-direccion-card-component',
   imports: [],
   templateUrl: './direccion-card-compontent.html',
-  styleUrl: './direccion-card-component.css'
 })
 export class DireccionCardComponent {
 

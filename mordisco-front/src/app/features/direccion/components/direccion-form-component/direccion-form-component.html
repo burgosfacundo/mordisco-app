@@ -43,15 +43,19 @@
         </div>  
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 form-field">    
                 <fieldset>
-                    <label for="codigoPostalID"  class="labelForm">Código Postal</label>
-                    <input type="text" id="codigoPostalID" formControlName="codigoPostal">
+                    <label for="codigoPostalID"  class="form-label">Código Postal</label>
+                    <input type="text" id="codigoPostalID" formControlName="codigoPostal" class="form-input"
+                    [class.border-red-500]="getError"
+                    [class.focus:ring-red-500]="getError">
                     @if (getError('codigoPostal')) {
                         <p class="form-error">{{ getError('codigoPostal') }}</p>
                     }
                 </fieldset>
                 <fieldset>
-                    <label for="ciudadID"  class="labelForm">Ciudad</label>
-                    <input type="text" id="ciudadID" formControlName="ciudad">
+                    <label for="ciudadID"  class="form-label">Ciudad</label>
+                    <input type="text" id="ciudadID" formControlName="ciudad" class="form-input"
+                    [class.border-red-500]="getError"
+                    [class.focus:ring-red-500]="getError">
                     @if (getError('ciudad')) {
                         <p class="form-error">{{ getError('ciudad') }}</p>
                     }

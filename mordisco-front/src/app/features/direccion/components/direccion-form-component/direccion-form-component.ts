@@ -26,8 +26,8 @@ export class DireccionFormComponent implements OnInit{
   private subscription : Subscription = new Subscription()
 
   @Input() modoEdicion: boolean = false; // valor inicial por defecto
-  @Output() modoEdicionChange = new EventEmitter<boolean>(); 
-  
+  @Output() loaded = new EventEmitter<void>();
+
   isSubmitting = signal(false)
   idCurrUser ?: number 
 
@@ -50,14 +50,16 @@ export class DireccionFormComponent implements OnInit{
       this.dService.currentDir.subscribe(d => {
         if(d){
           this.modoEdicion = true
-          this.modoEdicionChange.emit(this.modoEdicion)
           this.formDirecciones.patchValue(d)
+
         }else{
-          this.formDirecciones.reset({id : null})
+          this.formDirecciones.reset({id : null, calle: '', numero: '', piso: '', depto: '', codigoPostal: '', referencias: '', ciudad: ''});       
         }
-      })
+        this.loaded.emit();
+        }
     )
-  }
+    )
+}
 
   manejarEnvio(){
     if(this.formDirecciones.invalid) return;
@@ -70,21 +72,23 @@ export class DireccionFormComponent implements OnInit{
       if(this.modoEdicion){
         this.dService.updateDireccion(this.idCurrUser,direccionLeida).subscribe({
           next: (data) => {console.log(data),
+            this.dService.clearDireccionToEdit()
             this._snackbar.open("✅ Direccion editada correctamente",'',{duration: 3000})
-            this.router.navigate(['/profile/my-address'])
+            this.router.navigate(['/profile'])
           },error: (e) => {console.log(e),
+            this.dService.clearDireccionToEdit()
             this._snackbar.open("❌ No se ha podido editar la direccion",'',{duration: 3000})
-            this.router.navigate(['/profile/my-address'])
+            this.router.navigate(['/profile'])
           }
         })
       }else{
         this.dService.createDireccion(this.idCurrUser, direccionLeida).subscribe({
           next: (data) => {console.log(data),
             this._snackbar.open("✅ Direccion creada exitosamente", "Continuar",{ duration: 3000 })
-            this.router.navigate(['/profile/my-address'])
+            this.router.navigate(['/profile'])
           },error:(e)=>{ console.log(e),
             this._snackbar.open("❌ No se ha podido crear la direccion", "Continuar", { duration: 3000 })
-            this.router.navigate(['/profile/my-address'])
+            this.router.navigate(['/profile'])
           }
         })
       }     
@@ -95,5 +99,6 @@ export class DireccionFormComponent implements OnInit{
     return this.validationService.getErrorMessage(
       this.formDirecciones.get(fieldName),
       fieldName);
-    }
+  }
+
 }

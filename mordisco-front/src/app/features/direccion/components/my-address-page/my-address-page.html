@@ -1,18 +1,24 @@
-
-<section>
-    <h3 class="mordisco">Mis direcciones</h3>
-        <ul class="seccionDirecciones">
+<section class="contenedorGrande">
+    <div class="contenedorPrincipal"> 
+        <h3 class="subtitulo">Mis direcciones</h3>
+        <ul class="contenedorCards">
             @if (arrDirecciones) {
                 @for(direccion of arrDirecciones; track $index){
-                    <li class="direccionCard">
+                    <li class="card">
                         <app-direccion-card-component [direccion]="direccion"></app-direccion-card-component>
-                        <button (click)="modificarDireccion(direccion)">Editar</button>
-                        <button (click)="eliminarDireccion(direccion.id)">Eliminar</button>
+                        <div class="flex space-x-3">                        
+                            <button (click)="modificarDireccion(direccion)" class="btn">Editar</button>
+                            <button (click)="eliminarDireccion(direccion.id)" class="btn">Eliminar</button>
+                        </div>    
                     </li>
                 }
             }@else{
                 <p>No tiene direcciones cargadas aun!</p>
             }
         </ul>
-        <button (click)="crearDireccion()">Agregar nueva direccion</button>
+        
+        <section class="flex justify-center space-x-4 pt-3">
+            <button (click)="crearDireccion()" class="form-button">Agregar nueva direccion</button>
+        </section>    
+    </div>
 </section>

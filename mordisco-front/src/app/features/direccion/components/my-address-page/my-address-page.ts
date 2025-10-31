@@ -11,7 +11,6 @@ import { DireccionCardComponent } from '../direccion-card-component/direccion-ca
   selector: 'app-my-address-page',
   imports: [DireccionCardComponent],
   templateUrl: './my-address-page.html',
-  styleUrl: './my-address-page.css'
 })
 export class MyAddressPage implements OnInit{
 

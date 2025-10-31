@@ -1,21 +1,23 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../shared/services/auth-service';
+import { FormValidationService } from '../../../../shared/services/form-validation-service';
 
 @Component({
-  selector: 'app-edit-password',
+  selector: 'app-edit-password-component',
   imports: [ReactiveFormsModule],
   templateUrl: './edit-password-component.html',
-  styleUrls: ['./edit-password-component.css']
 })
 export class EditPasswordComponent implements OnInit {
   private fb : FormBuilder = inject(FormBuilder)
   private snackBar : MatSnackBar = inject(MatSnackBar)
   private router : Router = inject(Router)
   private authService : AuthService = inject(AuthService)
+  private validationService : FormValidationService = inject(FormValidationService)
 
+  isSubmitting = signal(false)
   editarPassword!: FormGroup;
 
 
@@ -30,6 +32,7 @@ export class EditPasswordComponent implements OnInit {
   manejarModificacionPassword(): void {
     if (this.editarPassword.invalid) return;
 
+    this.isSubmitting.set(true)
     const { passwordActual, confirmarPasswordNueva, passwordNueva } = this.editarPassword.value;
 
     if (passwordActual !== confirmarPasswordNueva) {
@@ -50,4 +53,10 @@ export class EditPasswordComponent implements OnInit {
     });
   
   }
+
+  getError(fieldName: string): string | null {
+    return this.validationService.getErrorMessage(
+    this.editarPassword.get(fieldName),
+    fieldName);
+}
 }

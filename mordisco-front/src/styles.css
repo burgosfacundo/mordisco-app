@@ -7,6 +7,7 @@
 /* ============================
    Theme Configuration
    ============================ */
+
 @theme {
   --color-bg: #fefaf0;
   --color-text: #1f2328;
@@ -42,6 +43,7 @@
 }
 
 body {
+  @apply flex flex-col min-h-screen;
   background-color: var(--color-bg);
 }
 
@@ -56,6 +58,23 @@ body {
   
   .max-w-content {
     @apply max-w-7xl mx-auto;
+  }
+
+  /*Contenedores muy lindos*/
+  .contenedorGrande{
+    @apply flex-1 flex justify-center py-4 px-4 bg-gray-50 mt-[70px]
+  }
+  .contenedorPrincipal{
+    @apply w-full max-w-2xl bg-white shadow-sm border border-gray-200 rounded-2xl p-6
+  }
+
+  .contenedorCards{
+    @apply grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-1 w-full max-w-[700px] list-none p-0
+  }
+
+  /*Titulo y subtitulo*/
+  .subtitulo{
+    @apply font-display text-lg md:text-xl font-bold mb-6 tracking-tight text-primary-500
   }
 
   /* Buttons */
@@ -83,8 +102,8 @@ body {
 
   /* Card */
   .card {
-    @apply rounded-2xl bg-white border border-neutral-200;
-    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    @apply bg-white rounded-xl shadow-md p-3 max-w-[220px] text-[0.9rem] transition-all 
+    duration-200 ease-in-out hover:shadow-lg hover:-translate-y-0.5
   }
 
   /* Input */
@@ -109,39 +128,40 @@ body {
   /* Form specific utilities */
   .form-container {
     @apply w-full bg-white rounded-2xl shadow-lg;
+    margin: 0 auto;
     max-width: 500px;
-    padding: 40px 48px;
+    padding: 24px 32px;
   }
 
   .form-field {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
 
   .form-label {
     @apply block font-semibold text-stone-900;
-    font-size: 16px;
-    margin-bottom: 12px;
+    font-size: 14px;
+    margin-bottom: 8px;
   }
 
   .form-input {
     @apply w-full rounded-lg border border-stone-300 outline-none
            transition-all focus:ring-2 focus:ring-primary-500 focus:border-primary-500
            placeholder:text-stone-400;
-    padding: 14px 16px;
-    font-size: 16px;
+    padding: 10px 14px;
+    font-size: 14px;
   }
 
   .form-error {
     @apply text-red-600;
-    font-size: 14px;
-    margin-top: 8px;
+    font-size: 12px;
+    margin-top: 4px;
   }
 
   .form-button {
     @apply w-full uppercase tracking-wide font-bold text-white rounded-xl
            transition-all disabled:cursor-not-allowed;
-    padding: 16px 24px;
-    font-size: 16px;
+    padding: 12px 20px;
+    font-size: 14px;
     background-color: var(--color-primary-500);
   }
 
@@ -152,6 +172,14 @@ body {
   .form-button:disabled {
     background-color: #fecaca;
   }
+}
+
+/* ============================
+    Footer
+   ============================ */
+
+footer{
+  @apply bg-[#fff7f6] text-[#1c1917] flex flex-col items-center justify-center w-full border-t-2 border-[#E3291D] gap-3 p-2 z-[1000] font-sans
 }
 
 /* ============================

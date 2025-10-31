@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth/auth-guard';
-import { EditPasswordComponent } from './features/profile/components/edit-password-component/edit-password-component';
 import { publicOnlyGuard } from './core/guards/public-only-guard';
 import { LoginPage } from './features/auth/components/login-page/login-page';
 import { RegistroPage } from './features/registro/components/registro-page/registro-page';
@@ -9,6 +8,7 @@ import { ProfilePage } from './features/profile/components/profile-page/profile-
 import { EditProfilePage } from './features/profile/components/edit-profile-page/edit-profile-page';
 import { MyAddressPage } from './features/direccion/components/my-address-page/my-address-page';
 import { FormAddressPage } from './features/direccion/components/form-address-page/form-address-page';
+import { EditPasswordPage } from './features/profile/components/edit-password-page/edit-password-page';
 
 export const routes: Routes = [
  // Páginas públicas 
@@ -21,7 +21,7 @@ export const routes: Routes = [
   {path: 'profile/edit', component:EditProfilePage, canActivate: [authGuard]},
   {path: 'profile/my-address', component: MyAddressPage, canActivate : [authGuard]},
   {path: 'profile/my-address/form-address', component: FormAddressPage, canActivate : [authGuard]},
-  {path: 'edit-password', component : EditPasswordComponent, canActivate: [authGuard]},
+  {path: 'edit-password', component : EditPasswordPage, canActivate: [authGuard]},
  
 
   // Ruta por defecto
