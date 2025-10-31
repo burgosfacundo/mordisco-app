@@ -14,6 +14,7 @@ import utn.back.mordiscoapi.model.dto.direccion.DireccionUpdateDTO;
 import utn.back.mordiscoapi.service.impl.DireccionService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/usuarios/{id}/direcciones")
@@ -38,10 +39,10 @@ public class DireccionController {
 
     @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
     @PutMapping
-    public ResponseEntity<String> update(@PathVariable Long id,
+    public ResponseEntity<Map<String,String>> update(@PathVariable Long id,
                                          @Valid @RequestBody DireccionUpdateDTO dto) throws NotFoundException {
         service.update(id, dto);
-        return ResponseEntity.ok("Dirección actualizada");
+        return ResponseEntity.ok(Map.of("message","Dirección actualizada correctamente"));
     }
 
     @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")

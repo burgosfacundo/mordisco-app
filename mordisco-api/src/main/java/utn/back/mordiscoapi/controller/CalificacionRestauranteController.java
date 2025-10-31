@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,7 +18,6 @@ import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionRestau
 import utn.back.mordiscoapi.model.projection.CalificacionRestauranteProjection;
 import utn.back.mordiscoapi.service.interf.ICalificacionRestaurante;
 
-import java.util.List;
 
 @Tag(name = "CalificacionRestaurante", description = "Operaciones relacionadas con las calificaciones de los restaurantes")
 @RestController
@@ -64,8 +64,11 @@ public class CalificacionRestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<CalificacionRestauranteProjection>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<CalificacionRestauranteProjection>> findAll(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page,size));
     }
 
 

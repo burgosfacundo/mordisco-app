@@ -7,19 +7,16 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.usuario.ChangePasswordDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
+import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
 
-import java.util.List;
 
 @Tag(name = "Usuarios", description = "Operaciones relacionadas a usuarios")
 @RestController
@@ -64,8 +61,11 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<UsuarioCardDTO>> findAll(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page,size));
     }
 
     /**
@@ -248,8 +248,11 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/rol/{id}")
-    public ResponseEntity<List<UsuarioResponseDTO>> findByRolId(@PathVariable Long id)
+    public ResponseEntity<Page<UsuarioCardDTO>> findByRolId(
+            @PathVariable Long id,
+            @RequestParam int page,
+            @RequestParam int size)
             throws NotFoundException {
-        return ResponseEntity.ok(service.findByRolId(id));
+        return ResponseEntity.ok(service.findByRolId(page,size,id));
     }
 }

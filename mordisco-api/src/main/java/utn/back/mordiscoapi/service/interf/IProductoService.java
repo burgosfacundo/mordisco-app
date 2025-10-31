@@ -1,11 +1,10 @@
 package utn.back.mordiscoapi.service.interf;
 
+import org.springframework.data.domain.Page;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.projection.ProductoProjection;
 
-import java.util.List;
-
 public interface IProductoService {
-    List<ProductoProjection> findAll();
+    Page<ProductoProjection> findAll(int pageNo,int pageSize);
     ProductoProjection findById(Long id) throws NotFoundException;
 }

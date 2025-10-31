@@ -3,6 +3,9 @@ package utn.back.mordiscoapi.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.enums.TipoEntrega;
@@ -18,7 +21,6 @@ import utn.back.mordiscoapi.service.interf.IPedidoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 
@@ -83,6 +85,10 @@ public class PedidoServiceImpl implements IPedidoService {
             pedido.setDireccionEntrega(direccion);
         }
 
+        if (!pedido.getDireccionEntrega().getCiudad().equals(restaurante.getDireccion().getCiudad())) {
+            throw new BadRequestException("No se puede entregar un pedido a otra ciudad");
+        }
+
         pedido.setTotal(total);
         pedidoRepository.save(pedido);
     }
@@ -93,10 +99,10 @@ public class PedidoServiceImpl implements IPedidoService {
      * @return una lista de pedidos.
      */
     @Override
-    public List<PedidoResponseDTO> findAll() {
-        return pedidoRepository.findAll().stream()
-                .map(PedidoMapper::toDTO)
-                .toList();
+    public Page<PedidoResponseDTO> findAll(int pageNo,int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return pedidoRepository.findAll(pageable)
+                .map(PedidoMapper::toDTO);
     }
 
 
@@ -106,13 +112,14 @@ public class PedidoServiceImpl implements IPedidoService {
      * @throws NotFoundException si el restaurante no se encuentra.
      */
     @Override
-    public List<PedidoResponseDTO> findAllByRestaurante_Id(Long idRestaurante) throws NotFoundException {
+    public Page<PedidoResponseDTO> findAllByRestaurante_Id(int pageNo,int pageSize,Long idRestaurante) throws NotFoundException {
         if(restauranteRepository.findById(idRestaurante).isEmpty()){
             throw new NotFoundException("El restaurante no existe");
         }
-        return pedidoRepository.findAllByRestaurante_Id(idRestaurante).stream()
-                .map(PedidoMapper::toDTO)
-                .toList();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return pedidoRepository.findAllByRestaurante_Id(pageable,idRestaurante)
+                .map(PedidoMapper::toDTO);
     }
 
     /**
@@ -179,14 +186,15 @@ public class PedidoServiceImpl implements IPedidoService {
      * @throws NotFoundException si el cliente no se encuentra.
      */
     @Override
-    public List<PedidoResponseDTO> findAllByCliente_IdAndEstado(Long idCliente, EstadoPedido estado) throws NotFoundException {
+    public Page<PedidoResponseDTO> findAllByCliente_IdAndEstado(int pageNo,int pageSize,Long idCliente, EstadoPedido estado) throws NotFoundException {
         if (!usuarioRepository.existsById(idCliente)) {
             throw new NotFoundException("Usuario no encontrado");
         }
 
-        return pedidoRepository.findAllByCliente_IdAndEstado(idCliente, estado).stream()
-                .map(PedidoMapper::toDTO)
-                .toList();
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return pedidoRepository.findAllByCliente_IdAndEstado(pageable,idCliente, estado)
+                .map(PedidoMapper::toDTO);
     }
 
     /**
@@ -195,13 +203,14 @@ public class PedidoServiceImpl implements IPedidoService {
      * @throws NotFoundException si el cliente no se encuentra.
      */
     @Override
-    public List<PedidoResponseDTO> findAllByCliente_Id(Long idCliente) throws NotFoundException {
+    public Page<PedidoResponseDTO> findAllByCliente_Id(int pageNo,int pageSize,Long idCliente) throws NotFoundException {
         if (!usuarioRepository.existsById(idCliente)) {
             throw new NotFoundException("Usuario no encontrado");
         }
-        return pedidoRepository.findAllByCliente_Id(idCliente).stream()
-                .map(PedidoMapper::toDTO)
-                .toList();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return pedidoRepository.findAllByCliente_Id(pageable,idCliente)
+                .map(PedidoMapper::toDTO);
     }
 
     /**
@@ -212,14 +221,14 @@ public class PedidoServiceImpl implements IPedidoService {
      *      * @throws BadRequestException si el estado del pedido no es válido.
      */
     @Override
-    public List<PedidoResponseDTO> findAllByRestaurante_IdAndEstado(Long idRestaurante, EstadoPedido estado) throws NotFoundException {
+    public Page<PedidoResponseDTO> findAllByRestaurante_IdAndEstado(int pageNo,int pageSize,Long idRestaurante, EstadoPedido estado) throws NotFoundException {
         if (!restauranteRepository.existsById(idRestaurante)) {
             throw new NotFoundException("Restaurante no encontrado");
         }
 
-        return pedidoRepository.findAllByRestaurante_IdAndEstado(idRestaurante, estado).stream()
-                .map(PedidoMapper::toDTO)
-                .toList();
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return pedidoRepository.findAllByRestaurante_IdAndEstado(pageable,idRestaurante, estado)
+                .map(PedidoMapper::toDTO);
     }
 
     /**

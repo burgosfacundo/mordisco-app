@@ -23,7 +23,6 @@ export class AuthService {
   private refreshTimer?: ReturnType<typeof setTimeout>;
 
   constructor() {
-    console.log('🚀 AuthService constructor called');
     this.loadStoredAuth();
   }
 
@@ -51,7 +50,10 @@ export class AuthService {
     this.http.post(`${this.API_URL}/logout`, {}, {
       withCredentials: true
     }).subscribe({
-      complete: () => this.clearAuth()
+      complete: () => {
+        this.clearAuth()
+        this.router.navigate(['login'])
+      }
     });
   }
 
@@ -148,6 +150,16 @@ export class AuthService {
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);
       this.refreshTimer = undefined;
+    }
+  }
+
+    clearAuthSilently(): void {
+    sessionStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    this.currentUser.set(null);
+    this.isAuthenticated.set(false);
+    
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
     }
   }
 }

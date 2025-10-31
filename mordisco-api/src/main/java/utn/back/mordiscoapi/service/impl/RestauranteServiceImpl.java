@@ -3,6 +3,9 @@ package utn.back.mordiscoapi.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
@@ -91,10 +94,11 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con todos los restaurantes.
      */
     @Override
-    public List<RestauranteResponseDTO> getAll() {
-        return restauranteRepository.findAllRestaurante().stream()
-                .map(RestauranteMapper::toDTO)
-                .toList();
+    public Page<RestauranteResponseDTO> getAll(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return restauranteRepository.findAllRestaurante(pageable)
+                .map(RestauranteMapper::toDTO);
     }
 
     /**
@@ -104,10 +108,10 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por estado.
      */
     @Override
-    public List<RestauranteResponseDTO> getAllByEstado(Boolean estado){
-        return restauranteRepository.findAllByEstado(estado).stream()
-                .map(RestauranteMapper::toDTO)
-                .toList();
+    public Page<RestauranteResponseDTO> getAllByEstado(int pageNo, int pageSize,Boolean estado){
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return restauranteRepository.findAllByEstado(pageable,estado)
+                .map(RestauranteMapper::toDTO);
     }
 
     /**
@@ -117,10 +121,10 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por ciudad.
      */
     @Override
-    public List<RestauranteResponseCardDTO> getAllByCiudad(String ciudad){
-        return restauranteRepository.findAllByCiudad(ciudad).stream()
-                .map(RestauranteMapper::toCardDTO)
-                .toList();
+    public Page<RestauranteResponseCardDTO> getAllByCiudad(int pageNo, int pageSize,String ciudad){
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return restauranteRepository.findAllByCiudad(pageable,ciudad)
+                .map(RestauranteMapper::toCardDTO);
     }
 
     /**
@@ -130,10 +134,10 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por nombre.
      */
     @Override
-    public List<RestauranteResponseCardDTO> getAllByNombre(String nombre) {
-        return restauranteRepository.findAllByNombre(nombre).stream()
-                .map(RestauranteMapper::toCardDTO)
-                .toList();
+    public Page<RestauranteResponseCardDTO> getAllByNombre(int pageNo, int pageSize,String nombre) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return restauranteRepository.findAllByNombre(pageable,nombre)
+                .map(RestauranteMapper::toCardDTO);
     }
 
     /**
@@ -141,10 +145,11 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes que tienen una promoción activa.
      */
     @Override
-    public List<RestauranteResponseCardDTO> findAllWithPromocionActivaAndCiudad(String ciudad) {
-        return restauranteRepository.findAllWithPromocionActivaAndCiudad(ciudad).stream()
-                .map(RestauranteMapper::toCardDTO)
-                .toList();
+    public Page<RestauranteResponseCardDTO> findAllWithPromocionActivaAndCiudad(int pageNo, int pageSize,String ciudad) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return restauranteRepository.findAllWithPromocionActivaAndCiudad(pageable,ciudad)
+                .map(RestauranteMapper::toCardDTO);
     }
 
     /**

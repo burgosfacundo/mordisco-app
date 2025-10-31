@@ -1,5 +1,7 @@
 package utn.back.mordiscoapi.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,7 +25,7 @@ public interface PromocionRepository extends JpaRepository<Promocion,Long> {
                p.restaurante.id AS restaurante_Id
        FROM Promocion p
        """)
-        List<PromocionProjection> findAllProject();
+    Page<PromocionProjection> findAllProject(Pageable pageable);
 
     // Definimos findProjectedById que devuelve un Optional de una promoción proyectada por su id
     @Query("""
@@ -44,5 +46,5 @@ public interface PromocionRepository extends JpaRepository<Promocion,Long> {
              FROM Promocion p
              WHERE p.restaurante.id = :restauranteId
             """)
-    List<Promocion> findByRestauranteId(@Param("restauranteId") Long restauranteId);
+    Page<Promocion> findByRestauranteId(Pageable pageable,@Param("restauranteId") Long restauranteId);
 }

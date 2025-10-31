@@ -1,5 +1,6 @@
 package utn.back.mordiscoapi.service.interf;
 
+import org.springframework.data.domain.Page;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
@@ -14,11 +15,11 @@ public interface IRestauranteService {
     void save(RestauranteCreateDTO restauranteCreateDTO);
     RestauranteResponseDTO findById(Long id) throws NotFoundException;
     RestauranteResponseDTO findByIdUsuario(Long idUsuario) throws NotFoundException, BadRequestException;
-    List<RestauranteResponseDTO> getAll();
-    List<RestauranteResponseDTO> getAllByEstado(Boolean estado);
-    List<RestauranteResponseCardDTO> getAllByCiudad(String ciudad);
-    List<RestauranteResponseCardDTO> getAllByNombre(String nombre);
-    List<RestauranteResponseCardDTO> findAllWithPromocionActivaAndCiudad(String ciudad);
+    Page<RestauranteResponseDTO> getAll(int pageNo,int pageSize);
+    Page<RestauranteResponseDTO> getAllByEstado(int pageNo,int pageSize,Boolean estado);
+    Page<RestauranteResponseCardDTO> getAllByCiudad(int pageNo,int pageSize,String ciudad);
+    Page<RestauranteResponseCardDTO> getAllByNombre(int pageNo,int pageSize,String nombre);
+    Page<RestauranteResponseCardDTO> findAllWithPromocionActivaAndCiudad(int pageNo,int pageSize,String ciudad);
     void update(RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException;
     void delete(Long id) throws NotFoundException;
     void adHorariosAtencion(Long idRestaurante, List<HorarioAtencionDTO> horarios) throws NotFoundException, BadRequestException;

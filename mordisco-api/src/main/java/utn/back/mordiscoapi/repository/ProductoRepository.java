@@ -1,5 +1,7 @@
 package utn.back.mordiscoapi.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,5 +29,5 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
         INNER JOIN Imagen i ON p.imagen.id = i.id
         INNER JOIN Menu m ON p.menu.id = m.id
         """)
-    List<ProductoProjection> findAllComplete();
+    Page<ProductoProjection> findAllComplete(Pageable pageable);
 }

@@ -17,7 +17,6 @@
             [length]="lengthRestaurantes"
             [pageSize]="sizeRestaurantes"
             [pageIndex]="pageRestaurantes"
-            [pageSizeOptions]="[5, 10, 20]"
             (page)="onPageChangeRestaurantes($event)">
         </mat-paginator>
         }@else {
@@ -43,7 +42,6 @@
             [length]="lengthUsuarios"
             [pageSize]="sizeUsuarios"
             [pageIndex]="pageUsuarios"
-            [pageSizeOptions]="[5, 10, 20]"
             (page)="onPageChangeUsuarios($event)">
         </mat-paginator>
         }@else {
@@ -70,7 +68,6 @@
             [length]="lengthPedidos"
             [pageSize]="sizePedidos"
             [pageIndex]="pagePedidos"
-            [pageSizeOptions]="[5, 10, 20]"
             (page)="onPageChangePedidos($event)">
             
         </mat-paginator>

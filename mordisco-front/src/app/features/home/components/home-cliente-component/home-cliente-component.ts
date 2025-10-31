@@ -21,13 +21,13 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   ciudadSeleccionada?: string = 'Mar del Plata';
 
 
-  sizePromocion : number = 10;
+  sizePromocion : number = 5;
   pagePromocion : number = 0;
-  lengthPromocion : number = 10;
+  lengthPromocion : number = 5;
 
-  sizeRestaurantes : number = 10;
+  sizeRestaurantes : number = 5;
   pageRestaurantes : number = 0;
-  lengthRestaurantes : number = 10;
+  lengthRestaurantes : number = 5;
 
   isLoadingRestaurantes = true;
   isLoadingPromocion = true;

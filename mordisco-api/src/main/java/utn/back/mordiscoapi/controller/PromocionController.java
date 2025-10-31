@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +19,6 @@ import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.service.interf.IPromocionService;
 
-import java.util.List;
 
 @Tag(name = "Promociones", description = "Operaciones relacionadas con las promociones de los restaurantes") // Anotación para documentar la API con Swagger
 @RestController
@@ -63,8 +63,11 @@ public class PromocionController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<PromocionProjection>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<PromocionProjection>> findAll(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page,size));
     }
 
     /**
@@ -147,9 +150,11 @@ public class PromocionController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or (hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante))")
     @GetMapping("restaurante/{idRestaurante}")
-    public ResponseEntity<List<PromocionResponseDTO>> listarPromoByIdRestaurante(@PathVariable
-                                                                                     Long idRestaurante) throws NotFoundException {
-        return ResponseEntity.ok(service.listarPromoPorRestaurante(idRestaurante));
+    public ResponseEntity<Page<PromocionResponseDTO>> listarPromoByIdRestaurante(
+            @PathVariable Long idRestaurante,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(service.listarPromoPorRestaurante(page,size,idRestaurante));
     }
 
 }
