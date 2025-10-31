@@ -10,6 +10,6 @@ public record CalificacionRestauranteResponseDTO(
         Long id,
         @Schema(description = "Fecha y hora de la calificación", example = "2023-10-01T12:00:00")
         LocalDateTime fechaHora,
-        CalificacionDTO calificacion
+        CalificacionResponseDTO calificacion
 ) {
 }
