@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -98,8 +99,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping
-    public ResponseEntity<List<RestauranteResponseDTO>> findAll() {
-        return ResponseEntity.ok(restauranteService.getAll());
+    public ResponseEntity<Page<RestauranteResponseDTO>> findAll(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(restauranteService.getAll(page,size));
     }
 
     /**
@@ -113,8 +117,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/estado")
-    public ResponseEntity<List<RestauranteResponseDTO>> getAllByEstado(@RequestParam Boolean estado) {
-        List<RestauranteResponseDTO> lista = restauranteService.getAllByEstado(estado);
+    public ResponseEntity<Page<RestauranteResponseDTO>> getAllByEstado(
+            @RequestParam Boolean estado,
+            @RequestParam int page,
+            @RequestParam int size) {
+        Page<RestauranteResponseDTO> lista = restauranteService.getAllByEstado(page,size,estado);
         return ResponseEntity.ok(lista);
     }
 
@@ -129,8 +136,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/ciudades")
-    public ResponseEntity<List<RestauranteResponseCardDTO>> getAllByCiudad(@RequestParam String ciudad) {
-        return ResponseEntity.ok(restauranteService.getAllByCiudad(ciudad));
+    public ResponseEntity<Page<RestauranteResponseCardDTO>> getAllByCiudad(
+            @RequestParam String ciudad,
+            @RequestParam int page,
+            @RequestParam int size) {
+        return ResponseEntity.ok(restauranteService.getAllByCiudad(page,size,ciudad));
     }
 
     /**
@@ -144,8 +154,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/nombre")
-    public ResponseEntity<List<RestauranteResponseCardDTO>> getAllByNombre(@RequestParam String nombre) {
-        return ResponseEntity.ok().body(restauranteService.getAllByNombre(nombre));
+    public ResponseEntity<Page<RestauranteResponseCardDTO>> getAllByNombre(
+            @RequestParam String nombre,
+            @RequestParam int page,
+            @RequestParam int size) {
+        return ResponseEntity.ok().body(restauranteService.getAllByNombre(page,size,nombre));
     }
 
     /**
@@ -158,8 +171,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/promociones")
-    public ResponseEntity<List<RestauranteResponseCardDTO>> findAllWithPromocionActivaAndCiudad(@RequestParam String ciudad) {
-        return ResponseEntity.ok(restauranteService.findAllWithPromocionActivaAndCiudad(ciudad));
+    public ResponseEntity<Page<RestauranteResponseCardDTO>> findAllWithPromocionActivaAndCiudad(
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam String ciudad) {
+        return ResponseEntity.ok(restauranteService.findAllWithPromocionActivaAndCiudad(page,size,ciudad));
     }
 
     /**

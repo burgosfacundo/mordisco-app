@@ -3,6 +3,9 @@ package utn.back.mordiscoapi.service.impl;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
@@ -16,7 +19,6 @@ import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.service.interf.IPromocionService;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Slf4j // Anotación de Lombok para el registro de logs
 @Service // Anotación de servicio de Spring para indicar que esta clase es un servicio
@@ -52,9 +54,9 @@ public class PromocionServiceImpl implements IPromocionService {
      * @return una página de promociones proyectadas.
      */
     @Override
-    public List<PromocionProjection> findAll() {
-        // Obtener todas las promociones usando el findAllProject creado en el repositorio
-        return repository.findAllProject();
+    public Page<PromocionProjection> findAll(int pageNo,int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return repository.findAllProject(pageable);
     }
 
 
@@ -156,11 +158,13 @@ public class PromocionServiceImpl implements IPromocionService {
      * @throws NotFoundException si el restaurante no se encuentra.
      */
     @Override
-    public List<PromocionResponseDTO> listarPromoPorRestaurante (Long idRestaurante) throws NotFoundException {
+    public Page<PromocionResponseDTO> listarPromoPorRestaurante (int pageNo,int pageSize,Long idRestaurante) throws NotFoundException {
         if (!restauranteRepository.existsById(idRestaurante)) {
             throw new NotFoundException("Restaurante no encontrado");
         }
-        return repository.findByRestauranteId(idRestaurante).stream()
-                .map(PromocionMapper::toDTO).toList();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return repository.findByRestauranteId(pageable,idRestaurante)
+                .map(PromocionMapper::toDTO);
     }
 }

@@ -3,6 +3,9 @@ package utn.back.mordiscoapi.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,10 +14,7 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.UsuarioMapper;
-import utn.back.mordiscoapi.model.dto.usuario.ChangePasswordDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
+import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.RolRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
@@ -22,7 +22,6 @@ import utn.back.mordiscoapi.service.interf.IUsuarioService;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 import utn.back.mordiscoapi.utils.Sanitize;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -52,10 +51,10 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
      * @return una página de usuarios proyectados.
      */
     @Override
-    public List<UsuarioResponseDTO> findAll() {
-        return repository.findAll().stream()
-                .map(UsuarioMapper::toUsuarioResponseDTO)
-                .toList();
+    public Page<UsuarioCardDTO> findAll(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return repository.findAll(pageable)
+                .map(UsuarioMapper::toUsuarioCardDTO);
     }
 
     /**
@@ -172,13 +171,13 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
      * @throws NotFoundException si el rol no se encuentra.
      */
     @Override
-    public List<UsuarioResponseDTO> findByRolId(Long id) throws NotFoundException {
+    public Page<UsuarioCardDTO> findByRolId(int pageNo,int pageSize,Long id) throws NotFoundException {
         if (!rolRepository.existsById(id)){
             throw new NotFoundException("Rol no encontrado");
         }
-        return repository.findUsuarioByRol_Id(id).stream()
-                .map(UsuarioMapper::toUsuarioResponseDTO)
-                .toList();
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return repository.findUsuarioByRol_Id(pageable,id)
+                .map(UsuarioMapper::toUsuarioCardDTO);
     }
 
     /**

@@ -1,5 +1,7 @@
 package utn.back.mordiscoapi.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -47,7 +49,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN  r.calificaciones
                 LEFT JOIN  r.direccion
             """)
-    List<Restaurante> findAllRestaurante();
+    Page<Restaurante> findAllRestaurante(Pageable pageable);
 
     @Query ("""
                 SELECT DISTINCT r
@@ -59,7 +61,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN  r.direccion
                 WHERE r.activo = :estadoRestaurante
             """)
-    List<Restaurante> findAllByEstado(@Param("estadoRestaurante") Boolean estadoRestaurante);
+    Page<Restaurante> findAllByEstado(Pageable pageable,@Param("estadoRestaurante") Boolean estadoRestaurante);
 
     @Query("""
             SELECT DISTINCT r
@@ -72,7 +74,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             WHERE r.direccion.ciudad = :ciudad
             AND r.activo = true
             """)
-    List<Restaurante> findAllByCiudad(@Param("ciudad") String ciudad);
+    Page<Restaurante> findAllByCiudad(Pageable pageable,@Param("ciudad") String ciudad);
 
     @Query("""
             SELECT DISTINCT r
@@ -84,7 +86,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             LEFT JOIN  r.direccion
             WHERE r.razonSocial LIKE %:nombre%
             """)
-    List<Restaurante> findAllByNombre(@Param("nombre") String nombre);
+    Page<Restaurante> findAllByNombre(Pageable pageable,@Param("nombre") String nombre);
 
     @Query("""
                 SELECT DISTINCT r
@@ -97,7 +99,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 WHERE p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE
                 AND r.direccion.ciudad = :ciudad
                 """)
-    List<Restaurante> findAllWithPromocionActivaAndCiudad(@Param("ciudad") String ciudad);
+    Page<Restaurante> findAllWithPromocionActivaAndCiudad(Pageable pageable, @Param("ciudad") String ciudad);
 
     boolean existsByIdAndImagen_Id(Long id, Long imagenId);
 

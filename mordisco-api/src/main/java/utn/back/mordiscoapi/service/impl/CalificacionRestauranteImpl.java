@@ -2,6 +2,9 @@ package utn.back.mordiscoapi.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
@@ -15,7 +18,6 @@ import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.interf.ICalificacionRestaurante;
 
-import java.util.List;
 
 @Slf4j
 @Service
@@ -60,8 +62,9 @@ public class CalificacionRestauranteImpl implements ICalificacionRestaurante {
      * @return una lista de calificaciones de restaurantes.
      */
     @Override
-    public List<CalificacionRestauranteProjection> findAll() {
-        return  repository.findAllProjection();
+    public Page<CalificacionRestauranteProjection> findAll(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return  repository.findAllProjection(pageable);
     }
 
     /**

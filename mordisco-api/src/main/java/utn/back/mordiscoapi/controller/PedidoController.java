@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +19,6 @@ import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
 
-import java.util.List;
 
 @Tag(name = "Pedidos", description = "Operaciones relacionadas con los pedidos de los restaurantes")
 @RestController
@@ -64,8 +64,11 @@ public class PedidoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<PedidoResponseDTO>> findAll() {
-        return ResponseEntity.ok(pedidoService.findAll());
+    public ResponseEntity<Page<PedidoResponseDTO>> findAll(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(pedidoService.findAll(page, size));
     }
 
     /**
@@ -107,8 +110,11 @@ public class PedidoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
     @GetMapping("/restaurantes/{id}")
-    public ResponseEntity<List<PedidoResponseDTO>> findAllByRestaurante_Id(@PathVariable Long id) throws NotFoundException {
-        return ResponseEntity.ok(pedidoService.findAllByRestaurante_Id(id));
+    public ResponseEntity<Page<PedidoResponseDTO>> findAllByRestaurante_Id(
+            @PathVariable Long id,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllByRestaurante_Id(page,size,id));
     }
 
     /**
@@ -206,9 +212,12 @@ public class PedidoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
     @GetMapping("/clientes/{id}/state")
-    public ResponseEntity<List<PedidoResponseDTO>> findAllByCliente_IdAndEstado(@PathVariable Long id,
-                                                                          @RequestParam EstadoPedido estado) throws NotFoundException {
-        return ResponseEntity.ok(pedidoService.findAllByCliente_IdAndEstado(id, estado));
+    public ResponseEntity<Page<PedidoResponseDTO>> findAllByCliente_IdAndEstado(
+            @PathVariable Long id,
+            @RequestParam EstadoPedido estado,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllByCliente_IdAndEstado(page,size,id, estado));
     }
 
     /**
@@ -226,8 +235,11 @@ public class PedidoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
     @GetMapping("/clientes/{id}")
-    public ResponseEntity<List<PedidoResponseDTO>> findAllByCliente_Id(@PathVariable Long id) throws NotFoundException {
-        return ResponseEntity.ok(pedidoService.findAllByCliente_Id(id));
+    public ResponseEntity<Page<PedidoResponseDTO>> findAllByCliente_Id(
+            @PathVariable Long id,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllByCliente_Id(page,size,id));
     }
 
     /**
@@ -246,9 +258,12 @@ public class PedidoController {
     })
     @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
     @GetMapping("/restaurantes/{id}/state")
-    public ResponseEntity<List<PedidoResponseDTO>> findAllByRestaurante_IdAndEstado(@PathVariable Long id,
-                                                                                    @RequestParam EstadoPedido estado) throws NotFoundException {
-        return ResponseEntity.ok(pedidoService.findAllByRestaurante_IdAndEstado(id, estado));
+    public ResponseEntity<Page<PedidoResponseDTO>> findAllByRestaurante_IdAndEstado(
+            @PathVariable Long id,
+            @RequestParam EstadoPedido estado,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.findAllByRestaurante_IdAndEstado(page,size,id, estado));
     }
 }
 
