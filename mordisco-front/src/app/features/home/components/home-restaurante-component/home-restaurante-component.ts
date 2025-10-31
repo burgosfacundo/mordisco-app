@@ -24,10 +24,9 @@ export class HomeRestauranteComponent implements OnInit {
 
   pedidosPendientes?: Pedido[];
 
-  sizePedidos : number = 10;
+  sizePedidos : number = 5;
   pagePedidos : number = 0;
-  length : number = 10;
-  sizeOptions : number[] = [5,10,20];
+  length : number = 5;
   
   isLoading = true;
 

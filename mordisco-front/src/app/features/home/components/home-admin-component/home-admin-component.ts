@@ -27,19 +27,17 @@ export class HomeAdminComponent implements OnInit {
   protected pedidos? : Pedido[];
   protected usuarios? : UserCard[];
 
-  sizeUsuarios : number = 10;
+  sizeUsuarios : number = 5;
   pageUsuarios : number = 0;
-  lengthUsuarios : number = 10;
+  lengthUsuarios : number = 5;
 
-  sizePedidos : number = 10;
+  sizePedidos : number = 5;
   pagePedidos : number = 0;
-  lengthPedidos : number = 10;
+  lengthPedidos : number = 5;
 
-  sizeRestaurantes : number = 10;
+  sizeRestaurantes : number = 5;
   pageRestaurantes : number = 0;
-  lengthRestaurantes : number = 10;
-
-  sizeOptions : number[] = [5,10,20];
+  lengthRestaurantes : number = 5;
 
   isLoadingRestaurantes = true;
   isLoadingPedidos = true;
@@ -91,6 +89,8 @@ export class HomeAdminComponent implements OnInit {
   loadUsuarios(): void {
     this.usuarioService.getAll(this.pageUsuarios,this.sizeUsuarios).subscribe({
       next: (data) => {
+        console.log(data.content);
+        
         this.usuarios = data.content;
         this.lengthUsuarios = data.totalElements
         this.isLoadingUsuarios = false;
