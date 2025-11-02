@@ -1,55 +1,109 @@
-<h1 class="titulo">¡Bienvenido a Mordisco!</h1>
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
+  
+  <!-- Hero Title -->
+  <h1 class="titulo-hero">
+    ¡Bienvenido a Mordisco!
+  </h1>
 
-@if (isLoadingRestaurantes) {
-    <div class="loading">
-        <p>Cargando...</p>
-    </div>
-}@else{
-    <ul class="seccion">            
-    <h2 class="subtitulo">Bienvenido a Mordisco! Dónde vas a pedir hoy?</h2>
+  <!-- Sección Restaurantes Principales -->
+  <section class="space-y-6">
+    <h2 class="titulo-seccion">
+      Restaurantes en {{ ciudadSeleccionada || 'Tu ciudad' }}
+    </h2>
 
-    @if(restaurantes && restaurantes.length > 0) {                    
-        @for (r of restaurantes; track r.id) {
-            <li class="card">
-                <app-restaurante-card-component [restaurante]="r" ></app-restaurante-card-component>
+    @if (isLoadingRestaurantes) {
+      <!-- Loading State -->
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando restaurantes...</p>
+      </div>
+    } @else {
+      @if (restaurantes && restaurantes.length > 0) {
+        <!-- Grid de Restaurantes -->
+        <ul class="grid-restaurantes">
+          @for (restaurante of restaurantes; track restaurante.id) {
+            <li class="fade-in">
+              <app-restaurante-card-component 
+                [restaurante]="restaurante"
+                class="block">
+              </app-restaurante-card-component>
             </li>
-        }
-        <mat-paginator
+          }
+        </ul>
+
+        <!-- Paginador -->
+        <div class="flex justify-center mt-8">
+          <mat-paginator
             [length]="lengthRestaurantes"
             [pageSize]="sizeRestaurantes"
             [pageIndex]="pageRestaurantes"
-            (page)="onPageChangeRestaurante($event)">
-        </mat-paginator>
-    }@else {
-        <p>No hay restaurantes con esas características.</p>
+            (page)="onPageChangeRestaurante($event)"
+            class="bg-white rounded-xl shadow-md">
+          </mat-paginator>
+        </div>
+      } @else {
+        <!-- Empty State -->
+        <div class="empty-state">
+          <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <h3 class="empty-title">
+            No hay restaurantes disponibles
+          </h3>
+          <p class="empty-description">
+            Intenta seleccionar otra ciudad o vuelve más tarde
+          </p>
+        </div>
+      }
     }
-    </ul>
-}
+  </section>
 
+  <!-- Sección Promociones -->
+  @if (!isLoadingPromocion && restaurantesPromociones && restaurantesPromociones.length > 0) {
+    <section class="space-y-6">
+      <div class="flex items-center gap-3">
+        <svg class="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+        <h2 class="titulo-seccion border-0 mb-0 pb-0">
+          No te pierdas estas promociones
+        </h2>
+      </div>
 
-@if (isLoadingPromocion) {
-    <div class="loading">
-        <p>Cargando...</p>
-    </div>
-}@else{
-    <ul class="seccion">            
-    <h2 class="subtitulo">No te pierdas estas promociones</h2>
-    
-    @if(restaurantesPromociones && restaurantesPromociones.length > 0) {                    
-        @for (r of restaurantesPromociones; track r.id) {
-            <li class="card">
-                <app-restaurante-card-component [restaurante]="r" ></app-restaurante-card-component>
+      @if (isLoadingPromocion) {
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Cargando promociones...</p>
+        </div>
+      } @else {
+        <ul class="grid-promociones">
+          @for (restaurante of restaurantesPromociones; track restaurante.id) {
+            <li class="fade-in relative">
+              <!-- Badge de Promoción -->
+              <span class="badge-promocion">
+                ¡PROMO!
+              </span>
+              <app-restaurante-card-component 
+                [restaurante]="restaurante"
+                class="block">
+              </app-restaurante-card-component>
             </li>
-        }
+          }
+        </ul>
 
-    <mat-paginator
-        [length]="lengthPromocion"
-        [pageSize]="sizePromocion"
-        [pageIndex]="pagePromocion"
-        (page)="onPageChangePromocion($event)">
-    </mat-paginator>
-    }@else {
-        <p>No hay restaurantes con esas características.</p>
-   }
-    </ul>
-}
+        <!-- Paginador Promociones -->
+        <div class="flex justify-center mt-8">
+          <mat-paginator
+            [length]="lengthPromocion"
+            [pageSize]="sizePromocion"
+            [pageIndex]="pagePromocion"
+            (page)="onPageChangePromocion($event)"
+            class="bg-white rounded-xl shadow-md">
+          </mat-paginator>
+        </div>
+      }
+    </section>
+  }
+</div>

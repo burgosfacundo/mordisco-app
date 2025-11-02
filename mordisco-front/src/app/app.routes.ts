@@ -29,10 +29,4 @@ export const routes: Routes = [
 
   // Ruta comodín
   {path: '**', redirectTo: 'home'}
-/*
-  // Rutas con autorización por roles
-  {path: 'admin', canMatch: [authGuard], data: { roles: ['ROLE_ADMIN'] } },
-  {path: 'owner', canMatch: [authGuard], data: { roles: ['ROLE_RESTAURANTE'] } },
-  {path: 'client', canMatch: [authGuard], data: { roles: ['ROLE_CLIENTE'] } },
-  {path: '**', redirectTo: ''}  // Ruta comodín para redirigir a la página principal en caso de ruta no encontrada*/
 ];

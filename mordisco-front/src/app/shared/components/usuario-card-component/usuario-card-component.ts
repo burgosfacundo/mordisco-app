@@ -6,9 +6,14 @@ import UserCard from '../../models/user/user-card';
 @Component({
   selector: 'app-usuario-card-component',
   imports: [RouterLink],
-  templateUrl: './usuario-card-component.html',
-  styleUrls: ['./usuario-card-component.css']
+  templateUrl: './usuario-card-component.html'
 })
 export class UsuarioCardComponent {
-    @Input() usuario!: UserCard;
+  @Input() usuario!: UserCard;
+
+  getInitials(): string {
+    const first = this.usuario.nombre?.charAt(0) || '';
+    const last = this.usuario.apellido?.charAt(0) || '';
+    return (first + last).toUpperCase() || 'U';
+  }
 }

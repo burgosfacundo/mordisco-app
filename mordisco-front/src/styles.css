@@ -1,8 +1,6 @@
-/* ============================
-   Global styles (Tailwind v4)
-   ============================ */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
+
 
 /* ============================
    Theme Configuration
@@ -23,15 +21,31 @@
   --color-primary-800: #7a130e;
   --color-primary-900: #5a0e0a;
 
-  --font-sans: Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui;
+--font-sans: "Montserrat", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui;
   --font-display: "Montserrat", ui-sans-serif, system-ui;
 
-  --radius-lg: .75rem;
-  --radius-2xl: 1rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  --spacing-navbar: 70px;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
   
 
   --color-bg-dark: #0c0a09;
   --color-text-dark: #f5f5f5;
+
+  --breakpoint-xs: 375px;   /* Mobile S */
+  --breakpoint-sm: 425px;   /* Mobile L */
+  --breakpoint-md: 768px;   /* Tablet */
+  --breakpoint-lg: 1024px;  /* Laptop */
+  --breakpoint-xl: 1440px;  /* Desktop */
 }
 
 /* ============================
@@ -43,162 +57,379 @@
 }
 
 body {
-  @apply flex flex-col min-h-screen;
-  background-color: var(--color-bg);
+  @apply flex flex-col min-h-screen bg-bg antialiased;
 }
 
 /* ============================
-   Custom Utilities (Tailwind v4)
+   Clases Utilitarias
    ============================ */
 @layer utilities {
-  /* Layout helpers */
-  .container-px {
-    @apply px-4 sm:px-6 lg:px-8;
-  }
-  
-  .max-w-content {
-    @apply max-w-7xl mx-auto;
+  /* ========== LAYOUT ========== */
+  .container-app {
+    @apply w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /*Contenedores muy lindos*/
-  .contenedorGrande{
-    @apply flex-1 flex justify-center py-4 px-4 bg-gray-50 mt-[70px]
-  }
-  .contenedorPrincipal{
-    @apply w-full max-w-2xl bg-white shadow-sm border border-gray-200 rounded-2xl p-6
+  .main-content {
+    @apply mt-navbar min-h-[calc(100vh-var(--spacing-navbar))];
   }
 
-  .contenedorCards{
-    @apply grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-1 w-full max-w-[700px] list-none p-0
+
+ /* ========== CONTENEDORES ========== */
+  .contenedor-grande {
+    @apply flex-1 flex justify-center py-8 px-4 bg-gray-50 mt-navbar;
   }
 
-  /*Titulo y subtitulo*/
-  .subtitulo{
-    @apply font-display text-lg md:text-xl font-bold mb-6 tracking-tight text-primary-500
+  .contenedor-principal {
+    @apply w-full max-w-2xl bg-white shadow-sm border border-gray-200 rounded-2xl p-6;
   }
 
-  /* Buttons */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2
-           text-white font-medium shadow-sm
-           hover:opacity-90 active:opacity-80
-           focus:outline-none focus:ring-2 focus:ring-primary-500;
-    background-color: var(--color-primary-600);
+  .contenedor-cards {
+    @apply grid gap-6 w-full list-none p-0;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  /* ========== TÍTULOS ========== */
+  .titulo-hero {
+    @apply font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold 
+           text-center text-primary-500 tracking-tight mb-8;
+  }
+
+  .titulo-seccion {
+    @apply font-display text-2xl sm:text-3xl font-bold text-primary-500 
+           tracking-tight mb-6 pb-3 border-b-2 border-primary-500;
+  }
+
+  .subtitulo {
+    @apply font-display text-lg md:text-xl font-bold text-primary-500 
+           tracking-tight mb-4;
+  }
+
+/* ========== BUTTONS ========== */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 
+           px-6 py-3 rounded-xl font-semibold text-white
+           bg-primary-600 hover:bg-primary-700 
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+           active:scale-95 transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-outline {
-    @apply border text-primary-600 bg-transparent
-           hover:text-white;
-    border-color: var(--color-primary-600);
-  }
-  
-  .btn-outline:hover {
-    background-color: var(--color-primary-600);
+    @apply inline-flex items-center justify-center gap-2 
+           px-6 py-3 rounded-xl font-semibold
+           text-primary-600 border-2 border-primary-600
+           bg-transparent hover:bg-primary-600 hover:text-white
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+           active:scale-95 transition-all duration-200;
   }
 
   .btn-ghost {
-    @apply text-primary-600 hover:bg-primary-100;
+    @apply inline-flex items-center justify-center gap-2 
+           px-4 py-2 rounded-lg font-medium
+           text-primary-600 hover:bg-primary-50
+           transition-colors duration-200;
   }
 
-  /* Card */
-  .card {
-    @apply bg-white rounded-xl shadow-md p-3 max-w-[220px] text-[0.9rem] transition-all 
-    duration-200 ease-in-out hover:shadow-lg hover:-translate-y-0.5
+  .btn-icon {
+    @apply inline-flex items-center justify-center
+           w-10 h-10 rounded-full
+           text-primary-600 hover:bg-primary-50
+           transition-colors duration-200;
   }
 
-  /* Input */
-  .input {
-    @apply w-full rounded-lg border border-neutral-300 px-3 py-2 outline-none
-           focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+/* ========== CARDS ========== */
+  .card-base {
+    @apply bg-white rounded-xl shadow-md overflow-hidden
+           transition-all duration-300 ease-out
+           hover:shadow-xl hover:-translate-y-1;
   }
 
-  /* Typography */
-  .h1 {
-    @apply text-3xl md:text-4xl font-semibold tracking-tight;
-  }
-  
-  .h2 {
-    @apply text-2xl md:text-3xl font-semibold tracking-tight;
-  }
-  
-  .h3 {
-    @apply text-xl md:text-2xl font-semibold;
+
+  .card-restaurante {
+    @apply flex flex-col
+           w-full max-w-sm h-full;
   }
 
-  /* Form specific utilities */
+  .card-restaurante img {
+    @apply w-full h-full object-cover;
+  }
+
+   /* ========== BADGES ========== */
+  .badge-promocion {
+    @apply absolute top-3 right-3 z-10
+           px-3 py-1 rounded-full
+           text-xs font-bold uppercase tracking-wider
+           bg-linear-to-r from-yellow-500 to-yellow-600
+           text-white shadow-lg
+           animate-pulse;
+  }
+
+  .badge-rol {
+    @apply inline-flex items-center gap-1.5
+           px-2.5 py-1 rounded-full
+           text-xs font-semibold uppercase tracking-wide;
+  }
+
+  .badge-cliente {
+    @apply inline-flex items-center gap-1.5
+           px-2.5 py-1 rounded-full
+           text-xs font-semibold uppercase tracking-wide bg-blue-100 text-blue-700;
+  }
+
+  .badge-restaurante {
+    @apply inline-flex items-center gap-1.5
+           px-2.5 py-1 rounded-full
+           text-xs font-semibold uppercase tracking-wide bg-orange-100 text-orange-700;
+  }
+
+  .badge-admin {
+    @apply inline-flex items-center gap-1.5
+           px-2.5 py-1 rounded-full
+           text-xs font-semibold uppercase tracking-wide bg-purple-100 text-purple-700;
+  }
+
+
+/* ========== INPUTS ========== */
+  .input-base {
+    @apply w-full px-4 py-2.5 rounded-lg
+           border border-gray-300 bg-white
+           text-gray-900 placeholder:text-gray-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+           transition-all duration-200;
+  }
+
+  .input-search {
+    @apply w-full px-4 py-2.5 rounded-lg
+           border border-gray-300 bg-white
+           text-gray-900 placeholder:text-gray-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+           transition-all duration-200 pl-10 pr-10
+           bg-white/95 backdrop-blur-sm;
+  }
+
+  /* ========== LOADING ========== */
+  .loading-container {
+    @apply flex flex-col items-center justify-center
+           min-h-[400px] gap-4;
+  }
+
+  .loading-spinner {
+    @apply w-12 h-12 border-4 border-primary-200 border-t-primary-600
+           rounded-full animate-spin;
+  }
+
+  .loading-text {
+    @apply text-primary-600 font-semibold text-lg;
+  }
+
+  /* ========== EMPTY STATE ========== */
+  .empty-state {
+    @apply flex flex-col items-center justify-center
+           min-h-[400px] p-8 text-center
+           bg-linear-to-br from-white to-primary-50
+           rounded-2xl border-2 border-dashed border-primary-300;
+  }
+
+  .empty-icon {
+    @apply w-20 h-20 text-primary-400 mb-4;
+  }
+
+  .empty-title {
+    @apply text-xl font-bold text-gray-800 mb-2;
+  }
+
+  .empty-description {
+    @apply text-gray-600;
+  }
+
+
+  .grid-restaurantes {
+    @apply grid gap-6 w-full
+           grid-cols-1
+           sm:grid-cols-2
+           lg:grid-cols-3
+           xl:grid-cols-5
+           auto-rows-fr;
+  }
+
+  .grid-promociones {
+    @apply grid gap-5 w-full
+           grid-cols-1
+           sm:grid-cols-2
+           lg:grid-cols-5
+           xl:grid-cols-5;
+  }
+
+  /* ========== ANIMACIONES ========== */
+  .fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  .slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+
+   /* ========== FORM ========== */
   .form-container {
-    @apply w-full bg-white rounded-2xl shadow-lg;
-    margin: 0 auto;
-    max-width: 500px;
-    padding: 24px 32px;
+    @apply w-full max-w-md mx-auto
+           bg-white rounded-2xl shadow-lg
+           p-6 sm:p-8;
   }
 
   .form-field {
-    margin-bottom: 16px;
+    @apply mb-4;
   }
 
   .form-label {
-    @apply block font-semibold text-stone-900;
-    font-size: 14px;
-    margin-bottom: 8px;
+    @apply block font-semibold text-gray-900 text-sm mb-2;
   }
 
   .form-input {
-    @apply w-full rounded-lg border border-stone-300 outline-none
-           transition-all focus:ring-2 focus:ring-primary-500 focus:border-primary-500
-           placeholder:text-stone-400;
-    padding: 10px 14px;
-    font-size: 14px;
+    @apply w-full px-4 py-2.5 rounded-lg
+           border border-gray-300 bg-white
+           text-gray-900 placeholder:text-gray-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+           transition-all duration-200;
   }
 
   .form-error {
-    @apply text-red-600;
-    font-size: 12px;
-    margin-top: 4px;
+    @apply text-red-600 text-xs mt-1;
   }
 
   .form-button {
-    @apply w-full uppercase tracking-wide font-bold text-white rounded-xl
-           transition-all disabled:cursor-not-allowed;
-    padding: 12px 20px;
-    font-size: 14px;
-    background-color: var(--color-primary-500);
-  }
-
-  .form-button:hover:not(:disabled) {
-    background-color: var(--color-primary-600);
-  }
-
-  .form-button:disabled {
-    background-color: #fecaca;
+    @apply w-full py-3 rounded-xl
+           font-bold uppercase tracking-wide text-white
+           bg-primary-500 hover:bg-primary-600
+           disabled:bg-red-200 disabled:cursor-not-allowed
+           transition-all duration-200;
   }
 }
 
-/* ============================
-    Footer
-   ============================ */
 
-footer{
-  @apply bg-[#fff7f6] text-[#1c1917] flex flex-col items-center justify-center w-full border-t-2 border-[#E3291D] gap-3 p-2 z-[1000] font-sans
-}
+/* ========== NAVBAR ========== */
+  .navbar-fixed {
+    @apply fixed top-0 left-0 right-0 z-50
+           h-navbar bg-linear-to-r from-primary-600 to-primary-700
+           shadow-lg;
+  }
+
+  .navbar-container {
+    @apply w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-full
+           flex items-center gap-4;
+  }
+
+  .navbar-brand {
+    @apply flex items-center gap-3 cursor-pointer
+           transition-transform duration-200
+           hover:scale-105;
+  }
+
+  .navbar-logo {
+    @apply h-[45px] w-auto object-contain;
+  }
+
+  .navbar-search {
+    @apply flex-1 max-w-md mt-1;
+  }
+
+  .navbar-city {
+    @apply min-w-[200px] mt-5;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .navbar-search {
+      @apply max-w-xs;
+    }
+    
+    .navbar-city {
+      @apply min-w-40;
+    }
+  }
+
+  .navbar-profile-btn {
+    @apply w-12 h-12 rounded-full
+           bg-white/20 hover:bg-white/30
+           flex items-center justify-center
+           font-bold text-white uppercase
+           transition-all duration-200;
+  }
+
+  /* ========== FOOTER ========== */
+  .footer-container {
+    @apply w-full h-navbar bg-[#fff7f6] border-t-2 border-primary-500
+           py-3 px-3;
+  }
+
+  .footer-content {
+    @apply w-full max-w-[1400px] mx-auto px-4 sm:px-4 lg:px-2
+           flex flex-col items-center gap-1
+           text-center text-gray-700;
+  }
+
+  .footer-company {
+    @apply font-bold text-primary-600 text-lg;
+  }
+
+  .footer-links {
+    @apply flex flex-wrap justify-center items-center gap-6;
+  }
+
+  .footer-link {
+    @apply text-sm cursor-pointer
+           text-gray-700 hover:text-primary-600
+           transition-colors duration-200;
+  }
+
 
 /* ============================
    Dark Mode
    ============================ */
 .dark {
-  background: var(--color-bg-dark);
-  color: var(--color-text-dark);
+  @apply bg-bg-dark text-text-dark;
 }
 
-.dark .card {
-  @apply bg-neutral-900 border-neutral-800;
+.dark .card-base {
+  @apply bg-neutral-900 border border-neutral-800;
 }
 
-.dark .input,
+.dark .input-base,
 .dark .form-input {
   @apply bg-neutral-900 border-neutral-700 text-white;
 }
 
-.dark .btn-outline {
-  @apply border-neutral-400 text-neutral-100;
+
+/* ============================
+   Responsive Typography
+   ============================ */
+@media (max-width: 425px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
 }

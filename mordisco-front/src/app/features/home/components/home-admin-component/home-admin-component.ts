@@ -14,8 +14,7 @@ import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 @Component({
   selector: 'app-home-admin-component',
   imports: [RestauranteCardComponent, UsuarioCardComponent, PedidoCardComponent, MatPaginator],
-  templateUrl: './home-admin-component.html',
-  styleUrl: './home-admin-component.css'
+  templateUrl: './home-admin-component.html'
 })
 export class HomeAdminComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);

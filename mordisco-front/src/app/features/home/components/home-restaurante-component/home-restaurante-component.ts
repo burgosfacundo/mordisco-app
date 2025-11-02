@@ -13,8 +13,7 @@ import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
   selector: 'app-home-restaurante-component',
   standalone: true,
   imports: [PedidoCardComponent, MatPaginator, CommonModule],
-  templateUrl: './home-restaurante-component.html',
-  styleUrl: './home-restaurante-component.css'
+  templateUrl: './home-restaurante-component.html'
 })
 export class HomeRestauranteComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);

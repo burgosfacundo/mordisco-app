@@ -1,7 +1,8 @@
 import { Component, inject, OnInit, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,12 +12,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { NavBarConfigFactory } from './navbar-config';
+import { AuthService } from '../../../shared/services/auth-service';
+import { Ciudad } from '../../../shared/models/ciudad/ciudad';
 import { CiudadService } from '../../services/ciudad/ciudad-service';
-import { Ciudad } from '../../models/ciudad/ciudad';
-import { AuthService } from '../../services/auth-service';
 import { NavbarConfig, NavbarMenuItem } from './navbar-models';
+import { NavBarConfigFactory } from './navbar-config';
 
 @Component({
   selector: 'app-navbar',
@@ -33,41 +33,42 @@ import { NavbarConfig, NavbarMenuItem } from './navbar-models';
     MatSelectModule,
     MatDividerModule,
     MatTooltipModule
-],
+  ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   private authService = inject(AuthService);
   private ciudadService = inject(CiudadService);
   private router = inject(Router);
+  ciudades = signal<Ciudad[]>([]);
+  searchTerm = '';
+  showMobileMenu = signal(false);
   isHomePage = false;
 
   config = signal<NavbarConfig>(NavBarConfigFactory.getConfig(null, false,this.isHomePage));
-  ciudades = signal<Ciudad[]>([]);
-  searchTerm = '';
-
-  private searchSubject = new Subject<string>();
   
+  private searchSubject = new Subject<string>();
+
   currentUser = this.authService.currentUser;
   isAuthenticated = this.authService.isAuthenticated;
   ciudadSeleccionada = this.ciudadService.ciudadSeleccionada;
-
+  
   userName = computed(() => {
     const user = this.currentUser();
     return user?.email?.split('@')[0] || 'Usuario';
   });
 
   constructor() {
-    const currentUrl = this.router.url;
-    this.isHomePage = currentUrl === '/home' || currentUrl === '/';
-
     effect(() => {
       const user = this.currentUser();
       const authenticated = this.isAuthenticated();
+
+      const currentUrl = this.router.url;
+      this.isHomePage = currentUrl === '/home' || currentUrl === '/';
       
       this.config.set(
-        NavBarConfigFactory.getConfig(user?.role ?? null, authenticated, this.isHomePage)
+        NavBarConfigFactory.getConfig(user?.role ?? null, authenticated,this.isHomePage)
       );
     });
 
@@ -77,7 +78,9 @@ export class NavbarComponent {
     ).subscribe(term => {
       this.emitSearchEvent(term);
     });
+  }
 
+  ngOnInit(): void {
     if (this.isHomePage) {
       this.loadCiudades();
     }
@@ -102,16 +105,7 @@ export class NavbarComponent {
         }
       }
     });
-     
   }
-
-
-  compareCiudades = (c1: Ciudad | null, c2: Ciudad | null): boolean => {
-    if (c1 == null && c2 == null) return true;
-    if (c1 == null || c2 == null) return false;
-    return c1.id === c2.id;
-  };
-
 
   private loadCiudades(): void {
     this.ciudadService.getCiudades().subscribe({
@@ -130,8 +124,20 @@ export class NavbarComponent {
     });
   }
 
- onCiudadChange(ciudad: Ciudad): void {
+  onCiudadChange(ciudad: Ciudad): void {
     this.ciudadService.setCiudad(ciudad);
+    this.closeMobileMenu();
+  }
+
+  onCiudadChangeMobile(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const ciudadId = Number(select.value);
+    const ciudad = this.ciudades().find(c => c.id === ciudadId);
+    
+    if (ciudad) {
+      this.ciudadService.setCiudad(ciudad);
+    }
+    this.closeMobileMenu();
   }
 
   onSearchInput(term: string): void {
@@ -164,7 +170,6 @@ export class NavbarComponent {
   logout(): void {
     if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
       this.authService.logout();
-      this.router.navigate(['/login'])
     }
   }
 
@@ -173,7 +178,8 @@ export class NavbarComponent {
   }
 
   goToHome(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/home']);
+    this.closeMobileMenu();
   }
 
   getUserInitials(): string {
@@ -184,4 +190,27 @@ export class NavbarComponent {
     return email.substring(0, 2).toUpperCase();
   }
 
+  toggleMobileMenu(): void {
+    this.showMobileMenu.update(v => !v);
+  }
+
+  closeMobileMenu(): void {
+    this.showMobileMenu.set(false);
+  }
+
+  compareCiudades(c1: Ciudad, c2: Ciudad): boolean {
+    return c1 && c2 ? c1.id === c2.id : c1 === c2;
+  }
+
+
+  getRoleDisplay(): string {
+    const role = this.currentUser()?.role;
+    if (!role) return 'USUARIO';
+    return role.replace('ROLE_', '');
+  }
+
+  getBadgeClass(): string {
+    const role = this.currentUser()?.role?.toLowerCase().replace('role_', '') || 'cliente';
+    return `badge-${role}`;
+  }
 }

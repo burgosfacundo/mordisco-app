@@ -1,15 +1,43 @@
-<div class="infoUsuario">
-  <h1 class="estiloUsuario">{{ usuario.nombre }} {{ usuario.apellido }}</h1>
-  <h2 class="estiloUsuario">{{ usuario.email }}</h2>
+<!-- usuario-card-component.html -->
+<article class="bg-white rounded-xl shadow-md overflow-hidden 
+                transition-all duration-300 hover:shadow-xl hover:-translate-y-1
+                flex flex-col h-full">
+  <!-- Header con Avatar -->
+  <div class="bg-linear-to-r from-blue-500 to-blue-600 p-6">
+    <div class="flex items-center gap-4">
+      <!-- Avatar con iniciales -->
+      <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center
+                  text-blue-600 font-bold text-xl shadow-lg">
+        {{ getInitials() }}
+      </div>
+      <div class="flex-1 min-w-0">
+        <h3 class="text-white font-bold text-lg truncate">
+          {{ usuario.nombre }} {{ usuario.apellido }}
+        </h3>
+        <p class="text-blue-100 text-sm truncate">
+          {{ usuario.email }}
+        </p>
+      </div>
+    </div>
+  </div>
 
-  <h2 class="estiloUsuario">
-    👤 Rol: {{usuario.rol.replace('ROLE_', '')}}
-  </h2>
+  <div class="p-6 flex-1 flex flex-col">
+    <!-- Rol Badge -->
+    <div class="mb-4">
+      <span [class]="'badge-' + usuario.rol.toLowerCase().replace('role_', '')">
+        {{ usuario.rol.replace('ROLE_', '') }}
+      </span>
+    </div>
 
-  <div class="botonContainer">
-    <button class="botonDetalles" [routerLink]="['/detalle-user']">
-      Ver detalles
+    <!-- Botón de acción -->
+    <button 
+      [routerLink]="['/detalle-user', usuario.id]"
+      class="mt-auto w-full py-2.5 rounded-lg
+             bg-blue-50 text-blue-700 font-semibold text-sm
+             hover:bg-blue-100 active:scale-95
+             transition-all duration-200
+             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+      Ver Detalles
     </button>
   </div>
-</div>
-
+</article>

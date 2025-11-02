@@ -7,6 +7,6 @@ export default interface RestauranteForCard {
     razonSocial : string
     activo : boolean
     logo : ImagenResponse
-    horariosDeAtencion : HorarioAtencion
+    horariosDeAtencion : HorarioAtencion[]
     estrellas: number
 }
