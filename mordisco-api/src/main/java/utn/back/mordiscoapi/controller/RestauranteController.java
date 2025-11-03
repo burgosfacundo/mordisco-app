@@ -14,14 +14,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
 import utn.back.mordiscoapi.service.interf.IRestauranteService;
-
-import java.util.List;
 
 @Tag(name = "Restaurante", description = "Operaciones relacionadas con los restaurantes")
 @RestController
@@ -223,31 +220,5 @@ public class RestauranteController {
     public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException{
         restauranteService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Función para agregar o modificar horarios de atención al restaurante.
-     *
-     * @param id del restaurante al que se le agregarán o modificarán los horarios.
-     * @param horarios Lista de horarios a agregar.
-     * @return Respuesta HTTP con un mensaje de éxito.
-     * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
-     */
-    @Operation(summary = "Agregar horarios de atención al restaurante", description = "Recibe un ID de restaurante y una lista de horarios para agregar. " +
-            "**El propio dueño del restaurante puede acceder a su restaurante para agregar horarios**")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Horarios agregados exitosamente al restaurante"),
-            @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
-    @PutMapping("/{id}/horarios")
-    public ResponseEntity<String> addHorarios(@PathVariable Long id,
-                                              @Valid @RequestBody List<HorarioAtencionDTO> horarios)
-            throws NotFoundException, BadRequestException {
-        restauranteService.adHorariosAtencion(id, horarios);
-        return ResponseEntity.ok("Horarios agregados exitosamente al restaurante");
     }
 }

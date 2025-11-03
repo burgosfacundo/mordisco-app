@@ -1,9 +1,10 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
-import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
+import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionRequestDTO;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionResponseDTO;
 import utn.back.mordiscoapi.model.entity.HorarioAtencion;
+import utn.back.mordiscoapi.model.entity.Restaurante;
 
 
 @UtilityClass
@@ -26,12 +27,18 @@ public class HorarioAtencionMapper {
      * @param dto el DTO HorarioAtenciónDTO a convertir
      * @return una entidad HorarioAtención con los datos del DTO
      */
-    public static HorarioAtencion toEntity(HorarioAtencionDTO dto) {
+    public static HorarioAtencion toEntity(Restaurante restaurante, HorarioAtencionRequestDTO dto) {
         return HorarioAtencion.builder()
-                .id(dto.id())
                 .dia(dto.dia())
                 .horaApertura(dto.horaApertura())
                 .horaCierre(dto.horaCierre())
+                .restaurante(restaurante)
                 .build();
+    }
+
+    public static void applyUpdate(HorarioAtencionRequestDTO dto, HorarioAtencion target) {
+        target.setDia(dto.dia());
+        target.setHoraApertura(dto.horaApertura());
+        target.setHoraCierre(dto.horaCierre());
     }
 }

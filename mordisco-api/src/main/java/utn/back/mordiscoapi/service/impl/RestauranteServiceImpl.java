@@ -10,23 +10,17 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.DireccionMapper;
-import utn.back.mordiscoapi.mapper.HorarioAtencionMapper;
 import utn.back.mordiscoapi.mapper.ImagenMapper;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
-import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
-import utn.back.mordiscoapi.model.entity.HorarioAtencion;
 import utn.back.mordiscoapi.model.entity.Restaurante;
-import utn.back.mordiscoapi.repository.HorarioAtencionRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.interf.IRestauranteService;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,7 +28,6 @@ import java.util.stream.Collectors;
 public class RestauranteServiceImpl implements IRestauranteService {
     private final RestauranteRepository restauranteRepository;
     private final UsuarioRepository usuarioRepository;
-    private final HorarioAtencionRepository horarioAtencionRepository;
 
     /**
      * Guarda un nuevo restaurante en la base de datos.
@@ -192,39 +185,5 @@ public class RestauranteServiceImpl implements IRestauranteService {
             throw new NotFoundException("El restaurante a borrar no fue encontrado");
         }
         restauranteRepository.deleteById(id);
-    }
-
-    /**
-     * Agrega o modifica horarios de atención a un restaurante.
-     *
-     * @param idRestaurante ID del restaurante al que se le agregarán o modificarán los horarios.
-     * @param horarios Lista de horarios de atención a agregar.
-     * @throws NotFoundException si el restaurante no se encuentra.
-     */
-    @Transactional
-    @Override
-    public void adHorariosAtencion(Long idRestaurante, List<HorarioAtencionDTO> horarios) throws NotFoundException, BadRequestException {
-        Restaurante restaurante = restauranteRepository.findRestauranteById(idRestaurante)
-                .orElseThrow(() -> new NotFoundException("El restaurante no fue encontrado"));
-
-        for (HorarioAtencionDTO dto : horarios) {
-            if (dto.id()!= null) {
-                HorarioAtencion original = horarioAtencionRepository.findById(dto.id())
-                        .orElseThrow(() -> new NotFoundException("Horario de atención con ID " + dto.id() + " no encontrado"));
-
-                // Verificamos que pertenezca al restaurante
-                if (!restaurante.getHorariosAtencion().contains(original)) {
-                    throw new BadRequestException("El horario con ID " + dto.id() + " no pertenece al restaurante con ID " + idRestaurante);
-                }
-            }
-        }
-
-        var list = horarios.stream()
-                .map(HorarioAtencionMapper::toEntity)
-                .collect(Collectors.toSet());
-
-        restaurante.getHorariosAtencion().clear();
-        restaurante.getHorariosAtencion().addAll(list);
-        restauranteRepository.save(restaurante);
     }
 }

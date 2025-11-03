@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,7 +20,6 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
      * @return una respuesta con un mensaje de error y estado HTTP 401
      */
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+    public ResponseEntity<ErrorResponse> handleBadCredentials() {
         log.warn("Login fallido: credenciales inválidas");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(
@@ -74,8 +74,8 @@ public class GlobalExceptionHandler {
      *
      * @return una respuesta con un mensaje de error y estado HTTP 403
      */
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AuthorizationDeniedException ex) {
         log.warn("Acceso denegado: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(
@@ -110,15 +110,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        // Log completo del error para debugging
+        log.error("DataIntegrityViolationException: ", ex);
+
         String rootMessage = Optional.ofNullable(ex.getRootCause())
                 .map(Throwable::getMessage)
                 .orElse("");
+
+        // Log del mensaje root para ver exactamente qué constraint falló
+        log.error("Root cause message: {}", rootMessage);
 
         String userMessage = messageResolver.resolveMessage(rootMessage);
 
         return Map.of(
                 "error", "Violación de integridad de datos",
-                "message", userMessage
+                "message", userMessage,
+                "debug", rootMessage // SOLO PARA DESARROLLO - Quitar en producción
         );
     }
 

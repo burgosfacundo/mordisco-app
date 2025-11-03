@@ -1,6 +1,7 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import utn.back.mordiscoapi.model.dto.pedido.RestaurantePedidoDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
@@ -9,6 +10,7 @@ import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.utils.Sanitize;
 
 
+@Slf4j
 @UtilityClass
 public class RestauranteMapper {
     /**
@@ -17,6 +19,7 @@ public class RestauranteMapper {
      * @return la entidad de restaurante con los datos del DTO
      */
     public static Restaurante toEntity(RestauranteCreateDTO dto) {
+        log.debug(dto.toString());
         Usuario usuario = Usuario.builder()
                 .id(dto.idUsuario())
                 .build();
@@ -34,6 +37,7 @@ public class RestauranteMapper {
                 .referencias(Sanitize.trimToNull(dto.direccion().referencias()))
                 .latitud(dto.direccion().latitud())
                 .longitud(dto.direccion().longitud())
+                .usuario(usuario)
                 .build();
         return Restaurante.builder()
                 .razonSocial(Sanitize.trimToNull(dto.razonSocial()))
