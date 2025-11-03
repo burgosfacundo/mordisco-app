@@ -1,7 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
 import { Ciudad } from '../../models/ciudad/ciudad';
 
 @Injectable({

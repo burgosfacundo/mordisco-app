@@ -79,4 +79,10 @@ public class CalificacionRestauranteImpl implements ICalificacionRestaurante {
         }
         repository.deleteById(aLong);
     }
+
+    @Override
+    public Page<CalificacionRestauranteProjection> findAllByIdRestaurante(int page, int size, Long idRestaurante) {
+        Pageable pageable = PageRequest.of(page, size);
+        return repository.findAllByRestaurante_Id(idRestaurante,pageable);
+    }
 }

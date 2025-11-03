@@ -43,8 +43,6 @@ public class DireccionMapper {
                 .codigoPostal(Sanitize.trimToNull(dto.codigoPostal()))
                 .ciudad(Sanitize.collapseSpaces(dto.ciudad()))
                 .referencias(Sanitize.trimToNull(dto.referencias()))
-                .latitud(dto.latitud())
-                .longitud(dto.longitud())
                 .build();
     }
 
@@ -61,7 +59,5 @@ public class DireccionMapper {
         target.setCodigoPostal(Sanitize.trimToNull(dto.codigoPostal()));
         target.setCiudad(Sanitize.collapseSpaces(dto.ciudad()));
         target.setReferencias(Sanitize.trimToNull(dto.referencias()));
-        target.setLatitud(dto.latitud());
-        target.setLongitud(dto.longitud());
     }
 }

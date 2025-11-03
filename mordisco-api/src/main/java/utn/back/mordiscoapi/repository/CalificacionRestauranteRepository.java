@@ -21,4 +21,6 @@ public interface CalificacionRestauranteRepository extends JpaRepository<Calific
     FROM CalificacionRestaurante c
     """)
     Page<CalificacionRestauranteProjection> findAllProjection(Pageable pageable);
+
+    Page<CalificacionRestauranteProjection> findAllByRestaurante_Id(Long idRestaurante,Pageable pageable);
 }

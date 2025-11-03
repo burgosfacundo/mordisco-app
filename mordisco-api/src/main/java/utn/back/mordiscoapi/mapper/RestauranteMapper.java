@@ -35,8 +35,6 @@ public class RestauranteMapper {
                 .codigoPostal(Sanitize.trimToNull(dto.direccion().codigoPostal()))
                 .ciudad(Sanitize.collapseSpaces(dto.direccion().ciudad()))
                 .referencias(Sanitize.trimToNull(dto.direccion().referencias()))
-                .latitud(dto.direccion().latitud())
-                .longitud(dto.direccion().longitud())
                 .usuario(usuario)
                 .build();
         return Restaurante.builder()
@@ -70,9 +68,6 @@ public class RestauranteMapper {
                 r.getActivo(),
                 imagen,
                 r.getMenu() == null ? null : r.getMenu().getId(),
-                r.getPromociones().stream().map(PromocionMapper::toDTO).toList(),
-                r.getHorariosAtencion().stream().map(HorarioAtencionMapper::toDTO).toList(),
-                r.getCalificaciones().stream().map(CalificacionRestauranteMapper::toDTO).toList(),
                 estrellas,
                 direccion
                 );

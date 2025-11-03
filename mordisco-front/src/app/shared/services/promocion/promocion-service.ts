@@ -1,9 +1,10 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { environment } from "../../../../environments/environment";
-import PromocionRequest from "../../models/restaurante/promocion-request";
-import PromocionResponse from "../../models/restaurante/promocion-response";
+import PromocionRequest from "../../models/promocion/promocion-request";
+import PromocionResponse from "../../models/promocion/promocion-response";
+import PaginationResponse from "../../models/pagination/pagination-response";
 
 
 @Injectable({
@@ -16,12 +17,13 @@ export class PromocionService {
         return this.http.post<string>(`${environment.apiUrl}/promociones/save`,promocion)
     }
 
-    get(id : number) : Observable<PromocionResponse>{
-        return this.http.get<PromocionResponse>(`${environment.apiUrl}/promociones/${id}`)
+    get(id : number, page : number, size : number) : Observable<PaginationResponse<PromocionResponse>>{
+        const params = new HttpParams().set('page',page).set('size',size)
+        return this.http.get<PaginationResponse<PromocionResponse>>(`${environment.apiUrl}/promociones/${id}`,{params})
     }
 
-    put(promocion : PromocionResponse) : Observable<string>{
-        return this.http.put<string>(`${environment.apiUrl}/promociones/${promocion.id}`,promocion)
+    put(promocion : PromocionRequest, id : number) : Observable<string>{
+        return this.http.put<string>(`${environment.apiUrl}/promociones/${id}`,promocion)
     }
 
     delete(idRestaurante : number , idPromocion : number) : Observable<string>{

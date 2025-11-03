@@ -15,7 +15,6 @@ import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
-import utn.back.mordiscoapi.model.projection.ProductoProjection;
 import utn.back.mordiscoapi.repository.*;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
 
@@ -57,7 +56,7 @@ public class PedidoServiceImpl implements IPedidoService {
         for (ProductoPedido item : pedido.getItems()) {
             item.setPedido(pedido);
 
-            Optional<ProductoProjection> p = productoRepository.findCompleteById(item.getProducto().getId());
+            var p = productoRepository.findById(item.getProducto().getId());
             if (p.isPresent()) {
                 item.setPrecioUnitario(p.get().getPrecio());
                 BigDecimal subtotal = p.get().getPrecio().multiply(BigDecimal.valueOf(item.getCantidad()));

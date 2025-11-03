@@ -3,14 +3,14 @@ package utn.back.mordiscoapi.model.dto.producto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
+import utn.back.mordiscoapi.model.dto.imagen.ImagenCreateDTO;
 
 import java.math.BigDecimal;
 
-public record ProductoDTO(
-        @Positive(message = "El id del producto debe ser positivo")
-        @Schema(description = "Id del producto", example = "5")
-        Long id,
+public record ProductoRequestDTO(
+        @Positive(message = "El id del menu debe ser positivo")
+        @Schema(description = "Id del menu al que pertenece", example = "5")
+        Long idMenu,
         @Size(message = "El nombre del producto debe tener como maximo 50 caracteres", max = 50)
         @NotBlank(message = "El nombre del producto es obligatorio")
         @Schema(description = "Nombre del producto", example = "flan mixto")
@@ -28,7 +28,7 @@ public record ProductoDTO(
         Boolean disponible,
         @NotNull(message = "La imagen es obligatoria")
         @Valid
-        ImagenResponseDTO imagen
+        ImagenCreateDTO imagen
 ) {
 
 }

@@ -9,6 +9,9 @@ import { EditProfilePage } from './features/profile/components/edit-profile-page
 import { MyAddressPage } from './features/direccion/components/my-address-page/my-address-page';
 import { FormAddressPage } from './features/direccion/components/form-address-page/form-address-page';
 import { EditPasswordPage } from './features/profile/components/edit-password-page/edit-password-page';
+import { PromocionFormComponent } from './features/mi-restaurante/components/promocion-form-component/promocion-form-component';
+import { roleGuard } from './core/guards/role/role-guard';
+import { MiRestaurantePageComponent } from './features/mi-restaurante/components/mi-restaurante-page/mi-restaurante-page';
 
 export const routes: Routes = [
  // Páginas públicas 
@@ -22,6 +25,8 @@ export const routes: Routes = [
   {path: 'profile/my-address', component: MyAddressPage, canActivate : [authGuard]},
   {path: 'profile/my-address/form-address', component: FormAddressPage, canActivate : [authGuard]},
   {path: 'edit-password', component : EditPasswordPage, canActivate: [authGuard]},
+  {path: 'mi-restaurante', component:MiRestaurantePageComponent, canActivate: [authGuard,roleGuard]},
+  {path: 'promocion-form', component: PromocionFormComponent, canActivate:[authGuard]},
  
 
   // Ruta por defecto

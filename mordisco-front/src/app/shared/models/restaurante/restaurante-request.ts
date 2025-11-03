@@ -6,7 +6,6 @@ export default interface RestauranteRequest {
     razonSocial: string
     activo: boolean
     logo : ImagenRequest
-    menuId : number
     idUsuario : number
     direccion : DireccionRequest
 
