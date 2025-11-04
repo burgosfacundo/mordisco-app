@@ -123,13 +123,13 @@
           Mis Horarios
         </h2>
         <button 
-          [routerLink]="['/horario-form']"
+          [routerLink]="['/horarios']"
           class="btn-primary">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M12 4v16m8-8H4" />
           </svg>
-          Agregar Horario
+          Gestionar Horarios
         </button>
       </div>
 
@@ -138,9 +138,7 @@
           @for (horario of horariosDeAtencion; track horario.id) {
             <li class="fade-in">
               <app-horario-restaurante-component 
-                [horario]="horario"
-                (editar)="$event"
-                (eliminar)="onEliminarHorario($event)">
+                [horario]="horario">
               </app-horario-restaurante-component>
             </li>
           }

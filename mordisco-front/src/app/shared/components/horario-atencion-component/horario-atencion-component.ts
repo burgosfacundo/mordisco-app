@@ -10,8 +10,6 @@ import HorarioAtencionResponse from '../../models/horario/horario-atencion-respo
 })
 export class HorarioRestauranteComponent {
   @Input() horario!: HorarioAtencionResponse;
-  @Output() editar = new EventEmitter<number>();
-  @Output() eliminar = new EventEmitter<number>();
 
   private readonly DIAS: { [key: string]: string } = {
     'MONDAY': 'Lunes',
@@ -46,13 +44,5 @@ export class HorarioRestauranteComponent {
       return `${baseClasses} bg-green-100 text-green-700`;
     }
     return `${baseClasses} bg-gray-100 text-gray-700`;
-  }
-
-  onEditar(): void {
-    this.editar.emit(this.horario.id);
-  }
-
-  onEliminar(): void {
-    this.eliminar.emit(this.horario.id);
   }
 }
