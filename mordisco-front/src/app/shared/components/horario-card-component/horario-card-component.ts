@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import HorarioAtencion from '../../models/restaurante/horario-atencion';
+import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 
 @Component({
   selector: 'app-horario-card-component',
@@ -9,6 +9,6 @@ import HorarioAtencion from '../../models/restaurante/horario-atencion';
 })
 export class HorarioCardComponent {
 
-    @Input() horario? : HorarioAtencion
+    @Input() horario? : HorarioAtencionResponse
 
 }

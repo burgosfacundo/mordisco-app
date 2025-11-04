@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { HorarioFormComponent } from "../horario-form-component/horario-form-component";
+import { HorarioService } from '../../../../shared/services/horario/horario-service';
 
 @Component({
   selector: 'app-horario-form-page',
@@ -9,13 +10,12 @@ import { HorarioFormComponent } from "../horario-form-component/horario-form-com
   styleUrl: './horario-form-page.css'
 })
 export class HorarioFormPage {
-  rService : RestauranteService = inject(RestauranteService)
+  hService : HorarioService = inject(HorarioService)
   modoEdicion = false;
-/*
-    ngOnInit() {
-    // Se suscribe una vez al BehaviorSubject
+
+  ngOnInit() {
     this.hService.currentHor.subscribe(hor => {//mover el behavior al service horario
-      this.modoEdicion = !!hor;
+        this.modoEdicion = !!hor;
     });
-    }*/
+  }
 }

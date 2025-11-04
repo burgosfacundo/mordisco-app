@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { environment } from "../../../../environments/environment";
 import HorarioAtencionRequest from "../../models/horario/horario-atencion-request";
 import HorarioAtencionResponse from "../../models/horario/horario-atencion-response";
@@ -11,6 +11,8 @@ import PaginationResponse from "../../models/pagination/pagination-response";
 })
 export class HorarioService {
     private http : HttpClient = inject(HttpClient)
+    private horarioObservable = new BehaviorSubject<HorarioAtencionResponse | null>(null)
+    currentHor = this.horarioObservable.asObservable()
 
     save(dto : HorarioAtencionRequest,idRestaurante : number) : Observable<string>{
         return this.http.post<string>(`${environment.apiUrl}/restaurantes/horarios/${idRestaurante}`,dto)
@@ -25,7 +27,15 @@ export class HorarioService {
         return this.http.put<string>(`${environment.apiUrl}/restaurantes/horarios/${id}`,dto)
     }
 
-    delete(idCalificacion : number) : Observable<string>{
-        return this.http.delete<string>(`${environment.apiUrl}/calificaciones/${idCalificacion}`)
+    delete(id : number) : Observable<string>{
+        return this.http.delete<string>(`${environment.apiUrl}/restaurantes/horarios/${id}`)
+    }
+    
+    setHorarioToEdit(horarioAEditar : HorarioAtencionResponse){
+        this.horarioObservable.next(horarioAEditar)
+    }
+    
+    clearHorarioToEdit(): void{
+        this.horarioObservable.next(null)
     }
 }
