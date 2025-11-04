@@ -60,31 +60,49 @@
                 </fieldset>
         </div>  
                 
-                <fieldset class="form-field">
-                    <label for="referenciasID"  class="form-label">Referencias</label>
-                    <input type="text" id="referenciasID" formControlName="referencias" class="form-input"
+        <fieldset class="form-field">
+            <label for="referenciasID"  class="form-label">Referencias</label>
+                <input type="text" id="referenciasID" formControlName="referencias" class="form-input"
                     [class.border-red-500]="getError"
                     [class.focus:ring-red-500]="getError">
                     @if (getError('referencias')) {
                         <p class="form-error">{{ getError('referencias') }}</p>
                     }
-                </fieldset>
+        </fieldset>
              
-    <div style="margin-top: 24px;">
-        <button 
-        (click)="ejecutarEnvio()"
-            type="submit" 
-            [disabled]="formDirecciones.invalid || isSubmitting()" 
-            class="form-button">
-            @if (isSubmitting()) {
-                <span class="inline-flex items-center justify-center gap-2">
-                    <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    {{modoEdicion ? 'Editando...' : 'Creando...' }}
-                </span>
-            } @else {
-                    {{modoEdicion ? 'Editar' : 'Crear' }}
-            }
-        </button>
-    </div>     
+    @if (direccionNeed) {
+        <div style="margin-top: 24px;">
+            <button 
+                type="submit" 
+                [disabled]="formDirecciones.invalid || isSubmitting()" 
+                class="form-button">
+                @if (isSubmitting()) {
+                    <span class="inline-flex items-center justify-center gap-2">
+                        <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        {{modoEdicion ? 'Editando...' : 'Creando...' }}
+                    </span>
+                } @else {
+                        {{modoEdicion ? 'Editar' : 'Crear' }}
+                }
+            </button>
+        </div>    
+    }@else {
+        <div style="margin-top: 24px;">
+            <button 
+                type="submit" 
+                [disabled]="formDirecciones.invalid || isSubmitting()" 
+                class="form-button">
+                @if (isSubmitting()) {
+                    <span class="inline-flex items-center justify-center gap-2">
+                        <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        {{'Cargando...' }}
+                    </span>
+                } @else {
+                        {{'Cargar'}}
+                }
+            </button>
+        </div>   
+    }
+ 
         
 </form>            

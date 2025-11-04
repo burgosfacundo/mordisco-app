@@ -31,6 +31,8 @@ export class DireccionFormComponent implements OnInit{
   @Input() modoEdicion: boolean = false; // valor inicial por defecto
   @Output() loaded = new EventEmitter<void>();
 
+  @Input() direccionNeed : boolean = false
+
   isSubmitting = signal(false)
   idCurrUser ?: number 
 

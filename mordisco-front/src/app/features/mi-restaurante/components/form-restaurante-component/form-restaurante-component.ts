@@ -84,16 +84,12 @@ export class RestauranteFormComponent implements OnInit {
           this.snackBar.open('❌ Restaurante no encontrado', 'Cerrar', { duration: 3000 });
           this.router.navigate(['/']);
         }
-      },
-      error: (error) => {
-        console.error('Error al cargar el restaurante:', error);
-        this.snackBar.open('❌ Error al cargar el restaurante', 'Cerrar', { duration: 4000 });
       }
     });
   }
 
   onSubmit(): void {
-    if (!this.restauranteForm.valid) {
+    if (!this.restauranteForm.valid && !this.direccion) {
       this.markFormGroupTouched(this.restauranteForm);
       this.snackBar.open('⚠️ Por favor completa todos los campos correctamente', 'Cerrar', { duration: 3000 });
       return;
@@ -130,40 +126,40 @@ export class RestauranteFormComponent implements OnInit {
         }
       });
     } else {
-        if(this.userId && this.direccion){
-            const restauranteData: RestauranteRequest = {
-            razonSocial: this.restauranteForm.value.razonSocial,
-            activo : this.restauranteForm.value.activo,
-            logo: {
-                url: this.restauranteForm.value.logo.url,
-                nombre: this.restauranteForm.value.logo.nombre
-            },
-            idUsuario: this.userId,
-            direccion: {
-                calle : this.direccion.calle,
-                numero : this.direccion.numero,
-                piso : this.direccion.piso,
-                depto : this.direccion.depto,
-                codigoPostal : this.direccion.codigoPostal,
-                referencias : this.direccion.referencias,
-                ciudad : this.direccion.ciudad
-            }
+      if(this.userId && this.direccion){
+
+        const restauranteData: RestauranteRequest = {
+          razonSocial: this.restauranteForm.value.razonSocial,
+          activo : this.restauranteForm.value.activo,
+          logo: {
+            url: this.restauranteForm.value.logo.url,
+            nombre: this.restauranteForm.value.logo.nombre
+          },
+          idUsuario: this.userId,
+          direccion: {
+            calle : this.direccion.calle,
+            numero : this.direccion.numero,
+            piso : this.direccion.piso,
+            depto : this.direccion.depto,
+            codigoPostal : this.direccion.codigoPostal,
+            referencias : this.direccion.referencias,
+            ciudad : this.direccion.ciudad
+          }
         };
 
       
-      this.restauranteService.save(restauranteData).subscribe({
-        next: () => {
-          this.snackBar.open('✅ Promoción creada correctamente', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/mi-restaurante']);
-        },
-        error: (error) => {
-          console.error('Error al crear promoción:', error);
-          this.snackBar.open('❌ Error al crear la promoción', 'Cerrar', { duration: 4000 });
-          this.isSubmitting = false;
-        }
-      });
-        }
-        
+        this.restauranteService.save(restauranteData).subscribe({
+          next: () => {
+            this.snackBar.open('✅ Restaurante creado correctamente', 'Cerrar', { duration: 3000 });
+            this.router.navigate(['/mi-restaurante']);
+          },
+          error: (error) => {
+            console.error('Error al crear restaurante:', error);
+            this.snackBar.open('❌ Error al crear el restaurante', 'Cerrar', { duration: 4000 });
+            this.isSubmitting = false;
+          }
+        });
+      }
     }
   }
 
@@ -175,7 +171,7 @@ export class RestauranteFormComponent implements OnInit {
     });
   }
 
-getError(fieldName: string): string | null {
+  getError(fieldName: string): string | null {
     return this.formValidationService.getErrorMessage(
       this.restauranteForm.get(fieldName),
       fieldName

@@ -50,7 +50,7 @@
     </fieldset>
 
     <fieldset class="form-field">
-      <label for="logoUrl" class="form-label">Logo Url</label>
+      <label for="logoUrl" class="form-label">Url del Logo</label>
         <input 
           matInput 
           formControlName="logoUrl"
@@ -67,11 +67,11 @@
     </fieldset>
 
     <fieldset class="form-field">
-      <label for="logoNombre" class="form-label">Logo Url</label>
+      <label for="logoNombre" class="form-label">Nombre del logo</label>
         <input 
           matInput 
           formControlName="logoNombre"
-          placeholder="Url del logo"
+          placeholder="Nombre del logo"
           class="form-input"
           [class.border-red-500]="getError"
           [class.focus:ring-red-500]="getError"
@@ -84,7 +84,8 @@
     </fieldset>
 
     @if(!isEditMode){
-      <app-direccion-form-component (enviarDireccion)="recibirDireccion($event)" />
+      <h2 class="text-3xl font-bold text-primary-600 mb-2">Dirección</h2>
+      <app-direccion-form-component [direccionNeed]="isEditMode" (enviarDireccion)="recibirDireccion($event)" />
     }
 
       <!-- Botones -->

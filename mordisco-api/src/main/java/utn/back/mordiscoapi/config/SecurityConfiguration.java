@@ -50,6 +50,7 @@ public class SecurityConfiguration {
             "/api/usuarios/save",
             "/api/auth/login",
             "/api/auth/refresh",
+            "/api/auth/logout",
 
             // Endpoints públicos de consulta
             "/api/restaurantes/{id}",
