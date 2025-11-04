@@ -1,0 +1,27 @@
+<article class="card-base flex flex-row items-center gap-4 p-4 hover:shadow-lg">
+  <!-- Badge de cantidad -->
+  <div class="flex-shrink-0">
+    <div class="w-12 h-12 rounded-full bg-primary-500 text-white
+                flex items-center justify-center font-bold text-lg shadow-md">
+      {{ producto?.cantidad }}
+    </div>
+  </div>
+
+  <!-- Información del producto -->
+  <div class="flex-1 min-w-0">
+    <h3 class="font-bold text-gray-900 text-base truncate mb-1">
+      {{ producto?.nombreProducto }}
+    </h3>
+    <p class="text-sm text-gray-600">
+      Precio unitario: <span class="font-semibold text-gray-800">${{ producto?.precioUnitario }}</span>
+    </p>
+  </div>
+
+  <!-- Subtotal -->
+  <div class="flex-shrink-0 text-right">
+    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Subtotal</p>
+    <p class="font-bold text-primary-600 text-xl">
+      ${{ calcularSubtotal() }}
+    </p>
+  </div>
+</article>

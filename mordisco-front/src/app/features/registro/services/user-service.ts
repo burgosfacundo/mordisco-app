@@ -38,4 +38,5 @@ export class UserService {
   deleteMe(){
     return this.http.delete<void>(`${environment.apiUrl}/usuarios/me`)
   }
+  
 }

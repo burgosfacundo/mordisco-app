@@ -1,0 +1,141 @@
+<div class="contenedor-grande">
+  <div class="form-container max-w-2xl">
+    <!-- Título dinámico -->
+    <h1 class="titulo-seccion text-center mb-6">
+      {{ isEditMode ? 'Editar Producto' : 'Nuevo Producto' }}
+    </h1>
+
+    <!-- Mensaje de error -->
+    @if (errorMessage) {
+      <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">{{ isEditMode ? 'Cargando producto...' : 'Guardando...' }}</p>
+      </div>
+    }
+
+    <!-- Formulario -->
+    <form [formGroup]="productoForm" (ngSubmit)="onSubmit()" class="form-container">
+      
+      <!-- Nombre del Producto -->
+      <fieldset class="form-field">
+        <label for="nombreProductoID" class="form-label">Nombre del Producto *</label>
+        <input 
+          type="text" 
+          id="nombreProductoID"
+          formControlName="nombreProducto"
+          class="form-input"
+          placeholder="Ej: Hamburguesa Clásica"
+          [class.border-red-500]="getError('nombreProducto')"
+          [class.focus:ring-red-500]="getError('nombreProducto')">
+        @if (getError('nombreProducto')) {
+          <p class="form-error">{{ getError('nombreProducto') }}</p>
+        }
+      </fieldset>
+
+      <!-- Descripción -->
+      <fieldset class="form-field">
+        <label for="descripcionID" class="form-label">Descripción *</label>
+        <textarea 
+          id="descripcionID"
+          formControlName="descripcion"
+          rows="4"
+          class="form-input resize-none"
+          placeholder="Describe el producto..."
+          [class.border-red-500]="getError('descripcion')"
+          [class.focus:ring-red-500]="getError('descripcion')"></textarea>
+        @if (getError('descripcion')) {
+          <p class="form-error">{{ getError('descripcion') }}</p>
+        }
+      </fieldset>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 form-field">
+        <!-- Precio -->
+        <fieldset>
+          <label for="precioUnitarioID" class="form-label">Precio Unitario *</label>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">$</span>
+            <input 
+              type="number" 
+              id="precioUnitarioID"
+              formControlName="precioUnitario"
+              class="form-input pl-8"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [class.border-red-500]="getError('precioUnitario')"
+              [class.focus:ring-red-500]="getError('precioUnitario')">
+          </div>
+          @if (getError('precioUnitario')) {
+            <p class="form-error">{{ getError('precioUnitario') }}</p>
+          }
+        </fieldset>
+
+        <!-- Disponibilidad -->
+        <fieldset>
+          <label class="form-label">Disponibilidad</label>
+          <label class="flex items-center gap-3 cursor-pointer mt-2">
+            <input 
+              type="checkbox" 
+              formControlName="disponible"
+              class="w-5 h-5 rounded border-gray-300 text-primary-600 
+                     focus:ring-2 focus:ring-primary-500">
+            <span class="text-sm text-gray-700">Producto disponible</span>
+          </label>
+        </fieldset>
+      </div>
+
+      <!-- Imagen -->
+      <fieldset class="form-field">
+        <label for="imagenID" class="form-label">Imagen del Producto</label>
+        
+        <!-- Preview de imagen -->
+        @if (imagenPreview) {
+          <div class="mb-4">
+            <img [src]="imagenPreview" alt="Preview" 
+                 class="w-full max-w-md h-64 object-cover rounded-lg border-2 border-gray-200 mx-auto">
+          </div>
+        }
+
+        <input 
+          type="file" 
+          id="imagenID"
+          accept="image/*"
+          (change)="onImageSelected($event)"
+          class="block w-full text-sm text-gray-500
+                 file:mr-4 file:py-2.5 file:px-4
+                 file:rounded-lg file:border-0
+                 file:text-sm file:font-semibold
+                 file:bg-primary-50 file:text-primary-700
+                 hover:file:bg-primary-100
+                 cursor-pointer">
+        <p class="text-xs text-gray-500 mt-2">
+          Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB
+        </p>
+      </fieldset>
+
+      <!-- Botón -->
+      <div style="margin-top: 24px;">
+        <button 
+          type="submit" 
+          [disabled]="productoForm.invalid || isSubmitting" 
+          class="form-button">
+          @if (isSubmitting) {
+            <span class="inline-flex items-center justify-center gap-2">
+              <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              {{ isEditMode ? 'Actualizando...' : 'Creando...' }}
+            </span>
+          } @else {
+            {{ isEditMode ? 'Actualizar Producto' : 'Crear Producto' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

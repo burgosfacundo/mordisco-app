@@ -16,6 +16,7 @@ import { MisPedidosPage } from './features/mis-pedidos/components/mis-pedidos-pa
 import { PromocionFormComponent } from './features/mi-restaurante/components/promocion-form-component/promocion-form-component';
 import { roleGuard } from './core/guards/role/role-guard';
 import { MiRestaurantePageComponent } from './features/mi-restaurante/components/mi-restaurante-page/mi-restaurante-page';
+import { ProductoFormComponent } from './features/mi-restaurante/components/producto-form-component/producto-form-component';
 
 export const routes: Routes = [
  // Páginas públicas 
@@ -39,6 +40,9 @@ export const routes: Routes = [
 
   // Ruta por defecto
   {path : '', redirectTo: 'home', pathMatch: 'full'},
+
+  {path: 'productos/nuevo', component: ProductoFormComponent},
+  {path: 'productos/editar/:id', component: ProductoFormComponent},
 
   // Ruta comodín
   {path: '**', redirectTo: 'home'}
