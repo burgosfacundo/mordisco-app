@@ -2,11 +2,14 @@ import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../shared/services/auth-service';
-import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
-import HorarioAtencion from '../../../../shared/models/restaurante/horario-atencion';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HorarioService } from '../../../../shared/services/horario/horario-service';
+import HorarioAtencionResponse from '../../../../shared/models/horario/horario-atencion-response';
+import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
+import HorarioAtencionRequest from '../../../../shared/models/horario/horario-atencion-request';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-horario-form-component',
@@ -17,16 +20,18 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 export class HorarioFormComponent implements OnInit{
 
   private fb : FormBuilder = inject(FormBuilder)
+  private _snackbar : MatSnackBar = inject(MatSnackBar)
   private validationService : FormValidationService = inject(FormValidationService)
   private aus : AuthService = inject(AuthService)
   private rService : RestauranteService = inject(RestauranteService)
-  //private hService : HorarioService = inject(HorarioService)
+  private hService : HorarioService = inject(HorarioService)
   private router : Router = inject(Router)
   private formatTimePart = (value: number | string): string => { return String(value).padStart(2, '0')} // // Helper para asegurar dos dígitos (ej: 9 -> '09') Asegura que el valor sea un string y rellena a la izquierda con '0' hasta tener 2 caracteres
+  private subscription : Subscription = new Subscription()
 
   formHorarioAtencion! : FormGroup
-  private subscription : Subscription = new Subscription()
-  horarioEditado? : HorarioAtencion
+  horarioEditado? : HorarioAtencionResponse
+
   restaurante? : RestauranteResponse
   idCurrUser ?: number 
 
@@ -47,9 +52,12 @@ export class HorarioFormComponent implements OnInit{
 
     const resp = this.aus.getCurrentUser()
     this.idCurrUser = resp?.userId
-/*
+    if(this.idCurrUser){
+      this.encontrarRestaurante(this.idCurrUser)
+    }
+
     this.subscription.add( 
-      this.rService.currentHor.subscribe(h  => {
+      this.hService.currentHor.subscribe(h  => {
       if(h){
         this.modoEdicion = true
         this.formHorarioAtencion.patchValue(h)
@@ -60,7 +68,15 @@ export class HorarioFormComponent implements OnInit{
       this.loaded.emit();
       })
     )
-  */
+  
+  }
+
+  encontrarRestaurante(id : number){
+    this.rService.getByUsuario(id).subscribe({
+      next:(data)=> this.restaurante=data,
+      error:(e)=>console.log(e)
+    })
+
   }
 
   manejarEnvio(){
@@ -72,25 +88,43 @@ export class HorarioFormComponent implements OnInit{
       const horario = this.formHorarioAtencion.value
       const horaApertura: string =`${this.formatTimePart(horario.horaA)}:${this.formatTimePart(horario.minuteA)}:00`;// Resultado: "HH:mm:00"
       const horaCierre: string =  `${this.formatTimePart(horario.horaC)}:${this.formatTimePart(horario.minuteC)}:00`;// Resultado: "HH:mm:00"
-      let horarioParaBackend: HorarioAtencion
-/*
+      let horarioParaBackend: HorarioAtencionRequest
+
       if(this.modoEdicion){
         horarioParaBackend = {
-          id : this.formHorarioAtencion.value.id,   
           dia: this.formHorarioAtencion.value.dia, 
           horaApertura: horaApertura,
-          horaCierre: horaCierre}
-        this.rService.setHorarioToEdit(horarioParaBackend)
+          horaCierre: horaCierre
+        }
+
+        this.hService.update(this.formHorarioAtencion.value.id,horarioParaBackend).subscribe({
+          next:(data)=>{console.log(data),
+            this.hService.clearHorarioToEdit()
+            this._snackbar.open("✅ Horario editado correctamente",'',{duration: 3000})
+            this.router.navigate(['/horarios'])
+          },error:(e)=> { this.hService.clearHorarioToEdit()
+            this._snackbar.open("❌ No se ha podido editar el horario",'',{duration: 3000})}})
+            this.router.navigate(['/horarios'])
       }else{
         horarioParaBackend = {
           dia: this.formHorarioAtencion.value.dia, 
           horaApertura: horaApertura,
           horaCierre: horaCierre
         }
-        this.rService.setHorarioToEdit(horarioParaBackend)
+
+        if(this.restaurante){
+          this.hService.save(horarioParaBackend, this.restaurante?.id).subscribe({
+            next:(data)=>{console.log(data),
+              this._snackbar.open("✅ Horario creado correctamente",'',{duration: 3000})
+              this.router.navigate(['/horarios'])
+            },error:(e)=>{ console.log(e),
+            this._snackbar.open("❌ No se ha podido crear el horario", "Continuar", { duration: 3000 })
+            this.router.navigate(['/horarios'])
+          }
+          })
+        }
       }
-        this.router.navigate(['/horarios'])
-*/
+
     }      
   }
 
