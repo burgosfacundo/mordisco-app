@@ -1,6 +1,5 @@
-<div class="contenedor-grande">
-  <div class="contenedor-principal">
-    
+<div class="contenedor-principal">
+
     <!-- Header -->
     <div class="mb-8 text-center">
       <h1 class="text-3xl font-bold text-primary-600 mb-2">
@@ -14,81 +13,79 @@
     <!-- Formulario -->
     <form [formGroup]="restauranteForm" (ngSubmit)="onSubmit()" class="space-y-6">
       
-      <div class="form-field">
-        <label for="razonSocial" class="form-label">
-          Razón Social
-        </label>
-        <textarea
-          id="razonSocial"
-          formControlName="razonSocial"
-          rows="3"
-          placeholder="Mc Donalds"
-          class="form-input resize-none">
-          
-        </textarea>
+      <fieldset class="form-field">
+        <label for="razonSocial" class="form-label">Email</label>
+        <input 
+            type="text" 
+            id="razonSocial" 
+            placeholder="Ingresa tu razón social"
+            formControlName="razonSocial" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
         @if (getError('razonSocial')) {
-          <p class="form-error">
-            {{ getError('razonSocial') }}
-          </p>
+            <p class="form-error">{{ getError('razonSocial') }}</p>
         }
-      </div>
+      </fieldset>
 
-      <div class="form-field">
-        <label for="activo" class="form-label">
-            Activo
-        </label>
-        <div class="relative">
-          <input
-            id="activo"
-            type="number"
-            formControlName="activo"
-            step="0.01"
-            class="form-input pr-12"
-            >
-        </div>
-        @if (getError('activo')) {
+    <fieldset class="form-field">
+      <label for="activo" class="form-label">Activo</label>
+      <select 
+        id="activo"
+        formControlName="activo" 
+        class="form-input"
+        [class.border-red-500]="getError"
+        [class.focus:ring-red-500]="getError"
+      >
+        <option value="" disabled selected>Seleccionar</option>
+        <option [value]="true">Si</option>
+        <option [value]="false">No</option>
+      </select>
+      @if (getError('activo')) {
           <p class="form-error">
             {{ getError('activo') }}
           </p>
         }
-      </div>
+    </fieldset>
 
-      <!-- Fecha Inicio -->
-      <div class="form-field">
-        <label for="logoUrl" class="form-label">
+    <fieldset class="form-field">
+      <label for="logoUrl" class="form-label">Logo Url</label>
+        <input 
+          matInput 
+          formControlName="logoUrl"
+          placeholder="Url del logo"
+          class="form-input"
+          [class.border-red-500]="getError"
+          [class.focus:ring-red-500]="getError"
+        >
+      @if (getError('logoUrl')) {
+        <p class="form-error">
+          {{ getError('logoUrl') }}
+        </p>
+      }
+    </fieldset>
 
-        </label>
-        <mat-form-field appearance="outline" class="w-full">
-          <input 
-            matInput 
-            formControlName="logoUrl"
-            placeholder="Url del logo"
-            >
-        </mat-form-field>
-        @if (getError('logoUrl')) {
-          <p class="form-error -mt-4">
-            {{ getError('logoUrl') }}
-          </p>
-        }
-      </div>
+    <fieldset class="form-field">
+      <label for="logoNombre" class="form-label">Logo Url</label>
+        <input 
+          matInput 
+          formControlName="logoNombre"
+          placeholder="Url del logo"
+          class="form-input"
+          [class.border-red-500]="getError"
+          [class.focus:ring-red-500]="getError"
+        >
+      @if (getError('logoNombre')) {
+        <p class="form-error">
+          {{ getError('logoNombre') }}
+        </p>
+      }
+    </fieldset>
 
-      <!-- Fecha Fin -->
-      <div class="form-field">
-        <label for="logoNombre" class="form-label">
-          Fecha de Fin *
-        </label>
-        <mat-form-field appearance="outline" class="w-full">
-          <input 
-            matInput 
-            formControlName="logoNombre"
-            placeholder="Nombre para la imagen">
-        </mat-form-field>
-        @if (getError('logoNombre')) {
-          <p class="form-error -mt-4">
-            {{ getError('logoNombre') }}
-          </p>
-        }
-      </div>
+    @if(!isEditMode){
+      <app-direccion-form-component (enviarDireccion)="recibirDireccion($event)" />
+    }
 
       <!-- Botones -->
       <div class="flex flex-col sm:flex-row gap-4 pt-6">
@@ -115,4 +112,3 @@
       </div>
     </form>
   </div>
-</div>

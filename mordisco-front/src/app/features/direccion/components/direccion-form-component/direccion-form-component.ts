@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
+import DireccionRequest from '../../../../shared/models/direccion/direccion-request';
 
 @Component({
   selector: 'app-direccion-form-component',
@@ -24,6 +25,8 @@ export class DireccionFormComponent implements OnInit{
   
   formDirecciones! : FormGroup 
   private subscription : Subscription = new Subscription()
+
+  @Output() enviarDireccion: EventEmitter<DireccionRequest> = new EventEmitter<DireccionRequest>
 
   @Input() modoEdicion: boolean = false; // valor inicial por defecto
   @Output() loaded = new EventEmitter<void>();
@@ -99,6 +102,19 @@ export class DireccionFormComponent implements OnInit{
     return this.validationService.getErrorMessage(
       this.formDirecciones.get(fieldName),
       fieldName);
+  }
+
+
+  ejecutarEnvio(){
+    this.enviarDireccion.emit({
+      calle: this.formDirecciones.value.calle,
+      numero : this.formDirecciones.value.numero,
+      piso: this.formDirecciones.value.piso,
+      depto: this.formDirecciones.value.depto,
+      codigoPostal: this.formDirecciones.value.codigoPostal,
+      referencias : this.formDirecciones.value.referencias,
+      ciudad: this.formDirecciones.value.ciudad
+    })
   }
 
 }

@@ -72,6 +72,7 @@
              
     <div style="margin-top: 24px;">
         <button 
+        (click)="ejecutarEnvio()"
             type="submit" 
             [disabled]="formDirecciones.invalid || isSubmitting()" 
             class="form-button">

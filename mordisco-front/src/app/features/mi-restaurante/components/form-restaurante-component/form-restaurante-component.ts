@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, Input, OnInit } from "@angular/core";
 import { RestauranteService } from "../../../../shared/services/restaurante/restaurante-service";
 import { AuthService } from "../../../../shared/services/auth-service";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -11,16 +11,18 @@ import RestauranteUpdate from "../../../../shared/models/restaurante/restaurante
 import RestauranteRequest from "../../../../shared/models/restaurante/restaurante-request";
 import DireccionRequest from "../../../../shared/models/direccion/direccion-request";
 import { FormValidationService } from "../../../../shared/services/form-validation-service";
+import { DireccionFormComponent } from "../../../direccion/components/direccion-form-component/direccion-form-component";
 
 @Component({
   selector: 'app-restaurante-form-component',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     ReactiveFormsModule,
     MatInputModule,
-    MatFormFieldModule
-  ],
+    MatFormFieldModule,
+    DireccionFormComponent
+],
   templateUrl: './form-restaurante-component.html'
 })
 export class RestauranteFormComponent implements OnInit {
@@ -38,7 +40,7 @@ export class RestauranteFormComponent implements OnInit {
   isSubmitting = false;
   userId = this.authService.currentUser()?.userId
 
-  direccion : input<DireccionRequest>
+  direccion? : DireccionRequest 
 
   ngOnInit(): void {
     this.initForm();
@@ -128,7 +130,7 @@ export class RestauranteFormComponent implements OnInit {
         }
       });
     } else {
-        if(this.userId){
+        if(this.userId && this.direccion){
             const restauranteData: RestauranteRequest = {
             razonSocial: this.restauranteForm.value.razonSocial,
             activo : this.restauranteForm.value.activo,
@@ -188,5 +190,9 @@ getError(fieldName: string): string | null {
     } else {
       this.router.navigate(['/mi-restaurante']);
     }
+  }
+
+  recibirDireccion(e :DireccionRequest){
+    this.direccion = e
   }
 }
