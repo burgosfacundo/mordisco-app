@@ -11,7 +11,7 @@ import { PromocionService } from '../../../../shared/services/promocion/promocio
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { AuthService } from '../../../../shared/services/auth-service';
 import PromocionRequest from '../../../../shared/models/promocion/promocion-request';
-import PromocionResponse from '../../../../shared/models/promocion/promocion-response';
+import { FormValidationService } from '../../../../shared/services/form-validation-service';
 
 @Component({
   selector: 'app-promocion-form-component',
@@ -29,6 +29,7 @@ import PromocionResponse from '../../../../shared/models/promocion/promocion-res
 export class PromocionFormComponent implements OnInit {
   private promocionService = inject(PromocionService);
   private restauranteService = inject(RestauranteService);
+  private formValidationService = inject(FormValidationService)
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -182,28 +183,11 @@ export class PromocionFormComponent implements OnInit {
     });
   }
 
-  hasError(field: string, error: string): boolean {
-    const control = this.promocionForm.get(field);
-    return !!(control?.hasError(error) && (control?.dirty || control?.touched));
-  }
-
-  getErrorMessage(field: string): string {
-    const control = this.promocionForm.get(field);
-    
-    if (control?.hasError('required')) {
-      return 'Este campo es obligatorio';
-    }
-    if (control?.hasError('maxlength')) {
-      return `Máximo ${control.errors?.['maxlength'].requiredLength} caracteres`;
-    }
-    if (control?.hasError('min')) {
-      return 'El descuento debe ser mayor a 0';
-    }
-    if (control?.hasError('max')) {
-      return 'El descuento no puede ser mayor a 100';
-    }
-    
-    return '';
+  getError(fieldName: string): string | null {
+    return this.formValidationService.getErrorMessage(
+      this.promocionForm.get(fieldName),
+      fieldName
+    );
   }
 
   onCancel(): void {

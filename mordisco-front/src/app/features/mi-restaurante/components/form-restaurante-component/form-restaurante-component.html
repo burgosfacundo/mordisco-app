@@ -4,101 +4,88 @@
     <!-- Header -->
     <div class="mb-8 text-center">
       <h1 class="text-3xl font-bold text-primary-600 mb-2">
-        {{ isEditMode ? 'Editar Promoción' : 'Nueva Promoción' }}
+        {{ isEditMode ? 'Editar Restaurante' : 'Nuevo Restaurante' }}
       </h1>
       <p class="text-gray-600">
-        {{ isEditMode ? 'Modifica los datos de la promoción' : 'Crea una nueva promoción para tu restaurante' }}
+        {{ isEditMode ? 'Modifica los datos del restaurante' : 'Crea tu restaurante' }}
       </p>
     </div>
 
     <!-- Formulario -->
-    <form [formGroup]="promocionForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <form [formGroup]="restauranteForm" (ngSubmit)="onSubmit()" class="space-y-6">
       
-      <!-- Descripción -->
       <div class="form-field">
-        <label for="descripcion" class="form-label">
-          Descripción *
+        <label for="razonSocial" class="form-label">
+          Razón Social
         </label>
         <textarea
-          id="descripcion"
-          formControlName="descripcion"
+          id="razonSocial"
+          formControlName="razonSocial"
           rows="3"
-          placeholder="Ej: 2x1 en hamburguesas todos los martes"
-          class="form-input resize-none"
-          >
+          placeholder="Mc Donalds"
+          class="form-input resize-none">
+          
         </textarea>
-        @if (getError('descripcion')) {
+        @if (getError('razonSocial')) {
           <p class="form-error">
-            {{ getError('descripcion') }}
+            {{ getError('razonSocial') }}
           </p>
         }
       </div>
 
-      <!-- Descuento -->
       <div class="form-field">
-        <label for="descuento" class="form-label">
-          Descuento (%) *
+        <label for="activo" class="form-label">
+            Activo
         </label>
         <div class="relative">
           <input
-            id="descuento"
+            id="activo"
             type="number"
-            formControlName="descuento"
-            min="1"
-            max="100"
+            formControlName="activo"
             step="0.01"
-            placeholder="Ej: 25"
             class="form-input pr-12"
-          >
-          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">
-            %
-          </span>
+            >
         </div>
-        @if (getError('descuento')) {
+        @if (getError('activo')) {
           <p class="form-error">
-            {{ getError('descuento') }}
+            {{ getError('activo') }}
           </p>
         }
       </div>
 
       <!-- Fecha Inicio -->
       <div class="form-field">
-        <label for="fechaInicio" class="form-label">
-          Fecha de Inicio *
+        <label for="logoUrl" class="form-label">
+
         </label>
         <mat-form-field appearance="outline" class="w-full">
           <input 
             matInput 
-            [matDatepicker]="pickerInicio"
-            formControlName="fechaInicio"
-            placeholder="Selecciona una fecha">
-          <mat-datepicker-toggle matIconSuffix [for]="pickerInicio"></mat-datepicker-toggle>
-          <mat-datepicker #pickerInicio></mat-datepicker>
+            formControlName="logoUrl"
+            placeholder="Url del logo"
+            >
         </mat-form-field>
-        @if (getError('fechaInicio')) {
+        @if (getError('logoUrl')) {
           <p class="form-error -mt-4">
-            {{ getError('fechaInicio') }}
+            {{ getError('logoUrl') }}
           </p>
         }
       </div>
 
       <!-- Fecha Fin -->
       <div class="form-field">
-        <label for="fechaFin" class="form-label">
+        <label for="logoNombre" class="form-label">
           Fecha de Fin *
         </label>
         <mat-form-field appearance="outline" class="w-full">
           <input 
             matInput 
-            [matDatepicker]="pickerFin"
-            formControlName="fechaFin"
-            placeholder="Selecciona una fecha">
-          <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
-          <mat-datepicker #pickerFin></mat-datepicker>
+            formControlName="logoNombre"
+            placeholder="Nombre para la imagen">
         </mat-form-field>
-        @if (getError('fechaFin')) {
+        @if (getError('logoNombre')) {
           <p class="form-error -mt-4">
-            {{ getError('fechaFin') }}
+            {{ getError('logoNombre') }}
           </p>
         }
       </div>
@@ -122,7 +109,7 @@
             </svg>
             Guardando...
           } @else {
-            {{ isEditMode ? 'Actualizar Promoción' : 'Crear Promoción' }}
+            {{ isEditMode ? 'Actualizar Restaurante' : 'Crear Restaurante' }}
           }
         </button>
       </div>

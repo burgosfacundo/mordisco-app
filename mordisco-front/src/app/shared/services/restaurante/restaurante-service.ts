@@ -14,6 +14,10 @@ import RestauranteUpdate from '../../models/restaurante/restaurante-update';
 export class RestauranteService {
   private http : HttpClient = inject(HttpClient)
 
+  findById(id : number){
+    return this.http.get<RestauranteResponse>(`${environment.apiUrl}/restaurantes/${id}`)
+  }
+
   getAll(page : number ,size : number) : Observable<PaginationResponse<RestauranteForCard>>{
     const params = new HttpParams().set('page',page).set('size',size);
     return this.http.get<PaginationResponse<RestauranteForCard>>(`${environment.apiUrl}/restaurantes`, {params})

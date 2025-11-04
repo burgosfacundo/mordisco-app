@@ -59,7 +59,7 @@ export class UserFormComponent implements OnInit{
     })
   }
 
-    getError(fieldName: string): string | null {
+  getError(fieldName: string): string | null {
     return this.validationService.getErrorMessage(
       this.userForm.get(fieldName),
       fieldName

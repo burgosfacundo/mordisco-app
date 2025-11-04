@@ -16,11 +16,12 @@ import HorarioAtencionResponse from '../../../../shared/models/horario/horario-a
 import { HorarioRestauranteComponent } from "../../../../shared/components/horario-atencion-component/horario-atencion-component";
 import { CalificacionService } from '../../../../shared/services/calificacion/calificacion-service';
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
+import { RestauranteFormComponent } from "../form-restaurante-component/form-restaurante-component";
 
 @Component({
   selector: 'app-mi-restaurante-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, DireccionCardComponent, PromocionCardComponent, CalificacionComponent, HorarioRestauranteComponent, MatPaginator],
+  imports: [CommonModule, RouterLink, DireccionCardComponent, PromocionCardComponent, CalificacionComponent, HorarioRestauranteComponent, MatPaginator, RestauranteFormComponent],
   templateUrl: './mi-restaurante-page.html'
 })
 export class MiRestaurantePageComponent implements OnInit {
