@@ -71,6 +71,17 @@ public class CalificacionRestauranteController {
         return ResponseEntity.ok(service.findAll(page,size));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante))")
+    @GetMapping("/{idRestaurante}")
+    public ResponseEntity<Page<CalificacionRestauranteProjection>> findAllByIdRestaurante(
+            @RequestParam int page,
+            @RequestParam int size,
+            @PathVariable Long idRestaurante
+    ) {
+        return ResponseEntity.ok(service.findAllByIdRestaurante(page,size,idRestaurante));
+    }
+
 
     /**
      * Función para borrar una calificación de restaurante por su ID.

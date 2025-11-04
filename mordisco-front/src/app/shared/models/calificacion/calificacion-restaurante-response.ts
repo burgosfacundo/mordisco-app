@@ -1,7 +1,8 @@
-import CalificacionDTO from "./calificacion-dto"
-
 export default interface CalificacionRestauranteReponse {
     id : number
+    puntaje :number
+    comentario : string
     fechaHora : string
-    calificacion : CalificacionDTO
+    restauranteId : number
+    usuarioId : number
 }

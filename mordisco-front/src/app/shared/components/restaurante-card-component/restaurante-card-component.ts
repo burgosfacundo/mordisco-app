@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
-import HorarioAtencion from '../../models/restaurante/horario-atencion';
+import HorarioAtencion from '../../models/horario/horario-atencion-request';
 
 
 @Component({

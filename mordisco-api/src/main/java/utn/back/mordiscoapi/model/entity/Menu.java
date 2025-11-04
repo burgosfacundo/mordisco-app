@@ -6,7 +6,10 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "menus")
+@Table(name = "menus",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_menus_restaurante", columnNames = "restaurante_id")
+        })
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,4 +25,8 @@ public class Menu {
 
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Producto> productos;
+
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "restaurante_id")
+    private Restaurante restaurante;
 }

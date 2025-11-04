@@ -6,7 +6,7 @@ import { environment } from '../../../../environments/environment';
 import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
 import RestauranteResponse from '../../models/restaurante/restaurante-response';
 import RestauranteRequest from '../../models/restaurante/restaurante-request';
-import HorarioAtencion from '../../models/restaurante/horario-atencion';
+import RestauranteUpdate from '../../models/restaurante/restaurante-update';
 
 @Injectable({
   providedIn: 'root'
@@ -37,15 +37,11 @@ export class RestauranteService {
     return this.http.post<string>(`${environment.apiUrl}/restaurantes/save`,restaurante)
   }
 
-  put(restaurante : RestauranteRequest) : Observable<string>{
+  put(restaurante : RestauranteUpdate) : Observable<string>{
     return this.http.put<string>(`${environment.apiUrl}/restaurantes/update`,restaurante)
   }
 
   delete(id : number) : Observable<string>{
     return this.http.delete<string>(`${environment.apiUrl}/restaurantes/delete/${id}`)
-  }
-
-  putHorarios(id : number, horarios : HorarioAtencion[]) : Observable<string>{
-    return this.http.put<string>(`${environment.apiUrl}/restaurantes/${id}/horarios`,horarios)
   }
 }

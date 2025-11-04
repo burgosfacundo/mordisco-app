@@ -74,10 +74,8 @@ export class NavBarConfigFactory {
       profileMenuItems: [
         { label: 'Mi Perfil', icon: 'person', route: '/profile' },
         { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
-        { label: 'Mi Restaurante', icon: 'restaurant', route: '/restaurante/editar' },
-        { label: 'Menú', icon: 'menu_book', route: '/restaurante/menu' },
-        { label: 'Ver Pedidos', icon: 'receipt_long', route: '/restaurante/pedidos' },
-        { label: 'Promociones', icon: 'local_offer', route: '/restaurante/promociones' },
+        { label: 'Mi Restaurante', icon: 'restaurant', route: '/mi-restaurante' },
+        { label: 'Menú', icon: 'menu_book', route: '/mi-restaurante/menu' },
         { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
       ]
     }

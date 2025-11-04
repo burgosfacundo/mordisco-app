@@ -48,6 +48,7 @@ public class HorariosServiceImpl implements IHorarioService {
         );
 
         HorarioAtencionMapper.applyUpdate(dto, horario);
+        repository.save(horario);
     }
 
     @Override

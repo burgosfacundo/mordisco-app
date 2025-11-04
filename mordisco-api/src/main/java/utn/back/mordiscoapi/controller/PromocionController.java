@@ -149,7 +149,7 @@ public class PromocionController {
     })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or (hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante))")
-    @GetMapping("restaurante/{idRestaurante}")
+    @GetMapping("/restaurantes/{idRestaurante}")
     public ResponseEntity<Page<PromocionResponseDTO>> listarPromoByIdRestaurante(
             @PathVariable Long idRestaurante,
             @RequestParam int page,

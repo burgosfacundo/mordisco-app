@@ -5,7 +5,5 @@ export default interface DireccionRequest{
     depto?: string,
     codigoPostal: string,
     referencias? : string,
-    latitud?: number,
-    longitud? : number,
     ciudad: string
 }

@@ -41,14 +41,12 @@ public class DireccionService implements IDireccionService {
         Direccion d = DireccionMapper.fromCreateDTO(dto);
         d.setUsuario(u);
 
-        // Si no viene lat/lng, intentar geocodificar
-        if (d.getLatitud() == null || d.getLongitud() == null) {
-            geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
-                    .ifPresent(latLng -> {
-                        d.setLatitud(latLng.lat());
-                        d.setLongitud(latLng.lng());
-                    });
-        }
+        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
+                .ifPresent(latLng -> {
+                    d.setLatitud(latLng.lat());
+                    d.setLongitud(latLng.lng());
+                });
+
 
         direccionRepository.save(d);
         return d.getId();
@@ -62,14 +60,13 @@ public class DireccionService implements IDireccionService {
 
         DireccionMapper.applyUpdate(dto, d);
 
-        // Si no viene lat/lng, o cambió algo clave, reintentar geocoding
-        if (dto.latitud() == null || dto.longitud() == null) {
-            geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
-                    .ifPresent(latLng -> {
-                        d.setLatitud(latLng.lat());
-                        d.setLongitud(latLng.lng());
-                    });
-        }
+
+        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
+                .ifPresent(latLng -> {
+                    d.setLatitud(latLng.lat());
+                    d.setLongitud(latLng.lng());
+                });
+
     }
 
     @Transactional

@@ -61,6 +61,8 @@ public class SecurityConfiguration {
             "/api/restaurantes/horarios/{idRestaurante}",
             "/api/menus/{restauranteId}",
             "/api/promociones/{id}",
+            "/api/productos",
+            "/api/productos{id}",
 
             "/api/public/**"
     };

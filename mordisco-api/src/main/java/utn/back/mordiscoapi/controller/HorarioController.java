@@ -22,7 +22,7 @@ public class HorarioController {
     private final IHorarioService horarioService;
 
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("(hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante)) or @PreAuthorize(hasRole('ADMIN')")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante)")
     @PostMapping("/{idRestaurante}")
     public ResponseEntity<String> save(
             @Valid @Positive @PathVariable Long idRestaurante,
@@ -43,7 +43,7 @@ public class HorarioController {
 
 
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE') or @PreAuthorize(hasRole('ADMIN')")
+    @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
     @PutMapping("/{idHorario}")
     public ResponseEntity<String> update(
             @Valid @Positive @PathVariable Long idHorario,
@@ -54,7 +54,7 @@ public class HorarioController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("(hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#id) or @PreAuthorize(hasRole('ADMIN'))")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('RESTAURANTE')")
     @DeleteMapping("/{idHorario}")
     public ResponseEntity<String> delete(
             @Valid @Positive @PathVariable Long idHorario

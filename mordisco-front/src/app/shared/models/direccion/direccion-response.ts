@@ -6,7 +6,7 @@ export default interface DireccionResponse{
     depto?: string,
     codigoPostal: string,
     referencias? : string,
-    latitud?: number,
-    longitud? : number,
+    latitud: number,
+    longitud : number,
     ciudad: string
 }

@@ -15,7 +15,7 @@ public interface CalificacionRestauranteProjection {
     String getComentario();
 
     @Schema(description = "Fecha y Hora de la calificación", example = " 2025/04/12T12:00")
-    LocalDateTime getFecha();
+    LocalDateTime getFechaHora();
 
     @Schema(description = "ID del restaurante", example = "2")
     Long getRestauranteId();

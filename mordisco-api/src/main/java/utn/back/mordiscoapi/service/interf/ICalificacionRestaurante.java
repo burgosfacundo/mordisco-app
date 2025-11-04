@@ -11,4 +11,6 @@ public interface ICalificacionRestaurante {
     void save(CalificacionRestauranteDTO dto) throws NotFoundException, BadRequestException;
     Page<CalificacionRestauranteProjection> findAll(int pageNo, int pageSize);
     void delete(Long aLong) throws NotFoundException;
+
+    Page<CalificacionRestauranteProjection> findAllByIdRestaurante(int page, int size, Long idRestaurante);
 }

@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.mapper.DireccionMapper;
 import utn.back.mordiscoapi.mapper.ImagenMapper;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
@@ -28,6 +27,7 @@ import utn.back.mordiscoapi.service.interf.IRestauranteService;
 public class RestauranteServiceImpl implements IRestauranteService {
     private final RestauranteRepository restauranteRepository;
     private final UsuarioRepository usuarioRepository;
+    private final GeocodingService geocodingService;
 
     /**
      * Guarda un nuevo restaurante en la base de datos.
@@ -39,6 +39,14 @@ public class RestauranteServiceImpl implements IRestauranteService {
     public void save(RestauranteCreateDTO restauranteCreateDTO) {
         Restaurante restaurante = RestauranteMapper.toEntity(restauranteCreateDTO);
         restaurante.setActivo(false);
+        var d = restaurante.getDireccion();
+
+        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
+                .ifPresent(latLng -> {
+                    d.setLatitud(latLng.lat());
+                    d.setLongitud(latLng.lng());
+                });
+
         restauranteRepository.save(restaurante);
     }
 
@@ -160,14 +168,10 @@ public class RestauranteServiceImpl implements IRestauranteService {
         if (!restauranteRepository.existsByIdAndImagen_Id(dto.id(), dto.logo().id())) {
             throw new BadRequestException("La imagen ya está asociada a otro restaurante");
         }
-        if (!restauranteRepository.existsByIdAndDireccion_Id(dto.id(),dto.direccion().id())) {
-            throw new BadRequestException("La dirección ya está asociada a otro restaurante");
-        }
 
         restaurante.setActivo(dto.activo());
         restaurante.setRazonSocial(dto.razonSocial());
         ImagenMapper.applyUpdate(dto.logo(),restaurante.getImagen());
-        DireccionMapper.applyUpdate(dto.direccion(),restaurante.getDireccion());
 
         restauranteRepository.save(restaurante);
     }

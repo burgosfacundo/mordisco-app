@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.exception.BadRequestException;
 import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.menu.MenuDTO;
+import utn.back.mordiscoapi.model.dto.menu.MenuResponseDTO;
 import utn.back.mordiscoapi.service.interf.IMenuService;
 
 @RequiredArgsConstructor
@@ -23,10 +24,10 @@ public class MenuController {
 
     /**
      * Endpoint para crear un nuevo menú asociado a un restaurante.
-     * Solo accesible por usuarios con rol ADMIN o aquellos que tienen permiso para modificar el menú del restaurante.
+     * Solo accesible por usuarios con rol ADMIN o aquellos que tienen permiso para crear el menú del restaurante.
      *
      * @param restauranteId ID del restaurante al que se asociará el menú.
-     * @param dto           Objeto DTO que contiene los datos del menú a crear.
+     * @param nombre           nombre del menú a crear.
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el restaurante o hay algún error al guardar el menú.
      */
@@ -41,8 +42,11 @@ public class MenuController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#restauranteId)")
     @PostMapping("/crear/{restauranteId}")
-    public ResponseEntity<String> save(@PathVariable Long restauranteId, @RequestBody @Valid MenuDTO dto) throws NotFoundException, BadRequestException {
-        menuService.save(restauranteId, dto);
+    public ResponseEntity<String> save(
+            @PathVariable Long restauranteId,
+            @RequestParam @Valid
+            @Size(max = 50) String nombre) throws NotFoundException, BadRequestException {
+        menuService.save(restauranteId, nombre);
         return ResponseEntity.status(HttpStatus.CREATED).body("Se ha creado el menu correctamente");
     }
 
@@ -62,9 +66,21 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/{restauranteId}")
-    public ResponseEntity<MenuDTO> findByRestauranteId(@PathVariable Long restauranteId) throws NotFoundException {
+    public ResponseEntity<MenuResponseDTO> findByRestauranteId(@PathVariable Long restauranteId) throws NotFoundException {
         return ResponseEntity.ok(menuService.findByRestauranteId(restauranteId));
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#restauranteId)")
+    @PatchMapping("/{restauranteId}")
+    public ResponseEntity<String> update(
+            @PathVariable Long restauranteId,
+            @RequestParam String nombre
+    ) throws NotFoundException {
+        menuService.update(restauranteId,nombre);
+        return ResponseEntity.ok("Se modifico el menu correctamente");
+    }
+
 
 
     /**
@@ -86,7 +102,7 @@ public class MenuController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#restauranteId)")
     @DeleteMapping("/{restauranteId}")
-    public ResponseEntity<String> deleteByRestauranteId(@PathVariable Long restauranteId) throws NotFoundException {
+    public ResponseEntity<String> deleteByRestauranteId(@PathVariable Long restauranteId) throws NotFoundException, BadRequestException {
         menuService.deleteByIdRestaurante(restauranteId);
         return ResponseEntity.noContent().build();
     }

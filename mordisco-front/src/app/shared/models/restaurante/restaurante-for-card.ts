@@ -1,6 +1,6 @@
 
 import ImagenResponse from "../imagen/imagen-response";
-import HorarioAtencion from "./horario-atencion";
+import HorarioAtencion from "../horario/horario-atencion-request";
 
 export default interface RestauranteForCard {
     id : number

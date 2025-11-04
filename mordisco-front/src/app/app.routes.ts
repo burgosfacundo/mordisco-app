@@ -15,6 +15,9 @@ import { HorarioPage } from './features/mi-restaurante/components/horario-page/h
 import { HorarioFormPage } from './features/mi-restaurante/components/horario-form-page/horario-form-page';
 import { MisPedidosPage } from './features/mis-pedidos/components/mis-pedidos-page/mis-pedidos-page';
 import { GestionPedidosPage } from './features/mis-pedidos/components/gestion-pedidos-page/gestion-pedidos-page';
+import { PromocionFormComponent } from './features/mi-restaurante/components/promocion-form-component/promocion-form-component';
+import { roleGuard } from './core/guards/role/role-guard';
+import { MiRestaurantePageComponent } from './features/mi-restaurante/components/mi-restaurante-page/mi-restaurante-page';
 
 export const routes: Routes = [
  // Páginas públicas 
@@ -34,6 +37,9 @@ export const routes: Routes = [
   {path: 'horarios/form-horarios', component: HorarioFormPage},
   {path: 'pedidos', component:MisPedidosPage},
   {path: 'pedidos/gestionar-pedido', component:GestionPedidosPage},
+  {path: 'mi-restaurante', component:MiRestaurantePageComponent, canActivate: [authGuard,roleGuard]},
+  {path: 'promocion-form', component: PromocionFormComponent, canActivate:[authGuard]},
+ 
 
   // Ruta por defecto
   {path : '', redirectTo: 'home', pathMatch: 'full'},
