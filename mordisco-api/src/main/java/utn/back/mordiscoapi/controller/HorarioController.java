@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import utn.back.mordiscoapi.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionRequestDTO;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionResponseDTO;
 import utn.back.mordiscoapi.service.interf.IHorarioService;
+
+import java.util.Map;
 
 @Tag(name = "Promociones", description = "Operaciones relacionadas con las promociones de los restaurantes") // Anotación para documentar la API con Swagger
 @RestController
@@ -24,13 +27,13 @@ public class HorarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante)")
     @PostMapping("/{idRestaurante}")
-    public ResponseEntity<String> save(
+    public ResponseEntity<Long> save(
             @Valid @Positive @PathVariable Long idRestaurante,
             @RequestBody @Valid HorarioAtencionRequestDTO dto
     )
             throws NotFoundException{
-        horarioService.save(idRestaurante, dto);
-        return ResponseEntity.ok("Horario agregado exitosamente al restaurante");
+        Long createdId=horarioService.save(idRestaurante, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdId);
     }
 
     @GetMapping("/{idRestaurante}")
@@ -45,21 +48,21 @@ public class HorarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
     @PutMapping("/{idHorario}")
-    public ResponseEntity<String> update(
+    public ResponseEntity<Map<String,String>> update(
             @Valid @Positive @PathVariable Long idHorario,
             @Valid @RequestBody HorarioAtencionRequestDTO dto
     ) throws NotFoundException {
         horarioService.update(idHorario,dto);
-        return ResponseEntity.ok().body("Horario actualizado correctamente");
+        return ResponseEntity.ok(Map.of("message","Horario actualizado correctamente"));
     }
 
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('RESTAURANTE')")
     @DeleteMapping("/{idHorario}")
-    public ResponseEntity<String> delete(
+    public ResponseEntity<Void> delete(
             @Valid @Positive @PathVariable Long idHorario
     ) throws NotFoundException {
         horarioService.delete(idHorario);
-        return ResponseEntity.ok().body("Horario eliminado correctamente");
+        return ResponseEntity.noContent().build();
     }
 }

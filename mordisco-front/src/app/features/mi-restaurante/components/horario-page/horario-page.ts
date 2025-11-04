@@ -49,6 +49,7 @@ export class HorarioPage implements OnInit{
         this.isLoading = false;
       },error:(e)=> {
         this._snackBar.open('❌ Error al cargar los horarios','Cerrar' , { duration: 3000 });
+        this.router.navigate(['/'])
       }
     })
   };
@@ -102,6 +103,7 @@ export class HorarioPage implements OnInit{
     this.hService.delete(id).subscribe({
       next :(data) => {console.log(data),
         this.openSnackBar('Horario eliminado correctamente')
+        console.log("IDDDD:: ", this.restauranteLeido?.id)
         if(this.restauranteLeido?.id){
           this.listarHorarios(this.restauranteLeido?.id)
         }

@@ -4,26 +4,27 @@
         <select id="diaId" formControlName="dia"class="form-input"
             [class.border-red-500]="formHorarioAtencion.get('dia')?.invalid && formHorarioAtencion.get('dia')?.touched">
             <option value="" disabled selected>Seleccionar tipo</option>
-            <option value="lunes">Lunes</option>
-            <option value="martes">Martes</option>
-            <option value="miercoles">Miercoles</option>
-            <option value="jueves">Jueves</option>
-            <option value="viernes">Viernes</option>
-            <option value="sabado">Sabado</option>
-            <option value="domingo">Domingo</option>
+            <option value="MONDAY">Lunes</option>
+            <option value="THURSDAY">Martes</option>
+            <option value="WEDNESDAY">Miercoles</option>
+            <option value="TUESDAY">Jueves</option>
+            <option value="FRIDAY">Viernes</option>
+            <option value="SATURDAY">Sabado</option>
+            <option value="SUNDAY">Domingo</option>
         </select> 
         @if (formHorarioAtencion.get('dia')?.touched && formHorarioAtencion.controls['dia'].errors?.['required']) {
                 <p class="form-error">*Obligatorio</p>
             } 
     </fieldset>
+
     <fieldset class="form-field">
         <label class="form-label">Hora de apertura</label>
         <div class="time-picker-container">
-            <div class="time-unit-wrapper">
-                <input type="number" id="horaAId" formControlName="horaA" class="form-input"
+            <div class="time-input-wrapper">
+                <input type="number" id="horaAId" formControlName="horaA" class="time-input time-input-hour"
                     [class.border-red-500]="getError('horaA')"
                     [class.focus:ring-red-500]="getError('horaA')">
-                    <span class="unit-label">Hora</span>
+                <span class="time-label">Hora</span>
                 @if (getError('horaA')) {
                         <p class="form-error">{{ getError('horaA') }}</p>
                     }
@@ -31,11 +32,11 @@
         
         <span class="time-separator">:</span>
         
-            <div class="time-unit-wrapper">
-                <input type="number" id="minuteAId" formControlName="minuteA"class="form-input"
+            <div class="time-input-wrapper">
+                <input type="number" id="minuteAId" formControlName="minuteA" class="time-input time-input-minute"
                     [class.border-red-500]="getError('minuteA')"
                     [class.focus:ring-red-500]="getError('minuteA')">
-                    <span class="unit-label">Minuto</span>
+                <span class="time-label">Minuto</span>
                 @if (getError('minuteA')) {
                         <p class="form-error">{{ getError('minuteA') }}</p>
                     }
@@ -46,11 +47,11 @@
     <fieldset class="form-field">
         <label class="form-label">Hora de cierre</label>
         <div class="time-picker-container">
-            <div class="time-unit-wrapper">
-                <input type="number" id="horaCId" formControlName="horaC" class="form-input"
+            <div class="time-input-wrapper">
+                <input type="number" id="horaCId" formControlName="horaC" class="time-input time-input-hour"
                     [class.border-red-500]="getError('horaC')"
                     [class.focus:ring-red-500]="getError('horaC')">
-                    <span class="unit-label">Hora</span>
+                <span class="time-label">Hora</span>
                 @if (getError('horaC')) {
                         <p class="form-error">{{ getError('horaC') }}</p>
                     }
@@ -58,11 +59,11 @@
         
         <span class="time-separator">:</span>
         
-            <div class="time-unit-wrapper">
-                <input type="number" id="minuteCId" formControlName="minuteC"class="form-input"
+            <div class="time-input-wrapper">
+                <input type="number" id="minuteCId" formControlName="minuteC" class="time-input time-input-minute"
                     [class.border-red-500]="getError('minuteC')"
                     [class.focus:ring-red-500]="getError('minuteC')">
-                    <span class="unit-label">Minuto</span>
+                <span class="time-label">Minuto</span>
                 @if (getError('minuteC')) {
                         <p class="form-error">{{ getError('minuteC') }}</p>
                     }

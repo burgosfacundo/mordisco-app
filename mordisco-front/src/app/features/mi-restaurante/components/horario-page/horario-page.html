@@ -22,9 +22,9 @@
                 @for(horario of arrHorarios; track $index){
                     <li class="card-base fade-in">
                         <app-horario-card-component [horario]="horario"></app-horario-card-component>
-                        <div class="flex space-x-3">                        
-                            <button (click)="modificarHorario(horario)" class="btn">Editar</button>
-                            <button (click)="confirmarEliminacion(horario.id)" class="btn">Eliminar</button>
+                        <div class="flex gap-3 p-4">                        
+                            <button (click)="modificarHorario(horario)" class="btn-outline flex-1">Editar</button>
+                            <button (click)="confirmarEliminacion(horario.id)" class="btn-ghost flex-1 text-red-600 hover:bg-red-50">Eliminar</button>
                         </div>    
                     </li>
                 }

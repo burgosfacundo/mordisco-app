@@ -419,17 +419,17 @@ body {
 
   /* ========== TIME PICKER ========== */
 .time-picker-container {
-  @apply flex items-center justify-center gap-3;
+  @apply flex items-center justify-center gap-1.5;
 }
 
 .time-input-wrapper {
-  @apply flex flex-col items-center gap-2;
+  @apply flex flex-col items-center gap-1;
 }
 
 .time-input {
-  @apply w-20 h-20 text-center text-2xl font-bold rounded-xl border-2
+  @apply w-11 h-11 text-center text-lg font-semibold rounded-md border
          transition-all duration-200
-         focus:outline-none focus:ring-4 focus:ring-primary-200
+         focus:outline-none focus:ring-2 focus:ring-primary-200
          [&::-webkit-inner-spin-button]:appearance-none 
          [&::-webkit-outer-spin-button]:appearance-none;
 }
@@ -447,17 +447,16 @@ body {
 }
 
 .time-label {
-  @apply text-xs font-medium text-gray-600;
+  @apply text-[0.55rem] font-medium text-gray-600;
 }
 
 .time-separator {
-  @apply text-3xl font-bold text-gray-400 mb-6;
+  @apply text-xl font-bold text-gray-400 mb-3;
 }
 
 .time-error-container {
-  @apply mt-2 text-center;
+  @apply mt-0.5 text-center;
 }
-
 
 /* ============================
    Dark Mode

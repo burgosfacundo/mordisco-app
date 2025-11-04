@@ -22,12 +22,13 @@ public class HorariosServiceImpl implements IHorarioService {
     private final RestauranteRepository restauranteRepository;
 
     @Override
-    public void save(Long idRestaurante, HorarioAtencionRequestDTO horario) throws NotFoundException {
+    public Long save(Long idRestaurante, HorarioAtencionRequestDTO horario) throws NotFoundException {
         var restaurante = restauranteRepository.findById(idRestaurante).orElseThrow(
                 () -> new NotFoundException("Restaurante no encontrado")
         );
-
-        repository.save(HorarioAtencionMapper.toEntity(restaurante,horario));
+        var hor = HorarioAtencionMapper.toEntity(restaurante,horario);
+        repository.save(hor);
+        return hor.getId();
     }
 
     @Override

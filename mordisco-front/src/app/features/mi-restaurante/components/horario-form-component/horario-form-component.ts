@@ -59,8 +59,19 @@ export class HorarioFormComponent implements OnInit{
     this.subscription.add( 
       this.hService.currentHor.subscribe(h  => {
       if(h){
-        this.modoEdicion = true
-        this.formHorarioAtencion.patchValue(h)
+        this.modoEdicion = true;
+
+        const [horaA, minuteA] = (h.horaApertura ?? '').split(':').slice(0, 2);
+        const [horaC, minuteC] = (h.horaCierre ?? '').split(':').slice(0, 2);
+
+        this.formHorarioAtencion.patchValue({
+          id: h.id ?? null,
+          dia: h.dia ?? '',
+          horaA: horaA ?? '',
+          minuteA: minuteA ?? '',
+          horaC: horaC ?? '',
+          minuteC: minuteC ?? ''
+        });
       }else{
         this.modoEdicion = false
         this.formHorarioAtencion.reset({id : null, dia : '', horaA : '', minuteA : '', horaC : '', minuteC :''})
