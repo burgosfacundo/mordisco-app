@@ -1,0 +1,49 @@
+Titulo “Mis pedidos“
+
+Subtitulo “Pendientes“
+
+Lista de componentes /pedido-card-component.ts
+
+Por cada componente boton “Gestionar“ con reedireccion a gestion-pedido-page.ts
+
+ 
+
+Subtitulo “Filtro por estado“
+
+Select con filtro por estado
+
+Lista de componentes /pedido-card-component.ts
+
+Por cada componente boton “Ver detalle“ con reedireccion a detalle-pedido-page.ts
+<section class="contenedorGrande">
+    <div class="contenedorPrincipal">
+        <h2 class="subtitulo">Mis pedidos</h2>
+        <h3>Pendientes</h3>
+
+        <label for="filtrado">Filtrar por estado: </label>
+        <input type="text" id="filtrado" [formControl]="filtroInput">
+
+        <ul class="contenedorCards">
+            @if(arrPedidosOriginales){
+                @for(pedido of arrPedidosOriginales; track $index){
+                    <li>
+                        <app-pedido-card-component [pedido]="pedido"></app-pedido-card-component>
+                            <div class="flex space-x-3">                        
+                                <button (click)="gestionarPedido(pedido)" class="btn">Gestionar</button>
+                                <button (click)="verDetalle(pedido)" class="btn">Gestionar</button>                            
+                            </div>   
+                    </li>
+                }
+                <mat-paginator
+                    [length]="lengthPedidos"
+                    [pageSize]="sizePedidos"
+                    [pageIndex]="pagePedidos"
+                    (page)="onPageChangePedidos($event)">
+                </mat-paginator>
+            }@else {
+                <p>No hay pedidos que mostrar</p>
+            }
+        </ul>
+    </div>
+
+</section>

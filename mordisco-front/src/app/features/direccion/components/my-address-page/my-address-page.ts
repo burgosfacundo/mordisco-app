@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import Direccion from '../../../../shared/models/direccion/direccion-response';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { DireccionCardComponent } from '../direccion-card-component/direccion-card-component';
+import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
 
 @Component({
   selector: 'app-my-address-page',
@@ -18,14 +19,16 @@ export class MyAddressPage implements OnInit{
   private dService : DireccionService = inject(DireccionService)
   private _snackBar : MatSnackBar = inject(MatSnackBar)
   private router : Router = inject(Router)
-  protected arrDirecciones? : Direccion[]
+  arrDirecciones? : DireccionResponse[]
   idCurrUser : number | undefined
-
+  isLoading = true
+  
   ngOnInit(): void {
     const resp : AuthResponse | null = this.aus.getCurrentUser()
     this.idCurrUser = resp?.userId
 
     if(this.idCurrUser){
+      console.log(this.idCurrUser)
       this.listarDirecciones(this.idCurrUser)
     }else{
         this.openSnackBar('❌ Ocurrió un error al cargar las direcciones')
@@ -36,7 +39,9 @@ export class MyAddressPage implements OnInit{
 
   listarDirecciones(idCurrUser : number){
     this.dService.getAll(idCurrUser).subscribe({
-      next: (data) => this.arrDirecciones = data,
+      next: (data) => { this.arrDirecciones = data
+        this.isLoading=false
+      },
       error:(e) => {console.log(e),
         this.openSnackBar('❌ Ocurrió un error al cargar las direcciones')
         this.router.navigate(['/'])
@@ -44,10 +49,17 @@ export class MyAddressPage implements OnInit{
     })
   }
   
+  confirmarEliminacion(id: number | undefined): void {
+    if (!id) return;
+       const confirmar = confirm('¿Estás seguro de eliminar esta dirección?');
+    if (confirmar) {
+      this.eliminarDireccion(id);
+    }
+  }
+
   eliminarDireccion(id : number | undefined){
    if(!this.idCurrUser || !id){
         this.openSnackBar('❌ Ocurrió un error al cargar el perfil')
-        this.router.navigate(['/'])
         return
     }
 
@@ -62,12 +74,12 @@ export class MyAddressPage implements OnInit{
   }
 
   crearDireccion(){
-    this.router.navigate(['/profile/my-address/form-address'])
+    this.router.navigate(['/my-address/form-address'])
   }
 
   modificarDireccion(direccionEditada : Direccion){
     this.dService.setDireccionToEdit(direccionEditada)
-    this.router.navigate(['/profile/my-address/form-address'])
+    this.router.navigate(['/my-address/form-address'])
   }
 
   private openSnackBar(message: string, action: string = 'Cerrar'): void {

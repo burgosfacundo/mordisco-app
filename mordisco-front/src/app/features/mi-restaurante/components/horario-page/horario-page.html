@@ -1,0 +1,25 @@
+<section class="contenedorGrande">
+
+    <div class="contenedorPrincipal">
+        <h3 class="subtitulo">Horarios de atencion</h3>
+        <ul class="contenedorCards">
+            @if (arrHorarios) {
+                @for(horario of arrHorarios; track $index){
+                    <li class="card">
+                        <app-horario-card-component [horario]="horario"></app-horario-card-component>
+                        <div class="flex space-x-3">                        
+                            <button (click)="modificarHorario(horario)" class="btn">Editar</button>
+                            <!-- <button (click)="eliminarHorario(horario.id)" class="btn">Eliminar</button> -->
+                        </div>    
+                    </li>
+                }
+            }@else{
+                <p>No tiene horarios cargados aun!</p>
+            }
+        </ul>
+
+        <section class="flex justify-center space-x-4 pt-3">
+            <button (click)="crearHorario()" class="form-button">Agregar nuevo horario</button>
+        </section> 
+    </div>
+</section>

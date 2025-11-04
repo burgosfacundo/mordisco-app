@@ -1,24 +1,53 @@
-<section class="contenedorGrande">
-    <div class="contenedorPrincipal"> 
-        <h3 class="subtitulo">Mis direcciones</h3>
-        <ul class="contenedorCards">
+<main class="pt-20">
+
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
+  <section class="space-y-6">
+    <section class="flex justify-between pt-1">
+      <h2 class="titulo-seccion"> Mis direcciones</h2>
+      <button 
+        (click)="crearDireccion()" 
+        class="btn-primary">
+        Agregar nueva dirección
+      </button>
+    </section>
+
+    @if (isLoading) {
+      <!-- Loading State -->
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando direcciones...</p>
+      </div>
+    }@else {
+        <ul class="grid-direcciones">
             @if (arrDirecciones) {
-                @for(direccion of arrDirecciones; track $index){
-                    <li class="card">
+                @for(direccion of arrDirecciones; track direccion.id){
+                    <li class="card-base fade-in">
                         <app-direccion-card-component [direccion]="direccion"></app-direccion-card-component>
-                        <div class="flex space-x-3">                        
-                            <button (click)="modificarDireccion(direccion)" class="btn">Editar</button>
-                            <button (click)="eliminarDireccion(direccion.id)" class="btn">Eliminar</button>
+                        <div class="flex gap-3 p-4">                        
+                            <button (click)="modificarDireccion(direccion)" class="btn-outline flex-1">Editar</button>
+                            <button (click)="confirmarEliminacion(direccion.id)"class="btn-ghost flex-1 text-red-600 hover:bg-red-50">Eliminar</button>
                         </div>    
                     </li>
                 }
             }@else{
-                <p>No tiene direcciones cargadas aun!</p>
+                        <!-- Empty State -->
+                <div class="empty-state">
+                    <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <h3 class="empty-title">No tienes direcciones</h3>
+                    <p class="empty-description">
+                        Agrega tu primera dirección para comenzar
+                    </p>
+                </div>
             }
-        </ul>
-        
-        <section class="flex justify-center space-x-4 pt-3">
-            <button (click)="crearDireccion()" class="form-button">Agregar nueva direccion</button>
-        </section>    
-    </div>
-</section>
+        </ul>        
+
+    }
+    
+</section> 
+</div>
+</main>

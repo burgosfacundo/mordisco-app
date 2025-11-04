@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import Direccion from '../../../../shared/models/direccion/direccion-response';
+import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
 
 @Component({
   selector: 'app-direccion-card-component',
@@ -8,6 +8,6 @@ import Direccion from '../../../../shared/models/direccion/direccion-response';
 })
 export class DireccionCardComponent {
 
-  @Input() direccion? : Direccion
+  @Input() direccion? : DireccionResponse
 
 }

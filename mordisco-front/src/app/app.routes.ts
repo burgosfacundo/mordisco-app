@@ -9,20 +9,31 @@ import { EditProfilePage } from './features/profile/components/edit-profile-page
 import { MyAddressPage } from './features/direccion/components/my-address-page/my-address-page';
 import { FormAddressPage } from './features/direccion/components/form-address-page/form-address-page';
 import { EditPasswordPage } from './features/profile/components/edit-password-page/edit-password-page';
+import { MiMenuPage } from './features/mi-restaurante/components/mi-menu-page/mi-menu-page';
+import { ProductoFormPage } from './features/mi-restaurante/components/producto-form-page/producto-form-page';
+import { HorarioPage } from './features/mi-restaurante/components/horario-page/horario-page';
+import { HorarioFormPage } from './features/mi-restaurante/components/horario-form-page/horario-form-page';
+import { MisPedidosPage } from './features/mis-pedidos/components/mis-pedidos-page/mis-pedidos-page';
+import { GestionPedidosPage } from './features/mis-pedidos/components/gestion-pedidos-page/gestion-pedidos-page';
 
 export const routes: Routes = [
  // Páginas públicas 
   {path : 'home', component: HomePage},
-  { path: 'login', component: LoginPage, canActivate: [publicOnlyGuard]},
-  { path: 'registro', component: RegistroPage, canActivate: [publicOnlyGuard]},
+  {path: 'login', component: LoginPage, canActivate: [publicOnlyGuard]},
+  {path: 'registro', component: RegistroPage, canActivate: [publicOnlyGuard]},
 
   // Rutas protegidas con authGuard
   {path: 'profile', component: ProfilePage, canActivate: [authGuard]},
   {path: 'profile/edit', component:EditProfilePage, canActivate: [authGuard]},
-  {path: 'profile/my-address', component: MyAddressPage, canActivate : [authGuard]},
-  {path: 'profile/my-address/form-address', component: FormAddressPage, canActivate : [authGuard]},
+  {path: 'my-address', component: MyAddressPage, canActivate : [authGuard]},
+  {path: 'my-address/form-address', component: FormAddressPage, canActivate : [authGuard]},
   {path: 'edit-password', component : EditPasswordPage, canActivate: [authGuard]},
- 
+  {path: 'mi-menu', component : MiMenuPage, canActivate : [authGuard]},
+  {path: 'product/form-product', component : ProductoFormPage, canActivate : [authGuard]},
+  {path: 'horarios', component: HorarioPage},
+  {path: 'horarios/form-horarios', component: HorarioFormPage},
+  {path: 'pedidos', component:MisPedidosPage},
+  {path: 'pedidos/gestionar-pedido', component:GestionPedidosPage},
 
   // Ruta por defecto
   {path : '', redirectTo: 'home', pathMatch: 'full'},

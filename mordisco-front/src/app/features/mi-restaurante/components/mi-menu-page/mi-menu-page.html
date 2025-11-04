@@ -1,0 +1,37 @@
+<main class="pt-20">
+
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
+    <section class="space-y-6">
+    <section class="flex justify-between pt-1">
+      <h2 class="titulo-seccion"> Mi menu</h2>
+      <button 
+        (click)="agregarProducto()" 
+        class="btn-primary">
+        Agregar nueva dirección
+      </button>
+    </section>        @
+        @if (isLoading) {
+        <!-- Loading State -->
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Cargando menu...</p>
+        </div>
+        }@else{
+            <ul class="grid-direcciones">
+                @if(menu?.productos){
+                    @for (producto of menu?.productos; track menu?.id) {
+                        <li class="card-base fade-in">
+                            <app-producto-card-component></app-producto-card-component>
+                            <div class="flex space-x-3">
+                                <button (click)="confirmarEliminacion(producto.id)" class="btn">Eliminar</button>
+                                <button (click)="editarProducto(producto)" class="btn">Editar</button>
+                            </div>
+                        </li>
+                    }
+                }
+            </ul>
+        }
+
+    </section>
+</div>
+</main>

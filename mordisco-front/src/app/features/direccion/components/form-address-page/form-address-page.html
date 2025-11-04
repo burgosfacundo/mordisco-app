@@ -1,6 +1,6 @@
-<section class="contenedorGrande">
-    <div class="contenedorPrincipal"> 
-        <h1 class="subtitulo"> {{modoEdicion ? 'Modificar direccion' : 'Crear nueva direccion'}}</h1>
+<main class="pt-20">
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
+        <h2 class="titulo-seccion"> {{modoEdicion ? 'Modificar direccion' : 'Crear nueva direccion'}}</h2>
         <app-direccion-form-component [modoEdicion]="modoEdicion"></app-direccion-form-component>
-    </div>
-</section>
+</div>
+</main>

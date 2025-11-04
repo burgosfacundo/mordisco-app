@@ -1,16 +1,16 @@
-<div class="flex flex-col gap-1 text-gray-700 font-poppins break-words">
-    
-    <h1 class="text-base m-0 text-black font-montserrat">{{direccion?.calle}}</h1>
-    <h1 class="text-base m-0 text-black font-montserrat">{{direccion?.numero}} </h1>
-
-    @if (direccion?.piso) {
-        <h2 class="text-base m-0 text-black font-montserrat"> {{direccion?.piso}} {{direccion?.depto}} </h2>
-    }
-    
-    <h2 class="text-base m-0 text-black font-montserrat">Codigo postal {{direccion?.codigoPostal}}</h2>
-    <h2 class="text-base m-0 text-black font-montserrat">Ciudad {{direccion?.ciudad}}</h2>
-
-    @if(direccion?.referencias){
-        <h3 class="text-sm text-gray-600 mt-2 italic">Referencias: {{direccion?.referencias}}</h3>
-    }
+<div class="card-base card-direccion-content">
+  <!-- Título con ícono -->
+    <div class="space-y-2 text-sm">
+        <p class="text-gray-900 font-medium">
+        {{ direccion?.calle }} {{ direccion?.numero }}
+        </p>
+        @if (direccion?.piso) {
+        <p class="text-gray-600">{{ direccion?.piso }} {{direccion?.depto}} </p>
+        }
+        <p class="text-gray-900 font-medium">Codigo postal {{direccion?.codigoPostal}}</p>
+        <p class="text-gray-900 font-medium">Ciudad {{direccion?.ciudad}}</p>
+        @if (direccion?.referencias) {
+        <p class="text-gray-500 text-xs">📍  {{direccion?.referencias}}</p>
+        }
+    </div>
 </div>

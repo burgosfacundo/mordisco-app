@@ -1,4 +1,5 @@
-    @if (usuario) {
+
+@if (usuario) {
         <div class="space-y-1.5">
             <h2 class="text-0.5rem font-semibold text-gray-700 border-b border-gray-100 pb-1" style="color: #E3291D;">Nombre <span style="color:black">{{usuario.nombre}}</span></h2> 
             <h2 class="text-0.5rem font-semibold text-gray-700 border-b border-gray-100 pb-1" style="color: #E3291D;">Apellido <span style="color:black">{{usuario.apellido}}</span></h2> 
@@ -6,8 +7,9 @@
             <h2 class="text-0.5rem font-semibold text-gray-700 border-b border-gray-100 pb-1" style="color: #E3291D;">Email <span style="color:black">{{usuario.email}}</span></h2> 
 
             <section class="flex justify-center space-x-4 pt-3">
-                <button (click)="editarPerfil()" class="btn">Editar perfil</button>
-                <button (click)="confirmarEliminacion()" class="btn">Eliminar cuenta</button>
+                <button (click)="editarPerfil()" class="btn-primary">Editar perfil</button>
+                    
+                <button (click)="confirmarEliminacion()" class="btn-primary">Eliminar cuenta</button>
             </section>
             
         </div>

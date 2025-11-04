@@ -154,6 +154,14 @@ body {
     @apply w-full h-full object-cover;
   }
 
+  .card-direccion {
+    @apply flex flex-col h-full;
+  }
+
+  .card-direccion-content {
+    @apply p-5 space-y-4;
+  }
+
    /* ========== BADGES ========== */
   .badge-promocion {
     @apply absolute top-3 right-3 z-10
@@ -258,6 +266,14 @@ body {
            sm:grid-cols-2
            lg:grid-cols-5
            xl:grid-cols-5;
+  }
+
+  .grid-direcciones {
+    @apply grid gap-6 w-full
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-3
+          auto-rows-fr;
   }
 
   /* ========== ANIMACIONES ========== */
