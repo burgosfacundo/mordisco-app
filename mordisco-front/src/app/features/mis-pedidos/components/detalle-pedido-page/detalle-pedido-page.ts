@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { UsuarioCardComponent } from '../../../../shared/components/usuario-card-component/usuario-card-component';
 import { ProductoPedidoCardComponent } from '../producto-pedido-card-component/producto-pedido-card-component';
 import { DireccionCardComponent } from '../../../direccion/components/direccion-card-component/direccion-card-component';
@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
+import UserPedido from '../../../../shared/models/user/user-pedido';
 
 @Component({
   selector: 'app-detalle-pedido-page',
@@ -21,10 +22,12 @@ export class DetallePedidoPage {
   private pedidoService = inject(PedidoService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  @Input() usuarioPedido!: UserPedido;
 
   protected pedido?: PedidoResponse;
   protected isLoading = true;
   readonly tipoEntregaEnum = TipoEntrega;
+
 
  formatearEntrega(pedidoResponse : PedidoResponse){
     if(pedidoResponse.tipoEntrega === TipoEntrega.DELIVERY){

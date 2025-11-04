@@ -1,5 +1,6 @@
 export default interface CalificacionDTO {
-    idUsuario: number
+    usuario: string
     puntaje : number
+    fechaHora : string
     comentario : string
 }
