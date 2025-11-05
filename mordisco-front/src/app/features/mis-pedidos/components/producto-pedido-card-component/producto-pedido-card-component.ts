@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import ProductoResponse from '../../../../shared/models/producto/producto-response';
+import ProductoPedidoResponse from '../../../../shared/models/producto/productoPedidoResponse';
 
 @Component({
   selector: 'app-producto-pedido-card-component',
@@ -9,7 +10,7 @@ import ProductoResponse from '../../../../shared/models/producto/producto-respon
   styleUrl: './producto-pedido-card-component.css'
 })
 export class ProductoPedidoCardComponent {
-    @Input() producto?: ProductoResponse;
+    @Input() producto?: ProductoPedidoResponse;
 
   /**
    * Calcula el subtotal del producto (precio unitario * cantidad)

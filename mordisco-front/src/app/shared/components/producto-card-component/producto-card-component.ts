@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import ProductoCard from '../../models/producto/producto-card';
+import ProductoResponse from '../../models/producto/producto-response';
 
 @Component({
   selector: 'app-producto-card-component',
@@ -8,5 +9,8 @@ import ProductoCard from '../../models/producto/producto-card';
   styleUrl: './producto-card-component.css'
 })
 export class ProductoCardComponent {
-@Input() producto? : ProductoCard
+
+  @Input() producto? : ProductoCard
+
+
 }

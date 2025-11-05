@@ -16,7 +16,7 @@ import { MisPedidosPage } from './features/mis-pedidos/components/mis-pedidos-pa
 import { PromocionFormComponent } from './features/mi-restaurante/components/promocion-form-component/promocion-form-component';
 import { roleGuard } from './core/guards/role/role-guard';
 import { MiRestaurantePageComponent } from './features/mi-restaurante/components/mi-restaurante-page/mi-restaurante-page';
-import { ProductoFormComponent } from './features/mi-restaurante/components/producto-form-component/producto-form-component';
+//import { ProductoFormComponent } from './features/mi-restaurante/components/producto-form-component/producto-form-component';
 
 export const routes: Routes = [
  // Páginas públicas 
@@ -31,18 +31,17 @@ export const routes: Routes = [
   {path: 'my-address/form-address', component: FormAddressPage, canActivate : [authGuard]},
   {path: 'edit-password', component : EditPasswordPage, canActivate: [authGuard]},
   {path: 'mi-menu', component : MiMenuPage, canActivate : [authGuard]},
-  {path: 'horarios', component: HorarioPage},
-  {path: 'horarios/form-horarios', component: HorarioFormPage},
-  {path: 'pedidos', component:MisPedidosPage},
+  {path: 'horarios', component: HorarioPage, canActivate:[authGuard]},
+  {path: 'horarios/form-horarios', component: HorarioFormPage, canActivate:[authGuard]},
+  {path: 'pedidos', component:MisPedidosPage, canActivate:[authGuard]},
   {path: 'mi-restaurante', component:MiRestaurantePageComponent, canActivate: [authGuard,roleGuard]},
   {path: 'promocion-form', component: PromocionFormComponent, canActivate:[authGuard]},
- 
 
   // Ruta por defecto
   {path : '', redirectTo: 'home', pathMatch: 'full'},
 
-  {path: 'productos/nuevo', component: ProductoFormComponent},
-  {path: 'productos/editar/:id', component: ProductoFormComponent},
+  //{path: 'productos/nuevo', component: ProductoFormComponent},
+  //{path: 'productos/editar/:id', component: ProductoFormComponent},
 
   // Ruta comodín
   {path: '**', redirectTo: 'home'}

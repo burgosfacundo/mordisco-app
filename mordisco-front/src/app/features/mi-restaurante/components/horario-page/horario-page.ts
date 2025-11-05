@@ -103,13 +103,12 @@ export class HorarioPage implements OnInit{
     this.hService.delete(id).subscribe({
       next :(data) => {console.log(data),
         this.openSnackBar('Horario eliminado correctamente')
-        console.log("IDDDD:: ", this.restauranteLeido?.id)
         if(this.restauranteLeido?.id){
           this.listarHorarios(this.restauranteLeido?.id)
         }
       },
       error: (e)=> {console.log(e),
-        this.openSnackBar('❌ Ocurrió un error al eliminar direccion')}
+        this.openSnackBar('❌ Ocurrió un error al eliminar el horario')}
     })
   }
 

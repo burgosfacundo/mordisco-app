@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { environment } from "../../../../environments/environment";
 import ProductoRequest from "../../models/producto/producto-request";
 import PaginationResponse from "../../models/pagination/pagination-response";
@@ -10,8 +10,10 @@ import ProductoUpdate from "../../models/producto/producto-update";
 @Injectable({
   providedIn: 'root'
 })
-export class RestauranteService {
+export class ProductoService {
   private http : HttpClient = inject(HttpClient)
+  private productoObservable = new BehaviorSubject<ProductoResponse | null>(null)
+  currentProd = this.productoObservable.asObservable()
 
   post(dto : ProductoRequest) : Observable<string>{
     return this.http.post<string>(`${environment.apiUrl}/productos/save`,dto)
@@ -28,5 +30,13 @@ export class RestauranteService {
 
   delete(id : number) : Observable<string>{
     return this.http.delete<string>(`${environment.apiUrl}/productos/${id}`)
+  }
+  
+  setProductoToEdit(producto : ProductoResponse){
+    this.productoObservable.next(producto)
+  }
+      
+  clearProductoToEdit(): void{
+    this.productoObservable.next(null)
   }
 }

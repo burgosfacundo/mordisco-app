@@ -257,7 +257,7 @@ body {
            sm:grid-cols-2
            lg:grid-cols-3
            xl:grid-cols-5
-           auto-rows-fr;
+           auto-rows-auto;
   }
 
   .grid-promociones {
@@ -457,7 +457,46 @@ body {
 .time-error-container {
   @apply mt-0.5 text-center;
 }
+/* ========== PEDIDO ESTADO BUTTONS ========== */
+.pedido-estado-container {
+  @apply flex flex-wrap gap-1 mt-1.5 pt-1.5 border-t border-gray-200;
+}
 
+.pedido-estado-btn {
+  @apply flex-1 min-w-[60px] py-1 px-1.5 rounded
+         font-semibold text-[0.55rem] uppercase tracking-wide
+         transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-1
+         disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.estado-activo {
+  @apply bg-primary-500 text-white shadow-sm
+         hover:bg-primary-600
+         focus:ring-primary-400;
+}
+
+.estado-inactivo {
+  @apply bg-gray-100 text-gray-500 
+         hover:bg-gray-200 hover:text-gray-700
+         focus:ring-gray-200;
+}
+
+/* Estilo especial para botón Cancelado cuando está activo */
+.pedido-estado-btn-cancelado.estado-activo {
+  @apply bg-red-500 hover:bg-red-600 focus:ring-red-400;
+}
+
+/* Responsive: columnas y fuente en móvil */
+@media (max-width: 640px) {
+  .pedido-estado-container {
+    @apply flex-col;
+  }
+
+  .pedido-estado-btn {
+    @apply w-full min-w-full text-[0.45rem] py-0.5 px-1;
+  }
+}
 /* ============================
    Dark Mode
    ============================ */
