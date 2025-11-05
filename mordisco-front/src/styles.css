@@ -497,6 +497,55 @@ body {
     @apply w-full min-w-full text-[0.45rem] py-0.5 px-1;
   }
 }
+/* ========== FILTRO PEDIDOS ========== */
+.filtro-pedidos-container {
+  @apply mb-3 p-2 bg-white rounded-lg shadow-sm border border-gray-200 inline-block max-w-fit;
+}
+
+.filtro-pedidos-field {
+  @apply flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2 sm:w-auto;
+}
+
+.filtro-pedidos-label {
+  @apply font-semibold text-gray-700 text-[11px] sm:min-w-[100px];
+}
+
+.filtro-pedidos-select {
+  @apply px-2 py-1.5 rounded-md
+         border border-gray-300 bg-white
+         text-gray-900 text-[12px] font-medium
+         focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400
+         transition-all duration-200
+         cursor-pointer
+         hover:border-primary-300
+         w-auto min-w-[120px];
+}
+
+.filtro-pedidos-badge {
+  @apply mt-1 flex justify-center sm:justify-start;
+}
+
+.badge-estado {
+  @apply inline-flex items-center gap-1
+         px-2 py-1 rounded-full
+         text-[10px] font-semibold uppercase tracking-wide
+         transition-all duration-200;
+}
+
+/* Estados */
+.badge-estado-todos      { @apply bg-gray-100 text-gray-700; }
+.badge-estado-pendiente  { @apply bg-yellow-100 text-yellow-700; }
+.badge-estado-en_proceso { @apply bg-blue-100 text-blue-700; }
+.badge-estado-en_camino  { @apply bg-purple-100 text-purple-700; }
+.badge-estado-recibido   { @apply bg-green-100 text-green-700; }
+.badge-estado-cancelado  { @apply bg-red-100 text-red-700; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .filtro-pedidos-container { @apply w-full; }
+  .filtro-pedidos-field { @apply flex-col w-full gap-1; }
+  .filtro-pedidos-select { @apply w-full text-[11px] py-1; }
+}
 /* ============================
    Dark Mode
    ============================ */

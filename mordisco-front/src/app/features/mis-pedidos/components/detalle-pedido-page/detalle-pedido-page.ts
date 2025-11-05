@@ -7,7 +7,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
-import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
 import UserPedido from '../../../../shared/models/user/user-pedido';
 
@@ -18,6 +17,7 @@ import UserPedido from '../../../../shared/models/user/user-pedido';
   styleUrl: './detalle-pedido-page.css'
 })
 export class DetallePedidoPage {
+  /*
    private _snackBar = inject(MatSnackBar);
   private pedidoService = inject(PedidoService);
   private route = inject(ActivatedRoute);
@@ -36,7 +36,7 @@ export class DetallePedidoPage {
       return 'Retiro en el local'
     }
   }
-/*
+
   ngOnInit(): void {
     this.loadPedido();
   }
@@ -65,7 +65,6 @@ export class DetallePedidoPage {
 
   volver(): void {
     this.router.navigate(['/admin']);
-  }*/
- volver(){}
-
+  }
+*/
 }
