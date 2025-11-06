@@ -7,21 +7,16 @@ import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
 @Component({
   selector: 'app-detalle-pedido-component',
   imports: [CommonModule],
-  templateUrl: './detalle-pedido-component.html',
-  styleUrl: './detalle-pedido-component.css'
+  templateUrl: './detalle-pedido-component.html'
 })
 export class DetallePedidoComponent {
   @Input() pedidoResponse?: PedidoResponse;
   @Output() onCancelar = new EventEmitter<number>();
   @Output() onVerDetalles = new EventEmitter<number>();
 
-  // Exponer los enums al template
   readonly tipoEntregaEnum = TipoEntrega;
   readonly estadoPedidoEnum = EstadoPedido;
 
-  /**
-   * Obtiene las clases CSS según el estado del pedido
-   */
   getEstadoClasses(): string {
     const estado = this.pedidoResponse?.estado;
     

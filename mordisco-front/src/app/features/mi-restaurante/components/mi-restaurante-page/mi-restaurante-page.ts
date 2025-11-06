@@ -21,47 +21,59 @@ import { RestauranteFormComponent } from "../form-restaurante-component/form-res
 @Component({
   selector: 'app-mi-restaurante-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, DireccionCardComponent, PromocionCardComponent, CalificacionComponent, HorarioRestauranteComponent, MatPaginator, RestauranteFormComponent],
+  imports: [
+    CommonModule, 
+    RouterLink, 
+    DireccionCardComponent, 
+    PromocionCardComponent, 
+    CalificacionComponent, 
+    HorarioRestauranteComponent, 
+    MatPaginator, 
+    RestauranteFormComponent
+  ],
   templateUrl: './mi-restaurante-page.html'
 })
 export class MiRestaurantePageComponent implements OnInit {
-  private authService = inject(AuthService)
-  private restauranteService = inject(RestauranteService)
-  private horarioService = inject(HorarioService)
-  private promocionService = inject(PromocionService)
-  private calificacionService = inject(CalificacionService)
-  private snackBar = inject(MatSnackBar)
-  private router = inject(Router)
+  private authService = inject(AuthService);
+  private restauranteService = inject(RestauranteService);
+  private horarioService = inject(HorarioService);
+  private promocionService = inject(PromocionService);
+  private calificacionService = inject(CalificacionService);
+  private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
 
-  restaurante?: RestauranteResponse
-  calificaciones?: CalificacionRestauranteReponse[]
-  promociones?: PromocionResponse[]
-  horariosDeAtencion?: HorarioAtencionResponse[]
+  restaurante?: RestauranteResponse;
+  calificaciones?: CalificacionRestauranteReponse[];
+  promociones?: PromocionResponse[];
+  horariosDeAtencion?: HorarioAtencionResponse[];
 
-  sizePromocion : number = 5;
-  pagePromocion : number = 0;
-  lengthPromocion : number = 5;
+  // Paginación Promociones
+  sizePromocion: number = 5;
+  pagePromocion: number = 0;
+  lengthPromocion: number = 0;
 
+  // Paginación Calificaciones
   sizeCalificacion: number = 5;
   pageCalificacion: number = 0;
-  lengthCalificacion : number = 5;
+  lengthCalificacion: number = 0;
 
+  // Paginación Horarios
   sizeHorario: number = 5;
   pageHorario: number = 0;
-  lengthHorario : number = 5;
+  lengthHorario: number = 0;
 
   isLoadingRestaurante = true;
 
   ngOnInit(): void {
-    this.cargarRestaurante()
+    this.cargarRestaurante();
   }
 
-  cargarRestaurante(): void {
+  private cargarRestaurante(): void {
     const userId = this.authService.currentUser()?.userId;
     
     if (!userId) {
       this.snackBar.open('❌ No se encontró información del usuario', 'Cerrar', { duration: 3000 });
-      console.error(userId)
+      this.authService.logout();
       return;
     }
 
@@ -69,108 +81,72 @@ export class MiRestaurantePageComponent implements OnInit {
       next: (restaurante) => {
         this.restaurante = restaurante;
         this.isLoadingRestaurante = false;
+
+        if (restaurante?.id) {
+          this.cargarPromociones();
+          this.cargarHorarios();
+          this.cargarCalificaciones();
+        }
       },
       error: (error) => {
-        console.error('Error al cargar restaurante:', error);
-        this.snackBar.open('❌ Error al cargar el restaurante', 'Cerrar', { duration: 4000 });
+        if (error.status === 404) {
+          this.restaurante = undefined;
+        }
         this.isLoadingRestaurante = false;
       }
     });
-
   }
 
-  cargarCalificaciones(){
-    const idRestaurante = this.restaurante?.id
-    if (!idRestaurante) {
-      this.snackBar.open('❌ No se encontró información del restaurante', 'Cerrar', { duration: 3000 });
-      console.error(idRestaurante)
-      return;
-    }
+  private cargarCalificaciones(): void {
+    const idRestaurante = this.restaurante?.id;
+    if (!idRestaurante) return;
 
-    this.calificacionService.getAllByRestauranteId(idRestaurante,this.pageCalificacion,this.sizeCalificacion).subscribe({
-        next: (c) => {
-          this.calificaciones = c.content
-          this.pageCalificacion = c.page
-          this.sizeCalificacion = c.size
-        },
-        error: (e) =>{
-        console.error('Error al cargar las calificaciones:', e);
-        this.snackBar.open('❌ Error al cargar las calificaciones', 'Cerrar', { duration: 4000 });
-        }
-    })
-  }
-
-  cargarPromociones(){
-    const idRestaurante = this.restaurante?.id
-
-    if (!idRestaurante) {
-      this.snackBar.open('❌ No se encontró información del restaurante', 'Cerrar', { duration: 3000 });
-      console.error(idRestaurante)
-      return;
-    }
-
-    this.promocionService.get(idRestaurante,this.pageCalificacion,this.sizeCalificacion).subscribe({
-        next: (p) => {
-          this.promociones = p.content
-          this.pagePromocion = p.page
-          this.sizePromocion = p.size
-        },
-        error: (e) =>{
-        console.error('Error al cargar las promociones:', e);
-        this.snackBar.open('❌ Error al cargar las promociones', 'Cerrar', { duration: 4000 });
-        }
-    })
-  }
-
-  cargarHorarios(){
-    const idRestaurante = this.restaurante?.id
-
-    if (!idRestaurante) {
-      this.snackBar.open('❌ No se encontró información del restaurante', 'Cerrar', { duration: 3000 });
-      console.error(idRestaurante)
-      return;
-    }
-
-    this.horarioService.getAllByRestauranteId(idRestaurante,this.pageCalificacion,this.sizeCalificacion).subscribe({
-        next: (h) => {
-          this.horariosDeAtencion = h.content
-          this.pageHorario = h.page
-          this.sizeHorario = h.size
-        },
-        error: (e) =>{
-        console.error('Error al cargar los horarios:', e);
-        this.snackBar.open('❌ Error al cargar los horarios', 'Cerrar', { duration: 4000 });
-        }
-    })
-  }
-
-  onEditarRestaurante(): void {
-    // TODO: Navegar al formulario de edición de restaurante
-    // this.router.navigate(['/restaurante/editar', this.restaurante?.id]);
-    this.snackBar.open('⚠️ Funcionalidad en desarrollo', 'Cerrar', { duration: 2000 });
-  }
-
-  onEliminarHorario(horarioId: number): void {
-    if (!horarioId) {
-      this.snackBar.open('❌ ID de horario inválido', 'Cerrar', { duration: 3000 });
-      return;
-    }
-
-    if (!confirm('¿Estás seguro de eliminar este horario de atención?')) {
-      return;
-    }
-
-    this.horarioService.delete(horarioId).subscribe({
-      next: () => {
-        this.snackBar.open('✅ Horario eliminado correctamente', 'Cerrar', { duration: 3000 });
-        this.cargarRestaurante();
-      },
-      error: (error) => {
-        console.error('Error al eliminar horario:', error);
-        this.snackBar.open('❌ Error al eliminar el horario', 'Cerrar', { duration: 4000 });
+    this.calificacionService.getAllByRestauranteId(
+      idRestaurante, 
+      this.pageCalificacion, 
+      this.sizeCalificacion
+    ).subscribe({
+      next: (response) => {
+        this.calificaciones = response.content;
+        this.lengthCalificacion = response.totalElements;
       }
     });
   }
+
+  private cargarPromociones(): void {
+    const idRestaurante = this.restaurante?.id;
+    if (!idRestaurante) return;
+
+    this.promocionService.getByIdRestaurante(idRestaurante, this.pagePromocion, this.sizePromocion).subscribe({
+      next: (response) => {
+        this.promociones = response.content;
+        this.lengthPromocion = response.totalElements;
+      }
+    });
+  }
+
+  private cargarHorarios(): void {
+    const idRestaurante = this.restaurante?.id;
+    if (!idRestaurante) return;
+
+    this.horarioService.getAllByRestauranteId(
+      idRestaurante, 
+      this.pageHorario, 
+      this.sizeHorario
+    ).subscribe({
+      next: (response) => {
+        this.horariosDeAtencion = response.content;
+        this.lengthHorario = response.totalElements;
+      }
+    });
+  }
+
+  onEditarRestaurante(): void {
+    if (this.restaurante?.id) {
+      this.router.navigate(['/restaurante-form', this.restaurante.id]);
+    }
+  }
+
 
   onEliminarPromocion(promocionId: number): void {
     if (!promocionId || !this.restaurante?.id) {
@@ -185,43 +161,29 @@ export class MiRestaurantePageComponent implements OnInit {
     this.promocionService.delete(this.restaurante.id, promocionId).subscribe({
       next: () => {
         this.snackBar.open('✅ Promoción eliminada correctamente', 'Cerrar', { duration: 3000 });
-        this.cargarRestaurante();
+        this.cargarPromociones();
       },
       error: (error) => {
-        console.error('Error al eliminar promoción:', error);
         this.snackBar.open('❌ Error al eliminar la promoción', 'Cerrar', { duration: 4000 });
       }
     });
   }
 
-  onEditarHorario(horarioId: number): void {
-    // TODO: Navegar al formulario de edición de horario
-    // this.router.navigate(['/horario-form', horarioId]);
-    this.snackBar.open('⚠️ Funcionalidad en desarrollo', 'Cerrar', { duration: 2000 });
-  }
-
-  onEditarPromocion(promocionId: number): void {
-    this.router.navigate(['/promocion-form', promocionId]);
-    this.snackBar.open('⚠️ Funcionalidad en desarrollo', 'Cerrar', { duration: 2000 });
-  }
-
-
   onPageChangeHorario(event: PageEvent): void {
-    this.pageHorario = event.pageIndex
+    this.pageHorario = event.pageIndex;
     this.sizeHorario = event.pageSize;
     this.cargarHorarios();
   }
 
   onPageChangePromocion(event: PageEvent): void {
-    this.pagePromocion = event.pageIndex
+    this.pagePromocion = event.pageIndex;
     this.sizePromocion = event.pageSize;
     this.cargarPromociones();
   }
 
   onPageChangeCalificacion(event: PageEvent): void {
-    this.pageCalificacion = event.pageIndex
+    this.pageCalificacion = event.pageIndex;
     this.sizeCalificacion = event.pageSize;
     this.cargarCalificaciones();
   }
-  
 }

@@ -8,8 +8,7 @@ import RestauranteForCard from '../../../../shared/models/restaurante/restaurant
 @Component({
   selector: 'app-home-cliente-component',
   imports: [RestauranteCardComponent, MatPaginator, RestauranteCardComponent],
-  templateUrl: './home-cliente-component.html',
-  styleUrl: './home-cliente-component.css'
+  templateUrl: './home-cliente-component.html'
 })
 export class HomeClienteComponent  implements OnInit , OnDestroy{
   private eventListeners: (() => void)[] = [];

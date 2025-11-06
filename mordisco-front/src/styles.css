@@ -443,7 +443,7 @@ body {
 }
 
 .time-input-error {
-  @apply !border-red-500 !bg-red-50;
+  @apply border-red-500! bg-red-50!;
 }
 
 .time-label {

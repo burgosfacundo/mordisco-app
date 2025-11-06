@@ -14,8 +14,7 @@ import { HomeAdminComponent } from '../home-admin-component/home-admin-component
     HomeClienteComponent,
     HomeAdminComponent
   ],
-  templateUrl: './redirect-home-page.html',
-  styleUrl: './redirect-home-page.css'
+  templateUrl: './redirect-home-page.html'
 })
 export class HomePage implements OnInit {
   protected authService = inject(AuthService);

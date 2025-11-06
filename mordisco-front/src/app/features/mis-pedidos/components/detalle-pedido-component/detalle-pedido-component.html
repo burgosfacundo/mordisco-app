@@ -1,6 +1,6 @@
 <article class="card-base flex flex-col h-full">
   <!-- Header con estado y fecha -->
-  <div class="bg-gradient-to-r from-primary-500 to-primary-600 p-6">
+  <div class="bg-linear-to-r from-primary-500 to-primary-600 p-6">
     <div class="flex flex-col gap-3">
       <!-- Badges de estado y tipo de entrega -->
      
@@ -45,12 +45,12 @@
             class="flex items-center justify-between text-sm">
           <div class="flex items-center gap-2 flex-1 min-w-0">
             <span class="inline-flex items-center justify-center w-6 h-6 rounded-full 
-                         bg-primary-100 text-primary-700 font-bold text-xs flex-shrink-0">
+                         bg-primary-100 text-primary-700 font-bold text-xs shrink-0">
               {{ producto.cantidad }}
             </span>
-            <span class="text-gray-700 truncate">{{ producto.nombreProducto }}</span>
+            <span class="text-gray-700 truncate">{{ producto.nombreproducto }}</span>
           </div>
-          <span class="text-gray-900 font-semibold ml-2 flex-shrink-0">
+          <span class="text-gray-900 font-semibold ml-2 hrink-0">
             ${{ producto.precioUnitario * producto.cantidad }}
           </span>
         </li>

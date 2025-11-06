@@ -17,9 +17,13 @@ export class PromocionService {
         return this.http.post<string>(`${environment.apiUrl}/promociones/save`,promocion)
     }
 
-    get(id : number, page : number, size : number) : Observable<PaginationResponse<PromocionResponse>>{
+    getByIdRestaurante(id : number, page : number, size : number) : Observable<PaginationResponse<PromocionResponse>>{
         const params = new HttpParams().set('page',page).set('size',size)
-        return this.http.get<PaginationResponse<PromocionResponse>>(`${environment.apiUrl}/promociones/${id}`,{params})
+        return this.http.get<PaginationResponse<PromocionResponse>>(`${environment.apiUrl}/promociones/restaurantes/${id}`,{params})
+    }
+
+    getById(id : number) : Observable<PromocionResponse>{
+        return this.http.get<PromocionResponse>(`${environment.apiUrl}/promociones/${id}`)
     }
 
     put(promocion : PromocionRequest, id : number) : Observable<string>{

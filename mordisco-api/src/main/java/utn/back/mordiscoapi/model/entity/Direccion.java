@@ -39,6 +39,7 @@ public class Direccion {
     @Column(nullable = false, length = 50)
     private String ciudad;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 }

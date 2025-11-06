@@ -1,4 +1,6 @@
-
+<article class="bg-white rounded-xl shadow-md overflow-hidden 
+                transition-all duration-300 hover:shadow-xl hover:-translate-y-1
+                flex flex-col h-full">
   <!-- Header con ID y Estado -->
   <div class="bg-linear-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
     <div class="flex items-center justify-between">
@@ -69,7 +71,7 @@
       </div>
     </div>
 
-    <!-- Tipo de Entrega
+    <!-- Tipo de Entrega --
     <div class="flex items-start gap-3">
       <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
         <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,11 +119,11 @@
     </div>
   </div>
 
-  <!-- Footer con botones de acción 
+  <!-- Footer con botones de acción -->
   <div class="px-6 pb-6 pt-2 space-y-2">
-  Botones para RESTAURANTE
+    <!-- Botones para RESTAURANTE -->
     @if (isRestaurante) {
-       @if (pedido?.estado === 'PENDIENTE') {
+      @if (pedido?.estado === 'PENDIENTE') {
         <button 
           (click)="onAceptarPedido()"
           class="w-full py-2.5 rounded-lg
@@ -151,11 +153,9 @@
           Marcar En Camino
         </button>
       }
-   }-->
-    
+    } 
 
     <!-- Botón Ver Detalle (para todos) -->
-        <!-- 
     <button 
       [routerLink]="['/detalle-pedido', pedido?.id]"
       class="w-full py-2.5 rounded-lg
@@ -165,4 +165,5 @@
              focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
       Ver Detalles
     </button>
-  </div>-->
+  </div>
+</article>

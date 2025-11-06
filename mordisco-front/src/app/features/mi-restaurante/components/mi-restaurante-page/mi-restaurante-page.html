@@ -18,7 +18,7 @@
       <div class="p-8">
         <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
           <!-- Logo -->
-          <div class="w-32 h-32 rounded-xl overflow-hidden bg-gray-100 hrink-0 shadow-md">
+          <div class="w-32 h-32 rounded-xl overflow-hidden bg-gray-100 shrink-0 shadow-md">
             @if (restaurante.logo.url) {
               <img 
                 [src]="restaurante.logo.url" 
@@ -90,7 +90,7 @@
           Dirección
         </h2>
         <button 
-          [routerLink]="['/direccion-form']"
+          [routerLink]="['/my-address/form-address']"
           class="btn-ghost">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -144,7 +144,7 @@
           }
         </ul>
 
-       <!-- Paginador -->
+        <!-- Paginador -->
         <div class="flex justify-center mt-8">
           <mat-paginator
             [length]="lengthHorario"
@@ -190,14 +190,13 @@
               <app-promocion-card-component
                 [promocion]="promocion"
                 [showActions]="true"
-                (editar)="$event"
                 (eliminar)="onEliminarPromocion($event)">
               </app-promocion-card-component>
             </li>
           }
         </ul>
 
-                <!-- Paginador -->
+        <!-- Paginador -->
         <div class="flex justify-center mt-8">
           <mat-paginator
             [length]="lengthPromocion"
@@ -258,7 +257,7 @@
       }
     </section>
 
-  } @else if(!restaurante){
-    <app-restaurante-form-component/>
+  } @else {
+    <app-restaurante-form-component />
   }
 </div>

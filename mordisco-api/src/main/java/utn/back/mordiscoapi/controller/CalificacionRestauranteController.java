@@ -44,11 +44,11 @@ public class CalificacionRestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('CLIENTE') and @calificacionSecurity.puedeAccederADtoConCalificacion(#dto)")
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody
-                                       @Valid
-                                       CalificacionRestauranteDTO dto) throws BadRequestException, NotFoundException {
+    public ResponseEntity<Void> save(@RequestBody
+                                     @Valid
+                                     CalificacionRestauranteDTO dto) throws BadRequestException, NotFoundException {
         service.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Calificación restaurante creada exitosamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -98,8 +98,8 @@ public class CalificacionRestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('CLIENTE') and @calificacionSecurity.esAutorDeCalificacion(#id)")
     @DeleteMapping ("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable
-                                             Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteById(@PathVariable
+                                           Long id) throws NotFoundException {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

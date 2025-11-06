@@ -1,141 +1,227 @@
 <div class="contenedor-grande">
-  <div class="form-container max-w-2xl">
-    <!-- Título dinámico -->
-    <h1 class="titulo-seccion text-center mb-6">
-      {{ isEditMode ? 'Editar Producto' : 'Nuevo Producto' }}
-    </h1>
-
-    <!-- Mensaje de error -->
-    @if (errorMessage) {
-      <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-        {{ errorMessage }}
+  <div class="form-container max-w-3xl">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
+           [class.bg-blue-100]="isEditMode"
+           [class.bg-green-100]="!isEditMode">
+        <svg class="w-10 h-10" 
+             [class.text-blue-600]="isEditMode"
+             [class.text-green-600]="!isEditMode"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          @if (isEditMode) {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          } @else {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 4v16m8-8H4" />
+          }
+        </svg>
       </div>
-    }
+      <h1 class="titulo-seccion mb-2">
+        {{ isEditMode ? 'Editar Producto' : 'Nuevo Producto' }}
+      </h1>
+      <p class="text-gray-600">
+        {{ isEditMode ? 'Modifica la información del producto' : 'Completa los datos para agregar el producto' }}
+      </p>
+    </div>
 
-    <!-- Loading -->
+    <!-- Loading State -->
     @if (isLoading) {
       <div class="loading-container">
         <div class="loading-spinner"></div>
-        <p class="loading-text">{{ isEditMode ? 'Cargando producto...' : 'Guardando...' }}</p>
+        <p class="loading-text">Cargando producto...</p>
       </div>
     }
 
     <!-- Formulario -->
-    <form [formGroup]="productoForm" (ngSubmit)="onSubmit()" class="form-container">
-      
-      <!-- Nombre del Producto -->
-      <fieldset class="form-field">
-        <label for="nombreProductoID" class="form-label">Nombre del Producto *</label>
-        <input 
-          type="text" 
-          id="nombreProductoID"
-          formControlName="nombreProducto"
-          class="form-input"
-          placeholder="Ej: Hamburguesa Clásica"
-          [class.border-red-500]="getError('nombreProducto')"
-          [class.focus:ring-red-500]="getError('nombreProducto')">
-        @if (getError('nombreProducto')) {
-          <p class="form-error">{{ getError('nombreProducto') }}</p>
-        }
-      </fieldset>
-
-      <!-- Descripción -->
-      <fieldset class="form-field">
-        <label for="descripcionID" class="form-label">Descripción *</label>
-        <textarea 
-          id="descripcionID"
-          formControlName="descripcion"
-          rows="4"
-          class="form-input resize-none"
-          placeholder="Describe el producto..."
-          [class.border-red-500]="getError('descripcion')"
-          [class.focus:ring-red-500]="getError('descripcion')"></textarea>
-        @if (getError('descripcion')) {
-          <p class="form-error">{{ getError('descripcion') }}</p>
-        }
-      </fieldset>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 form-field">
-        <!-- Precio -->
-        <fieldset>
-          <label for="precioUnitarioID" class="form-label">Precio Unitario *</label>
-          <div class="relative">
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">$</span>
-            <input 
-              type="number" 
-              id="precioUnitarioID"
-              formControlName="precioUnitario"
-              class="form-input pl-8"
-              placeholder="0.00"
-              step="0.01"
-              min="0"
-              [class.border-red-500]="getError('precioUnitario')"
-              [class.focus:ring-red-500]="getError('precioUnitario')">
-          </div>
-          @if (getError('precioUnitario')) {
-            <p class="form-error">{{ getError('precioUnitario') }}</p>
-          }
-        </fieldset>
-
-        <!-- Disponibilidad -->
-        <fieldset>
-          <label class="form-label">Disponibilidad</label>
-          <label class="flex items-center gap-3 cursor-pointer mt-2">
-            <input 
-              type="checkbox" 
-              formControlName="disponible"
-              class="w-5 h-5 rounded border-gray-300 text-primary-600 
-                     focus:ring-2 focus:ring-primary-500">
-            <span class="text-sm text-gray-700">Producto disponible</span>
-          </label>
-        </fieldset>
-      </div>
-
-      <!-- Imagen -->
-      <fieldset class="form-field">
-        <label for="imagenID" class="form-label">Imagen del Producto</label>
+    @if (!isLoading) {
+      <form [formGroup]="productoForm" (ngSubmit)="onSubmit()" class="space-y-6">
         
-        <!-- Preview de imagen -->
-        @if (imagenPreview) {
-          <div class="mb-4">
-            <img [src]="imagenPreview" alt="Preview" 
-                 class="w-full max-w-md h-64 object-cover rounded-lg border-2 border-gray-200 mx-auto">
-          </div>
-        }
-
-        <input 
-          type="file" 
-          id="imagenID"
-          accept="image/*"
-          (change)="onImageSelected($event)"
-          class="block w-full text-sm text-gray-500
-                 file:mr-4 file:py-2.5 file:px-4
-                 file:rounded-lg file:border-0
-                 file:text-sm file:font-semibold
-                 file:bg-primary-50 file:text-primary-700
-                 hover:file:bg-primary-100
-                 cursor-pointer">
-        <p class="text-xs text-gray-500 mt-2">
-          Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB
-        </p>
-      </fieldset>
-
-      <!-- Botón -->
-      <div style="margin-top: 24px;">
-        <button 
-          type="submit" 
-          [disabled]="productoForm.invalid || isSubmitting" 
-          class="form-button">
-          @if (isSubmitting) {
-            <span class="inline-flex items-center justify-center gap-2">
-              <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-              {{ isEditMode ? 'Actualizando...' : 'Creando...' }}
-            </span>
-          } @else {
-            {{ isEditMode ? 'Actualizar Producto' : 'Crear Producto' }}
+        <!-- Nombre del Producto -->
+        <fieldset class="form-field">
+          <label for="nombreProductoID" class="form-label">
+            Nombre del Producto *
+          </label>
+          <input 
+            type="text" 
+            id="nombreProductoID"
+            formControlName="nombreProducto"
+            class="form-input"
+            placeholder="Ej: Hamburguesa Clásica, Pizza Margarita"
+            maxlength="100"
+            [class.border-red-500]="getError('nombreProducto')"
+            [class.focus:ring-red-500]="getError('nombreProducto')">
+          @if (getError('nombreProducto')) {
+            <p class="form-error">{{ getError('nombreProducto') }}</p>
           }
-        </button>
-      </div>
-    </form>
+          <p class="text-xs text-gray-500 mt-1">
+            {{ productoForm.get('nombreProducto')?.value?.length || 0 }}/100 caracteres
+          </p>
+        </fieldset>
+
+        <!-- Descripción -->
+        <fieldset class="form-field">
+          <label for="descripcionID" class="form-label">
+            Descripción *
+          </label>
+          <textarea 
+            id="descripcionID"
+            formControlName="descripcion"
+            rows="5"
+            class="form-input resize-none"
+            placeholder="Describe el producto, sus ingredientes principales o características..."
+            maxlength="500"
+            [class.border-red-500]="getError('descripcion')"
+            [class.focus:ring-red-500]="getError('descripcion')"></textarea>
+          @if (getError('descripcion')) {
+            <p class="form-error">{{ getError('descripcion') }}</p>
+          }
+          <p class="text-xs text-gray-500 mt-1">
+            {{ productoForm.get('descripcion')?.value?.length || 0 }}/500 caracteres
+          </p>
+        </fieldset>
+
+        <!-- Precio y Disponibilidad -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Precio -->
+          <fieldset class="form-field">
+            <label for="precioUnitarioID" class="form-label">
+              Precio Unitario *
+            </label>
+            <div class="relative">
+              <input 
+                type="number" 
+                id="precioUnitarioID"
+                formControlName="precioUnitario"
+                class="form-input pl-10 text-lg font-semibold"
+                step="0.01"
+                min="0.01"
+                max="999999"
+                [class.border-red-500]="getError('precioUnitario')"
+                [class.focus:ring-red-500]="getError('precioUnitario')">
+            </div>
+            @if (getError('precioUnitario')) {
+              <p class="form-error">{{ getError('precioUnitario') }}</p>
+            }
+          </fieldset>
+
+          <!-- Disponibilidad -->
+          <fieldset class="form-field">
+            <label class="form-label">
+              Estado del Producto
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer mt-2 p-4 rounded-lg border-2 transition-all duration-200"
+                   [class.border-green-500]="productoForm.get('disponible')?.value"
+                   [class.bg-green-50]="productoForm.get('disponible')?.value"
+                   [class.border-gray-300]="!productoForm.get('disponible')?.value"
+                   [class.hover:bg-gray-50]="!productoForm.get('disponible')?.value">
+              <input 
+                type="checkbox" 
+                formControlName="disponible"
+                class="w-5 h-5 rounded border-gray-300 text-green-600 
+                       focus:ring-2 focus:ring-green-500">
+              <div class="flex-1">
+                <span class="text-sm font-semibold block"
+                      [class.text-green-700]="productoForm.get('disponible')?.value"
+                      [class.text-gray-700]="!productoForm.get('disponible')?.value">
+                  {{ productoForm.get('disponible')?.value ? 'Producto Disponible' : 'Producto No Disponible' }}
+                </span>
+                <span class="text-xs text-gray-500">
+                  Los clientes {{ productoForm.get('disponible')?.value ? 'pueden' : 'no pueden' }} ordenar este producto
+                </span>
+              </div>
+            </label>
+          </fieldset>
+        </div>
+
+        <!-- URL de Imagen -->
+        <fieldset class="form-field">
+          <label for="imagenUrl" class="form-label">
+            URL de la Imagen *
+          </label>
+          <input 
+            type="url"
+            id="imagenUrl"
+            formControlName="imagenUrl"
+            placeholder="https://ejemplo.com/producto.jpg"
+            class="form-input"
+            [class.border-red-500]="getError('imagenUrl')"
+            [class.focus:ring-red-500]="getError('imagenUrl')">
+          @if (getError('imagenUrl')) {
+            <p class="form-error">{{ getError('imagenUrl') }}</p>
+          }
+          <p class="text-xs text-gray-500 mt-1">
+            Debe ser una URL válida que termine en .jpg, .jpeg, .png, .gif o .webp
+          </p>
+          
+          <!-- Preview de imagen -->
+          @if (productoForm.get('imagenUrl')?.valid && productoForm.get('imagenUrl')?.value) {
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p class="text-xs font-semibold text-gray-700 mb-3">Vista previa:</p>
+              <div class="w-full max-w-sm mx-auto rounded-lg overflow-hidden shadow-md">
+                <img 
+                  [src]="productoForm.get('imagenUrl')?.value" 
+                  [alt]="productoForm.get('nombreProducto')?.value || 'Producto'"
+                  class="w-full h-64 object-cover"
+                  (error)="$event.target.src='https://via.placeholder.com/400x300?text=Imagen+no+disponible'">
+              </div>
+            </div>
+          }
+        </fieldset>
+
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+          <button 
+            type="button"
+            (click)="onCancel()"
+            class="btn-outline flex-1">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Cancelar
+          </button>
+          
+          <button 
+            type="submit" 
+            [disabled]="productoForm.invalid || isSubmitting" 
+            class="btn-primary flex-1">
+            @if (isSubmitting) {
+              <span class="inline-flex items-center justify-center gap-2">
+                <span class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                {{ isEditMode ? 'Actualizando...' : 'Creando...' }}
+              </span>
+            } @else {
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M5 13l4 4L19 7" />
+              </svg>
+              {{ isEditMode ? 'Actualizar Producto' : 'Crear Producto' }}
+            }
+          </button>
+        </div>
+
+        <!-- Ayuda adicional -->
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="text-sm text-blue-900">
+              <p class="font-semibold mb-1">Consejos para mejores resultados:</p>
+              <ul class="space-y-1 text-blue-800 list-disc list-inside">
+                <li>Usa imágenes de alta calidad (mínimo 800x600 px)</li>
+                <li>Escribe descripciones claras y apetitosas</li>
+                <li>Actualiza la disponibilidad cuando el producto se agote</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </form>
+    }
   </div>
 </div>

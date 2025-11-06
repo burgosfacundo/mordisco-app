@@ -5,8 +5,7 @@ import CalificacionRequestDTO from '../../models/calificacion/calificacion-reque
 @Component({
   selector: 'app-calificacion-card-component',
   imports: [CommonModule],
-  templateUrl: './calificacion-card-component.html',
-  styleUrl: './calificacion-card-component.css'
+  templateUrl: './calificacion-card-component.html'
 })
 export class CalificacionCardComponent {
   @Input() calificacionRequest? : CalificacionRequestDTO

@@ -15,8 +15,7 @@ export class MenuService {
     }
 
     save(restauranteId : number,nombreMenu : string) : Observable<string>{
-        const params = new HttpParams().set('nombre',nombreMenu)
-        return this.http.post<string>(`${environment.apiUrl}/menus/${restauranteId}`,{params})
+        return this.http.post<string>(`${environment.apiUrl}/menus/crear/${restauranteId}?nombre=${nombreMenu}`,{})
     }
 
     update(restauranteId : number,nombreMenu : string) :Observable<string> {

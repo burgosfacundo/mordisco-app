@@ -25,4 +25,7 @@ public class Menu {
 
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Producto> productos;
+
+    @OneToOne(mappedBy = "menu")
+    private Restaurante restaurante;
 }

@@ -28,11 +28,11 @@ public class ProductoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody
-                                       @Valid
-                                       ProductoRequestDTO dto) throws BadRequestException, NotFoundException {
+    public ResponseEntity<Void> save(@RequestBody
+                                     @Valid
+                                     ProductoRequestDTO dto) throws BadRequestException, NotFoundException {
         service.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Producto creado exitosamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 
@@ -54,21 +54,21 @@ public class ProductoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@Valid @Positive @PathVariable Long id) throws NotFoundException {
+    public ResponseEntity<Void> delete(@Valid @Positive @PathVariable Long id) throws NotFoundException {
         service.delete(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Producto eliminado exitosamente");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(
+    public ResponseEntity<Void> update(
             @Valid @Positive @PathVariable Long id,
             @Valid @RequestBody ProductoUpdateDTO dto
     ) throws NotFoundException {
         service.update(id,dto);
-        return ResponseEntity.ok().body("Producto actualizado exitosamente");
+        return ResponseEntity.ok().build();
     }
 
 }

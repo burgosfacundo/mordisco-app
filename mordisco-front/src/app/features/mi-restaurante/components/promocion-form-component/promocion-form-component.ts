@@ -44,37 +44,13 @@ export class PromocionFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    this.loadRestauranteId();
     
-    // Detectar si es modo edición
-    this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.isEditMode = true;
-        this.promocionId = +params['id'];
-        this.cargarPromocion(this.promocionId);
-      }
-    });
-  }
+    this.promocionId = this.route.snapshot.params['id'];
 
-  private loadRestauranteId(): void {
-    const userId = this.authService.currentUser()?.userId;
-    
-    if (!userId) {
-      this.snackBar.open('❌ Usuario no autenticado', 'Cerrar', { duration: 3000 });
-      this.router.navigate(['/login']);
-      return;
+    if (this.promocionId) {
+      this.isEditMode = true;
+      this.cargarPromocion();
     }
-
-    this.restauranteService.getByUsuario(userId).subscribe({
-      next: (restaurante) => {
-        this.restauranteId = restaurante.id;
-      },
-      error: (error) => {
-        console.error('Error al cargar restaurante:', error);
-        this.snackBar.open('❌ Error al cargar información del restaurante', 'Cerrar', { duration: 4000 });
-        this.router.navigate(['/']);
-      }
-    });
   }
 
   initForm(): void {
@@ -86,32 +62,23 @@ export class PromocionFormComponent implements OnInit {
     });
   }
 
-  cargarPromocion(id: number): void {
-    if (!this.restauranteId) {
-      this.snackBar.open('⚠️ Esperando datos del restaurante...', 'Cerrar', { duration: 2000 });
-      setTimeout(() => this.cargarPromocion(id), 1000);
+  cargarPromocion(): void {
+    if (!this.promocionId) {
+      this.router.navigate(['/mi-restaurante']);
       return;
     }
 
-    // Cargar todas las promociones del restaurante y buscar la específica
-    this.promocionService.get(this.restauranteId, 0, 100).subscribe({
-      next: (response) => {
-        const promocion = response.content.find(p => p.id === id);
-        
-        if (promocion) {
-          this.promocionForm.patchValue({
-            descripcion: promocion.descripcion,
-            descuento: promocion.descuento,
-            fechaInicio: new Date(promocion.fechainicio),
-            fechaFin: new Date(promocion.fechafin)
-          });
-        } else {
-          this.snackBar.open('❌ Promoción no encontrada', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/mi-restaurante']);
-        }
+    this.promocionService.getById(this.promocionId).subscribe({
+      next: (p) => {
+        this.promocionForm.patchValue({
+          descripcion: p.descripcion,
+          descuento: p.descuento,
+          fechaInicio: new Date(p.fechaInicio),
+          fechaFin: new Date(p.fechaFin)
+        });
+        this.restauranteId = p.restauranteId;
       },
-      error: (error) => {
-        console.error('Error al cargar promoción:', error);
+      error: () => {
         this.snackBar.open('❌ Error al cargar la promoción', 'Cerrar', { duration: 4000 });
       }
     });
@@ -124,47 +91,46 @@ export class PromocionFormComponent implements OnInit {
       return;
     }
 
-    if (!this.restauranteId) {
-      this.snackBar.open('❌ No se pudo identificar el restaurante', 'Cerrar', { duration: 3000 });
-      return;
-    }
-
-    this.isSubmitting = true;
+    console.log(this.restauranteId);
     
-    const promocionData: PromocionRequest = {
-      descripcion: this.promocionForm.value.descripcion,
-      descuento: parseFloat(this.promocionForm.value.descuento),
-      fechainicio: this.formatDate(this.promocionForm.value.fechaInicio),
-      fechafin: this.formatDate(this.promocionForm.value.fechaFin),
-      restauranteId: this.restauranteId
-    };
+    if (this.restauranteId) {
+      this.isSubmitting = true;
+      
+      const promocionData: PromocionRequest = {
+        descripcion: this.promocionForm.value.descripcion,
+        descuento: parseFloat(this.promocionForm.value.descuento),
+        fechaInicio: this.formatDate(this.promocionForm.value.fechaInicio),
+        fechaFin: this.formatDate(this.promocionForm.value.fechaFin),
+        restauranteId: this.restauranteId
+      };
 
-    if (this.isEditMode && this.promocionId) {
-      // Actualizar promoción existente
-      this.promocionService.put(promocionData, this.promocionId).subscribe({
-        next: () => {
-          this.snackBar.open('✅ Promoción actualizada correctamente', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/mi-restaurante']);
-        },
-        error: (error) => {
-          console.error('Error al actualizar promoción:', error);
-          this.snackBar.open('❌ Error al actualizar la promoción', 'Cerrar', { duration: 4000 });
-          this.isSubmitting = false;
-        }
-      });
-    } else {
-      // Crear nueva promoción
-      this.promocionService.save(promocionData).subscribe({
-        next: () => {
-          this.snackBar.open('✅ Promoción creada correctamente', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/mi-restaurante']);
-        },
-        error: (error) => {
-          console.error('Error al crear promoción:', error);
-          this.snackBar.open('❌ Error al crear la promoción', 'Cerrar', { duration: 4000 });
-          this.isSubmitting = false;
-        }
-      });
+
+      if (this.isEditMode && this.promocionId) {
+        this.promocionService.put(promocionData, this.promocionId).subscribe({
+          next: () => {
+            this.snackBar.open('✅ Promoción actualizada correctamente', 'Cerrar', { duration: 3000 });
+            this.router.navigate(['/mi-restaurante']);
+          },
+          error: (error) => {
+            console.error('Error al actualizar promoción:', error);
+            this.snackBar.open('❌ Error al actualizar la promoción', 'Cerrar', { duration: 4000 });
+            this.isSubmitting = false;
+          }
+        });
+      } else {
+        // Crear nueva promoción
+        this.promocionService.save(promocionData).subscribe({
+          next: () => {
+            this.snackBar.open('✅ Promoción creada correctamente', 'Cerrar', { duration: 3000 });
+            this.router.navigate(['/mi-restaurante']);
+          },
+          error: (error) => {
+            console.error('Error al crear promoción:', error);
+            this.snackBar.open('❌ Error al crear la promoción', 'Cerrar', { duration: 4000 });
+            this.isSubmitting = false;
+          }
+        });
+      }
     }
   }
 

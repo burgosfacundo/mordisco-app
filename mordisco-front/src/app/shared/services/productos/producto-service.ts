@@ -24,8 +24,12 @@ export class ProductoService {
     return this.http.get<PaginationResponse<ProductoResponse>>(`${environment.apiUrl}/productos`,{params})
   }
 
+  getById(id : number ) : Observable<ProductoResponse>{
+      return this.http.get<ProductoResponse>(`${environment.apiUrl}/productos/${id}`)
+  }
+
   update(dto : ProductoUpdate,id : number) : Observable<string> {
-    return this.http.put<string>(`${environment}/productos/${id}`,dto)
+    return this.http.put<string>(`${environment.apiUrl}/productos/${id}`,dto)
   }
 
   delete(id : number) : Observable<string>{

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../../registro/services/user-service';
 import UserProfile from '../../../../shared/models/user/user-profile';
+import { AuthService } from '../../../../shared/services/auth-service';
 
 @Component({
   selector: 'app-view-profile',
@@ -10,6 +11,7 @@ import UserProfile from '../../../../shared/models/user/user-profile';
   templateUrl: './view-profile-component.html',
 })
 export class ViewProfileComponent {
+  private authService = inject(AuthService)
   private userService : UserService = inject(UserService)
   private router : Router = inject(Router)
   private _snackBar : MatSnackBar = inject(MatSnackBar)
@@ -40,11 +42,10 @@ export class ViewProfileComponent {
     this.userService.deleteMe().subscribe({
       next: () => {
         this._snackBar.open('Cuenta eliminada correctamente','',{duration: 3000});
-        localStorage.removeItem('user');
-        this.router.navigate(['/home']);
+        this.authService.logout();
       },
-      error: () => {
-        console.error();
+      error: (e) => {
+        console.error(e);
         this._snackBar.open('❌ No se pudo eliminar la cuenta','',{duration: 3000});
       }
     });

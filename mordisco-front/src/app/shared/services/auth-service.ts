@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, filter, Observable, switchMap, take, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../../features/auth/models/auth-response';
@@ -22,11 +22,15 @@ export class AuthService {
   // Timer para renovar token antes de que expire
   private refreshTimer?: ReturnType<typeof setTimeout>;
 
+  // Subject para evitar múltiples refresh simultáneos
+  private refreshInProgress$ = new BehaviorSubject<boolean>(false);
+  private refreshTokenSubject$ = new BehaviorSubject<string | null>(null);
+
   constructor() {
     this.loadStoredAuth();
   }
 
-  updatePassword(dto: { passwordActual: string, passwordNueva: string }) {
+  updatePassword(dto: { currentPassword: string, newPassword: string }) {
     return this.http.patch<void>(`${environment.apiUrl}/usuarios/password`, dto);
   }
 
@@ -38,21 +42,56 @@ export class AuthService {
     );
   }
 
-  refreshToken(): Observable<AuthResponse> {
+refreshToken(): Observable<AuthResponse> {
+    // Si ya hay un refresh en progreso, esperar a que termine
+    if (this.refreshInProgress$.value) {
+      return this.refreshTokenSubject$.pipe(
+        filter(token => token !== null),
+        take(1),
+        switchMap(() => {
+          const userData = sessionStorage.getItem(this.USER_DATA_KEY);
+          if (userData) {
+            return new Observable<AuthResponse>(observer => {
+              observer.next(JSON.parse(userData));
+              observer.complete();
+            });
+          }
+          return throwError(() => new Error('No hay user data despues del refresh'));
+        })
+      );
+    }
+
+    // Marcar que el refresh está en progreso
+    this.refreshInProgress$.next(true);
+    
     return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {}, {
       withCredentials: true
     }).pipe(
-      tap(response => this.handleAuthResponse(response))
+      tap(response => {
+        this.handleAuthResponse(response);
+        this.refreshTokenSubject$.next(response.accessToken);
+        this.refreshInProgress$.next(false);
+      }),
+      catchError((error) => {
+        this.refreshInProgress$.next(false);
+        this.refreshTokenSubject$.next(null);
+        this.clearAuth();
+        return throwError(() => error);
+      })
     );
   }
 
-  logout(): void {
+logout(): void {
     this.http.post(`${this.API_URL}/logout`, {}, {
       withCredentials: true
     }).subscribe({
-      complete: () => {
-        this.clearAuth()
-        this.router.navigate(['login'])
+      next: () => {
+        this.clearAuth();
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        this.clearAuth();
+        this.router.navigate(['/login']);
       }
     });
   }
@@ -61,7 +100,21 @@ export class AuthService {
     this.http.post(`${this.API_URL}/logout-all`, {}, {
       withCredentials: true
     }).subscribe({
-      complete: () => this.clearAuth()
+      next: () => {
+        this.clearAuth();
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        this.clearAuth();
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  clearAuthAndRedirect(): void {
+    this.clearAuth();
+    this.router.navigate(['/login'], {
+      queryParams: { sessionExpired: 'true' }
     });
   }
 
@@ -73,13 +126,17 @@ export class AuthService {
     return this.currentUser();
   }
 
-  /**
-   * Maneja la respuesta de autenticación y actualiza el estado
-   */
   private handleAuthResponse(response: AuthResponse): void {
     // Guardar access token y datos de usuario en sessionStorage
     sessionStorage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken);
-    sessionStorage.setItem(this.USER_DATA_KEY, JSON.stringify(response));
+
+    // Agregar timestamp de creación para calcular edad del token
+    const userDataWithTimestamp = {
+      ...response,
+      issuedAt: Date.now() // Guardar cuándo se emitió el token
+    };
+    
+    sessionStorage.setItem(this.USER_DATA_KEY, JSON.stringify(userDataWithTimestamp));
     
     // Actualizar signals
     this.currentUser.set(response);
@@ -90,27 +147,29 @@ export class AuthService {
     this.scheduleTokenRefresh(response.expiresIn);
   }
 
-  /**
-   * Programa la renovación automática del token
-   */
-  private scheduleTokenRefresh(expiresIn: number): void {
+    private scheduleTokenRefresh(expiresIn: number): void {
     // Limpiar timer anterior si existe
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);
     }
 
-    const expiresInSeconds = expiresIn > 100000 ? expiresIn / 1000 : expiresIn;
+    // El backend envía milisegundos (900000 = 15 min)
+    // Refrescar 1 minuto antes de expirar (mínimo 30 segundos antes)
+    const oneMinuteInMs = 60000;
+    const thirtySecondsInMs = 30000;
     
-    const refreshTime = Math.max((expiresInSeconds - 60) * 1000, 30000);
+    const refreshTimeMs = Math.max(expiresIn - oneMinuteInMs, thirtySecondsInMs);
     
     this.refreshTimer = setTimeout(() => {
       this.refreshToken().subscribe({
+        next: () => {
+        },
         error: () => {
-          this.clearAuth();
         }
       });
-    }, refreshTime);
+    }, refreshTimeMs);
   }
+
 
   /**
    * Carga el estado de autenticación almacenado al iniciar la app
@@ -121,14 +180,40 @@ export class AuthService {
     
     if (token && userData) {
       try {
-        const user: AuthResponse = JSON.parse(userData);
+        const user: AuthResponse & { issuedAt?: number } = JSON.parse(userData);
         
         this.currentUser.set(user);
         this.isAuthenticated.set(true);
+
+              // Verificar si el token ya expiró
+        if (user.issuedAt) {
+          const now = Date.now();
+          const tokenAgeMs = now - user.issuedAt;
+          const tokenExpiresInMs = user.expiresIn || 900000; // default 15 min
+          
+          // Si el token tiene menos de 14 minutos de edad, programar refresh
+          if (tokenAgeMs < (tokenExpiresInMs - 60000)) { // Tiene al menos 1 minuto antes de expirar
+            const remainingTimeMs = tokenExpiresInMs - tokenAgeMs;
+            this.scheduleTokenRefresh(remainingTimeMs);
+          } else {
+            // Token muy viejo o a punto de expirar, hacer refresh inmediato
+            this.refreshToken().subscribe({
+              error: () => {
+                console.error('❌ Refresh falló, limpiando auth');
+                this.clearAuth();
+              }
+            });
+          }
+        } else {
+          // Datos viejos sin timestamp, hacer refresh inmediato
+          this.refreshToken().subscribe({
+            error: () => {
+              this.clearAuth();
+            }
+          });
+        }
         
-        this.scheduleTokenRefresh(user.expiresIn);
-        
-      } catch (error) {
+      } catch (_error) {
         this.clearAuth();
       }
     } else {
@@ -153,13 +238,7 @@ export class AuthService {
     }
   }
 
-    clearAuthSilently(): void {
-    sessionStorage.removeItem(this.ACCESS_TOKEN_KEY);
-    this.currentUser.set(null);
-    this.isAuthenticated.set(false);
-    
-    if (this.refreshTimer) {
-      clearTimeout(this.refreshTimer);
-    }
+  clearAuthSilently(): void {
+    this.clearAuth();
   }
 }

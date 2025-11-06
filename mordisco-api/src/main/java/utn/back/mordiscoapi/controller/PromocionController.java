@@ -43,10 +43,10 @@ public class PromocionController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.restauranteId())")
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody @Valid
-                                       PromocionRequestDTO dto) throws BadRequestException {
+    public ResponseEntity<Void> save(@RequestBody @Valid
+                                     PromocionRequestDTO dto) throws BadRequestException {
         service.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Promoción creada exitosamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -109,11 +109,11 @@ public class PromocionController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.restauranteId())")
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable Long id,
-                                        @RequestBody @Valid PromocionRequestDTO dto)
+    public ResponseEntity<Void> update(@PathVariable Long id,
+                                       @RequestBody @Valid PromocionRequestDTO dto)
             throws NotFoundException, BadRequestException {
         service.update(id,dto);
-        return ResponseEntity.ok().body("Promoción actualizada exitosamente");
+        return ResponseEntity.ok().build();
     }
 
     /**

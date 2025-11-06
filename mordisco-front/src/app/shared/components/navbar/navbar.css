@@ -1,5 +1,3 @@
-/* navbar.css - SOLO estilos que Tailwind no puede manejar */
-
 /* Customización de Angular Material en navbar */
 ::ng-deep .navbar mat-form-field .mat-mdc-text-field-wrapper {
   background: rgba(255, 255, 255, 0.95) !important;

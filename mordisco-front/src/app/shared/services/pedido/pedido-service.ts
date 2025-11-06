@@ -17,7 +17,8 @@ export class PedidoService {
     return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos`, { params });
   }
 
-  fildAllByRestaurante_Id(idRest : number, page: number, size: number){
+
+  findAllByRestaurante_Id(idRest : number, page: number, size: number){
     const params = new HttpParams().set('page', page).set('size', size);
     return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/restaurantes/${idRest}`, { params });
   }
@@ -25,6 +26,10 @@ export class PedidoService {
   getAllByRestaurante_IdAndEstado(idRest : number, estado : string, page : number,size : number) : Observable<PaginationResponse<PedidoResponse>> {
     const params = new HttpParams().set('estado',estado).set('page', page).set('size', size);
     return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/restaurantes/${idRest}/state`, { params });
+  }
+
+  getById(idPedido : number) : Observable<PedidoResponse>{ 
+    return this.http.get<PedidoResponse>(`${environment.apiUrl}/pedidos/${idPedido}`)
   }
 
   changeState(id : number,estado : EstadoPedido) : Observable<string>{

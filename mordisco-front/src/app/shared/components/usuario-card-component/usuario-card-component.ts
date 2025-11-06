@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from "@angular/router";
 import UserCard from '../../models/user/user-card';
-import UserPedido from '../../models/user/user-pedido';
 
 @Component({
   selector: 'app-usuario-card-component',

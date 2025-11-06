@@ -1,8 +1,5 @@
 import { NavbarConfig } from "./navbar-models";
 
-
-
-
 export class NavBarConfigFactory {
   
   static getConfig(role: string | null, isAuthenticated: boolean, home : boolean): NavbarConfig {
@@ -75,7 +72,7 @@ export class NavBarConfigFactory {
         { label: 'Mi Perfil', icon: 'person', route: '/profile' },
         { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
         { label: 'Mi Restaurante', icon: 'restaurant', route: '/mi-restaurante' },
-        { label: 'Menú', icon: 'menu_book', route: '/mi-restaurante/menu' },
+        { label: 'Menú', icon: 'menu_book', route: '/mi-menu' },
         { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
       ]
     }

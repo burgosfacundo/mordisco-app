@@ -32,12 +32,12 @@ public class MenuController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#restauranteId)")
     @PostMapping("/crear/{restauranteId}")
-    public ResponseEntity<String> save(
+    public ResponseEntity<Void> save(
             @PathVariable Long restauranteId,
             @RequestParam @Valid @Size(max = 50) String nombre
     ) throws NotFoundException, BadRequestException {
         menuService.save(restauranteId, nombre);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Menu creado exitosamente.");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "Obtener menú por restaurante")
@@ -51,12 +51,12 @@ public class MenuController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#restauranteId)")
     @PatchMapping("/{restauranteId}")
-    public ResponseEntity<String> update(
+    public ResponseEntity<Void> update(
             @PathVariable Long restauranteId,
             @RequestParam @Size(max = 50) String nombre
     ) throws NotFoundException {
         menuService.update(restauranteId, nombre);
-        return ResponseEntity.ok("Menú actualizado correctamente");
+        return ResponseEntity.ok().build();
     }
 
     @SecurityRequirement(name = "bearerAuth")

@@ -15,9 +15,7 @@ import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionRequestDTO;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionResponseDTO;
 import utn.back.mordiscoapi.service.interf.IHorarioService;
 
-import java.util.Map;
-
-@Tag(name = "Promociones", description = "Operaciones relacionadas con las promociones de los restaurantes") // Anotación para documentar la API con Swagger
+@Tag(name = "Promociones", description = "Operaciones relacionadas con las promociones de los restaurantes")
 @RestController
 @RequestMapping("/api/restaurantes/horarios")
 @RequiredArgsConstructor
@@ -48,12 +46,12 @@ public class HorarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
     @PutMapping("/{idHorario}")
-    public ResponseEntity<Map<String,String>> update(
+    public ResponseEntity<Void> update(
             @Valid @Positive @PathVariable Long idHorario,
             @Valid @RequestBody HorarioAtencionRequestDTO dto
     ) throws NotFoundException {
         horarioService.update(idHorario,dto);
-        return ResponseEntity.ok(Map.of("message","Horario actualizado correctamente"));
+        return ResponseEntity.ok().build();
     }
 
     @SecurityRequirement(name = "bearerAuth")

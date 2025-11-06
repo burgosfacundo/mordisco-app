@@ -14,8 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-horario-form-component',
   imports: [ReactiveFormsModule],
-  templateUrl: './horario-form-component.html',
-  styleUrl: './horario-form-component.css'
+  templateUrl: './horario-form-component.html'
 })
 export class HorarioFormComponent implements OnInit{
 
@@ -109,7 +108,7 @@ export class HorarioFormComponent implements OnInit{
         }
 
         this.hService.update(this.formHorarioAtencion.value.id,horarioParaBackend).subscribe({
-          next:(data)=>{console.log(data),
+          next:(data)=>{
             this.hService.clearHorarioToEdit()
             this._snackbar.open("✅ Horario editado correctamente",'',{duration: 3000})
             this.router.navigate(['/horarios'])

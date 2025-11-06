@@ -3,131 +3,165 @@ import { MenuService } from '../../../../shared/services/menu/menu-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { AuthService } from '../../../../shared/services/auth-service';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
-import { AuthResponse } from '../../../auth/models/auth-response';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import ProductoResponse from '../../../../shared/models/producto/producto-response';
 import { ProductoCardComponent } from "../../../../shared/components/producto-card-component/producto-card-component";
 import MenuResponse from '../../../../shared/models/menu/menu-response';
 import { ProductoService } from '../../../../shared/services/productos/producto-service';
 import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MenuFormComponent } from "../menu-form-component/menu-form-component";
 
 @Component({
   selector: 'app-mi-menu-page',
-  imports: [ProductoCardComponent, MatPaginator],
-  templateUrl: './mi-menu-page.html',
-  styleUrl: './mi-menu-page.css'
+  standalone: true,
+  imports: [ProductoCardComponent, MatPaginator, MenuFormComponent, RouterLink],
+  templateUrl: './mi-menu-page.html'
 })
-export class MiMenuPage implements OnInit{
+export class MiMenuPage implements OnInit {
+  private aus = inject(AuthService);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private mService = inject(MenuService);
+  private rService = inject(RestauranteService);
+  private pService = inject(ProductoService);
 
-  private aus : AuthService = inject(AuthService)
-  private router : Router = inject(Router)
-  private _snackBar : MatSnackBar = inject(MatSnackBar)
-  private mService : MenuService = inject(MenuService)
-  private rService : RestauranteService = inject(RestauranteService)
-  private pService : ProductoService = inject(ProductoService)
+  restaurante?: RestauranteResponse;
+  menu?: MenuResponse;
+  arrProductos?: ProductoResponse[];
 
-  menu? : MenuResponse 
-  idCurrUser? : number | undefined 
-  restLeido? : RestauranteResponse
-  arrProductos? : ProductoResponse[]
+  sizeProductos = 10;
+  pageProductos = 0;
+  lengthProductos = 0;
 
-  sizeProductos : number = 5;
-  pageProductos: number = 0;
-  lengthProductos : number = 5;
-
-  isLoading = true
+  isLoading = true;
+  hasRestaurante = false;
+  hasMenu = false;
 
   ngOnInit(): void {
-    const resp : AuthResponse | null = this.aus.getCurrentUser()
-    this.idCurrUser = resp?.userId
-    if(this.idCurrUser){
-      this.findRestaurante_and_menu(this.idCurrUser)
+    const userId = this.aus.currentUser()?.userId;
+    
+    if (!userId) {
+      this.snackBar.open('❌ Usuario no autenticado', 'Cerrar', { duration: 3000 });
+      this.router.navigate(['/login']);
+      return;
     }
+
+    this.cargarDatos(userId);
   }
 
-  listarProductos(){
-    if(this.menu){
-      this.pService.getAllByIdMenu(this.menu?.id, this.pageProductos,this.sizeProductos).subscribe({
-        next:(data)=> { this.arrProductos= data.content,
-          this.lengthProductos=data.totalElements,
-          this.isLoading=false
-        },error:(e)=>{
-          this._snackBar.open('❌ Error al cargar los productos','Cerrar' , { duration: 3000 });
-          this.router.navigate(['/'])
+  private cargarDatos(userId: number): void {
+    // PASO 1: Verificar si tiene restaurante
+    this.rService.getByUsuario(userId).subscribe({
+      next: (restaurante) => {
+        if (!restaurante) {
+          this.mostrarError('⚠️ Primero debes crear tu restaurante');
+          this.router.navigate(['/mi-restaurante']);
+          return;
         }
-      })
-      }
-  }
 
-  findRestaurante_and_menu(id : number){
-    this.rService.getByUsuario(id).subscribe({
-          next: (r) =>{ 
-            if(!r){
-              console.log("No existe ese restaurante"); return
-            }else{
-              this.mService.getByRestauranteId(r.id).subscribe({
-                next:(m)=> {
-                  if(!m){
-                    console.log("No existe el menu"); return
-                  }else{
-                    this.menu=m
-                    this.listarProductos()
-                  }},
-                error:(e)=> {console.log(e); alert("Tu restaurante no tiene menu") 
-                }})
-            }
-          },error: (e)=> console.log(e)})
-  }
-  
-  onPageChangeProductos(event: PageEvent): void {
-    this.pageProductos = event.pageIndex
-    this.sizeProductos = event.pageSize;
-    if (this.idCurrUser){
-      this.findRestaurante_and_menu(this.idCurrUser);
-    }
-  }
-
-  confirmarEliminacion(id : number) {
-      const confirmado = confirm(
-        '⚠️ ¿Estás segura/o de que querés eliminar este producto? Esta acción no se puede deshacer.'
-      );
-
-      if (confirmado) {
-        this.eliminarProducto(id);
-      }
-  }
-    
-  eliminarProducto(id : number) {
-    if(!this.idCurrUser || !id){
-        this.openSnackBar('❌ Ocurrió un error al cargar el perfil')
-        this.router.navigate(['/'])
-        return
-    }
-
-    this.pService.delete(id).subscribe({
-      next :(data) => {console.log(data),
-        this.openSnackBar('Producto eliminado correctamente')
-          this.listarProductos()
+        this.restaurante = restaurante;
+        this.hasRestaurante = true;
+        
+        // PASO 2: Verificar si tiene menú
+        this.verificarMenu(restaurante.id);
       },
-      error: (e)=> {console.log(e),
-        this.openSnackBar('❌ Ocurrió un error al eliminar el producto')}
-    })
+      error: (error) => {
+        if (error.status === 404) {
+          this.mostrarError('⚠️ Primero debes crear tu restaurante');
+          this.router.navigate(['/mi-restaurante']);
+        } else {
+          this.mostrarError('❌ Error al cargar el restaurante');
+        }
+        this.isLoading = false;
+      }
+    });
   }
 
-  editarProducto(producto : ProductoResponse){
-    this.pService.setProductoToEdit(producto)
-    this.router.navigate(['/product/form-product']);
+  private verificarMenu(restauranteId: number): void {
+    this.mService.getByRestauranteId(restauranteId).subscribe({
+      next: (menu) => {
+        if (!menu?.id) {
+          this.hasMenu = false;
+          this.isLoading = false;
+          return;
+        }
+
+        this.menu = menu;
+        this.hasMenu = true;
+        
+        // PASO 3: Cargar productos del menú
+        this.cargarProductos();
+      },
+      error: (error) => {
+        if (error.status === 404) {
+          this.hasMenu = false;
+        }
+        this.isLoading = false;
+      }
+    });
   }
 
-  agregarProducto(){
-    this.router.navigate(['/product/form-product']);
+  private cargarProductos(): void {
+    if (!this.menu?.id) {
+      this.isLoading = false;
+      return;
+    }
+
+    this.pService.getAllByIdMenu(
+      this.menu.id, 
+      this.pageProductos, 
+      this.sizeProductos
+    ).subscribe({
+      next: (data) => {
+        this.arrProductos = data.content;
+        this.lengthProductos = data.totalElements;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.mostrarError('❌ Error al cargar los productos');
+        this.isLoading = false;
+      }
+    });
   }
 
-  private openSnackBar(message: string, action: string = 'Cerrar'): void {
-    this._snackBar.open(message, action, { duration: 3000 });
-  } 
-    
+  onPageChangeProductos(event: PageEvent): void {
+    this.pageProductos = event.pageIndex;
+    this.sizeProductos = event.pageSize;
+    this.cargarProductos();
+  }
+
+  agregarProducto(): void {
+    if (!this.menu?.id) {
+      this.snackBar.open('⚠️ Error: Menú no disponible', 'Cerrar', { duration: 3000 });
+      return;
+    }
+    this.router.navigate(['/productos/nuevo', this.menu.id]);
+  }
+
+  editarProducto(producto: ProductoResponse): void {
+    this.router.navigate(['/productos/editar', producto.id]);
+  }
+
+  confirmarEliminacion(id: number): void {
+    if (confirm('⚠️ ¿Estás seguro de eliminar este producto?')) {
+      this.eliminarProducto(id);
+    }
+  }
+
+  private eliminarProducto(id: number): void {
+    this.pService.delete(id).subscribe({
+      next: () => {
+        this.snackBar.open('✅ Producto eliminado', 'Cerrar', { duration: 3000 });
+        this.cargarProductos();
+      },
+      error: () => {
+        this.mostrarError('❌ Error al eliminar el producto');
+      }
+    });
+  }
+
+  private mostrarError(mensaje: string): void {
+    this.snackBar.open(mensaje, 'Cerrar', { duration: 3000 });
+  }
 }
-
-

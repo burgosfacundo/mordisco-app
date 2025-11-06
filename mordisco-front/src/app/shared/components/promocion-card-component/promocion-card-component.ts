@@ -20,8 +20,8 @@ export class PromocionCardComponent {
     const baseClasses = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide';
     
     const hoy = new Date();
-    const inicio = new Date(this.promocion.fechainicio);
-    const fin = new Date(this.promocion.fechafin);
+    const inicio = new Date(this.promocion.fechaInicio);
+    const fin = new Date(this.promocion.fechaFin);
     
     if (hoy < inicio) {
       return `${baseClasses} bg-blue-100 text-blue-700`;
@@ -34,8 +34,8 @@ export class PromocionCardComponent {
 
   getEstadoVigenciaLabel(): string {
     const hoy = new Date();
-    const inicio = new Date(this.promocion.fechainicio);
-    const fin = new Date(this.promocion.fechafin);
+    const inicio = new Date(this.promocion.fechaInicio);
+    const fin = new Date(this.promocion.fechaFin);
     
     if (hoy < inicio) {
       return 'Próximamente';

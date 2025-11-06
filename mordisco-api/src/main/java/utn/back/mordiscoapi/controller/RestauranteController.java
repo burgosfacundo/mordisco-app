@@ -79,11 +79,11 @@ public class RestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @usuarioSecurity.puedeAccederAUsuario(#dto.idUsuario())")
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody
+    public ResponseEntity<Void> save(@RequestBody
                                        @Valid
                                        RestauranteCreateDTO dto) {
         restauranteService.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Restaurante guardado correctamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -194,9 +194,9 @@ public class RestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.id)")
     @PutMapping("/update")
-    public ResponseEntity<String> update(@RequestBody @Valid RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException {
+    public ResponseEntity<Void> update(@RequestBody @Valid RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException {
         restauranteService.update(dto);
-        return ResponseEntity.ok("El restaurante se actualizo exitosamente");
+        return ResponseEntity.ok().build();
     }
 
     /**

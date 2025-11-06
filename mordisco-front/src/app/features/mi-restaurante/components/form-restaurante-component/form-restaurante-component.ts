@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { RestauranteService } from "../../../../shared/services/restaurante/restaurante-service";
 import { AuthService } from "../../../../shared/services/auth-service";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -9,9 +9,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import RestauranteUpdate from "../../../../shared/models/restaurante/restaurante-update";
 import RestauranteRequest from "../../../../shared/models/restaurante/restaurante-request";
-import DireccionRequest from "../../../../shared/models/direccion/direccion-request";
 import { FormValidationService } from "../../../../shared/services/form-validation-service";
-import { DireccionFormComponent } from "../../../direccion/components/direccion-form-component/direccion-form-component";
 
 @Component({
   selector: 'app-restaurante-form-component',
@@ -20,14 +18,13 @@ import { DireccionFormComponent } from "../../../direccion/components/direccion-
     CommonModule,
     ReactiveFormsModule,
     MatInputModule,
-    MatFormFieldModule,
-    DireccionFormComponent
-],
+    MatFormFieldModule
+  ],
   templateUrl: './form-restaurante-component.html'
 })
 export class RestauranteFormComponent implements OnInit {
   private restauranteService = inject(RestauranteService);
-  private formValidationService = inject(FormValidationService)
+  private formValidationService = inject(FormValidationService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -37,129 +34,135 @@ export class RestauranteFormComponent implements OnInit {
   restauranteForm!: FormGroup;
   isEditMode = false;
   restauranteId?: number;
+  imagenId? : number
   isSubmitting = false;
-  userId = this.authService.currentUser()?.userId
-
-  direccion? : DireccionRequest 
+  userId = this.authService.currentUser()?.userId;
 
   ngOnInit(): void {
-    this.initForm();
-    
-    // Detectar si es modo edición
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
         this.restauranteId = +params['id'];
+      }
+      
+      this.initForm();
+      
+      if (this.isEditMode && this.restauranteId) {
         this.cargarRestaurante(this.restauranteId);
       }
     });
   }
 
   initForm(): void {
-    this.restauranteForm = this.fb.group({
+    const baseFields = {
       razonSocial: ['', [Validators.required, Validators.maxLength(50)]],
-      activo: ['', [Validators.required]],
-      logoUrl: ['', [Validators.required,Validators.maxLength(255)]],
-      logoNombre: ['', [Validators.required,Validators.maxLength(50)]]
+      activo: [true, [Validators.required]],
+      logoUrl: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]]
+    };
+    const addressFields = this.isEditMode ? {} : {
+      calle: ['', [Validators.required, Validators.maxLength(50)]],
+      numero: ['', [Validators.required, Validators.maxLength(50)]],
+      piso: ['', [Validators.maxLength(15)]],
+      depto: ['', [Validators.maxLength(15)]],
+      codigoPostal: ['', [Validators.required, Validators.maxLength(15)]],
+      ciudad: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
+      referencias: ['', [Validators.maxLength(250)]]
+    };
+
+    this.restauranteForm = this.fb.group({
+      ...baseFields,
+      ...addressFields
     });
   }
 
   cargarRestaurante(id: number): void {
-    if (!this.restauranteId) {
-      this.snackBar.open('⚠️ Esperando datos del restaurante...', 'Cerrar', { duration: 2000 });
-      setTimeout(() => this.cargarRestaurante(id), 1000);
-      return;
-    }
-
-    this.restauranteService.findById(this.restauranteId).subscribe({
+    this.restauranteService.findById(id).subscribe({
       next: (r) => {
-        if (r) {
           this.restauranteForm.patchValue({
             razonSocial: r.razonSocial,
             activo: r.activo,
             logoUrl: r.logo.url,
-            logoNombre: r.logo.nombre
           });
-        } else {
-          this.snackBar.open('❌ Restaurante no encontrado', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/']);
-        }
+          this.imagenId = r.logo.id
+      },
+      error: () => {
+        this.snackBar.open('❌ Error al cargar el restaurante', 'Cerrar', { duration: 4000 });
+        this.router.navigate(['/mi-restaurante']);
       }
     });
   }
 
   onSubmit(): void {
-    if (!this.restauranteForm.valid && !this.direccion) {
+    if (this.restauranteForm.invalid) {
       this.markFormGroupTouched(this.restauranteForm);
       this.snackBar.open('⚠️ Por favor completa todos los campos correctamente', 'Cerrar', { duration: 3000 });
       return;
     }
 
-    if (!this.restauranteId) {
-      this.snackBar.open('❌ No se pudo identificar el restaurante', 'Cerrar', { duration: 3000 });
+    if (!this.userId) {
+      this.snackBar.open('❌ No se pudo identificar el usuario', 'Cerrar', { duration: 3000 });
       return;
     }
 
     this.isSubmitting = true;
+    const formValue = this.restauranteForm.value;
 
-    if (this.isEditMode && this.restauranteId && this.userId) {
-        const restauranteData: RestauranteUpdate = {
-            razonSocial: this.restauranteForm.value.razonSocial,
-            activo : this.restauranteForm.value.activo,
-            logo: {
-                id: this.restauranteForm.value.logo.id,
-                url: this.restauranteForm.value.logo.url,
-                nombre: this.restauranteForm.value.logo.nombre
-            },
-            idUsuario: this.userId
-        };
+    if (this.isEditMode && this.restauranteId && this.imagenId) {
+      const restauranteData: RestauranteUpdate = {
+        id : this.restauranteId,
+        razonSocial: formValue.razonSocial,
+        activo: formValue.activo,
+        logo: {
+          id: this.imagenId,
+          url: formValue.logoUrl,
+          nombre: `${formValue.razonSocial} Logo`
+        },
+      };
 
       this.restauranteService.put(restauranteData).subscribe({
         next: () => {
           this.snackBar.open('✅ Restaurante actualizado correctamente', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/mi-restaurante']);
+          this.router.navigate(['/']);
         },
-        error: (error) => {
-          console.error('Error al actualizar restaurante:', error);
+        error: () => {
           this.snackBar.open('❌ Error al actualizar el restaurante', 'Cerrar', { duration: 4000 });
+        },
+        complete: () => {
           this.isSubmitting = false;
         }
       });
     } else {
-      if(this.userId && this.direccion){
+      const restauranteData: RestauranteRequest = {
+        razonSocial: formValue.razonSocial,
+        activo: formValue.activo,
+        logo: {
+          url: formValue.logoUrl,
+          nombre: `${formValue.razonSocial} Logo`
+        },
+        idUsuario: this.userId,
+        direccion: {
+          calle: formValue.calle,
+          numero: formValue.numero,
+          piso: formValue.piso || undefined,
+          depto: formValue.depto || undefined,
+          codigoPostal: formValue.codigoPostal,
+          referencias: formValue.referencias || undefined,
+          ciudad: formValue.ciudad
+        }
+      };
 
-        const restauranteData: RestauranteRequest = {
-          razonSocial: this.restauranteForm.value.razonSocial,
-          activo : this.restauranteForm.value.activo,
-          logo: {
-            url: this.restauranteForm.value.logo.url,
-            nombre: this.restauranteForm.value.logo.nombre
-          },
-          idUsuario: this.userId,
-          direccion: {
-            calle : this.direccion.calle,
-            numero : this.direccion.numero,
-            piso : this.direccion.piso,
-            depto : this.direccion.depto,
-            codigoPostal : this.direccion.codigoPostal,
-            referencias : this.direccion.referencias,
-            ciudad : this.direccion.ciudad
-          }
-        };
-
-      
-        this.restauranteService.save(restauranteData).subscribe({
-          next: () => {
-            this.snackBar.open('✅ Restaurante creado correctamente', 'Cerrar', { duration: 3000 });
-            this.router.navigate(['/mi-restaurante']);
-          },
-          error: (error) => {
-            console.error('Error al crear restaurante:', error);
-            this.snackBar.open('❌ Error al crear el restaurante', 'Cerrar', { duration: 4000 });
-            this.isSubmitting = false;
-          }
-        });
-      }
+      this.restauranteService.save(restauranteData).subscribe({
+        next: () => {
+          this.snackBar.open('✅ Restaurante creado correctamente', 'Cerrar', { duration: 3000 });
+          this.router.navigate(['/']);
+        },
+        error: () => {
+          this.snackBar.open('❌ Error al crear el restaurante', 'Cerrar', { duration: 4000 });
+        },
+        complete: () => {
+          this.isSubmitting = false;
+        }
+      });
     }
   }
 
@@ -186,9 +189,5 @@ export class RestauranteFormComponent implements OnInit {
     } else {
       this.router.navigate(['/mi-restaurante']);
     }
-  }
-
-  recibirDireccion(e :DireccionRequest){
-    this.direccion = e
   }
 }

@@ -8,6 +8,7 @@ import { PedidoCardComponent } from '../../../../shared/components/pedido-card-c
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home-restaurante-component',
@@ -20,6 +21,7 @@ export class HomeRestauranteComponent implements OnInit {
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
   private restauranteService = inject(RestauranteService);
+  private router = inject(Router)
 
   pedidosPendientes?: PedidoResponse[];
 
@@ -46,12 +48,12 @@ export class HomeRestauranteComponent implements OnInit {
 
     this.restauranteService.getByUsuario(user.userId).subscribe({
       next: (r) => {
-        this.restaurante = r;
-        this.loadPedidosPendientes(r.id);
+        this.restaurante = r
+        this.loadPedidosPendientes(r.id)
       },
       error: () => {
-        this._snackBar.open('❌ Error al cargar el restaurante', 'Cerrar' , { duration: 3000 });
-        this.isLoading = false;
+        this.router.navigate(['/mi-restaurante'])
+        this.isLoading = false
       }
     });
   }

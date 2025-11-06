@@ -43,11 +43,11 @@ public class PedidoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('CLIENTE') and @usuarioSecurity.puedeAccederAUsuario(#dto.idCliente())")
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody
-                                       @Valid
-                                       PedidoRequestDTO dto) throws NotFoundException, BadRequestException {
+    public ResponseEntity<Void> save(@RequestBody
+                                     @Valid
+                                     PedidoRequestDTO dto) throws NotFoundException, BadRequestException {
         pedidoService.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Pedido creado exitosamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -134,8 +134,8 @@ public class PedidoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("@pedidoSecurity.esPropietarioPedido(#id)")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable
-                                         Long id) throws NotFoundException {
+    public ResponseEntity<Void> delete(@PathVariable
+                                       Long id) throws NotFoundException {
         pedidoService.delete(id);
         return ResponseEntity.noContent().build();
     }
@@ -159,12 +159,12 @@ public class PedidoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("@pedidoSecurity.esPropietarioRestaurantePedido(#id)")
     @PutMapping("/state/{id}")
-    public ResponseEntity<String> changeState(
+    public ResponseEntity<Void> changeState(
             @PathVariable
             Long id,
             @RequestParam EstadoPedido nuevoEstado) throws NotFoundException, BadRequestException {
         pedidoService.changeState(id,nuevoEstado);
-        return ResponseEntity.ok().body("Pedido actualizado exitosamente");
+        return ResponseEntity.ok().build();
     }
 
 
@@ -186,11 +186,11 @@ public class PedidoController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("@pedidoSecurity.esPropietarioPedido(#id)")
     @PutMapping("/cancelar/{id}")
-    public ResponseEntity<String> cancelarPedido(
+    public ResponseEntity<Void> cancelarPedido(
             @PathVariable
             Long id) throws NotFoundException, BadRequestException {
         pedidoService.cancelarPedido(id);
-        return ResponseEntity.ok().body("Pedido actualizado exitosamente");
+        return ResponseEntity.ok().build();
     }
 
 

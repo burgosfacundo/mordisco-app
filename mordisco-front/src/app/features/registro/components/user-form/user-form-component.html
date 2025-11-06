@@ -103,8 +103,8 @@
             [class.border-red-500]="getError"
             [class.focus:ring-red-500]="getError"
         >
-        @if (getError('email')) {
-            <p class="form-error">{{ getError('email') }}</p>
+        @if (getError('password')) {
+            <p class="form-error">{{ getError('password') }}</p>
         }
     </fieldset>
 

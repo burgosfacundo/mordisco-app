@@ -5,8 +5,7 @@ import ProductoResponse from '../../models/producto/producto-response';
 @Component({
   selector: 'app-producto-card-component',
   imports: [],
-  templateUrl: './producto-card-component.html',
-  styleUrl: './producto-card-component.css'
+  templateUrl: './producto-card-component.html'
 })
 export class ProductoCardComponent {
 

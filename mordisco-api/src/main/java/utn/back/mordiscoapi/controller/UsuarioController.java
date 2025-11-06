@@ -39,11 +39,11 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody
+    public ResponseEntity<Void> save(@RequestBody
                                        @Valid
                                        UsuarioCreateDTO dto) throws NotFoundException {
         service.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Usuario guardado correctamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -149,13 +149,13 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN")
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updatePerfil(@PathVariable
+    public ResponseEntity<Void> updatePerfil(@PathVariable
                                                Long id,
                                                @RequestBody
                                                @Valid
                                                UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         service.update(id,dto);
-        return ResponseEntity.ok().body("Usuario actualizado exitosamente");
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -223,11 +223,11 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/password")
-    public ResponseEntity<String> changePassword(
+    public ResponseEntity<Void> changePassword(
             @RequestBody @Valid
             ChangePasswordDTO dto) throws NotFoundException, BadRequestException {
         service.changePassword(dto);
-        return ResponseEntity.ok().body("Contraseña actualizada exitosamente");
+        return ResponseEntity.ok().build();
     }
 
     /**

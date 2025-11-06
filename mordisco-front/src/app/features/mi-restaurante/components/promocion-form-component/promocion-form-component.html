@@ -72,7 +72,10 @@
             [matDatepicker]="pickerInicio"
             formControlName="fechaInicio"
             placeholder="Selecciona una fecha">
-          <mat-datepicker-toggle matIconSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+          <mat-datepicker-toggle 
+          matIconSuffix 
+          [for]="pickerInicio"
+          ></mat-datepicker-toggle>
           <mat-datepicker #pickerInicio></mat-datepicker>
         </mat-form-field>
         @if (getError('fechaInicio')) {

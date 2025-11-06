@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { PedidoCardComponent } from '../../../../shared/components/pedido-card-component/pedido-card-component';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -14,12 +14,9 @@ import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 @Component({
   selector: 'app-mis-pedidos-page',
   imports: [PedidoCardComponent, ReactiveFormsModule, MatPaginator],
-  templateUrl: './mis-pedidos-page.html',
-  styleUrl: './mis-pedidos-page.css'
+  templateUrl: './mis-pedidos-page.html'
 })
-export class MisPedidosPage implements OnInit, OnDestroy {
-
-  //private eventListeners: (() => void)[] = [];
+export class MisPedidosPage implements OnInit {
   private pService : PedidoService = inject(PedidoService)
   private rService : RestauranteService = inject(RestauranteService)
   private auS : AuthService = inject(AuthService)
@@ -51,10 +48,9 @@ export class MisPedidosPage implements OnInit, OnDestroy {
         },
         error:(e)=> {
           console.log(e);
-          this.isLoadingPedidos = false; // En caso de error, también paramos el spinner
+          this.isLoadingPedidos = false
         }
       })
-     // this.setupEventListeners()
     }
     this.estado.valueChanges.subscribe((nuevoEstado) => {
       if (nuevoEstado) {
@@ -70,26 +66,6 @@ export class MisPedidosPage implements OnInit, OnDestroy {
       }
     });
   }
-
-  ngOnDestroy(): void {
-   // this.eventListeners.forEach(cleanup => cleanup());
-  }
-  /*
-  private setupEventListeners(): void {
-    const estadoListener = (event: Event) => {
-      const { detail } = event as CustomEvent<any>;
-      this.estadoSeleccionado = typeof detail === 'string' ? detail : detail?.nombre;
-      if (this.estadoSeleccionado) {
-        this.listarPedidosEstado(this.estadoSeleccionado);
-      }
-    };
-
-    window.addEventListener('estado-changed', estadoListener);
-
-    this.eventListeners.push(
-      () => window.removeEventListener('estado-changed', estadoListener),
-    );
-  }*/
 
   listarPedidosEstado(estado : string){
     if(!this.restaurante) return;
@@ -108,7 +84,7 @@ export class MisPedidosPage implements OnInit, OnDestroy {
 
   listarTodos(){
     if(!this.restaurante) return;
-    this.pService.fildAllByRestaurante_Id(this.restaurante.id, this.pagePedidos,this.sizePedidos).subscribe({
+    this.pService.findAllByRestaurante_Id(this.restaurante.id, this.pagePedidos,this.sizePedidos).subscribe({
         next: (p)=> {this.arrPedidos = p.content,
           this.lengthPedidos = p.totalElements
           this.isLoadingPedidos=false
@@ -171,7 +147,7 @@ export class MisPedidosPage implements OnInit, OnDestroy {
     })
   }
 
-  verDetalle(pedido : PedidoResponse){
-    this.router.navigate(['/pedidos/detalle-pedido'])
-  }
+verDetalle(pedido: PedidoResponse): void {
+  this.router.navigate(['/restaurante/pedidos/detalle', pedido.id]);
+}
 }

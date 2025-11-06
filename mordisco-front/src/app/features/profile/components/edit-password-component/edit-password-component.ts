@@ -1,13 +1,13 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 
 @Component({
   selector: 'app-edit-password-component',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './edit-password-component.html',
 })
 export class EditPasswordComponent implements OnInit {
@@ -24,7 +24,7 @@ export class EditPasswordComponent implements OnInit {
   ngOnInit(): void {
     this.editarPassword = this.fb.group({
       passwordActual: ['', Validators.required],
-      passwordNueva: ['', [Validators.required, Validators.minLength(8)],Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)],
+      password: ['', [Validators.required, Validators.minLength(8)],Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)],
       confirmarPasswordNueva: ['', Validators.required]
     });
   }
@@ -33,30 +33,39 @@ export class EditPasswordComponent implements OnInit {
     if (this.editarPassword.invalid) return;
 
     this.isSubmitting.set(true)
-    const { passwordActual, confirmarPasswordNueva, passwordNueva } = this.editarPassword.value;
+    const { passwordActual, password , confirmarPasswordNueva } = this.editarPassword.value;
 
-    if (passwordActual !== confirmarPasswordNueva) {
-      this.snackBar.open('Las contraseñas nuevas no coinciden', 'Cerrar', { duration: 3000 });
+    if (password !== confirmarPasswordNueva) {
+      this.isSubmitting.set(false)
+      this.snackBar.open('❌ Las contraseñas nuevas no coinciden', 'Cerrar', { duration: 3000 });
       return;
     }
 
 
-    this.authService.updatePassword({passwordActual, passwordNueva}).subscribe({
+    this.authService.updatePassword({currentPassword : passwordActual, newPassword : password}).subscribe({
       next: () => {
         this.snackBar.open('Contraseña actualizada correctamente', 'Cerrar', { duration: 3000 });
-        this.router.navigate(['/perfil']);
+        this.router.navigate(['/profile']);
       },
       error: (err) => {
-        console.error(err);
-        this.snackBar.open('Error al actualizar la contraseña', 'Cerrar', { duration: 3000 });
+        if(err.error.message.includes('Contraseña actual incorrecta')) {
+          this.isSubmitting.set(false)
+          this.snackBar.open('❌ La contraseña actual no es correcta', 'Cerrar', { duration: 3000 });
+        }else if (err.error.newPassword.includes('debe tener')) {
+          this.isSubmitting.set(false)
+          this.snackBar.open('❌ Formato de la contraseña nueva incorrecto', 'Cerrar', { duration: 3000 });
+        }else{
+          console.log(err);
+          
+           this.isSubmitting.set(false)
+          this.snackBar.open('❌ Error al actualizar la contraseña', 'Cerrar', { duration: 3000 });
+        }
       }
     });
   
   }
 
   getError(fieldName: string): string | null {
-    return this.validationService.getErrorMessage(
-    this.editarPassword.get(fieldName),
-    fieldName);
-}
+    return this.validationService.getErrorMessage(this.editarPassword.get(fieldName),fieldName);
+  }
 }
