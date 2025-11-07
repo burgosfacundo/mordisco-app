@@ -15,5 +15,5 @@ public interface IUsuarioService {
     void changePassword(ChangePasswordDTO dto) throws NotFoundException, BadRequestException;
     Page<UsuarioCardDTO> findByRolId(int pageNo,int pageSize,Long id) throws NotFoundException;
     void update(Long id, UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;
-    UsuarioResponseDTO updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;
+    void updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;
 }

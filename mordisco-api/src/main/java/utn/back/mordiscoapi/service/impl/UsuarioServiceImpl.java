@@ -103,7 +103,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     }
 
     @Override
-    public UsuarioResponseDTO updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
+    public void updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         var userAuthenticated = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("No autenticado"));
 
@@ -114,7 +114,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         user.setApellido(Sanitize.collapseSpaces(dto.apellido()));
         user.setTelefono(Sanitize.collapseSpaces(dto.telefono()));
 
-        return UsuarioMapper.toUsuarioResponseDTO(user);
+        repository.save(user);
     }
 
     /**
