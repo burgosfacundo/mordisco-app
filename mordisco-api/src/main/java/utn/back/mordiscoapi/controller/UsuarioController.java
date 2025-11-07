@@ -124,9 +124,10 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/me")
-    public ResponseEntity<UsuarioResponseDTO> updateMe(@RequestBody @Valid UsuarioUpdateDTO dto)
+    public ResponseEntity<Void> updateMe(@RequestBody @Valid UsuarioUpdateDTO dto)
             throws NotFoundException, BadRequestException {
-        return ResponseEntity.ok(service.updateMe(dto));
+        service.updateMe(dto);
+        return ResponseEntity.ok().build();
     }
 
     /**

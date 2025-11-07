@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../../registro/services/user-service';
-import UserProfileEdit from '../../../../shared/models/user/user-profile-edit';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -61,15 +60,8 @@ export class EditProfileFormComponent {
     }
 
     this.isSubmitting.set(true)
-    const raw = this.editarPerfil.getRawValue();
 
-    const userActualizado : UserProfileEdit =  {
-      nombre: raw.nombre,
-      apellido: raw.apellido,
-      telefono: raw.telefono
-    };
-
-    this.userService.updateMe(userActualizado).subscribe({
+    this.userService.updateMe(this.editarPerfil.value).subscribe({
       next: () => {
         this._snackBar.open('✅ Perfil actualizado correctamente','',{duration: 3000});
         this.router.navigate(['/profile'])
