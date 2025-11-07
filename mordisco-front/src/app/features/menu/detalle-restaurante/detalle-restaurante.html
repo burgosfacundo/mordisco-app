@@ -1,0 +1,42 @@
+<div class="restaurant-container">
+    <!-- Header Section -->
+        <div class="restaurant-header">
+            <!-- Logo -->
+        <img 
+          src="{{rest.logo.url}}" 
+          class="w-20 h-20 object-cover rounded-lg border border-gray-300 shadow-sm"
+        />
+
+            <!-- Info Section -->
+            <div class="restaurant-info">            
+                <!-- Rating -->
+                <div class="restaurant-rating">
+                    <span class="text-black text-lg">⭐</span>
+                    <span class="text-base font-semibold text-black">{{rest.estrellas}}</span>
+                    <br>
+                    <span class="text-gray-600 text-sm">{{cantCalificaciones}} opiniones</span>
+                </div>
+
+                <!-- Delivery Buttons -->
+                <div class="restaurant-buttons">
+                    <button class="btn-outline px-[8px] py-[3px] text-xs rounded-lg">
+                        Delivery
+                    </button>
+                    <button class="btn-outline px-[8px] py-[3px] text-xs rounded-lg">
+                        Retira por local
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section 
+        <div class="restaurant-search-section">
+            <div class="restaurant-search-wrapper">
+                <input 
+                    type="text" 
+                    placeholder="Buscar productos..." 
+                    class="input-search"
+                />
+            </div>
+        </div>-->
+    </div>

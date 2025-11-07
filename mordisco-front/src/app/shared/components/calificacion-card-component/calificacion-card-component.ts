@@ -1,6 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import CalificacionRequestDTO from '../../models/calificacion/calificacion-request-dto';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-calificacion-card-component',

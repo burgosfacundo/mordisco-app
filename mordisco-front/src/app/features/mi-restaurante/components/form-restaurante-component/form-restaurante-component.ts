@@ -1,15 +1,15 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { RestauranteService } from "../../../../shared/services/restaurante/restaurante-service";
 import { AuthService } from "../../../../shared/services/auth-service";
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { CommonModule } from "@angular/common";
-import { MatInputModule } from "@angular/material/input";
-import { MatFormFieldModule } from "@angular/material/form-field";
 import RestauranteUpdate from "../../../../shared/models/restaurante/restaurante-update";
 import RestauranteRequest from "../../../../shared/models/restaurante/restaurante-request";
 import { FormValidationService } from "../../../../shared/services/form-validation-service";
+import { CommonModule } from "@angular/common";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { MatInputModule } from "@angular/material/input";
+import { MatFormFieldModule } from "@angular/material/form-field";
 
 @Component({
   selector: 'app-restaurante-form-component',

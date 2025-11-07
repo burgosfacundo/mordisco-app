@@ -1,6 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import CalificacionRestauranteReponse from '../../../../shared/models/calificacion/calificacion-restaurante-response';
@@ -15,8 +13,10 @@ import PromocionResponse from '../../../../shared/models/promocion/promocion-res
 import HorarioAtencionResponse from '../../../../shared/models/horario/horario-atencion-response';
 import { HorarioRestauranteComponent } from "../../../../shared/components/horario-atencion-component/horario-atencion-component";
 import { CalificacionService } from '../../../../shared/services/calificacion/calificacion-service';
-import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { RestauranteFormComponent } from "../form-restaurante-component/form-restaurante-component";
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-mi-restaurante-page',

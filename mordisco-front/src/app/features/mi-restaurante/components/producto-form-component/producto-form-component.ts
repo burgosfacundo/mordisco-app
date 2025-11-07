@@ -1,13 +1,13 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductoService } from '../../../../shared/services/productos/producto-service';
 import ProductoResponse from '../../../../shared/models/producto/producto-response';
-import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import ProductoUpdate from '../../../../shared/models/producto/producto-update';
 import ProductoRequest from '../../../../shared/models/producto/producto-request';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormValidationService } from '../../../../shared/services/form-validation-service';
 
 @Component({
   selector: 'app-producto-form-component',
@@ -41,12 +41,8 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
   }
 
   private initializeForm(): void {
-    this.productoForm = this.fb.group({
-      nombreProducto: ['', [
-        Validators.required, 
-        Validators.minLength(3),
-        Validators.maxLength(100)
-      ]],
+      this.productoForm = this.fb.group({
+      nombreProducto: ['', [Validators.required, Validators.minLength(3),Validators.maxLength(100)]],
       descripcion: ['', [
         Validators.required, 
         Validators.minLength(10),

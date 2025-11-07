@@ -1,10 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../../registro/services/user-service';
 import UserProfileEdit from '../../../../shared/models/user/user-profile-edit';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
+import { Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-edit-profile-form-component',

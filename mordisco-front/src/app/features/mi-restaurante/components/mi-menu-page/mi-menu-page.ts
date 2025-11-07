@@ -3,19 +3,19 @@ import { MenuService } from '../../../../shared/services/menu/menu-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { AuthService } from '../../../../shared/services/auth-service';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
-import { Router, RouterLink } from '@angular/router';
 import ProductoResponse from '../../../../shared/models/producto/producto-response';
 import { ProductoCardComponent } from "../../../../shared/components/producto-card-component/producto-card-component";
 import MenuResponse from '../../../../shared/models/menu/menu-response';
 import { ProductoService } from '../../../../shared/services/productos/producto-service';
-import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MenuFormComponent } from "../menu-form-component/menu-form-component";
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-mi-menu-page',
   standalone: true,
-  imports: [ProductoCardComponent, MatPaginator, MenuFormComponent, RouterLink],
+  imports: [ProductoCardComponent,MatPaginator , MenuFormComponent,RouterLink ],
   templateUrl: './mi-menu-page.html'
 })
 export class MiMenuPage implements OnInit {

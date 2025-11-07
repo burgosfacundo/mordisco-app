@@ -1,8 +1,8 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-detalle-pedido-component',

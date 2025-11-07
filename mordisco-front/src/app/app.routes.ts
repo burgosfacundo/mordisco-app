@@ -19,6 +19,7 @@ import { MiRestaurantePageComponent } from './features/mi-restaurante/components
 import { ProductoFormComponent } from './features/mi-restaurante/components/producto-form-component/producto-form-component';
 import { RestauranteFormComponent } from './features/mi-restaurante/components/form-restaurante-component/form-restaurante-component';
 import { DetallePedidoPage } from './features/mis-pedidos/components/detalle-pedido-page/detalle-pedido-page';
+import { MenuPage } from './features/menu/menu-page/menu-page';
 
 export const routes: Routes = [
   // Páginas públicas 
@@ -67,6 +68,12 @@ export const routes: Routes = [
     path: 'productos/editar/:id', 
     component: ProductoFormComponent, 
     canActivate: [authGuard, roleGuard(['ROLE_RESTAURANTE'])]
+  },
+  //Menu para usuario
+  { 
+    path: 'menu/:id', 
+    component : MenuPage, 
+    canActivate: [authGuard]
   },
 
   // Rutas de horarios (protegidas + role guard)

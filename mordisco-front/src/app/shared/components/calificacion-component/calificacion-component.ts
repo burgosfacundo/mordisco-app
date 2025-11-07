@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import CalificacionRestauranteReponse from '../../models/calificacion/calificacion-restaurante-response';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-calificacion-component',

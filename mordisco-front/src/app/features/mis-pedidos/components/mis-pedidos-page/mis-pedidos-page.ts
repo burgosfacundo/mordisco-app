@@ -1,15 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { PedidoCardComponent } from '../../../../shared/components/pedido-card-component/pedido-card-component';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
+import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
+import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
+import { Router } from '@angular/router';
+import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageEvent, MatPaginator } from '@angular/material/paginator';
-import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
-import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
-import { Router } from '@angular/router';
-import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 
 @Component({
   selector: 'app-mis-pedidos-page',

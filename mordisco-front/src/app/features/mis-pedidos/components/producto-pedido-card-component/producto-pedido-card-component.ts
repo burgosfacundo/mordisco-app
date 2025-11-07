@@ -1,6 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import ProductoPedidoResponse from '../../../../shared/models/producto/producto-pedido-response';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-producto-pedido-card-component',

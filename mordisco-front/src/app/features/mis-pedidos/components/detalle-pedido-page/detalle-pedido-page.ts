@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -9,7 +8,7 @@ import { PedidoService } from '../../../../shared/services/pedido/pedido-service
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
-
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-detalle-pedido-page',
   standalone: true,

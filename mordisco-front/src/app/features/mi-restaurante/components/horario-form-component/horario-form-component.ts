@@ -4,12 +4,12 @@ import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../shared/services/auth-service';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HorarioService } from '../../../../shared/services/horario/horario-service';
 import HorarioAtencionResponse from '../../../../shared/models/horario/horario-atencion-response';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import HorarioAtencionRequest from '../../../../shared/models/horario/horario-atencion-request';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-horario-form-component',

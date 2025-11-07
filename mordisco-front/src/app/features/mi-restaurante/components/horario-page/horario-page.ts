@@ -6,8 +6,8 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { HorarioService } from '../../../../shared/services/horario/horario-service';
-import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import HorarioAtencionResponse from '../../../../shared/models/horario/horario-atencion-response';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-horario-page',

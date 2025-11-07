@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import DireccionResponse from '../../models/direccion/direccion-response';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-direccion-card-component',

@@ -1,9 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { AuthService } from '../../../../shared/services/auth-service';
+import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../../shared/services/auth-service';
-import { FormValidationService } from '../../../../shared/services/form-validation-service';
 
 @Component({
   selector: 'app-edit-password-component',

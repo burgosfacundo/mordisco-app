@@ -1,6 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +10,8 @@ import { RestauranteService } from '../../../../shared/services/restaurante/rest
 import { AuthService } from '../../../../shared/services/auth-service';
 import PromocionRequest from '../../../../shared/models/promocion/promocion-request';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-promocion-form-component',

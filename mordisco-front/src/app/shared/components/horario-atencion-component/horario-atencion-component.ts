@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-horario-restaurante-component',
