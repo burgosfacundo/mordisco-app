@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.HorarioAtencionMapper;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionRequestDTO;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionResponseDTO;

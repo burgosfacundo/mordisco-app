@@ -46,6 +46,9 @@ public class Pedido {
     @JoinColumn(name = "direccion_id", referencedColumnName = "id")
     private Direccion direccionEntrega;
 
+    @Column(length = 500)
+    private String direccionSnapshot;
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductoPedido> items;
 }

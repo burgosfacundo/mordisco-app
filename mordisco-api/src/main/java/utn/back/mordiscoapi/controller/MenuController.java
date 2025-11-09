@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.menu.MenuResponseDTO;
 import utn.back.mordiscoapi.service.interf.IMenuService;
 

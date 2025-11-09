@@ -2,44 +2,32 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import DireccionRequest from '../../../shared/models/direccion/direccion-request';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import DireccionResponse from '../../../shared/models/direccion/direccion-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DireccionService {
-  private http : HttpClient = inject(HttpClient)
-  private direccionObservable = new BehaviorSubject<DireccionResponse | null>(null)
-  currentDir = this.direccionObservable.asObservable()
+  private http = inject(HttpClient);
 
-  getAll(id : number) : Observable<DireccionResponse[]> {
-    return this.http.get<DireccionResponse[]>(`${environment.apiUrl}/usuarios/${id}/direcciones`)
+  getMisDirecciones(): Observable<DireccionResponse[]> {
+    return this.http.get<DireccionResponse[]>(`${environment.apiUrl}/usuarios/me/direcciones`);
   }
 
-  createDireccion(id : number, direccion : DireccionRequest){
-    return this.http.post<DireccionRequest>(`${environment.apiUrl}/usuarios/${id}/direcciones`, direccion)
+  getByUsuarioId(id: number): Observable<DireccionResponse[]> {
+    return this.http.get<DireccionResponse[]>(`${environment.apiUrl}/usuarios/${id}/direcciones`);
   }
 
-  updateDireccion(idUsuario : number, direccionUpd : DireccionRequest){
-    return this.http.put<DireccionRequest>(`${environment.apiUrl}/usuarios/${idUsuario}/direcciones`, direccionUpd)
+  save(direccion: DireccionRequest): Observable<DireccionResponse> {
+    return this.http.post<DireccionResponse>(`${environment.apiUrl}/usuarios/me/direcciones`, direccion);
   }
 
-  deleteDireccion (id : number, idDir : number){
-    return this.http.delete<void>(`${environment.apiUrl}/usuarios/${id}/direcciones/${idDir}`)
+  update(id: number, direccion: DireccionRequest): Observable<DireccionResponse> {
+    return this.http.put<DireccionResponse>(`${environment.apiUrl}/usuarios/me/direcciones/${id}`, direccion);
   }
 
-  /*Los dos metodos siguientes son para pasar informacion de un componente a otro
-    de una forma mas robusta y escalable, porque los @input/@output no son tan eficientes */
- 
-  setDireccionToEdit( direccionAEditar : DireccionResponse){
-    this.direccionObservable.next(direccionAEditar)
-  }
-
-  clearDireccionToEdit(): void{
-    this.direccionObservable.next(null)
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/usuarios/me/direcciones/${id}`);
   }
 }
-  
-
-

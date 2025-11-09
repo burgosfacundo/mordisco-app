@@ -47,6 +47,15 @@
         {{ getError('password') }}
       </p>
     }
+
+     <div class="text-right mt-2">
+        <a 
+          [routerLink]="['/recover-password']" 
+          class="text-xs font-semibold hover:underline transition-colors"
+          style="color: #E3291D;">
+          ¿Olvidaste tu contraseña?
+        </a>
+    </div>
   </fieldset>
 
   <!-- Botón Submit -->

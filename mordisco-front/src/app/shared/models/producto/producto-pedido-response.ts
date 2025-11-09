@@ -3,5 +3,5 @@ export default interface ProductoPedidoResponse{
     cantidad : number,
     precioUnitario : number,
     idProducto : number,
-    nombreproducto: string
+    nombreProducto: string
 }

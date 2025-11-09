@@ -1,89 +1,102 @@
-import { Component, inject, Inject, OnInit } from '@angular/core';
-import { AuthResponse } from '../../../auth/models/auth-response';
-import { DireccionService } from '../../services/direccion-service';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
-import Direccion from '../../../../shared/models/direccion/direccion-response';
-import { AuthService } from '../../../../shared/services/auth-service';
+import { DireccionFormComponent } from '../direccion-form-component/direccion-form-component';
 import { DireccionCardComponent } from '../direccion-card-component/direccion-card-component';
+import { DireccionService } from '../../services/direccion-service';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
 
 @Component({
   selector: 'app-my-address-page',
-  imports: [DireccionCardComponent],
-  templateUrl: './my-address-page.html',
+  standalone: true,
+  imports: [
+    CommonModule,
+    DireccionFormComponent,
+    DireccionCardComponent
+  ],
+  templateUrl: './my-address-page.html'
 })
-export class MyAddressPage implements OnInit{
+export class MyAddressPage implements OnInit {
+  private direccionService = inject(DireccionService);
+  private snackBar = inject(MatSnackBar);
 
-  private aus : AuthService = inject (AuthService)
-  private dService : DireccionService = inject(DireccionService)
-  private _snackBar : MatSnackBar = inject(MatSnackBar)
-  private router : Router = inject(Router)
-  arrDirecciones? : DireccionResponse[]
-  idCurrUser : number | undefined
-  isLoading = true
-  
+  @ViewChild('direccionForm') direccionFormComponent?: DireccionFormComponent;
+
+  direcciones = signal<DireccionResponse[]>([]);
+  direccionParaEditar = signal<DireccionResponse | undefined>(undefined);
+  isLoading = signal(true);
+
   ngOnInit(): void {
-    const resp : AuthResponse | null = this.aus.getCurrentUser()
-    this.idCurrUser = resp?.userId
-
-    if(this.idCurrUser){
-      console.log(this.idCurrUser)
-      this.listarDirecciones(this.idCurrUser)
-    }else{
-        this.openSnackBar('❌ Ocurrió un error al cargar las direcciones')
-        this.router.navigate(['/'])
-        return
-    }
+    this.cargarDirecciones();
   }
 
-  listarDirecciones(idCurrUser : number){
-    this.dService.getAll(idCurrUser).subscribe({
-      next: (data) => { this.arrDirecciones = data
-        this.isLoading=false
+  private cargarDirecciones(): void {
+    this.isLoading.set(true);
+
+    this.direccionService.getMisDirecciones().subscribe({
+      next: (direcciones) => {
+        this.direcciones.set(direcciones);
+        this.isLoading.set(false);
       },
-      error:(e) => {console.log(e),
-        this.openSnackBar('❌ Ocurrió un error al cargar las direcciones')
-        this.router.navigate(['/'])
+      error: (error) => {
+        console.error('Error al cargar direcciones:', error);
+        this.snackBar.open('❌ Error al cargar las direcciones', 'Cerrar', { duration: 3000 });
+        this.isLoading.set(false);
       }
-    })
+    });
   }
-  
-  confirmarEliminacion(id: number | undefined): void {
-    if (!id) return;
-       const confirmar = confirm('¿Estás seguro de eliminar esta dirección?');
-    if (confirmar) {
-      this.eliminarDireccion(id);
+
+  handleDireccionSaved(): void {
+    this.direccionParaEditar.set(undefined);
+    this.cargarDirecciones();
+    this.scrollToList();
+  }
+
+  handleCancelEdit(): void {
+    this.direccionParaEditar.set(undefined);
+    if (this.direccionFormComponent) {
+      this.direccionFormComponent.reset();
     }
   }
 
-  eliminarDireccion(id : number | undefined){
-   if(!this.idCurrUser || !id){
-        this.openSnackBar('❌ Ocurrió un error al cargar el perfil')
-        return
+  editarDireccion(direccion: DireccionResponse): void {
+    this.direccionParaEditar.set(direccion);
+    this.scrollToForm();
+  }
+
+  eliminarDireccion(id: number): void {
+    if (!confirm('¿Estás seguro de eliminar esta dirección?')) {
+      return;
     }
 
-    this.dService.deleteDireccion(this.idCurrUser,id).subscribe({
-      next :(data) => {console.log(data),
-        this.openSnackBar('Direccion eliminada correctamente')
-        this.listarDirecciones(this.idCurrUser!)
+    this.direccionService.delete(id).subscribe({
+      next: () => {
+        this.snackBar.open('✅ Dirección eliminada correctamente', 'Cerrar', { duration: 3000 });
+        
+        if (this.direccionParaEditar()?.id === id) {
+          this.handleCancelEdit();
+        }
+        
+        this.cargarDirecciones();
       },
-      error: (e)=> {console.log(e),
-        this.openSnackBar('❌ Ocurrió un error al eliminar direccion')}
-    })
+      error: (error) => {
+        console.error('Error al eliminar dirección:', error);
+        this.snackBar.open('❌ Error al eliminar la dirección', 'Cerrar', { duration: 4000 });
+      }
+    });
   }
 
-  crearDireccion(){
-    this.router.navigate(['/my-address/form-address'])
+  private scrollToForm(): void {
+    setTimeout(() => {
+      const formElement = document.querySelector('app-direccion-form-component');
+      formElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   }
 
-  modificarDireccion(direccionEditada : Direccion){
-    this.dService.setDireccionToEdit(direccionEditada)
-    this.router.navigate(['/my-address/form-address'])
+  private scrollToList(): void {
+    setTimeout(() => {
+      const listElement = document.querySelector('.grid');
+      listElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
   }
-
-  private openSnackBar(message: string, action: string = 'Cerrar'): void {
-    this._snackBar.open(message, action, { duration: 3000 });
-  }
-
 }

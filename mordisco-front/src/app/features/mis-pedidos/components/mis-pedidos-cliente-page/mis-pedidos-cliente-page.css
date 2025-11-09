@@ -1,0 +1,7 @@
+:host ::ng-deep .custom-tabs .mat-mdc-tab {
+  min-width: 120px;
+}
+
+:host ::ng-deep .custom-tabs .mdc-tab__text-label {
+  font-weight: 600;
+}

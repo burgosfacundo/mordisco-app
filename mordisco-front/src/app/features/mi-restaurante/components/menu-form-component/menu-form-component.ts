@@ -56,7 +56,7 @@ export class MenuFormComponent implements OnInit {
       },
       error: () => {
         this.snackBar.open('❌ No se encontró el restaurante', 'Cerrar', { duration: 3000 });
-        this.router.navigate(['/mi-restaurante']);
+        this.router.navigate(['/restaurante']);
       }
     });
   }
@@ -78,7 +78,7 @@ export class MenuFormComponent implements OnInit {
     this.menuService.save(this.restauranteId, nombreMenu).subscribe({
       next: () => {
         this.snackBar.open('✅ Menú creado exitosamente', 'Cerrar', { duration: 3000 });
-        this.router.navigate(['/mi-restaurante']);
+        this.router.navigate(['/restaurante']);
       },
       error: (error) => {
         console.error('Error al crear menú:', error);
@@ -89,7 +89,7 @@ export class MenuFormComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/mi-restaurante']);
+    this.router.navigate(['/restaurante']);
   }
 
   getError(fieldName: string): string | null {

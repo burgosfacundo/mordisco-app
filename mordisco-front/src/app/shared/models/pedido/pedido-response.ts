@@ -15,5 +15,6 @@ export default interface PedidoResponse{
     estado : EstadoPedido,
     fechaHora : string,
     total : number,
-    direccionEntrega : DireccionResponse
+    direccionEntrega? : DireccionResponse,
+    direccionSnapshot? : string
 }

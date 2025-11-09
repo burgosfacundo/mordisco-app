@@ -1,53 +1,61 @@
 package utn.back.mordiscoapi.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionCreateDTO;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.direccion.DireccionRequestDTO;
 import utn.back.mordiscoapi.model.dto.direccion.DireccionResponseDTO;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionUpdateDTO;
-import utn.back.mordiscoapi.service.impl.DireccionService;
+import utn.back.mordiscoapi.service.interf.IDireccionService;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/usuarios/{id}/direcciones")
-@SecurityRequirement(name = "bearerAuth")
+@RequestMapping("/api/usuarios")
 @RequiredArgsConstructor
 public class DireccionController {
 
-    private final DireccionService service;
+    private final IDireccionService direccionService;
 
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
-    @GetMapping
-    public List<DireccionResponseDTO> list(@PathVariable Long id) {
-        return service.list(id);
+    @GetMapping("/me/direcciones")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'RESTAURANTE')")
+    public ResponseEntity<List<DireccionResponseDTO>> getMisDirecciones()
+            throws NotFoundException, BadRequestException {
+        return ResponseEntity.ok(direccionService.getMisDirecciones());
     }
 
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
-    @PostMapping
-    public ResponseEntity<Long> create(@PathVariable Long id, @Valid @RequestBody DireccionCreateDTO dto) throws NotFoundException {
-        Long createdId = service.add(id, dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdId);
+    @PostMapping("/me/direcciones")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'RESTAURANTE')")
+    public ResponseEntity<DireccionResponseDTO> createMiDireccion(
+            @Valid @RequestBody DireccionRequestDTO dto)
+            throws NotFoundException, BadRequestException {
+        return ResponseEntity.ok(direccionService.createMiDireccion(dto));
     }
 
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
-    @PutMapping
-    public ResponseEntity<Void> update(@PathVariable Long id,
-                                       @Valid @RequestBody DireccionUpdateDTO dto) throws NotFoundException {
-        service.update(id, dto);
-        return ResponseEntity.ok().build();
+    @PutMapping("/me/direcciones/{id}")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'RESTAURANTE')")
+    public ResponseEntity<DireccionResponseDTO> updateMiDireccion(
+            @PathVariable Long id,
+            @Valid @RequestBody DireccionRequestDTO dto)
+            throws NotFoundException, BadRequestException {
+        return ResponseEntity.ok(direccionService.updateMiDireccion(id, dto));
     }
 
-    @PreAuthorize("@usuarioSecurity.puedeAccederAUsuario(#id)")
-    @DeleteMapping("/{dirId}")
-    public ResponseEntity<Void> delete(@PathVariable Long id, @PathVariable Long dirId) throws NotFoundException {
-        service.delete(id, dirId);
+    @DeleteMapping("/me/direcciones/{id}")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'RESTAURANTE')")
+    public ResponseEntity<Void> deleteMiDireccion(@PathVariable Long id)
+            throws NotFoundException, BadRequestException {
+        direccionService.deleteMiDireccion(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{userId}/direcciones")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DireccionResponseDTO>> getDireccionesByUsuario(
+            @PathVariable Long userId) throws NotFoundException {
+        return ResponseEntity.ok(direccionService.getByUsuarioId(userId));
     }
 }

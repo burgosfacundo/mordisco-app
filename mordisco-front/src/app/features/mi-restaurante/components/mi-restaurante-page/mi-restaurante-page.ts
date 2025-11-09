@@ -143,7 +143,7 @@ export class MiRestaurantePageComponent implements OnInit {
 
   onEditarRestaurante(): void {
     if (this.restaurante?.id) {
-      this.router.navigate(['/restaurante-form', this.restaurante.id]);
+      this.router.navigate(['/restaurante/editar', this.restaurante.id]);
     }
   }
 
@@ -163,7 +163,7 @@ export class MiRestaurantePageComponent implements OnInit {
         this.snackBar.open('✅ Promoción eliminada correctamente', 'Cerrar', { duration: 3000 });
         this.cargarPromociones();
       },
-      error: (error) => {
+      error: () => {
         this.snackBar.open('❌ Error al eliminar la promoción', 'Cerrar', { duration: 4000 });
       }
     });

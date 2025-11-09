@@ -1,109 +1,118 @@
 <main class="pt-20">
-    <div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
-    <section class="space-y-6">
-  
-        <h2 class="subtitulo">Mis pedidos</h2>
-        <div class="filtro-pedidos-container">
-        <h3 class="h3 font-bold text-primary-500 ">Filtrar pedidos</h3>
-        
-        <div class="filtro-pedidos-field">
-            <label for="filtrado" class="filtro-pedidos-label">Estado del pedido</label>
-            <select id="filtrado" [formControl]="estado" class="filtro-pedidos-select">
-            <option value="TODOS">Todos los pedidos</option>
-            <option value="PENDIENTE">Pendiente</option>
-            <option value="EN_PROCESO">En proceso</option>
-            <option value="EN_CAMINO">En camino</option>
-            <option value="RECIBIDO">Recibido</option>
-            <option value="CANCELADO">Cancelado</option>
-            </select>
-        </div>
-               
-        </div>
-        @if (isLoadingPedidos) {
-            <!-- Loading State -->
-            <div class="loading-container">
-                <div class="loading-spinner"></div>
-                <p class="loading-text">Cargando pedidos...</p>
-            </div>
-        } @else {
-            @if(arrPedidos){
-                <ul class="grid-restaurantes">
-                    @for(pedido of arrPedidos; track pedido.id){
-                        <li class="fade-in">
-                            <article class="bg-white rounded-xl shadow-md overflow-hidden 
-                            transition-all duration-300 hover:shadow-xl hover:-translate-y-1
-                            flex flex-col h-full">
-                            <app-pedido-card-component [pedido]="pedido"></app-pedido-card-component>
-                            <div class="flex space-x-3 p-2">                        
-                                <button (click)="verDetalle(pedido)" class="btn-ghost">Ver detalle</button>    
-                                <div class="pedido-estado-container">
-                                    <button type="button" (click)="confirmacionCambioEstado(pedido, EstadoPedido.PENDIENTE)" class="pedido-estado-btn" 
-                                    [class.estado-activo]="pedido.estado ===  EstadoPedido.PENDIENTE"
-                                    [class.estado-inactivo]="pedido.estado !==  EstadoPedido.PENDIENTE"
-                                    [disabled]="isUpdating">
-                                    Pendiente
-                                    </button>
-
-                                    <button type="button" (click)="confirmacionCambioEstado(pedido,  EstadoPedido.EN_PROCESO)" class="pedido-estado-btn"
-                                    [class.estado-activo]="pedido.estado ===  EstadoPedido.EN_PROCESO"
-                                    [class.estado-inactivo]="pedido.estado !==  EstadoPedido.EN_PROCESO"
-                                    [disabled]="isUpdating">
-                                    En Proceso
-                                    </button>
-
-                                    <button type="button" (click)="confirmacionCambioEstado(pedido, EstadoPedido.EN_CAMINO)" class="pedido-estado-btn"
-                                    [class.estado-activo]="pedido.estado ===  EstadoPedido.EN_CAMINO"
-                                    [class.estado-inactivo]="pedido.estado !==  EstadoPedido.EN_CAMINO"
-                                    [disabled]="isUpdating">
-                                    En Camino
-                                    </button>
-
-                                    <button type="button" (click)="confirmacionCambioEstado(pedido, EstadoPedido.RECIBIDO)" class="pedido-estado-btn"
-                                    [class.estado-activo]="pedido.estado === EstadoPedido.RECIBIDO"
-                                    [class.estado-inactivo]="pedido.estado !== EstadoPedido.RECIBIDO"
-                                    [disabled]="isUpdating">
-                                    Recibido
-                                    </button>
-
-                                    <button type="button" (click)="confirmacionCambioEstado(pedido, EstadoPedido.CANCELADO)" class="pedido-estado-btn pedido-estado-btn-cancelado"
-                                    [class.estado-activo]="pedido.estado ===  EstadoPedido.CANCELADO"
-                                    [class.estado-inactivo]="pedido.estado !==  EstadoPedido.CANCELADO"
-                                    [disabled]="isUpdating">
-                                    Cancelado
-                                    </button>
-                                </div>                        
-                            </div> 
-                            </article>      
-                        </li>
-                    }
-                </ul>
+  <div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
     
-            <!-- Paginador -->
-            <div class="flex justify-center mt-8">
-            <mat-paginator
-                [length]="lengthPedidos"
-                [pageSize]="sizePedidos"
-                [pageIndex]="pagePedidos"
-                (page)="onPageChangePedidos($event)"
-                class="bg-white rounded-xl shadow-md">
-            </mat-paginator>
-            </div>
-            }@else {
-                <!-- Empty State -->
-                <div class="empty-state">
-                <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <h3 class="empty-title">
-                    No hay pedidos disponibles
-                </h3>
-                <p class="empty-description">
-                    Intenta seleccionar otro estado o vuelve más tarde
-                </p>
-                </div>                
+    <!-- Header -->
+    <div class="text-center space-y-2">
+      <h1 class="titulo-hero">Mis Pedidos</h1>
+      <p class="text-gray-600 text-lg">Gestiona los pedidos de tu restaurante</p>
+    </div>
+
+    <!-- Tabs de filtros -->
+    <mat-tab-group
+      [(selectedIndex)]="selectedTabIndex"
+      (selectedIndexChange)="onTabChange($event)"
+      class="custom-tabs">
+      
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2">
+            <mat-icon>all_inbox</mat-icon>
+            <span>Todos</span>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-yellow-600">schedule</mat-icon>
+            <span>Pendientes</span>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-blue-600">restaurant</mat-icon>
+            <span>En Preparación</span>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-purple-600">local_shipping</mat-icon>
+            <span>En Camino</span>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-green-600">check_circle</mat-icon>
+            <span>Entregados</span>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-red-600">cancel</mat-icon>
+            <span>Cancelados</span>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+
+    <!-- Contenido -->
+    <section class="space-y-6 mt-8">
+      @if (isLoadingPedidos) {
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Cargando pedidos...</p>
+        </div>
+      } @else {
+        @if (arrPedidos && arrPedidos.length > 0) {
+          <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (pedido of arrPedidos; track pedido.id) {
+              <li class="fade-in">
+                <app-pedido-card-component 
+                  [isRestaurante]="true"
+                  [pedido]="pedido"
+                  (aceptarPedido)="aceptarPedido($event)"
+                  (rechazarPedido)="rechazarPedido($event)"
+                  (marcarEnCamino)="marcarEnCamino($event)"
+                  class="block h-full">
+                </app-pedido-card-component>
+              </li>
             }
+          </ul>
+
+          <!-- Paginador -->
+          <div class="flex justify-center mt-8">
+            <mat-paginator
+              [length]="lengthPedidos"
+              [pageSize]="sizePedidos"
+              [pageIndex]="pagePedidos"
+              [pageSizeOptions]="[5, 10, 25, 50]"
+              (page)="onPageChangePedidos($event)"
+              class="bg-white rounded-xl shadow-md">
+            </mat-paginator>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">receipt_long</mat-icon>
+            <h3 class="empty-title">No hay pedidos</h3>
+            <p class="empty-description">
+              Los pedidos aparecerán aquí cuando los clientes realicen compras
+            </p>
+          </div>
         }
-    </section>    
-    </div>    
+      }
+    </section>
+  </div>
 </main>

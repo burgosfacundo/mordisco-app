@@ -1,52 +1,82 @@
 <main class="pt-20">
-
-    <div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
-        <section class="space-y-6">
-            <section class="flex justify-between pt-1">
-            <h2 class="titulo-seccion"> Mis direcciones</h2>
-            <button 
-                (click)="crearDireccion()" 
-                class="btn-primary">
-                Agregar nueva dirección
-            </button>
-            </section>
-
-            @if (isLoading) {
-            <!-- Loading State -->
-            <div class="loading-container">
-                <div class="loading-spinner"></div>
-                <p class="loading-text">Cargando direcciones...</p>
-            </div>
-            }@else {
-                <ul class="grid-direcciones">
-                    @if (arrDirecciones) {
-                        @for(direccion of arrDirecciones; track direccion.id){
-                            <li class="card-base fade-in">
-                                <app-direccion-card-component [direccion]="direccion"></app-direccion-card-component>
-                                <div class="flex gap-3 p-4">                        
-                                    <button (click)="modificarDireccion(direccion)" class="btn-outline flex-1">Editar</button>
-                                    <button (click)="confirmarEliminacion(direccion.id)"class="btn-ghost flex-1 text-red-600 hover:bg-red-50">Eliminar</button>
-                                </div>    
-                            </li>
-                        }
-                    }@else{
-                                <!-- Empty State -->
-                        <div class="empty-state">
-                            <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <h3 class="empty-title">No tienes direcciones</h3>
-                            <p class="empty-description">
-                                Agrega tu primera dirección para comenzar
-                            </p>
-                        </div>
-                    }
-                </ul>        
-
-            }
-        </section> 
+  <div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
+    
+    <!-- Header -->
+    <div class="text-center space-y-2">
+      <h1 class="titulo-hero">Mis Direcciones</h1>
+      <p class="text-gray-600 text-lg">
+        Administra las direcciones de entrega para tus pedidos
+      </p>
     </div>
+
+    <!-- Formulario de dirección -->
+    <section class="max-w-3xl mx-auto">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <app-direccion-form-component
+          #direccionForm
+          [direccion]="direccionParaEditar()"
+          (onSaved)="handleDireccionSaved()"
+          (onCancelled)="handleCancelEdit()">
+        </app-direccion-form-component>
+      </div>
+    </section>
+
+    <!-- Lista de direcciones -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-gray-900">
+          Direcciones Guardadas
+        </h2>
+        <span class="px-3 py-1 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full">
+          {{ direcciones().length }} direccion(es)
+        </span>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Cargando direcciones...</p>
+        </div>
+      } @else {
+        @if (direcciones().length > 0) {
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (direccion of direcciones(); track direccion.id) {
+              <div class="card-base">
+                <app-direccion-card-component
+                  [direccion]="direccion">
+                </app-direccion-card-component>
+                
+                <div class="flex gap-3 p-4">                        
+                  <button 
+                    (click)="editarDireccion(direccion)" 
+                    class="btn-outline flex-1"
+                    [disabled]="direccionParaEditar()?.id === direccion.id">
+                    {{ direccionParaEditar()?.id === direccion.id ? 'Editando...' : 'Editar' }}
+                  </button>
+                  <button 
+                    (click)="eliminarDireccion(direccion.id)"
+                    class="btn-ghost flex-1 text-red-600 hover:bg-red-50">
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <h3 class="empty-title">No tienes direcciones guardadas</h3>
+            <p class="empty-description">
+              Agrega tu primera dirección usando el formulario de arriba
+            </p>
+          </div>
+        }
+      }
+    </section>
+  </div>
 </main>

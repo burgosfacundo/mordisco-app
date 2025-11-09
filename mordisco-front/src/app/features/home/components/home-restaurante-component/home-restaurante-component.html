@@ -14,7 +14,7 @@
       <div class="flex items-center gap-4">
         <div class="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-4">
           <p class="text-primary-100 text-sm">Pedidos Pendientes</p>
-          <p class="text-4xl font-bold mt-1">{{ length || 0 }}</p>
+          <p class="text-4xl font-bold mt-1">{{ pedidosPendientes?.length || 0 }}</p>
         </div>
       </div>
     </div>
@@ -47,7 +47,11 @@
           @for (pedido of pedidosPendientes; track pedido.id) {
             <li class="fade-in">
               <app-pedido-card-component 
+                [isRestaurante]="true"
                 [pedido]="pedido"
+                (aceptarPedido)="aceptarPedido($event)"
+                (rechazarPedido)="rechazarPedido($event)"
+                (marcarEnCamino)="marcarEnCamino($event)"
                 class="block h-full">
               </app-pedido-card-component>
             </li>

@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.security.jwt.model.entity.RefreshToken;
@@ -69,6 +69,7 @@ public class RefreshTokenService {
                 ipAddress
         );
     }
+
 
     public RefreshToken verifyRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)

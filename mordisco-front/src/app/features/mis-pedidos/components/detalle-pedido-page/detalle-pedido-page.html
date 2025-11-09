@@ -1,4 +1,4 @@
-<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8 pt-36">
   
   <!-- Hero Title -->
   <div class="text-center space-y-2">
@@ -68,13 +68,15 @@
         </div>
       </div>
 
-      <!-- Cliente -->
-      <section class="space-y-4">
-        <h2 class="titulo-seccion">
-          Información del Cliente
-        </h2>
-        <app-usuario-card-component [usuario]="pedido.cliente"class="block"></app-usuario-card-component>
-      </section>
+       @if (isUsuarioRestaurante) {
+        <section class="space-y-4">
+          <h2 class="titulo-seccion">
+            Información del Cliente
+          </h2>
+          <app-usuario-card-component [usuario]="pedido.cliente"class="block" />
+        </section>
+      }
+ 
 
       <!-- Productos del Pedido -->
       <section class="space-y-4">
@@ -115,7 +117,30 @@
               [direccion]="pedido.direccionEntrega"
               class="block">
             </app-direccion-card-component>
-          } @else {
+          } @else if(pedido.direccionSnapshot){
+                <div class="bg-white rounded-xl shadow-md p-6 border-2 border-dashed border-yellow-500">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+                      <svg class="w-5 h-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-semibold text-yellow-800 mb-2">
+                        ⚠️ Dirección original eliminada
+                      </p>
+                      <p class="text-sm text-gray-700 leading-relaxed">
+                        {{ pedido.direccionSnapshot }}
+                      </p>
+                      <p class="text-xs text-gray-500 mt-2 italic">
+                        Esta dirección fue eliminada por el usuario, pero aquí se muestra 
+                        cómo era al momento del pedido.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+          }@else {
             <div class="empty-state">
               <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -129,16 +154,47 @@
         </section>
       }
 
-      <!-- Botón de Volver -->
-      <div class="flex justify-center pt-4">
-        <button 
-          (click)="volver()"
-          class="px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-          Volver al Panel
-        </button>
-      </div>
+    <div class="px-6 pb-6 pt-2 space-y-2">
+      @if (isUsuarioRestaurante) {
+        @if (pedido.estado === 'PENDIENTE') {
+          <button 
+            (click)="aceptarPedido()"
+            class="w-full py-2.5 rounded-lg
+                  bg-green-50 text-green-700 font-semibold text-sm
+                  hover:bg-green-100 active:scale-95
+                  transition-all duration-200">
+            Aceptar Pedido
+          </button>
+          <button 
+            (click)="rechazarPedido()"
+            class="w-full py-2.5 rounded-lg
+                  bg-red-50 text-red-700 font-semibold text-sm
+                  hover:bg-red-100 active:scale-95
+                  transition-all duration-200">
+            Rechazar Pedido
+          </button>
+        } @else if (pedido.estado === 'EN_PROCESO') {
+          <button 
+            (click)="marcarEnCamino()"
+            class="w-full py-2.5 rounded-lg
+                  bg-blue-50 text-blue-700 font-semibold text-sm
+                  hover:bg-blue-100 active:scale-95
+                  transition-all duration-200">
+            Marcar En Camino
+          </button>
+        }
+      } 
 
-    } @else {
+      <button 
+        (click)="volver()"
+        class="w-full py-2.5 rounded-lg
+              bg-gray-600 hover:bg-gray-700 text-white 
+              font-semibold transition-all duration-200">
+        Volver al Panel
+      </button>
+    </div>
+
+  } @else {
       <div class="empty-state">
         <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 

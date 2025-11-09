@@ -4,5 +4,6 @@ export default interface UserPedido{
     nombre : string,
     apellido : string,
     email : string,
-    rol: string
+    telefono : string,
+    rol? : string
 }

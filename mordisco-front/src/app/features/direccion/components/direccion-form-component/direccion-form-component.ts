@@ -1,175 +1,135 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { DireccionService } from '../../services/direccion-service';
+import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
-import { AuthService } from '../../../../shared/services/auth-service';
-import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
+import { CommonModule } from '@angular/common';
+import { DireccionService } from '../../services/direccion-service';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import DireccionRequest from '../../../../shared/models/direccion/direccion-request';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
 
 @Component({
   selector: 'app-direccion-form-component',
-  imports: [ReactiveFormsModule],
-  templateUrl: './direccion-form-component.html',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './direccion-form-component.html'
 })
-export class DireccionFormComponent implements OnInit {
+export class DireccionFormComponent implements OnInit , OnChanges{
   private fb = inject(FormBuilder);
-  private dService = inject(DireccionService);
-  private auS = inject(AuthService);
-  private restauranteService = inject(RestauranteService);
-  private _snackbar = inject(MatSnackBar);
-  private router = inject(Router);
-  private validationService = inject(FormValidationService);
-  
+  private direccionService = inject(DireccionService);
+  private snackBar = inject(MatSnackBar);
+  protected validationService = inject(FormValidationService);
+
+  @Input() direccion?: DireccionResponse;
+  @Output() onSaved = new EventEmitter<void>();
+  @Output() onCancelled = new EventEmitter<void>();
+
   formDirecciones!: FormGroup;
-  private subscription: Subscription = new Subscription();
-
-  @Output() enviarDireccion: EventEmitter<DireccionRequest> = new EventEmitter<DireccionRequest>();
-  @Input() modoEdicion: boolean = false;
-  @Input() direccionNeed: boolean = false; // Para uso en formulario de restaurante
-  @Output() loaded = new EventEmitter<void>();
-
-  isSubmitting = signal(false);
-  idCurrUser?: number;
-  userRole?: string;
-  restauranteId?: number;
+  protected isSubmitting = signal(false);
+  protected isEditMode = signal(false);
 
   ngOnInit(): void {
-    this.formDirecciones = this.fb.group({
-      id: [null],
-      calle: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
-      numero: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[0-9]+$/)]],
-      piso: ['', [Validators.maxLength(15), Validators.pattern(/^[0-9]+$/)]],
-      depto: ['', Validators.maxLength(15)],
-      codigoPostal: ['', [Validators.required, Validators.maxLength(15)]],
-      referencias: ['', Validators.maxLength(250)],
-      ciudad: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]]
-    });
-
-    const resp = this.auS.currentUser();
-    this.idCurrUser = resp?.userId;
-    this.userRole = resp?.role;
-
-    // Si es restaurante y no es para creación, cargar su dirección
-    if (this.userRole === 'ROLE_RESTAURANTE' && !this.direccionNeed) {
-      this.cargarDireccionRestaurante();
+    if (this.direccion) {
+      this.isEditMode.set(true);
+      this.initializeForm();
+      this.loadDireccionData();
+    }else {
+      this.isEditMode.set(false);
+      this.initializeForm();
     }
-    
-    // Subscribirse a cambios de dirección a editar
-    this.subscription.add(
-      this.dService.currentDir.subscribe(d => {
-        if (d) {
-          this.modoEdicion = true;
-          this.formDirecciones.patchValue(d);
-        } else {
-          this.formDirecciones.reset({
-            id: null,
-            calle: '',
-            numero: '',
-            piso: '',
-            depto: '',
-            codigoPostal: '',
-            referencias: '',
-            ciudad: ''
-          });
-        }
-        this.loaded.emit();
-      })
-    );
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  ngOnChanges(_changes: SimpleChanges): void {
+       if (this.direccion) {
+      this.isEditMode.set(true);
+      this.initializeForm();
+      this.loadDireccionData();
+    }else {
+      this.isEditMode.set(false);
+      this.initializeForm();
+    }
   }
 
-  private cargarDireccionRestaurante(): void {
-    if (!this.idCurrUser) return;
-
-    this.restauranteService.getByUsuario(this.idCurrUser).subscribe({
-      next: (restaurante) => {
-        this.restauranteId = restaurante.id;
-        if (restaurante.direccion) {
-          this.modoEdicion = true;
-          this.formDirecciones.patchValue(restaurante.direccion);
-        }
-      },
-      error: (error) => {
-        console.error('Error al cargar restaurante:', error);
-      }
+  private initializeForm(): void {
+    this.formDirecciones = this.fb.group({
+      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      numero: ['', [Validators.required, Validators.maxLength(5)]],
+      piso: ['', [Validators.maxLength(20)]],
+      depto: ['', [Validators.maxLength(20)]],
+      codigoPostal: ['', [Validators.required, Validators.maxLength(10)]],
+      referencias: ['', [Validators.maxLength(250)]],
+      ciudad: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]]
     });
   }
 
-  manejarEnvio(): void {
+  private loadDireccionData(): void {
+    if (!this.direccion) return;
+
+    this.formDirecciones.patchValue({
+      calle: this.direccion.calle,
+      numero: this.direccion.numero,
+      piso: this.direccion.piso || '',
+      depto: this.direccion.depto || '',
+      codigoPostal: this.direccion.codigoPostal,
+      referencias: this.direccion.referencias || '',
+      ciudad: this.direccion.ciudad
+    });
+  }
+
+  guardarDireccion(): void {
     if (this.formDirecciones.invalid) {
       this.formDirecciones.markAllAsTouched();
       return;
     }
-    
+
     this.isSubmitting.set(true);
-    
-    if (!this.idCurrUser) {
-      this._snackbar.open('❌ Usuario no autenticado', 'Cerrar', { duration: 3000 });
-      this.isSubmitting.set(false);
-      return;
-    }
 
-    const direccionLeida: DireccionRequest = this.formDirecciones.value;
+    const direccionData: DireccionRequest = this.formDirecciones.value;
 
-    // Si es para el formulario de creación de restaurante, solo emitir
-    if (this.direccionNeed) {
-      this.ejecutarEnvio();
-      this.isSubmitting.set(false);
-      return;
-    }
-
-    // Si es restaurante, actualizar dirección del restaurante
-    if (this.userRole === 'ROLE_RESTAURANTE' && this.restauranteId) {
-      this.dService.updateDireccion(this.idCurrUser, direccionLeida).subscribe({
+    if (this.isEditMode() && this.direccion?.id) {
+      // Modo edición
+      this.direccionService.update(this.direccion.id, direccionData).subscribe({
         next: () => {
-          this.dService.clearDireccionToEdit();
-          this._snackbar.open('✅ Dirección actualizada correctamente', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/mi-restaurante']);
+          this.snackBar.open('✅ Dirección actualizada correctamente', 'Cerrar', { duration: 3000 });
+          this.resetForm();
+          this.onSaved.emit();
         },
         error: (error) => {
           console.error('Error:', error);
-          this.dService.clearDireccionToEdit();
-          this._snackbar.open('❌ No se ha podido actualizar la dirección', 'Cerrar', { duration: 3000 });
+          this.snackBar.open('❌ Error al actualizar la dirección', 'Cerrar', { duration: 4000 });
           this.isSubmitting.set(false);
         }
       });
     } else {
-      // Para clientes, usar el flujo normal
-      if (this.modoEdicion) {
-        const direccionCompleta = { ...direccionLeida, id: this.formDirecciones.value.id };
-        this.dService.updateDireccion(this.idCurrUser, direccionCompleta as any).subscribe({
-          next: () => {
-            this.dService.clearDireccionToEdit();
-            this._snackbar.open('✅ Dirección editada correctamente', 'Cerrar', { duration: 3000 });
-            this.router.navigate(['/my-address']);
-          },
-          error: (error) => {
-            console.error('Error:', error);
-            this.dService.clearDireccionToEdit();
-            this._snackbar.open('❌ No se ha podido editar la dirección', 'Cerrar', { duration: 3000 });
-            this.isSubmitting.set(false);
-          }
-        });
-      } else {
-        this.dService.createDireccion(this.idCurrUser, direccionLeida).subscribe({
-          next: () => {
-            this._snackbar.open('✅ Dirección creada exitosamente', 'Cerrar', { duration: 3000 });
-            this.router.navigate(['/my-address']);
-          },
-          error: (error) => {
-            console.error('Error:', error);
-            this._snackbar.open('❌ No se ha podido crear la dirección', 'Cerrar', { duration: 3000 });
-            this.isSubmitting.set(false);
-          }
-        });
-      }
+      // Modo creación
+      this.direccionService.save(direccionData).subscribe({
+        next: () => {
+          this.snackBar.open('✅ Dirección guardada correctamente', 'Cerrar', { duration: 3000 });
+          this.resetForm();
+          this.onSaved.emit();
+        },
+        error: (error) => {
+          console.error('Error:', error);
+          this.snackBar.open('❌ Error al guardar la dirección', 'Cerrar', { duration: 4000 });
+          this.isSubmitting.set(false);
+        }
+      });
     }
+  }
+
+  cancelar(): void {
+    this.resetForm();
+    this.onCancelled.emit();
+  }
+
+  private resetForm(): void {
+    this.formDirecciones.reset();
+    this.direccion = undefined;
+    this.isEditMode.set(false);
+    this.isSubmitting.set(false);
+  }
+
+  public reset(): void {
+    this.resetForm();
   }
 
   getError(fieldName: string): string | null {
@@ -177,17 +137,5 @@ export class DireccionFormComponent implements OnInit {
       this.formDirecciones.get(fieldName),
       fieldName
     );
-  }
-
-  ejecutarEnvio(): void {
-    this.enviarDireccion.emit({
-      calle: this.formDirecciones.value.calle,
-      numero: this.formDirecciones.value.numero,
-      piso: this.formDirecciones.value.piso,
-      depto: this.formDirecciones.value.depto,
-      codigoPostal: this.formDirecciones.value.codigoPostal,
-      referencias: this.formDirecciones.value.referencias,
-      ciudad: this.formDirecciones.value.ciudad
-    });
   }
 }

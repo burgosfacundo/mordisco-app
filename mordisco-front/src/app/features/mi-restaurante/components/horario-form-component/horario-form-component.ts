@@ -108,13 +108,13 @@ export class HorarioFormComponent implements OnInit{
         }
 
         this.hService.update(this.formHorarioAtencion.value.id,horarioParaBackend).subscribe({
-          next:(data)=>{
+          next:()=>{
             this.hService.clearHorarioToEdit()
             this._snackbar.open("✅ Horario editado correctamente",'',{duration: 3000})
-            this.router.navigate(['/horarios'])
-          },error:(e)=> { this.hService.clearHorarioToEdit()
+            this.router.navigate(['/restaurante/horarios'])
+          },error:()=> { this.hService.clearHorarioToEdit()
             this._snackbar.open("❌ No se ha podido editar el horario",'',{duration: 3000})}})
-            this.router.navigate(['/horarios'])
+            this.router.navigate(['/restaurante/horarios'])
       }else{
         horarioParaBackend = {
           dia: this.formHorarioAtencion.value.dia, 
@@ -126,10 +126,10 @@ export class HorarioFormComponent implements OnInit{
           this.hService.save(horarioParaBackend, this.restaurante?.id).subscribe({
             next:(data)=>{console.log(data),
               this._snackbar.open("✅ Horario creado correctamente",'',{duration: 3000})
-              this.router.navigate(['/horarios'])
+              this.router.navigate(['/restaurante/horarios'])
             },error:(e)=>{ console.log(e),
             this._snackbar.open("❌ No se ha podido crear el horario", "Continuar", { duration: 3000 })
-            this.router.navigate(['/horarios'])
+            this.router.navigate(['/restaurante/horarios'])
           }
           })
         }

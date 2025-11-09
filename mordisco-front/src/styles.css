@@ -137,6 +137,20 @@ body {
            transition-colors duration-200;
   }
 
+  /* ========== CUSTOM RADIO BUTTONS ========== */ 
+  :host ::ng-deep .mat-mdc-radio-button.custom-radio { 
+    display: block !important; 
+    width: 100%; 
+  } 
+
+  :host ::ng-deep .mat-mdc-radio-button.custom-radio .mdc-form-field { 
+    width: 100%; 
+  } 
+
+  :host ::ng-deep .mat-mdc-radio-button.custom-radio .mdc-radio { 
+    padding: 0 !important;
+  }
+
 /* ========== CARDS ========== */
   .card-base {
     @apply bg-white rounded-xl shadow-md overflow-hidden
@@ -305,6 +319,17 @@ body {
     }
   }
 
+  @keyframes fadeInUp { 
+    from { 
+      opacity: 0; 
+      transform: translateY(30px); 
+    } 
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    } 
+  }
+
 
    /* ========== FORM ========== */
   .form-container {
@@ -389,6 +414,39 @@ body {
            flex items-center justify-center
            font-bold text-white uppercase
            transition-all duration-200;
+  }
+
+/* ========== SNACKBAR PERSONALIZADOS ========== */
+  :host ::ng-deep .snackbar-success {
+    background-color: #10b981 !important;
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-success .mat-mdc-snack-bar-label {
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-error {
+    background-color: #ef4444 !important;
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-error .mat-mdc-snack-bar-label {
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-info {
+    background-color: #3b82f6 !important;
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-info .mat-mdc-snack-bar-label {
+    color: white !important;
+  }
+
+  :host ::ng-deep .mat-mdc-snack-bar-container {
+    --mdc-snackbar-container-color: #323232;
+    --mat-snack-bar-button-color: #fff;
   }
 
   /* ========== FOOTER ========== */
@@ -556,7 +614,7 @@ body {
   }
 
   .restaurant-logo {
-    @apply w-44 h-44 bg-black rounded-xl flex items-center justify-center flex-shrink-0 mx-auto md:mx-0;
+    @apply w-44 h-44 bg-black rounded-xl flex items-center justify-center shrink-0 mx-auto md:mx-0;
   }
 
   .restaurant-info {
@@ -609,7 +667,7 @@ body {
   .quantity-selector {
     @apply flex items-center gap-0
            border border-gray-400 rounded-full
-           px-2 py-[2px] bg-white;
+           px-2 py-0.5 bg-white;
   }
 
   /* Botones - y + */
@@ -628,7 +686,7 @@ body {
   /* Valor numérico */
   .quantity-value {
     @apply text-sm font-semibold text-black
-           min-w-[1.5rem] text-center
+           min-w-6 text-center
            select-none;
   }
 }
@@ -638,13 +696,13 @@ body {
   .quantity-selector-compact {
     @apply flex items-center gap-0
            border border-gray-400 rounded-full
-           px-[6px] py-[1px] bg-white;
+           px-1.5 py-px bg-white;
   }
 
   .quantity-btn-compact {
     @apply bg-transparent border-0
            text-gray-500 text-sm font-light
-           cursor-pointer px-[4px] py-0
+           cursor-pointer px-1 py-0
            transition-all duration-200
            flex items-center justify-center
            leading-none
@@ -655,7 +713,7 @@ body {
 
   .quantity-value-compact {
     @apply text-sm font-semibold text-black
-           min-w-[1.25rem] text-center
+           min-w-5 text-center
            select-none;
   }
 }

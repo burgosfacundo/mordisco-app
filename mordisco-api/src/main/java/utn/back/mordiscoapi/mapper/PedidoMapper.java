@@ -55,7 +55,10 @@ public class PedidoMapper {
         var productos = pedido.getItems().stream()
                 .map(ProductoPedidoMapper::toDTO)
                 .toList();
-        var direccionEntrega = DireccionMapper.toDTO(pedido.getDireccionEntrega());
+        var direccionEntrega = pedido.getDireccionEntrega() != null
+                ? DireccionMapper.toDTO(pedido.getDireccionEntrega())
+                : null;
+
         return new PedidoResponseDTO(pedido.getId(),
                 usuario,
                 restaurante,
@@ -64,7 +67,8 @@ public class PedidoMapper {
                 pedido.getEstado(),
                 pedido.getFechaHora(),
                 pedido.getTotal(),
-                direccionEntrega
+                direccionEntrega,
+                pedido.getDireccionSnapshot()
                 );
     }
 }

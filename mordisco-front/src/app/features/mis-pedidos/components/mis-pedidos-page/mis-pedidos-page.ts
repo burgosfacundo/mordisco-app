@@ -1,153 +1,191 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatIconModule } from '@angular/material/icon';
 import { PedidoCardComponent } from '../../../../shared/components/pedido-card-component/pedido-card-component';
+import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
+import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
+import { AuthService } from '../../../../shared/services/auth-service';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
-import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
-import { Router } from '@angular/router';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
-import { AuthService } from '../../../../shared/services/auth-service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { PageEvent, MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-mis-pedidos-page',
-  imports: [PedidoCardComponent, ReactiveFormsModule, MatPaginator],
-  templateUrl: './mis-pedidos-page.html'
+  standalone: true,
+  imports: [
+    CommonModule,
+    PedidoCardComponent,
+    MatPaginatorModule,
+    MatTabsModule,
+    MatIconModule
+  ],
+  templateUrl: './mis-pedidos-page.html',
+  styleUrl: './mis-pedidos-page.css'
 })
 export class MisPedidosPage implements OnInit {
-  private pService : PedidoService = inject(PedidoService)
-  private rService : RestauranteService = inject(RestauranteService)
-  private auS : AuthService = inject(AuthService)
+  private pService = inject(PedidoService);
+  private rService = inject(RestauranteService);
+  private auS = inject(AuthService);
   private _snackBar = inject(MatSnackBar);
-  private router : Router = inject(Router)
+  private router = inject(Router);
 
-  EstadoPedido = EstadoPedido
-  arrPedidos? : PedidoResponse[]
-  estado = new FormControl<string>('TODOS')
-  idCurrUser? : number
-  restaurante?: RestauranteResponse
-  estadoSeleccionado : string | null = this.estado.value
+  arrPedidos?: PedidoResponse[];
+  restaurante?: RestauranteResponse;
 
-  sizePedidos : number = 5;
-  pagePedidos : number = 0;
-  lengthPedidos : number = 5;
+  sizePedidos = 10;
+  pagePedidos = 0;
+  lengthPedidos = 0;
   isLoadingPedidos = true;
-  isUpdating = false;
 
+  selectedTabIndex = 0;
+  estadoActual: EstadoPedido | 'TODOS' = 'TODOS';
 
   ngOnInit(): void {
-    const resp = this.auS.getCurrentUser()
-    this.idCurrUser= resp?.userId
+    this.cargarRestaurante();
+  }
 
-    if(this.idCurrUser){
-      this.rService.getByUsuario(this.idCurrUser).subscribe({
-        next:(data)=> {this.restaurante=data,
-          this.listarTodos()
-        },
-        error:(e)=> {
-          console.log(e);
-          this.isLoadingPedidos = false
-        }
-      })
+  private cargarRestaurante(): void {
+    const userId = this.auS.getCurrentUser()?.userId;
+
+    if (!userId) {
+      this._snackBar.open('Error: Usuario no autenticado', 'Cerrar', { duration: 3000 });
+      this.router.navigate(['/login']);
+      return;
     }
-    this.estado.valueChanges.subscribe((nuevoEstado) => {
-      if (nuevoEstado) {
-        if(nuevoEstado === "TODOS"){
-          this.estadoSeleccionado = nuevoEstado;
-          console.log(this.estadoSeleccionado)
-          this.listarTodos()}
-        else{
-          this.estadoSeleccionado = nuevoEstado;
-          console.log(this.estadoSeleccionado)
-          this.listarPedidosEstado(nuevoEstado);
-        }
+
+    this.rService.getByUsuario(userId).subscribe({
+      next: (data) => {
+        this.restaurante = data;
+        this.cargarPedidos();
+      },
+      error: (e) => {
+        console.error('Error al cargar restaurante:', e);
+        this._snackBar.open('Error al cargar el restaurante', 'Cerrar', { duration: 3000 });
+        this.isLoadingPedidos = false;
       }
     });
   }
 
-  listarPedidosEstado(estado : string){
-    if(!this.restaurante) return;
-      this.pService.getAllByRestaurante_IdAndEstado(this.restaurante?.id,estado,this.pagePedidos,this.sizePedidos).subscribe({
-        next: (p)=> {this.arrPedidos = p.content,
-          this.lengthPedidos = p.totalElements
-          this.isLoadingPedidos=false
+  private cargarPedidos(): void {
+    if (!this.restaurante) return;
+
+    this.isLoadingPedidos = true;
+
+    if (this.estadoActual === 'TODOS') {
+      this.pService.findAllByRestaurante_Id(
+        this.restaurante.id,
+        this.pagePedidos,
+        this.sizePedidos
+      ).subscribe({
+        next: (response) => {
+          this.arrPedidos = response.content;
+          this.lengthPedidos = response.totalElements;
+          this.isLoadingPedidos = false;
         },
         error: () => {
-          this._snackBar.open('❌ Error al cargar los pedidos','Cerrar' , { duration: 3000 });
+          this._snackBar.open('Error al cargar pedidos', 'Cerrar', { duration: 3000 });
           this.isLoadingPedidos = false;
         }
-      })
-    
+      });
+    } else {
+      this.pService.getAllByRestaurante_IdAndEstado(
+        this.restaurante.id,
+        this.estadoActual,
+        this.pagePedidos,
+        this.sizePedidos
+      ).subscribe({
+        next: (response) => {
+          this.arrPedidos = response.content;
+          this.lengthPedidos = response.totalElements;
+          this.isLoadingPedidos = false;
+        },
+        error: () => {
+          this._snackBar.open('Error al cargar pedidos', 'Cerrar', { duration: 3000 });
+          this.isLoadingPedidos = false;
+        }
+      });
+    }
   }
 
-  listarTodos(){
-    if(!this.restaurante) return;
-    this.pService.findAllByRestaurante_Id(this.restaurante.id, this.pagePedidos,this.sizePedidos).subscribe({
-        next: (p)=> {this.arrPedidos = p.content,
-          this.lengthPedidos = p.totalElements
-          this.isLoadingPedidos=false
-        },
-        error: () => {
-          this._snackBar.open('❌ Error al cargar los pedidos','Cerrar' , { duration: 3000 });
-          this.isLoadingPedidos = false;
-        }
-    })
+  onTabChange(index: number): void {
+    const estados: (EstadoPedido | 'TODOS')[] = [
+      'TODOS',
+      EstadoPedido.PENDIENTE,
+      EstadoPedido.EN_PROCESO,
+      EstadoPedido.EN_CAMINO,
+      EstadoPedido.RECIBIDO,
+      EstadoPedido.CANCELADO
+    ];
+
+    this.estadoActual = estados[index];
+    this.pagePedidos = 0;
+    this.cargarPedidos();
   }
-  
+
   onPageChangePedidos(event: PageEvent): void {
-    this.pagePedidos = event.pageIndex
+    this.pagePedidos = event.pageIndex;
     this.sizePedidos = event.pageSize;
-    if (this.estadoSeleccionado === 'TODOS'){
-      this.listarTodos()
-    }else if(this.estadoSeleccionado){
-      this.listarPedidosEstado(this.estadoSeleccionado);
-    }
+    this.cargarPedidos();
   }
 
-  confirmacionCambioEstado(pedido : PedidoResponse, estado : EstadoPedido){
-    if (!pedido.id) return;
-    const confirmar = confirm('¿Estás seguro de cambiar este estado?');
-    if (confirmar && estado !==  EstadoPedido.CANCELADO) {
-      this.cambiarEstado(pedido,estado)
-    }else{
-      this.cancelarPedido(pedido)
-    }
-  }
+  aceptarPedido(pedidoId: number): void {
+    if (!confirm('¿Aceptar este pedido?')) return;
 
-  cambiarEstado(pedido : PedidoResponse, estado : EstadoPedido){
-    this.pService.changeState(pedido.id,estado).subscribe({
-      next:(data)=> {console.log(data)
-        if (this.estadoSeleccionado === 'TODOS') {
-          this.listarTodos();
-        } else if (this.estadoSeleccionado) {
-          this.listarPedidosEstado(this.estadoSeleccionado);
-        }
+    this.pService.changeState(pedidoId, EstadoPedido.EN_PROCESO).subscribe({
+      next: () => {
+        this._snackBar.open('✅ Pedido aceptado', 'Cerrar', { duration: 3000 });
+        this.cargarPedidos();
       },
-      error:(e)=>{console.log(e), 
-        alert("No puedes cambiar al estado anterior")
+      error: (error) => {
+        console.error('Error al aceptar pedido:', error);
+        this._snackBar.open(
+          error.error?.message || 'No se pudo aceptar el pedido',
+          'Cerrar',
+          { duration: 4000 }
+        );
       }
-    })
-
+    });
   }
 
-  cancelarPedido(pedido : PedidoResponse){
-    this.pService.cancel(pedido.id).subscribe({
-      next:(data)=> {console.log(data)
-        if (this.estadoSeleccionado === 'TODOS') {
-          this.listarTodos();
-        } else if (this.estadoSeleccionado) {
-          this.listarPedidosEstado(this.estadoSeleccionado);
-        }
+  rechazarPedido(pedidoId: number): void {
+    if (!confirm('¿Rechazar/Cancelar este pedido?')) return;
+
+    this.pService.cancel(pedidoId).subscribe({
+      next: () => {
+        this._snackBar.open('✅ Pedido cancelado', 'Cerrar', { duration: 3000 });
+        this.cargarPedidos();
       },
-      error:(e)=>{console.log(e), 
-        alert("No puedes cambiar al estado anterior")
+      error: (error) => {
+        console.error('Error al cancelar pedido:', error);
+        this._snackBar.open(
+          error.error?.message || 'No se pudo cancelar el pedido',
+          'Cerrar',
+          { duration: 4000 }
+        );
       }
-    })
+    });
   }
 
-verDetalle(pedido: PedidoResponse): void {
-  this.router.navigate(['/restaurante/pedidos/detalle', pedido.id]);
-}
+  marcarEnCamino(pedidoId: number): void {
+    if (!confirm('¿Marcar pedido como "En Camino"?')) return;
+
+    this.pService.changeState(pedidoId, EstadoPedido.EN_CAMINO).subscribe({
+      next: () => {
+        this._snackBar.open('✅ Pedido marcado como "En Camino"', 'Cerrar', { duration: 3000 });
+        this.cargarPedidos();
+      },
+      error: (error) => {
+        console.error('Error al actualizar pedido:', error);
+        this._snackBar.open(
+          error.error?.message || 'No se pudo actualizar el pedido',
+          'Cerrar',
+          { duration: 4000 }
+        );
+      }
+    });
+  }
 }

@@ -1,30 +1,21 @@
-import { Component, inject, Input } from '@angular/core';
-import ProductoCard from '../../models/producto/producto-card';
-
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import ProductoResponse from '../../models/producto/producto-response';
 @Component({
   selector: 'app-producto-card-with-add',
-  imports: [],
-  templateUrl: './producto-card-with-add.html',
-  styleUrl: './producto-card-with-add.css'
+  standalone: true,
+  imports: [CommonModule, MatIconModule],
+  templateUrl: './producto-card-with-add.html'
 })
-export class ProductoCardWithAdd {
-  @Input() producto? : ProductoCard
+export class ProductoCardWithAdd{
+  @Input() producto!: ProductoResponse;
+  @Input() enCarrito = false;
+  @Input() cantidad = 0;
+  
+  @Output() agregar = new EventEmitter<void>();
 
-  cantidad : number = 0
-  private cService : CarritoService = inject(CarritoService)
-
-  incrementar(){
-    this.cService().agregarProducto(this.producto).subscribe({
-
-    })
-    this.cantidad++
+  onAgregar(): void {
+    this.agregar.emit();
   }
-
-  decrementar(){
-    this.cService().quitarProducto(this.producto?.id).subscribe({
-      
-    })
-    this.cantidad--
-  }
-
 }

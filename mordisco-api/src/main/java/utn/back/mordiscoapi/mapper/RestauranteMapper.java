@@ -7,7 +7,7 @@ import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 
 @Slf4j

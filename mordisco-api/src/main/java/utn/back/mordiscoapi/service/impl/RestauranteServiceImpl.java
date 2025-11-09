@@ -7,8 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.ImagenMapper;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
@@ -18,6 +18,7 @@ import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
+import utn.back.mordiscoapi.service.GeocodingService;
 import utn.back.mordiscoapi.service.interf.IRestauranteService;
 
 

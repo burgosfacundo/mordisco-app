@@ -1,3 +1,4 @@
 export enum TipoEntrega{
-    DELIVERY, RETIRO_POR_LOCAL
+    DELIVERY = 'DELIVERY', 
+    RETIRO_POR_LOCAL = 'RETIRO_POR_LOCAL'
 }

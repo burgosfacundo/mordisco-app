@@ -28,6 +28,7 @@ public record PedidoResponseDTO(
     @Schema(description = "Total del pedido", example = "150.00")
     BigDecimal total,
     @Schema(description = "Dirección de entrega del pedido")
-    DireccionResponseDTO direccionEntrega
+    DireccionResponseDTO direccionEntrega,
+    String direccionSnapshot
 ) {
 }

@@ -1,8 +1,11 @@
 package utn.back.mordiscoapi.service.interf;
 
 import org.springframework.data.domain.Page;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
+import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
 import utn.back.mordiscoapi.model.dto.usuario.*;
 
 public interface IUsuarioService {
@@ -12,7 +15,9 @@ public interface IUsuarioService {
     UsuarioResponseDTO getMe() throws NotFoundException, BadRequestException;
     void delete(Long id) throws NotFoundException;
     void deleteMe() throws NotFoundException, BadRequestException;
-    void changePassword(ChangePasswordDTO dto) throws NotFoundException, BadRequestException;
+    void changePassword(ChangePasswordDTO dto) throws NotFoundException, BadRequestException, InternalServerErrorException;
+    void requestPasswordRecovery(RecoverPasswordDTO dto) throws NotFoundException, InternalServerErrorException, BadRequestException ;
+    void resetPassword(ResetPasswordDTO dto) throws BadRequestException, NotFoundException;
     Page<UsuarioCardDTO> findByRolId(int pageNo,int pageSize,Long id) throws NotFoundException;
     void update(Long id, UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;
     void updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;

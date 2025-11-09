@@ -51,28 +51,22 @@ export class MiMenuPage implements OnInit {
   }
 
   private cargarDatos(userId: number): void {
-    // PASO 1: Verificar si tiene restaurante
     this.rService.getByUsuario(userId).subscribe({
       next: (restaurante) => {
         if (!restaurante) {
           this.mostrarError('⚠️ Primero debes crear tu restaurante');
-          this.router.navigate(['/mi-restaurante']);
+          this.router.navigate(['/restaurante']);
           return;
         }
 
         this.restaurante = restaurante;
         this.hasRestaurante = true;
         
-        // PASO 2: Verificar si tiene menú
         this.verificarMenu(restaurante.id);
       },
-      error: (error) => {
-        if (error.status === 404) {
-          this.mostrarError('⚠️ Primero debes crear tu restaurante');
-          this.router.navigate(['/mi-restaurante']);
-        } else {
-          this.mostrarError('❌ Error al cargar el restaurante');
-        }
+      error: () => {
+        this.mostrarError('⚠️ Primero debes crear tu restaurante');
+        this.router.navigate(['/restaurante']);
         this.isLoading = false;
       }
     });
@@ -90,7 +84,6 @@ export class MiMenuPage implements OnInit {
         this.menu = menu;
         this.hasMenu = true;
         
-        // PASO 3: Cargar productos del menú
         this.cargarProductos();
       },
       error: (error) => {
@@ -136,11 +129,11 @@ export class MiMenuPage implements OnInit {
       this.snackBar.open('⚠️ Error: Menú no disponible', 'Cerrar', { duration: 3000 });
       return;
     }
-    this.router.navigate(['/productos/nuevo', this.menu.id]);
+    this.router.navigate(['/restaurante/menu/producto/nuevo', this.menu.id]);
   }
 
   editarProducto(producto: ProductoResponse): void {
-    this.router.navigate(['/productos/editar', producto.id]);
+    this.router.navigate(['/restaurante/menu/producto/editar', producto.id]);
   }
 
   confirmarEliminacion(id: number): void {

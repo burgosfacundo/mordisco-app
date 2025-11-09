@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { inject, Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { inject, Injectable, signal } from "@angular/core";
+import { Observable } from "rxjs";
 import { environment } from "../../../../environments/environment";
 import ProductoRequest from "../../models/producto/producto-request";
 import PaginationResponse from "../../models/pagination/pagination-response";
@@ -12,8 +12,8 @@ import ProductoUpdate from "../../models/producto/producto-update";
 })
 export class ProductoService {
   private http : HttpClient = inject(HttpClient)
-  private productoObservable = new BehaviorSubject<ProductoResponse | null>(null)
-  currentProd = this.productoObservable.asObservable()
+  private _productoToEdit = signal<ProductoResponse | null>(null);
+  productoToEdit = this._productoToEdit.asReadonly();
 
   post(dto : ProductoRequest) : Observable<string>{
     return this.http.post<string>(`${environment.apiUrl}/productos/save`,dto)
@@ -37,10 +37,10 @@ export class ProductoService {
   }
   
   setProductoToEdit(producto : ProductoResponse){
-    this.productoObservable.next(producto)
+    this._productoToEdit.set(producto)
   }
       
   clearProductoToEdit(): void{
-    this.productoObservable.next(null)
+    this._productoToEdit.set(null)
   }
 }

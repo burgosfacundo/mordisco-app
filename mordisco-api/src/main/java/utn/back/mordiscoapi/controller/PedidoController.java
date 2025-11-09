@@ -13,8 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.enums.EstadoPedido;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
@@ -28,26 +29,29 @@ public class PedidoController {
     private final IPedidoService pedidoService;
 
     /**
-     * Función para guardar un nuevo pedido.
-     * @param dto Objeto DTO que contiene los datos del pedido a crear.
-     * @return Respuesta HTTP con un mensaje de éxito.
-     * @throws NotFoundException Si el restaurante, producto o la dirección no existen,
+     * Función para guardar un nuevo pedido
+     * @param dto Objeto DTO que contiene los datos del pedido a crear
+     * @return MercadoPagoPreferenceResponse si es Mercado Pago, o respuesta vacía si es efectivo
+     * @throws NotFoundException Si el restaurante, producto o la dirección no existen
+     * @throws BadRequestException Si hay errores de validación
      */
-    @Operation(summary = "Crear un pedido nuevo", description = "Recibe un pedido y lo guarda en la base de datos. " +
-            "**Rol necesario: CLIENTE y puedo guardar un pedido para mi propio usuario**")
+    @Operation(summary = "Crear un pedido nuevo",
+            description = "Recibe un pedido y lo guarda en la base de datos. " +
+                    "Si el método de pago es Mercado Pago, retorna la URL de pago. " +
+                    "**Rol necesario: CLIENTE**")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201",description = "Pedido creado exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Si el restaurante, producto o la dirección no existen"),
+            @ApiResponse(responseCode = "201", description = "Pedido creado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Restaurante, producto o dirección no encontrados"),
+            @ApiResponse(responseCode = "400", description = "Error en validación de datos"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('CLIENTE') and @usuarioSecurity.puedeAccederAUsuario(#dto.idCliente())")
     @PostMapping("/save")
-    public ResponseEntity<Void> save(@RequestBody
-                                     @Valid
-                                     PedidoRequestDTO dto) throws NotFoundException, BadRequestException {
-        pedidoService.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<MercadoPagoPreferenceResponse> save(
+            @RequestBody @Valid PedidoRequestDTO dto) throws NotFoundException, BadRequestException {
+        MercadoPagoPreferenceResponse response = pedidoService.save(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**

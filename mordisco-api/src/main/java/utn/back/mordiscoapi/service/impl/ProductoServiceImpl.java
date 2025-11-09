@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.ImagenMapper;
 import utn.back.mordiscoapi.mapper.ProductoMapper;
 import utn.back.mordiscoapi.model.dto.producto.ProductoRequestDTO;

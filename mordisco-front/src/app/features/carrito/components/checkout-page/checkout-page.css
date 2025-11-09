@@ -1,0 +1,8 @@
+:host ::ng-deep .custom-radio .mdc-radio {
+  padding: 0 !important;
+}
+
+:host ::ng-deep .custom-radio .mdc-form-field {
+  display: block !important;
+  width: 100%;
+}

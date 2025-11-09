@@ -3,19 +3,19 @@
   <div class="bg-linear-to-r from-primary-500 to-primary-600 p-6">
     <div class="flex flex-col gap-3">
       <!-- Badges de estado y tipo de entrega -->
-     
-       @if(pedidoResponse){ 
+      @if(pedidoResponse) { 
         <div class="flex items-center gap-2 flex-wrap">
-        <span [ngClass]="getEstadoClasses()" 
-              class="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
-          {{ fromatearEstado(pedidoResponse) }}
-        </span>
-        <span class="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide
-                     bg-white text-primary-600 shadow-md">
-          {{ formatearEntrega(pedidoResponse) }}
-        </span>
-      </div>
+          <span [ngClass]="getEstadoClasses()" 
+                class="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+            {{ fromatearEstado(pedidoResponse) }}
+          </span>
+          <span class="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide
+                       bg-white text-primary-600 shadow-md">
+            {{ formatearEntrega(pedidoResponse) }}
+          </span>
+        </div>
       }
+      
       <!-- Restaurante y fecha -->
       <div class="flex items-center justify-between">
         <h3 class="text-white font-bold text-lg truncate">
@@ -41,67 +41,87 @@
         Productos ({{ pedidoResponse?.productos?.length }})
       </h4>
       <ul class="space-y-2">
-        <li *ngFor="let producto of pedidoResponse?.productos" 
-            class="flex items-center justify-between text-sm">
-          <div class="flex items-center gap-2 flex-1 min-w-0">
-            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full 
-                         bg-primary-100 text-primary-700 font-bold text-xs shrink-0">
-              {{ producto.cantidad }}
+        @for (producto of pedidoResponse?.productos; track producto.idProducto) {
+          <li class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full 
+                           bg-primary-100 text-primary-700 font-bold text-xs shrink-0">
+                {{ producto.cantidad }}
+              </span>
+              <span class="text-gray-700 truncate">{{ producto.nombreProducto }}</span>
+            </div>
+            <span class="text-gray-900 font-semibold ml-2 shrink-0">
+              ${{ producto.precioUnitario * producto.cantidad | number:'1.2-2' }}
             </span>
-            <span class="text-gray-700 truncate">{{ producto.nombreproducto }}</span>
-          </div>
-          <span class="text-gray-900 font-semibold ml-2 hrink-0">
-            ${{ producto.precioUnitario * producto.cantidad }}
-          </span>
-        </li>
+          </li>
+        }
       </ul>
     </div>
 
-    <!-- Dirección de entrega (solo si es delivery) -->
-    <div @if (pedidoResponse?.tipoEntrega === tipoEntregaEnum.DELIVERY && pedidoResponse?.direccionEntrega  )
-         class="border-b border-gray-200 pb-4">
-      <h4 class="font-semibold text-gray-900 mb-2 text-sm uppercase tracking-wide">
-        Dirección de Entrega
-      </h4>
-      <p class="text-sm text-gray-700 leading-relaxed">
-        {{ obtenerDireccionCompleta() }}
-      </p>
-      <p class="text-xs text-gray-500 mt-1 italic"> 
-        @if(pedidoResponse?.direccionEntrega?.referencias){
-        Ref: {{ pedidoResponse?.direccionEntrega?.referencias }}
+    <!-- Dirección de entrega (solo si es delivery Y tiene dirección) -->
+    @if (pedidoResponse?.tipoEntrega === tipoEntregaEnum.DELIVERY && pedidoResponse?.direccionEntrega) {
+      <div class="border-b border-gray-200 pb-4">
+        <h4 class="font-semibold text-gray-900 mb-2 text-sm uppercase tracking-wide">
+          Dirección de Entrega
+        </h4>
+        <p class="text-sm text-gray-700 leading-relaxed">
+          {{ obtenerDireccionCompleta() }}
+        </p>
+        @if (pedidoResponse?.direccionEntrega?.referencias) {
+          <p class="text-xs text-gray-500 mt-1 italic"> 
+            Ref: {{ pedidoResponse?.direccionEntrega?.referencias }}
+          </p>
+        }
+      </div>
     }
-      </p>
-    </div>
+
+    <!-- Si es RETIRO_POR_LOCAL, mostrar dirección del restaurante -->
+    @if (pedidoResponse?.tipoEntrega === tipoEntregaEnum.RETIRO_POR_LOCAL) {
+      <div class="border-b border-gray-200 pb-4">
+        <h4 class="font-semibold text-gray-900 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
+          <mat-icon class="text-primary-600">store</mat-icon>
+          Retiro en Local
+        </h4>
+        <p class="text-sm text-gray-700 leading-relaxed">
+          {{ obtenerDireccionCompleta() }}
+        </p>
+        <p class="text-xs text-gray-500 mt-2 italic">
+          Recuerda llevar tu DNI al retirar el pedido
+        </p>
+      </div>
+    }
 
     <!-- Total -->
     <div class="flex items-center justify-between pt-2">
       <span class="font-bold text-gray-900 text-lg">Total:</span>
       <span class="font-bold text-primary-600 text-2xl">
-        ${{ pedidoResponse?.total }}
+        ${{ pedidoResponse?.total | number:'1.2-2' }}
       </span>
     </div>
 
     <!-- Botón de acción (opcional, según el estado) -->
-    <button 
-      *ngIf="mostrarBotonCancelar()"
-      (click)="cancelarPedido()"
-      class="mt-auto w-full py-2.5 rounded-lg
-             bg-red-50 text-red-700 font-semibold text-sm
-             hover:bg-red-100 active:scale-95
-             transition-all duration-200
-             focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-      Cancelar Pedido
-    </button>
+    @if (mostrarBotonCancelar()) {
+      <button 
+        (click)="cancelarPedido()"
+        class="mt-auto w-full py-2.5 rounded-lg
+               bg-red-50 text-red-700 font-semibold text-sm
+               hover:bg-red-100 active:scale-95
+               transition-all duration-200
+               focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+        Cancelar Pedido
+      </button>
+    }
 
-    <button 
-      *ngIf="mostrarBotonDetalles()"
-      (click)="verDetalles()"
-      class="mt-auto w-full py-2.5 rounded-lg
-             bg-primary-50 text-primary-700 font-semibold text-sm
-             hover:bg-primary-100 active:scale-95
-             transition-all duration-200
-             focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-      Ver Detalles
-    </button>
+    @if (mostrarBotonDetalles()) {
+      <button 
+        (click)="verDetalles()"
+        class="mt-auto w-full py-2.5 rounded-lg
+               bg-primary-50 text-primary-700 font-semibold text-sm
+               hover:bg-primary-100 active:scale-95
+               transition-all duration-200
+               focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+        Ver Detalles
+      </button>
+    }
   </div>
 </article>

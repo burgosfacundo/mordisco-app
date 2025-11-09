@@ -9,6 +9,7 @@ import { RestauranteService } from '../../../../shared/services/restaurante/rest
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { Router } from '@angular/router';
+import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 
 @Component({
   selector: 'app-home-restaurante-component',
@@ -73,8 +74,65 @@ export class HomeRestauranteComponent implements OnInit {
       });
   }
 
+  aceptarPedido(pedidoId: number): void {
+    if (!confirm('¿Aceptar este pedido?')) return;
 
-    onPageChangePedidos(event: PageEvent): void {
+    this.pedidoService.changeState(pedidoId, EstadoPedido.EN_PROCESO).subscribe({
+      next: () => {
+        this._snackBar.open('✅ Pedido aceptado', 'Cerrar', { duration: 3000 });
+        this.loadRestauranteData(); // Recargar pedidos
+      },
+      error: (error) => {
+        console.error('Error al aceptar pedido:', error);
+        this._snackBar.open(
+          error.error?.message || 'No se pudo aceptar el pedido',
+          'Cerrar',
+          { duration: 4000 }
+        );
+      }
+    });
+  }
+
+  rechazarPedido(pedidoId: number): void {
+    if (!confirm('¿Rechazar/Cancelar este pedido?')) return;
+
+    this.pedidoService.cancel(pedidoId).subscribe({
+      next: () => {
+        this._snackBar.open('✅ Pedido cancelado', 'Cerrar', { duration: 3000 });
+        this.loadRestauranteData();
+      },
+      error: (error) => {
+        console.error('Error al cancelar pedido:', error);
+        this._snackBar.open(
+          error.error?.message || 'No se pudo cancelar el pedido',
+          'Cerrar',
+          { duration: 4000 }
+        );
+      }
+    });
+  }
+
+  marcarEnCamino(pedidoId: number): void {
+    if (!confirm('¿Marcar pedido como "En Camino"?')) return;
+
+    this.pedidoService.changeState(pedidoId, EstadoPedido.EN_CAMINO).subscribe({
+      next: () => {
+        this._snackBar.open('✅ Pedido marcado como "En Camino"', 'Cerrar', { duration: 3000 });
+        this.loadRestauranteData();
+      },
+      error: (error) => {
+        console.error('Error al actualizar pedido:', error);
+        this._snackBar.open(
+          error.error?.message || 'No se pudo actualizar el pedido',
+          'Cerrar',
+          { duration: 4000 }
+        );
+      }
+    });
+  }
+
+
+  onPageChangePedidos(event: PageEvent): void {
     this.pagePedidos = event.pageIndex
     this.sizePedidos = event.pageSize;
     this.loadRestauranteData();

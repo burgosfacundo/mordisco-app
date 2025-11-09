@@ -5,7 +5,7 @@ import utn.back.mordiscoapi.model.dto.imagen.ImagenCreateDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenUpdateDTO;
 import utn.back.mordiscoapi.model.entity.Imagen;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 @UtilityClass
 public class ImagenMapper {

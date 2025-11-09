@@ -12,8 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
+import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
 import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
 
@@ -226,8 +229,26 @@ public class UsuarioController {
     @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(
             @RequestBody @Valid
-            ChangePasswordDTO dto) throws NotFoundException, BadRequestException {
+            ChangePasswordDTO dto) throws NotFoundException, BadRequestException, InternalServerErrorException {
         service.changePassword(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/recover-password")
+    public ResponseEntity<Void> recoverPassword(
+            @Valid @RequestBody RecoverPasswordDTO dto) throws NotFoundException, InternalServerErrorException, BadRequestException {
+        service.requestPasswordRecovery(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Restablecer contraseña con token
+     * POST /api/auth/reset-password
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @Valid @RequestBody ResetPasswordDTO dto) throws BadRequestException, NotFoundException {
+        service.resetPassword(dto);
         return ResponseEntity.ok().build();
     }
 

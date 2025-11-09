@@ -1,4 +1,4 @@
-<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12 relative">
   
   <!-- Hero Title -->
   <h1 class="titulo-hero">
@@ -12,26 +12,25 @@
     </h2>
 
     @if (isLoadingRestaurantes) {
-      <!-- Loading State -->
       <div class="loading-container">
         <div class="loading-spinner"></div>
         <p class="loading-text">Cargando restaurantes...</p>
       </div>
     } @else {
       @if (restaurantes && restaurantes.length > 0) {
-        <!-- Grid de Restaurantes -->
         <ul class="grid-restaurantes">
           @for (restaurante of restaurantes; track restaurante.id) {
-            <li class="fade-in">
-              <app-restaurante-card-component 
-                [restaurante]="restaurante"
-                class="block">
-              </app-restaurante-card-component>
+            <li class="fade-in relative">
+              <div  class="cursor-pointer">
+                <app-restaurante-card-component 
+                  [restaurante]="restaurante"
+                  class="block">
+                </app-restaurante-card-component>
+              </div>
             </li>
           }
         </ul>
 
-        <!-- Paginador -->
         <div class="flex justify-center mt-8">
           <mat-paginator
             [length]="lengthRestaurantes"
@@ -42,18 +41,13 @@
           </mat-paginator>
         </div>
       } @else {
-        <!-- Empty State -->
         <div class="empty-state">
           <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
-          <h3 class="empty-title">
-            No hay restaurantes disponibles
-          </h3>
-          <p class="empty-description">
-            Intenta seleccionar otra ciudad o vuelve más tarde
-          </p>
+          <h3 class="empty-title">No hay restaurantes disponibles</h3>
+          <p class="empty-description">Intenta seleccionar otra ciudad o vuelve más tarde</p>
         </div>
       }
     }
@@ -80,11 +74,8 @@
       } @else {
         <ul class="grid-promociones">
           @for (restaurante of restaurantesPromociones; track restaurante.id) {
-            <li class="fade-in relative">
-              <!-- Badge de Promoción -->
-              <span class="badge-promocion">
-                ¡PROMO!
-              </span>
+            <li class="fade-in relative cursor-pointer">
+              <span class="badge-promocion">¡PROMO!</span>
               <app-restaurante-card-component 
                 [restaurante]="restaurante"
                 class="block">
@@ -93,7 +84,6 @@
           }
         </ul>
 
-        <!-- Paginador Promociones -->
         <div class="flex justify-center mt-8">
           <mat-paginator
             [length]="lengthPromocion"
@@ -106,4 +96,6 @@
       }
     </section>
   }
+
+  <app-carrito-flotante />
 </div>

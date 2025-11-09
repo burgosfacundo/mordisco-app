@@ -7,7 +7,7 @@ import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionRestau
 import utn.back.mordiscoapi.model.entity.CalificacionRestaurante;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 import utn.back.mordiscoapi.model.entity.Usuario;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 import java.time.LocalDateTime;
 

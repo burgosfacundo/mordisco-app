@@ -21,7 +21,9 @@ export class ViewProfileComponent {
   ngOnInit(): void {
     this.userService.getMe().subscribe({
       next: u => this.usuario = u,
-      error: () => {
+      error: (error) => {
+        console.log(error);
+        
         this.openSnackBar('❌ Ocurrió un error al cargar el perfil')
         this.router.navigate(['/'])
       }

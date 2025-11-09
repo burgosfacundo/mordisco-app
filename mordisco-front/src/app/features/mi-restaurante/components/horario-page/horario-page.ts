@@ -77,12 +77,12 @@ export class HorarioPage implements OnInit{
   }
 
   crearHorario(){
-    this.router.navigate(['/horarios/form-horarios'])
+    this.router.navigate(['/restaurante/horarios/nuevo'])
   }
 
   modificarHorario(horarioEditado : HorarioAtencionResponse){
     this.hService.setHorarioToEdit(horarioEditado)
-    this.router.navigate(['/horarios/form-horarios'])
+    this.router.navigate(['/restaurante/horarios/editar', horarioEditado.id])
   }
 
   confirmarEliminacion(id: number | undefined): void {

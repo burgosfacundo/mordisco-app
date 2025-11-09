@@ -65,21 +65,21 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
     this.route.params.subscribe(params => {
       const urlSegments = this.route.snapshot.url;
       
-      if (params['id'] && urlSegments[1]?.path === 'editar') {
+      if (params['id'] && urlSegments[2]?.path === 'editar') {
         this.isEditMode = true;
         this.productoId = +params['id'];
         this.cargarProducto(this.productoId);
-      }else if (params['menuId'] && urlSegments[1]?.path === 'nuevo') {
+      }else if (params['menuId'] && urlSegments[2]?.path === 'nuevo') {
         this.menuId = +params['menuId'];
         this.isEditMode = false;
         
         if (!this.menuId || isNaN(this.menuId)) {
           this.snackBar.open('⚠️ ID de menú inválido', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/mi-menu']);
+          this.router.navigate(['/restaurante/menu']);
         }
       }else {
         this.snackBar.open('⚠️ Ruta inválida', 'Cerrar', { duration: 3000 });
-        this.router.navigate(['/mi-menu']);
+        this.router.navigate(['/restaurante/menu']);
       }
     });
   }
@@ -91,7 +91,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
       next: (producto) => {
         if (!producto) {
           this.snackBar.open('❌ Producto no encontrado', 'Cerrar', { duration: 3000 });
-          this.router.navigate(['/mi-menu']);
+          this.router.navigate(['/restaurante/menu']);
           return;
         }
         
@@ -103,7 +103,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
         console.error('Error al cargar producto:', error);
         this.snackBar.open('❌ Error al cargar el producto', 'Cerrar', { duration: 3000 });
         this.isLoading = false;
-        this.router.navigate(['/mi-menu']);
+        this.router.navigate(['/restaurante/menu']);
       }
     });
   }
@@ -124,11 +124,6 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
     if (this.productoForm.invalid) {
       this.productoForm.markAllAsTouched();
       this.snackBar.open('⚠️ Por favor completa todos los campos correctamente', 'Cerrar', { duration: 3000 });
-      return;
-    }
-
-    if (!this.menuId) {
-      this.snackBar.open('❌ ID de menú no disponible', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -162,7 +157,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
     this.productoService.post(request).subscribe({
       next: () => {
         this.snackBar.open('✅ Producto creado exitosamente', 'Cerrar', { duration: 3000 });
-        this.router.navigate(['/mi-menu']);
+        this.router.navigate(['/restaurante/menu']);
       },
       error: (error) => {
         console.error('Error al crear producto:', error);
@@ -191,7 +186,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
     this.productoService.update(update, this.productoId!).subscribe({
       next: () => {
         this.snackBar.open('✅ Producto actualizado exitosamente', 'Cerrar', { duration: 3000 });
-        this.router.navigate(['/mi-menu']);
+        this.router.navigate(['/restaurante/menu']);
       },
       error: (error) => {
         console.error('Error al actualizar producto:', error);
@@ -212,10 +207,10 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
   onCancel(): void {
     if (this.productoForm.dirty) {
       if (confirm('⚠️ ¿Deseas salir sin guardar los cambios?')) {
-        this.router.navigate(['/mi-menu']);
+        this.router.navigate(['/restaurante/menu']);
       }
     } else {
-      this.router.navigate(['/mi-menu']);
+      this.router.navigate(['/restaurante/menu']);
     }
   }
 }

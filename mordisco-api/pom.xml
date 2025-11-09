@@ -103,6 +103,26 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
+
+        <!-- Mercado Pago SDK -->
+        <dependency>
+            <groupId>com.mercadopago</groupId>
+            <artifactId>sdk-java</artifactId>
+            <version>2.1.21</version>
+        </dependency>
+
+        <!-- WebSocket para notificaciones -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <!-- Dependencia para enviar correos electrónicos -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

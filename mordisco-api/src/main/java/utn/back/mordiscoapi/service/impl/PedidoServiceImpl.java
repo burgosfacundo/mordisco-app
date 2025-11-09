@@ -7,15 +7,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import utn.back.mordiscoapi.enums.EstadoPago;
 import utn.back.mordiscoapi.enums.EstadoPedido;
+import utn.back.mordiscoapi.enums.MetodoPago;
 import utn.back.mordiscoapi.enums.TipoEntrega;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.PedidoMapper;
+import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.repository.*;
+import utn.back.mordiscoapi.service.MercadoPagoService;
+import utn.back.mordiscoapi.service.NotificacionService;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
 
 import java.math.BigDecimal;
@@ -32,64 +37,67 @@ public class PedidoServiceImpl implements IPedidoService {
     private final RestauranteRepository restauranteRepository;
     private final ProductoRepository productoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final PagoRepository pagoRepository;
+
+    private final MercadoPagoService mercadoPagoService;
+    private final NotificacionService notificacionService;
 
     /**
-     * Guarda un pedido.
+     * Guarda un pedido y gestiona el pago
      * @param dto DTORequest del pedido a guardar.
-     * @throws NotFoundException si el restaurante, producto o la dirección no existen,
+     * @return MercadoPagoPreferenceResponse si el tipo de pago es Mercado Pago, null si es efectivo
+     * @throws NotFoundException si el restaurante, producto o dirección no existen
+     * @throws BadRequestException si hay errores de validación
      */
     @Transactional
     @Override
-    public void save(PedidoRequestDTO dto) throws NotFoundException, BadRequestException {
-       var restaurante = restauranteRepository.findById(dto.idRestaurante())
+    public MercadoPagoPreferenceResponse save(PedidoRequestDTO dto) throws NotFoundException, BadRequestException {
+        Restaurante restaurante = restauranteRepository.findById(dto.idRestaurante())
                 .orElseThrow(() -> new NotFoundException("El restaurante no existe"));
 
-        var usuario = usuarioRepository.findById(dto.idCliente())
+        Usuario cliente = usuarioRepository.findById(dto.idCliente())
                 .orElseThrow(() -> new NotFoundException("El cliente no existe"));
 
         Pedido pedido = PedidoMapper.toEntity(dto);
         pedido.setEstado(EstadoPedido.PENDIENTE);
         pedido.setFechaHora(LocalDateTime.now());
+        pedido.setRestaurante(restaurante);
+        pedido.setCliente(cliente);
 
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (ProductoPedido item : pedido.getItems()) {
-            item.setPedido(pedido);
-
-            var p = productoRepository.findById(item.getProducto().getId());
-            if (p.isPresent()) {
-                item.setPrecioUnitario(p.get().getPrecio());
-                BigDecimal subtotal = p.get().getPrecio().multiply(BigDecimal.valueOf(item.getCantidad()));
-                total = total.add(subtotal);
-            } else {
-                throw new NotFoundException("El producto con ID " + item.getProducto().getId() + " no existe");
-            }
-        }
-
-        Optional<Direccion> direccionOpt = direccionRepository.findById(dto.idDireccion());
-        if (direccionOpt.isEmpty()) {
-            throw new NotFoundException("La dirección no existe");
-        }
-        var direccion = direccionOpt.get();
-
-        if (pedido.getTipoEntrega().equals(TipoEntrega.DELIVERY)){
-            if (!usuario.getDirecciones().contains(direccion)) {
-                throw new BadRequestException("La dirección no pertenece al cliente");
-            }
-            pedido.setDireccionEntrega(direccion);
-        } else if (pedido.getTipoEntrega().equals(TipoEntrega.RETIRO_POR_LOCAL)) {
-            if (!restaurante.getDireccion().equals(direccion)) {
-                throw new BadRequestException("La dirección no pertenece al restaurante");
-            }
-            pedido.setDireccionEntrega(direccion);
-        }
-
-        if (!pedido.getDireccionEntrega().getCiudad().equals(restaurante.getDireccion().getCiudad())) {
-            throw new BadRequestException("No se puede entregar un pedido a otra ciudad");
-        }
-
+        BigDecimal total = calcularTotalYValidarProductos(pedido);
         pedido.setTotal(total);
-        pedidoRepository.save(pedido);
+
+        validarYAsignarDireccion(pedido, dto, restaurante, cliente);
+
+        if (pedido.getDireccionEntrega() != null) {
+            pedido.setDireccionSnapshot(pedido.getDireccionEntrega().toSnapshot());
+        }
+
+
+        pedido = pedidoRepository.save(pedido);
+
+        Pago pago = crearRegistroPago(pedido, dto.metodoPago());
+        pagoRepository.save(pago);
+
+        if (dto.metodoPago() == MetodoPago.MERCADO_PAGO) {
+            // Crear preferencia de pago en Mercado Pago
+            MercadoPagoPreferenceResponse preference = mercadoPagoService.crearPreferenciaDePago(pedido);
+
+            // Guardar preferenceId en el pago
+            pago.setMercadoPagoPreferenceId(preference.preferenceId());
+            pagoRepository.save(pago);
+
+            return preference;
+
+        } else if (dto.metodoPago() == MetodoPago.EFECTIVO) {
+            // Para efectivo, notificar directamente al restaurante
+            notificacionService.notificarNuevoPedidoARestaurante(pedido);
+
+            // Retornar response sin preference (para que el front sepa que es efectivo)
+            return new MercadoPagoPreferenceResponse(null, null, null,
+                    pedido.getId());
+        }
+        return null;
     }
 
 
@@ -176,6 +184,12 @@ public class PedidoServiceImpl implements IPedidoService {
 
         pedido.setEstado(nuevoEstado);
         pedidoRepository.changeState(id, nuevoEstado);
+
+        notificacionService.notificarCambioEstadoACliente(pedido);
+
+        log.info("✅ Pedido #{} cambió de {} a {} y cliente notificado",
+                id, estadoActual, nuevoEstado);
+
     }
 
     /**
@@ -248,6 +262,96 @@ public class PedidoServiceImpl implements IPedidoService {
 
         pedido.setEstado(EstadoPedido.CANCELADO);
         pedidoRepository.save(pedido);
+
+        notificacionService.notificarCambioEstadoACliente(pedido);
+
+        log.info("❌ Pedido #{} cancelado", id);
+    }
+
+
+    private BigDecimal calcularTotalYValidarProductos(Pedido pedido) throws NotFoundException, BadRequestException {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (ProductoPedido item : pedido.getItems()) {
+            item.setPedido(pedido);
+
+            Producto producto = productoRepository.findById(item.getProducto().getId())
+                    .orElseThrow(() -> new NotFoundException(
+                            "El producto con ID " + item.getProducto().getId() + " no existe"
+                    ));
+
+            // Validar que el producto esté disponible
+            if (!producto.getDisponible()) {
+                throw new BadRequestException(
+                        "El producto '" + producto.getNombre() + "' no está disponible"
+                );
+            }
+
+            // Asignar precio actual del producto
+            item.setPrecioUnitario(producto.getPrecio());
+
+            // Calcular subtotal
+            BigDecimal subtotal = producto.getPrecio()
+                    .multiply(BigDecimal.valueOf(item.getCantidad()));
+            total = total.add(subtotal);
+        }
+
+        return total;
+    }
+
+    /**
+     /**
+     * Valida y asigna la dirección según el tipo de entrega
+     */
+    private void validarYAsignarDireccion(Pedido pedido, PedidoRequestDTO dto,
+                                          Restaurante restaurante, Usuario cliente)
+            throws NotFoundException, BadRequestException {
+
+        if (pedido.getTipoEntrega().equals(TipoEntrega.DELIVERY)) {
+            // Para DELIVERY, validar que venga idDireccion
+            if (dto.idDireccion() == null) {
+                throw new BadRequestException("Debe proporcionar una dirección para delivery");
+            }
+
+            Direccion direccion = direccionRepository.findById(dto.idDireccion())
+                    .orElseThrow(() -> new NotFoundException("La dirección no existe"));
+
+            // Validar que la dirección pertenezca al cliente
+            if (!cliente.getDirecciones().contains(direccion)) {
+                throw new BadRequestException("La dirección no pertenece al cliente");
+            }
+
+            // Validar que la dirección esté en la misma ciudad que el restaurante
+            if (!direccion.getCiudad().equals(restaurante.getDireccion().getCiudad())) {
+                throw new BadRequestException(
+                        "No se puede realizar delivery a otra ciudad. " +
+                                "Restaurante: " + restaurante.getDireccion().getCiudad() +
+                                ", Dirección: " + direccion.getCiudad()
+                );
+            }
+
+            pedido.setDireccionEntrega(direccion);
+
+        } else if (pedido.getTipoEntrega().equals(TipoEntrega.RETIRO_POR_LOCAL)) {
+            if (restaurante.getDireccion() == null) {
+                throw new BadRequestException("El restaurante no tiene dirección configurada");
+            }
+
+            pedido.setDireccionEntrega(restaurante.getDireccion());
+        }
+    }
+
+
+    /**
+     * Crea el registro de pago inicial
+     */
+    private Pago crearRegistroPago(Pedido pedido, MetodoPago metodoPago) {
+        return Pago.builder()
+                .pedido(pedido)
+                .metodoPago(metodoPago)
+                .monto(pedido.getTotal())
+                .estado(EstadoPago.PENDIENTE)
+                .build();
     }
 }
 

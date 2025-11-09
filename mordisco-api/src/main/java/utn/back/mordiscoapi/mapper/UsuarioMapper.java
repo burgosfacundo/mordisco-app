@@ -8,7 +8,7 @@ import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 
 @UtilityClass
@@ -69,7 +69,9 @@ public class UsuarioMapper {
         return new UsuarioPedidoDTO(
                 usuario.getId(),
                 usuario.getNombre(),
-                usuario.getApellido()
+                usuario.getApellido(),
+                usuario.getEmail(),
+                usuario.getTelefono()
         );
     }
 }

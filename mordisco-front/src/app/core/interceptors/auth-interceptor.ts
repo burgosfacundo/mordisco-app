@@ -13,7 +13,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/auth/login',
     '/auth/register',
     '/auth/refresh',
-    '/auth/logout'
+    '/auth/logout',
+    '/auth/recover-password',
+    '/auth/reset-password'
   ];
   
   const isPublicEndpoint = publicEndpoints.some(endpoint => req.url.includes(endpoint));

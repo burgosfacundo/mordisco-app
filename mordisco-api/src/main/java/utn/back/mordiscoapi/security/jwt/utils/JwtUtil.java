@@ -22,10 +22,10 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    @Value("${jwt.secret}")
+    @Value("${app.jwt.secret}")
     private String secret;
 
-    @Value("${jwt.access.expiration:900000}") // 15 minutos
+    @Value("${app.jwt.access.expiration:900000}") // 15 minutos
     private Long accessTokenExpiration;
 
     @Value("${spring.profiles.active:dev}")
@@ -80,7 +80,22 @@ public class JwtUtil {
                 .compact();
     }
 
-    public Boolean isTokenValid(String token, UserDetails userDetails) {
+    public String generateRecoveryPasswordToken(Usuario usuario) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("type", "password_recovery");
+        extraClaims.put("userId", usuario.getId());
+        extraClaims.put("username", usuario.getEmail());
+
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setSubject(usuario.getEmail())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration * 4)) // 1 hora
+                .signWith(this.secretKey)
+                .compact();
+    }
+
+    public Boolean isAccessTokenValid(String token, UserDetails userDetails) {
         try {
             final String username = extractUserName(token);
 
@@ -89,6 +104,14 @@ public class JwtUtil {
             }
 
             return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    public boolean isTokenValid(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return !claims.getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
@@ -148,5 +171,4 @@ public class JwtUtil {
         String xfHeader = request.getHeader("X-Forwarded-For");
         return xfHeader == null ? request.getRemoteAddr() : xfHeader.split(",")[0];
     }
-
 }

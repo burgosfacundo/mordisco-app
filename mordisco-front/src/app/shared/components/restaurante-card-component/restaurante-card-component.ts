@@ -62,6 +62,6 @@ export class RestauranteCardComponent {
   }
 
   verMenu(r : RestauranteForCard){
-    this.router.navigate(['/menu/', r.id])
+    this.router.navigate(['/cliente/restaurante', r.id])
   }
 }

@@ -72,6 +72,10 @@
     <!-- Spacer -->
     <div class="flex-1"></div>
 
+    @if (isAuthenticated()) {
+      <app-notificaciones-dropdown />
+    }
+
     <!-- Menú de Perfil -->
     @if (config().showProfileMenu) {
       <button 

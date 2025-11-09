@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionUpdateDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenUpdateDTO;
 
 public record RestauranteUpdateDTO(

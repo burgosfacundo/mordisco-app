@@ -3,10 +3,11 @@ import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
 import { CommonModule } from '@angular/common';
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-detalle-pedido-component',
-  imports: [CommonModule],
+  imports: [CommonModule, MatIcon],
   templateUrl: './detalle-pedido-component.html'
 })
 export class DetallePedidoComponent {

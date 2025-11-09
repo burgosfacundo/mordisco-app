@@ -42,7 +42,7 @@ export class AuthService {
     );
   }
 
-refreshToken(): Observable<AuthResponse> {
+  refreshToken(): Observable<AuthResponse> {
     // Si ya hay un refresh en progreso, esperar a que termine
     if (this.refreshInProgress$.value) {
       return this.refreshTokenSubject$.pipe(
@@ -81,7 +81,7 @@ refreshToken(): Observable<AuthResponse> {
     );
   }
 
-logout(): void {
+  logout(): void {
     this.http.post(`${this.API_URL}/logout`, {}, {
       withCredentials: true
     }).subscribe({

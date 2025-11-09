@@ -1,0 +1,29 @@
+<main class="pt-20">
+  <div class="w-full max-w-3xl mx-auto px-4 py-8 space-y-8">
+    
+    <!-- Header -->
+    <div class="text-center space-y-2">
+      <h1 class="titulo-hero">Dirección del Restaurante</h1>
+      <p class="text-gray-600 text-lg">
+        {{ direccion() ? 'Actualiza la dirección de tu local' : 'Registra la dirección de tu local' }}
+      </p>
+    </div>
+
+    <!-- Formulario -->
+    @if (isLoading()) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando...</p>
+      </div>
+    } @else{
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <app-direccion-form-component
+          #direccionForm
+          [direccion]="direccion()"
+          (onSaved)="handleSaved()"
+          (onCancelled)="handleCancel()">
+        </app-direccion-form-component>
+      </div>
+    }
+  </div>
+</main>

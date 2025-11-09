@@ -1,7 +1,7 @@
 package utn.back.mordiscoapi.service.interf;
 
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.menu.MenuResponseDTO;
 
 public interface IMenuService {

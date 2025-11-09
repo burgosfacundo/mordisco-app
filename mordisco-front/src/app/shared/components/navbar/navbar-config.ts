@@ -40,7 +40,7 @@ export class NavBarConfigFactory {
         showLoginButton: false,
         profileMenuItems: [
           { label: 'Mi Perfil', icon: 'person', route: '/profile' },
-          { label: 'Mis Direcciones', icon: 'home',route: '/profile/my-address'},
+          { label: 'Mis Direcciones', icon: 'home',route: '/cliente/my-address'},
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Pedidos', icon: 'receipt_long', route: '/cliente/pedidos' },
           { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
@@ -54,6 +54,7 @@ export class NavBarConfigFactory {
         showLoginButton: false,
         profileMenuItems: [
           { label: 'Mi Perfil', icon: 'person', route: '/profile' },
+          { label: 'Mis Direcciones', icon: 'home',route: '/cliente/my-address'},
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Pedidos', icon: 'receipt_long', route: '/cliente/pedidos' },
           { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
@@ -71,8 +72,9 @@ export class NavBarConfigFactory {
       profileMenuItems: [
         { label: 'Mi Perfil', icon: 'person', route: '/profile' },
         { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
-        { label: 'Mi Restaurante', icon: 'restaurant', route: '/mi-restaurante' },
-        { label: 'Menú', icon: 'menu_book', route: '/mi-menu' },
+        { label: 'Mi Restaurante', icon: 'restaurant', route: '/restaurante' },
+        { label: 'Menú', icon: 'menu_book', route: '/restaurante/menu' },
+        { label: 'Pedidos', icon: 'receipt_long', route: '/restaurante/pedidos' },
         { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
       ]
     }

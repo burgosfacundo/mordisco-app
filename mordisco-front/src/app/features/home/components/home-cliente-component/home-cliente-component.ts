@@ -4,13 +4,16 @@ import { RestauranteCardComponent } from '../../../../shared/components/restaura
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import RestauranteForCard from '../../../../shared/models/restaurante/restaurante-for-card';
+import { Router } from '@angular/router';
+import { CarritoFlotanteComponent } from "../../../../shared/components/carrito-flotante-component/carrito-flotante-component";
 
 @Component({
   selector: 'app-home-cliente-component',
-  imports: [RestauranteCardComponent, MatPaginator, RestauranteCardComponent],
+  imports: [RestauranteCardComponent, MatPaginator, RestauranteCardComponent, CarritoFlotanteComponent],
   templateUrl: './home-cliente-component.html'
 })
 export class HomeClienteComponent  implements OnInit , OnDestroy{
+  private router = inject(Router);
   private eventListeners: (() => void)[] = [];
   private _snackBar = inject(MatSnackBar);
   private restauranteService = inject(RestauranteService);
@@ -37,7 +40,7 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
     this.loadRestaurantesPromocionesData('Mar del Plata');
   }
 
-    ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.eventListeners.forEach(cleanup => cleanup());
   }
 

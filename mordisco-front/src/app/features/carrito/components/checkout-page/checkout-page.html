@@ -1,0 +1,309 @@
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8 mt-20">
+  
+  <nav class="flex items-center gap-2 text-sm text-gray-600">
+    <a routerLink="/home" class="hover:text-primary-600 transition-colors">Inicio</a>
+    <span class="text-gray-400">/</span>
+    <a routerLink="/cliente/carrito" class="hover:text-primary-600 transition-colors">Carrito</a>
+    <span class="text-gray-400">/</span>
+    <span class="text-gray-900 font-semibold">Checkout</span>
+  </nav>
+
+  <!-- Header -->
+  <div class="text-center space-y-2">
+    <h1 class="titulo-hero">Finalizar Pedido</h1>
+    <p class="text-gray-600 text-lg">
+      Confirma los detalles de tu pedido
+    </p>
+  </div>
+
+  <form [formGroup]="checkoutForm" (ngSubmit)="confirmarPedido()">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Formulario de checkout -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Tipo de entrega -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <mat-icon class="text-primary-600">local_shipping</mat-icon>
+            Tipo de Entrega
+          </h2>
+          
+          <mat-radio-group formControlName="tipoEntrega" class="flex flex-col gap-3">
+            <mat-radio-button value="DELIVERY" class="custom-radio">
+              <div class="flex items-start gap-3 py-2">
+                <div>
+                  <p class="font-semibold text-gray-900">Delivery</p>
+                  <p class="text-sm text-gray-600">Recibe tu pedido en tu domicilio</p>
+                  <p class="text-xs text-primary-600 font-semibold mt-1">
+                    + ${{ COSTO_ENVIO | number:'1.2-2' }} de envío
+                  </p>
+                </div>
+              </div>
+            </mat-radio-button>
+            
+            <mat-radio-button value="RETIRO_POR_LOCAL" class="custom-radio">
+              <div class="flex items-start gap-3 py-2">
+                <div>
+                  <p class="font-semibold text-gray-900">Retiro en el Local</p>
+                  <p class="text-sm text-gray-600">Retira tu pedido en el restaurante</p>
+                  <p class="text-xs text-green-600 font-semibold mt-1">
+                    ✓ Sin costo de envío
+                  </p>
+                </div>
+              </div>
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Dirección de entrega (solo si es DELIVERY) -->
+        @if (checkoutForm.get('tipoEntrega')?.value === 'DELIVERY') {
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <mat-icon class="text-primary-600">location_on</mat-icon>
+                Dirección de Entrega
+              </h2>
+              <button 
+                type="button"
+                (click)="agregarDireccion()"
+                class="text-sm text-primary-600 hover:text-primary-700 font-semibold">
+                + Agregar Nueva
+              </button>
+            </div>
+
+            @if (isLoading()) {
+              <div class="flex items-center justify-center py-8">
+                <div class="loading-spinner"></div>
+              </div>
+            } @else {
+              @if (direcciones().length > 0) {
+                <div class="space-y-3">
+                  @for (direccion of direcciones(); track direccion.id) {
+                    <label 
+                      class="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer
+                             transition-all duration-200 hover:border-primary-300"
+                      [class.border-primary-600]="checkoutForm.get('direccionId')?.value === direccion.id"
+                      [class.bg-primary-50]="checkoutForm.get('direccionId')?.value === direccion.id"
+                      [class.border-gray-200]="checkoutForm.get('direccionId')?.value !== direccion.id">
+                      <input 
+                        type="radio" 
+                        formControlName="direccionId"
+                        [value]="direccion.id"
+                        class="mt-1">
+                      <div class="flex-1">
+                        <p class="font-semibold text-gray-900">
+                          {{ direccion.calle }} {{ direccion.numero }}
+                          @if (direccion.piso) {
+                            , Piso {{ direccion.piso }}
+                          }
+                          @if (direccion.depto) {
+                            {{ direccion.depto }}
+                          }
+                        </p>
+                        <p class="text-sm text-gray-600 mt-1">
+                          {{ direccion.ciudad }} - CP: {{ direccion.codigoPostal }}
+                        </p>
+                        @if (direccion.referencias) {
+                          <p class="text-xs text-gray-500 mt-1 italic">
+                            Ref: {{ direccion.referencias }}
+                          </p>
+                        }
+                      </div>
+                    </label>
+                  }
+                </div>
+              } @else {
+                <div class="text-center py-8">
+                  <mat-icon class="text-gray-400 text-4xl mb-2">location_off</mat-icon>
+                  <p class="text-gray-600 mb-4">No tienes direcciones guardadas</p>
+                  <button 
+                    type="button"
+                    (click)="agregarDireccion()"
+                    class="btn-primary">
+                    Agregar Dirección
+                  </button>
+                </div>
+              }
+            }
+          </div>
+        }
+
+        <!-- Si es RETIRO_POR_LOCAL, mostrar info del restaurante -->
+        @if (checkoutForm.get('tipoEntrega')?.value === 'RETIRO_POR_LOCAL') {
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <mat-icon class="text-primary-600">store</mat-icon>
+              Retiro en el Local
+            </h2>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+              <div class="flex items-start gap-3">
+                <mat-icon class="text-blue-600">info</mat-icon>
+                <div>
+                  <p class="text-sm font-semibold text-blue-900 mb-1">
+                    Podrás retirar tu pedido en el restaurante
+                  </p>
+                  <p class="text-xs text-blue-700">
+                    Te notificaremos cuando esté listo. Recuerda llevar tu DNI.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Método de pago -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <mat-icon class="text-primary-600">payment</mat-icon>
+            Método de Pago
+          </h2>
+          
+          <mat-radio-group formControlName="metodoPago" class="flex flex-col gap-3">
+            <mat-radio-button value="MERCADO_PAGO" class="custom-radio">
+              <div class="flex items-center gap-3 py-2">
+                <img 
+                  src="https://http2.mlstatic.com/storage/logos-api-admin/a5f047d0-9be0-11ec-aad4-c3381f368aaf-m.svg" 
+                  alt="Mercado Pago"
+                  class="h-8">
+                <div>
+                  <p class="font-semibold text-gray-900">Mercado Pago</p>
+                  <p class="text-sm text-gray-600">Tarjeta de crédito, débito o efectivo</p>
+                </div>
+              </div>
+            </mat-radio-button>
+            
+            <mat-radio-button value="EFECTIVO" class="custom-radio">
+              <div class="flex items-center gap-3 py-2">
+                <mat-icon class="text-green-600">payments</mat-icon>
+                <div>
+                  <p class="font-semibold text-gray-900">Efectivo</p>
+                  <p class="text-sm text-gray-600">Paga en efectivo al recibir tu pedido</p>
+                </div>
+              </div>
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Comentarios adicionales -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <mat-icon class="text-primary-600">comment</mat-icon>
+            Comentarios (Opcional)
+          </h2>
+          
+          <textarea 
+            formControlName="comentarios"
+            rows="4"
+            placeholder="Ej: Sin cebolla, tocar timbre, etc."
+            class="w-full px-4 py-3 rounded-lg border border-gray-300
+                   focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+                   resize-none"></textarea>
+        </div>
+      </div>
+      
+      <!-- Resumen del pedido -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl shadow-md p-6 sticky top-24 space-y-6">
+          <h2 class="text-xl font-bold text-gray-900">
+            Resumen del Pedido
+          </h2>
+          
+          <!-- Items -->
+          <div class="space-y-3 max-h-64 overflow-y-auto">
+            @for (item of items(); track item.productoId) {
+              <div class="flex items-center gap-3">
+                <img 
+                  [src]="item.imagen.url" 
+                  [alt]="item.nombre"
+                  class="w-12 h-12 rounded-lg object-cover">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-900 truncate">
+                    {{ item.nombre }}
+                  </p>
+                  <p class="text-xs text-gray-600">
+                    {{ item.cantidad }} x ${{ item.precio | number:'1.2-2' }}
+                  </p>
+                </div>
+                <p class="text-sm font-bold text-gray-900">
+                  ${{ (item.precio * item.cantidad) | number:'1.2-2' }}
+                </p>
+              </div>
+            }
+          </div>
+          
+          <!-- Totales -->
+          <div class="space-y-2 pt-4 border-t border-gray-200">
+            <div class="flex items-center justify-between text-gray-700">
+              <span>Subtotal</span>
+              <span class="font-semibold">${{ resumenConEnvio().subtotal | number:'1.2-2' }}</span>
+            </div>
+            
+            <!-- Mostrar envío SOLO si es DELIVERY -->
+            @if (cobraEnvio()) {
+              <div class="flex items-center justify-between text-gray-700">
+                <span>Envío</span>
+                <span class="font-semibold">${{ resumenConEnvio().costoEnvio | number:'1.2-2' }}</span>
+              </div>
+            } @else {
+              <div class="flex items-center justify-between text-green-600">
+                <span class="flex items-center gap-1">
+                  <mat-icon class="text-base">check_circle</mat-icon>
+                  Retiro en local
+                </span>
+                <span class="font-semibold">$0.00</span>
+              </div>
+            }
+            
+            <div class="flex items-center justify-between pt-2 border-t border-gray-300">
+              <span class="text-lg font-bold text-gray-900">Total</span>
+              <span class="text-2xl font-bold text-primary-600">
+                ${{ resumenConEnvio().total | number:'1.2-2' }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Botones -->
+          <div class="space-y-3 pt-4">
+            <button 
+              type="submit"
+              [disabled]="checkoutForm.invalid || isProcessing()"
+              class="w-full btn-primary">
+              @if (isProcessing()) {
+                <span class="inline-flex items-center gap-2">
+                  <span class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  Procesando...
+                </span>
+              } @else {
+                <span class="inline-flex items-center gap-2">
+                  <mat-icon>check_circle</mat-icon>
+                  Confirmar Pedido - ${{ resumenConEnvio().total | number:'1.2-2' }}
+                </span>
+              }
+            </button>
+            
+            <button 
+              type="button"
+              (click)="volver()"
+              [disabled]="isProcessing()"
+              class="w-full btn-outline">
+              <mat-icon>arrow_back</mat-icon>
+              Volver al Carrito
+            </button>
+          </div>
+          
+          <!-- Información de seguridad -->
+          <div class="pt-4 border-t border-gray-200">
+            <div class="flex items-start gap-2 text-xs text-gray-600">
+              <mat-icon class="text-green-600 text-base">lock</mat-icon>
+              <p>
+                Tu información está protegida. Todos los pagos son procesados de forma segura.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

@@ -17,6 +17,8 @@ import { Ciudad } from '../../../shared/models/ciudad/ciudad';
 import { CiudadService } from '../../services/ciudad/ciudad-service';
 import { NavbarConfig, NavbarMenuItem } from './navbar-models';
 import { NavBarConfigFactory } from './navbar-config';
+import { CarritoFlotanteComponent } from "../carrito-flotante-component/carrito-flotante-component";
+import { NotificacionesDropdownComponent } from "../notificaciones-dropdown/notificaciones-dropdown";
 
 @Component({
   selector: 'app-navbar',
@@ -32,8 +34,9 @@ import { NavBarConfigFactory } from './navbar-config';
     MatInputModule,
     MatSelectModule,
     MatDividerModule,
-    MatTooltipModule
-  ],
+    MatTooltipModule,
+    NotificacionesDropdownComponent
+],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })

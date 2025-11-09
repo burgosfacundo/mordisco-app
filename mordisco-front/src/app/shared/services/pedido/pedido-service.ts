@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 import PaginationResponse from '../../models/pagination/pagination-response';
 import { EstadoPedido } from '../../models/enums/estado-pedido';
 import PedidoResponse from '../../models/pedido/pedido-response';
+import { CrearPedidoRequest } from '../../models/pedido/crear-pedido-request';
+import { MercadoPagoPreferenceResponse } from '../../models/pago/mercado-pago-preference-response';
 
 @Injectable({
   providedIn: 'root'
@@ -38,5 +40,19 @@ export class PedidoService {
 
   cancel(id : number) : Observable<string>{
     return this.http.put<string>(`${environment.apiUrl}/pedidos/cancelar/${id}`,null)
+  }
+
+  crearPedido(request: CrearPedidoRequest): Observable<MercadoPagoPreferenceResponse> {
+    return this.http.post<MercadoPagoPreferenceResponse>(`${environment.apiUrl}/pedidos/save`,request)
+  }
+
+  getAllByCliente(clienteId: number, page: number, size: number): Observable<PaginationResponse<PedidoResponse>> {
+    const params = new HttpParams().set('page', page).set('size', size)
+    return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/clientes/${clienteId}`,{ params })
+  }
+
+    getAllByClienteYEstado(clienteId: number, estado : EstadoPedido,page: number, size: number): Observable<PaginationResponse<PedidoResponse>> {
+    const params = new HttpParams().set('estado', estado).set('page', page).set('size', size)
+    return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/clientes/${clienteId}/state`,{ params })
   }
 }
