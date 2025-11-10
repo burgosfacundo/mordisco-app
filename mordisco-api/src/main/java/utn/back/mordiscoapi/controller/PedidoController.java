@@ -188,8 +188,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("@pedidoSecurity.esPropietarioPedido(#id)")
-    @PutMapping("/cancelar/{id}")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('RESTAURANTE')")    @PutMapping("/cancelar/{id}")
     public ResponseEntity<Void> cancelarPedido(
             @PathVariable
             Long id) throws NotFoundException, BadRequestException {

@@ -1,7 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Client, StompSubscription } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import { Notificacion } from '../../models/notificacion/notificacion-dto';
 import { TipoNotificacion } from '../../models/notificacion/tipo-notificacion';
 import { environment } from '../../../../environments/environment';

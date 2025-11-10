@@ -322,7 +322,7 @@ public class PedidoServiceImpl implements IPedidoService {
             }
 
             // Validar que la dirección esté en la misma ciudad que el restaurante
-            if (!direccion.getCiudad().equals(restaurante.getDireccion().getCiudad())) {
+            if (!direccion.getCiudad().equalsIgnoreCase(restaurante.getDireccion().getCiudad())) {
                 throw new BadRequestException(
                         "No se puede realizar delivery a otra ciudad. " +
                                 "Restaurante: " + restaurante.getDireccion().getCiudad() +
