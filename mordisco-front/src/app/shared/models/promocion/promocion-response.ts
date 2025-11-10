@@ -4,5 +4,5 @@ export default interface PromocionResponse{
     descuento : number
     fechaInicio : string
     fechaFin : string
-    restauranteId : number
+    restaurante_Id : number
 }

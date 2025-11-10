@@ -63,7 +63,6 @@ public class MercadoPagoService {
                     .items(items)
                     .payer(payer)
                     .backUrls(backUrls)
-                    .autoReturn("approved") // Auto-redirect cuando se aprueba el pago
                     .externalReference(pedido.getId().toString())
                     .notificationUrl(appProperties.getMercadoPago().getNotificationUrl())
                     .statementDescriptor("MORDISCO") // Aparece en el resumen de la tarjeta

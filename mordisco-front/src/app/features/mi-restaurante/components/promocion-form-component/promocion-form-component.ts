@@ -46,6 +46,7 @@ export class PromocionFormComponent implements OnInit {
     this.initForm();
     
     this.promocionId = this.route.snapshot.params['id'];
+    this.restauranteId = this.route.snapshot.params['idRestaurante']
 
     if (this.promocionId) {
       this.isEditMode = true;
@@ -64,7 +65,7 @@ export class PromocionFormComponent implements OnInit {
 
   cargarPromocion(): void {
     if (!this.promocionId) {
-      this.router.navigate(['/mi-restaurante']);
+      this.router.navigate(['/restaurante']);
       return;
     }
 
@@ -76,7 +77,8 @@ export class PromocionFormComponent implements OnInit {
           fechaInicio: new Date(p.fechaInicio),
           fechaFin: new Date(p.fechaFin)
         });
-        this.restauranteId = p.restauranteId;
+
+        this.restauranteId = p.restaurante_Id;
       },
       error: () => {
         this.snackBar.open('❌ Error al cargar la promoción', 'Cerrar', { duration: 4000 });

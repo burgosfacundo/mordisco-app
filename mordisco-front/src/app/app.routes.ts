@@ -99,7 +99,7 @@ export const routes: Routes = [
       { path: 'horarios/nuevo', component: HorarioFormPage },
       { path: 'horarios/editar/:id', component: HorarioFormPage },
       { path: 'promociones', component: PromocionFormComponent },
-      { path: 'promociones/nueva', component: PromocionFormComponent },
+      { path: 'promociones/nueva/:idRestaurante', component: PromocionFormComponent },
       { path: 'promociones/editar/:id', component: PromocionFormComponent },
       { path: 'pedidos', component: MisPedidosPage },
       { path: 'pedidos/detalle/:id', component: DetallePedidoPage }
