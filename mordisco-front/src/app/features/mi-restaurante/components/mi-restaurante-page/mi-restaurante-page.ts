@@ -22,13 +22,13 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
   selector: 'app-mi-restaurante-page',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterLink, 
-    DireccionCardComponent, 
-    PromocionCardComponent, 
-    CalificacionComponent, 
-    HorarioRestauranteComponent, 
-    MatPaginator, 
+    CommonModule,
+    RouterLink,
+    DireccionCardComponent,
+    PromocionCardComponent,
+    CalificacionComponent,
+    HorarioRestauranteComponent,
+    MatPaginator,
     RestauranteFormComponent
   ],
   templateUrl: './mi-restaurante-page.html'
@@ -70,7 +70,7 @@ export class MiRestaurantePageComponent implements OnInit {
 
   private cargarRestaurante(): void {
     const userId = this.authService.currentUser()?.userId;
-    
+
     if (!userId) {
       this.snackBar.open('❌ No se encontró información del usuario', 'Cerrar', { duration: 3000 });
       this.authService.logout();
@@ -102,8 +102,8 @@ export class MiRestaurantePageComponent implements OnInit {
     if (!idRestaurante) return;
 
     this.calificacionService.getAllByRestauranteId(
-      idRestaurante, 
-      this.pageCalificacion, 
+      idRestaurante,
+      this.pageCalificacion,
       this.sizeCalificacion
     ).subscribe({
       next: (response) => {
@@ -130,8 +130,8 @@ export class MiRestaurantePageComponent implements OnInit {
     if (!idRestaurante) return;
 
     this.horarioService.getAllByRestauranteId(
-      idRestaurante, 
-      this.pageHorario, 
+      idRestaurante,
+      this.pageHorario,
       this.sizeHorario
     ).subscribe({
       next: (response) => {

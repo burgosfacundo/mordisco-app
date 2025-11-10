@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.model.entity.Pedido;
 
-import java.util.List;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido,Long> {
@@ -34,4 +33,9 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
     boolean existsByCliente_IdAndRestaurante_Id(Long clienteId, Long restauranteId);
 
     boolean existsByIdAndCliente_Id(Long id, Long clienteId);
+    @Modifying
+    @Query("""
+            UPDATE Pedido p SET p.direccionEntrega = NULL
+            WHERE p.direccionEntrega.id = :direccionId""")
+    void desasociarDireccion(@Param("direccionId") Long direccionId);
 }

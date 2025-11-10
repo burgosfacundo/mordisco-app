@@ -18,7 +18,7 @@ export class CalificacionService {
 
     getAllByRestauranteId(id : number,page : number, size : number) : Observable<PaginationResponse<CalificacionRestauranteReponse>>{
         const params = new HttpParams().set('page',page).set('size',size);
-        return this.http.get<PaginationResponse<CalificacionRestauranteReponse>>(`${environment.apiUrl}/promociones/${id}`,{params})
+        return this.http.get<PaginationResponse<CalificacionRestauranteReponse>>(`${environment.apiUrl}/calificaciones/${id}`,{params})
     }
 
     delete(idCalificacion : number) : Observable<string>{

@@ -11,6 +11,7 @@ import utn.back.mordiscoapi.model.dto.direccion.DireccionResponseDTO;
 import utn.back.mordiscoapi.model.entity.Direccion;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.DireccionRepository;
+import utn.back.mordiscoapi.repository.PedidoRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 import utn.back.mordiscoapi.service.GeocodingService;
@@ -25,6 +26,7 @@ public class DireccionServiceImpl implements IDireccionService {
     private final UsuarioRepository usuarioRepository;
     private final DireccionRepository direccionRepository;
     private final GeocodingService geocodingService;
+    private final PedidoRepository pedidoRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -98,15 +100,11 @@ public class DireccionServiceImpl implements IDireccionService {
     @Override
     @Transactional
     public void deleteMiDireccion(Long id) throws NotFoundException, BadRequestException {
-        Usuario usuario = authUtils.getUsuarioAutenticado()
-                .orElseThrow(() -> new BadRequestException("Usuario no autenticado"));
 
         Direccion direccion = direccionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Dirección no encontrada"));
 
-        if (!direccion.getUsuario().getId().equals(usuario.getId())) {
-            throw new BadRequestException("No tienes permiso para eliminar esta dirección");
-        }
+        pedidoRepository.desasociarDireccion(id);
 
         direccionRepository.delete(direccion);
     }
