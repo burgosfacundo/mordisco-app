@@ -14,8 +14,6 @@
 - [Funcionalidades Actuales](#-funcionalidades-actuales)
 - [Funcionalidades Futuras (Tesis)](#-funcionalidades-futuras-tesis)
 - [Tecnologías](#-tecnologías)
-- [Usuarios de Prueba](#-usuarios-de-prueba)
-- [API Endpoints](#-api-endpoints)
 - [Autores](#-autores)
 
 ---
