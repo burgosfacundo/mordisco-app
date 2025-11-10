@@ -215,7 +215,7 @@ export class CheckoutPage implements OnInit {
   }
 
   agregarDireccion(): void {
-    this.router.navigate(['/my-address/form'], {
+    this.router.navigate(['/cliente/my-address'], {
       queryParams: { returnUrl: '/checkout' }
     });
   }

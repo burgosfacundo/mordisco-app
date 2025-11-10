@@ -39,7 +39,7 @@ export class PedidoService {
   }
 
   cancel(id : number) : Observable<string>{
-    return this.http.put<string>(`${environment.apiUrl}/pedidos/cancelar/${id}`,null)
+    return this.http.put<string>(`${environment.apiUrl}/pedidos/cancelar/${id}`,{})
   }
 
   crearPedido(request: CrearPedidoRequest): Observable<MercadoPagoPreferenceResponse> {
