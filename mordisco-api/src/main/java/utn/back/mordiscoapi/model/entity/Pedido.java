@@ -2,6 +2,8 @@ package utn.back.mordiscoapi.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.enums.TipoEntrega;
 
@@ -44,7 +46,11 @@ public class Pedido {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "direccion_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Direccion direccionEntrega;
+
+    @Column(length = 500)
+    private String direccionSnapshot;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductoPedido> items;

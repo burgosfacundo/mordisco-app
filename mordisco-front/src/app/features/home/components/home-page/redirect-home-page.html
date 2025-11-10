@@ -1,0 +1,28 @@
+<main class="pt-20">
+  @if (isLoading) {
+    <div class="loading">
+      <p>Cargando...</p>
+    </div>
+  } @else {
+    @switch (userRole) {
+      @case ('ROLE_RESTAURANTE') {
+        <app-home-restaurante-component></app-home-restaurante-component>
+      }
+      @case ('ROLE_CLIENTE') {
+        <app-home-cliente-component></app-home-cliente-component>
+      }
+      @case ('ROLE_ADMIN') {
+        <app-home-admin-component></app-home-admin-component>
+      }
+      @case (null) {
+        <app-home-cliente-component></app-home-cliente-component>
+      }
+      @default {
+        <div class="error">
+          <p>No se pudo determinar tu tipo de usuario.</p>
+          <button (click)="authService.logout()">Volver al login</button>
+        </div>
+      }
+    }
+  }
+</main>

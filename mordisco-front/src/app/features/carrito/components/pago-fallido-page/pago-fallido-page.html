@@ -1,0 +1,56 @@
+<div class="min-h-screen flex items-center justify-center px-4 py-8 bg-linear-to-br from-red-50 to-orange-50">
+  <div class="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-8 space-y-6 animate-in fade-in slide-up">
+    
+    <!-- Ícono de error -->
+    <div class="flex justify-center">
+      <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center">
+        <mat-icon class="text-red-600 text-6xl">cancel</mat-icon>
+      </div>
+    </div>
+    
+    <!-- Título -->
+    <div class="text-center space-y-2">
+      <h1 class="text-3xl font-bold text-gray-900">
+        Pago Rechazado
+      </h1>
+      <p class="text-lg text-gray-600">
+        No se pudo procesar tu pago
+      </p>
+    </div>
+    
+    <!-- Mensaje informativo -->
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-red-600">warning</mat-icon>
+        <div class="flex-1">
+          <p class="text-sm text-red-900 mb-2">
+            <strong>Posibles razones:</strong>
+          </p>
+          <ul class="text-sm text-red-900 space-y-1 list-disc list-inside">
+            <li>Fondos insuficientes</li>
+            <li>Datos de tarjeta incorrectos</li>
+            <li>La transacción fue rechazada por tu banco</li>
+            <li>Límite de compra excedido</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Botones -->
+    <div class="space-y-3 pt-4">
+      <button 
+        (click)="intentarNuevamente()"
+        class="w-full btn-primary">
+        <mat-icon>refresh</mat-icon>
+        Intentar Nuevamente
+      </button>
+      
+      <button 
+        (click)="irAlInicio()"
+        class="w-full btn-outline">
+        <mat-icon>home</mat-icon>
+        Volver al Inicio
+      </button>
+    </div>
+  </div>
+</div>

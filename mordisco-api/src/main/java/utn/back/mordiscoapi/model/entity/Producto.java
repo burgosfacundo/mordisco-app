@@ -11,7 +11,7 @@ import java.util.List;
         uniqueConstraints = {
                 @UniqueConstraint(name = "UK_producto_nombre", columnNames = "nombre"),
                 @UniqueConstraint(name = "UK_producto_imagen", columnNames = "imagen_id")
-})
+        })
 @Getter
 @Setter
 @AllArgsConstructor

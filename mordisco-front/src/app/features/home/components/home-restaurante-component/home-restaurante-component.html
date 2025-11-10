@@ -1,0 +1,88 @@
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
+  
+  <!-- Hero Section -->
+  <div class="bg-linear-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-white shadow-xl">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">
+          ¡Bienvenido de vuelta!
+        </h1>
+        <p class="text-primary-100 text-lg">
+          {{ restaurante?.razonSocial || 'Tu Restaurante' }}
+        </p>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-4">
+          <p class="text-primary-100 text-sm">Pedidos Pendientes</p>
+          <p class="text-4xl font-bold mt-1">{{ pedidosPendientes?.length || 0 }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Sección Pedidos Pendientes -->
+  <section class="space-y-6">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+        <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <h2 class="titulo-seccion border-0 mb-0">
+        Pedidos Pendientes
+      </h2>
+    </div>
+
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando pedidos...</p>
+      </div>
+    } @else {
+      @if (pedidosPendientes && pedidosPendientes.length > 0) {
+        <!-- Lista de Pedidos -->
+        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (pedido of pedidosPendientes; track pedido.id) {
+            <li class="fade-in">
+              <app-pedido-card-component 
+                [isRestaurante]="true"
+                [pedido]="pedido"
+                (aceptarPedido)="aceptarPedido($event)"
+                (rechazarPedido)="rechazarPedido($event)"
+                (marcarEnCamino)="marcarEnCamino($event)"
+                class="block h-full">
+              </app-pedido-card-component>
+            </li>
+          }
+        </ul>
+
+        <!-- Paginador -->
+        <div class="flex justify-center mt-8">
+          <mat-paginator
+            [length]="length"
+            [pageSize]="sizePedidos"
+            [pageIndex]="pagePedidos"
+            (page)="onPageChangePedidos($event)"
+            class="bg-white rounded-xl shadow-md">
+          </mat-paginator>
+        </div>
+      } @else {
+        <!-- Empty State -->
+        <div class="empty-state">
+          <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 class="empty-title">
+            ¡Todo al día!
+          </h3>
+          <p class="empty-description">
+            No hay pedidos pendientes en este momento
+          </p>
+        </div>
+      }
+    }
+  </section>
+</div>

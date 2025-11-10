@@ -1,0 +1,228 @@
+<header class="navbar-fixed">
+  <div class="navbar-container">
+    
+    <!-- Logo -->
+    <div class="navbar-brand" (click)="goToHome()">
+      <img 
+        src="https://res.cloudinary.com/dyzhap5j4/image/upload/v1762182458/ChatGPT_Image_3_nov_2025_12_05_53_p.m._u7ewry.png" 
+        alt="Mordisco" 
+        class="navbar-logo">
+    </div>
+
+    <!-- Spacer -->
+    <div class="flex-1"></div>
+
+    <!-- Buscador (solo clientes) -->
+    @if (config().showSearch) {
+      <div class="navbar-search hidden lg:block">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input 
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchInput($any($event.target).value)"
+            placeholder="Buscar..."
+            maxlength="50"
+            class="w-full pl-10 pr-10 py-2.5 rounded-full
+                   bg-white/95 backdrop-blur-sm
+                   border border-white/20
+                   text-gray-900 placeholder:text-gray-500
+                   focus:outline-none focus:ring-2 focus:ring-white/50
+                   transition-all duration-200">
+          @if (searchTerm) {
+            <button 
+              (click)="onSearchClear()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <svg class="w-5 h-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Selector de Ciudad -->
+    @if (config().showCitySelector) {
+      <div class="navbar-city hidden lg:block">
+        <mat-form-field appearance="outline" class="w-full ">
+          <mat-icon matPrefix class="text-white">location_on</mat-icon>
+          <mat-select 
+            [value]="ciudadSeleccionada()"
+            (selectionChange)="onCiudadChange($event.value)"
+            class="text-white ">
+            @for (ciudad of ciudades(); track ciudad.id) {
+              <mat-option [value]="ciudad">
+                {{ ciudad.nombre }}
+                @if (ciudad.provincia) {
+                  <span class="text-gray-500 text-sm ml-1">({{ ciudad.provincia }})</span>
+                }
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+
+    <!-- Spacer -->
+    <div class="flex-1"></div>
+
+    @if (isAuthenticated()) {
+      <app-notificaciones-dropdown />
+    }
+
+    <!-- Menú de Perfil -->
+    @if (config().showProfileMenu) {
+      <button 
+        [matMenuTriggerFor]="profileMenu"
+        class="navbar-profile-btn">
+        <span class="text-base">
+          {{ getUserInitials() }}
+        </span>
+      </button>
+
+      <mat-menu #profileMenu="matMenu" xPosition="before">
+        <!-- Header -->
+        <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center
+                        text-primary-700 font-bold text-sm">
+              {{ getUserInitials() }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-gray-900 truncate">
+                {{ currentUser()?.email }}
+              </p>
+              <span [class]="getBadgeClass()">
+                {{ getRoleDisplay() }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu Items -->
+        @for (item of config().profileMenuItems; track item.label) {
+          @if (item.label === 'Cerrar Sesión') {
+            <mat-divider></mat-divider>
+          }
+          
+          <button 
+            mat-menu-item 
+            (click)="onMenuItemClick(item)"
+            [class.text-red-600]="item.action === logout">
+            <mat-icon [class.text-red-600]="item.action === logout">
+              {{ item.icon }}
+            </mat-icon>
+            <span>{{ item.label }}</span>
+          </button>
+        }
+      </mat-menu>
+    }
+
+    <!-- Botón Login -->
+    @if (config().showLoginButton) {
+      <button 
+        (click)="goToLogin()"
+        class="flex items-center gap-2 px-6 py-2.5 rounded-full
+               bg-white text-primary-600 font-semibold
+               hover:bg-primary-50 hover:scale-105
+               transition-all duration-200 shadow-lg">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+        </svg>
+        <span class="hidden sm:inline">Iniciar Sesión</span>
+      </button>
+    }
+
+    <!-- Botón de menú móvil (hamburger) -->
+    @if (config().showSearch || config().showCitySelector) {
+      <button 
+        (click)="toggleMobileMenu()"
+        class="lg:hidden p-2 rounded-lg text-white hover:bg-white/20 transition-colors">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    }
+  </div>
+
+  <!-- Menú móvil desplegable -->
+  @if (showMobileMenu()) {
+    <div class="lg:hidden bg-primary-700 border-t border-primary-800 
+                animate-in slide-in-from-top duration-300">
+      <div class="container-app py-4 space-y-4">
+        
+        <!-- Buscador móvil -->
+        @if (config().showSearch) {
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input 
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="onSearchInput($any($event.target).value)"
+              placeholder="Buscar restaurantes..."
+              class="w-full pl-10 pr-10 py-2.5 rounded-lg
+                     bg-white text-gray-900 placeholder:text-gray-500
+                     focus:outline-none focus:ring-2 focus:ring-white/50">
+            @if (searchTerm) {
+              <button 
+                (click)="onSearchClear()"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Selector de ciudad móvil -->
+        @if (config().showCitySelector) {
+          <div class="relative">
+            <select 
+              [value]="ciudadSeleccionada()"
+              (change)="onCiudadChangeMobile($event)"
+              class="w-full pl-10 pr-10 py-2.5 rounded-lg
+                     bg-white text-gray-900
+                     focus:outline-none focus:ring-2 focus:ring-white/50
+                     appearance-none">
+              @for (ciudad of ciudades(); track ciudad.id) {
+                <option [value]="ciudad.id">
+                  {{ ciudad.nombre }}
+                  @if (ciudad.provincia) {
+                    ({{ ciudad.provincia }})
+                  }
+                </option>
+              }
+            </select>
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</header>

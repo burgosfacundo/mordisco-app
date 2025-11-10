@@ -1,0 +1,18 @@
+:host ::ng-deep .notif-menu {
+  max-width: 420px;
+  min-width: 360px;
+}
+
+:host ::ng-deep .mat-mdc-menu-content {
+  padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-menu-item {
+  height: auto !important;
+  min-height: auto !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-menu-item .mat-mdc-menu-item-text {
+  width: 100%;
+}

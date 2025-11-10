@@ -3,27 +3,24 @@ package utn.back.mordiscoapi.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.mapper.DireccionMapper;
-import utn.back.mordiscoapi.mapper.HorarioAtencionMapper;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.ImagenMapper;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
-import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
-import utn.back.mordiscoapi.model.entity.HorarioAtencion;
 import utn.back.mordiscoapi.model.entity.Restaurante;
-import utn.back.mordiscoapi.repository.HorarioAtencionRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
+import utn.back.mordiscoapi.service.GeocodingService;
 import utn.back.mordiscoapi.service.interf.IRestauranteService;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,7 +28,7 @@ import java.util.stream.Collectors;
 public class RestauranteServiceImpl implements IRestauranteService {
     private final RestauranteRepository restauranteRepository;
     private final UsuarioRepository usuarioRepository;
-    private final HorarioAtencionRepository horarioAtencionRepository;
+    private final GeocodingService geocodingService;
 
     /**
      * Guarda un nuevo restaurante en la base de datos.
@@ -43,6 +40,14 @@ public class RestauranteServiceImpl implements IRestauranteService {
     public void save(RestauranteCreateDTO restauranteCreateDTO) {
         Restaurante restaurante = RestauranteMapper.toEntity(restauranteCreateDTO);
         restaurante.setActivo(false);
+        var d = restaurante.getDireccion();
+
+        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
+                .ifPresent(latLng -> {
+                    d.setLatitud(latLng.lat());
+                    d.setLongitud(latLng.lng());
+                });
+
         restauranteRepository.save(restaurante);
     }
 
@@ -91,10 +96,11 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con todos los restaurantes.
      */
     @Override
-    public List<RestauranteResponseDTO> getAll() {
-        return restauranteRepository.findAllRestaurante().stream()
-                .map(RestauranteMapper::toDTO)
-                .toList();
+    public Page<RestauranteResponseDTO> getAll(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return restauranteRepository.findAllRestaurante(pageable)
+                .map(RestauranteMapper::toDTO);
     }
 
     /**
@@ -104,10 +110,10 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por estado.
      */
     @Override
-    public List<RestauranteResponseDTO> getAllByEstado(Boolean estado){
-        return restauranteRepository.findAllByEstado(estado).stream()
-                .map(RestauranteMapper::toDTO)
-                .toList();
+    public Page<RestauranteResponseDTO> getAllByEstado(int pageNo, int pageSize,Boolean estado){
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return restauranteRepository.findAllByEstado(pageable,estado)
+                .map(RestauranteMapper::toDTO);
     }
 
     /**
@@ -117,10 +123,10 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por ciudad.
      */
     @Override
-    public List<RestauranteResponseCardDTO> getAllByCiudad(String ciudad){
-        return restauranteRepository.findAllByCiudad(ciudad).stream()
-                .map(RestauranteMapper::toCardDTO)
-                .toList();
+    public Page<RestauranteResponseCardDTO> getAllByCiudad(int pageNo, int pageSize,String ciudad){
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return restauranteRepository.findAllByCiudad(pageable,ciudad)
+                .map(RestauranteMapper::toCardDTO);
     }
 
     /**
@@ -130,10 +136,10 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes filtrados por nombre.
      */
     @Override
-    public List<RestauranteResponseCardDTO> getAllByNombre(String nombre) {
-        return restauranteRepository.findAllByNombre(nombre).stream()
-                .map(RestauranteMapper::toCardDTO)
-                .toList();
+    public Page<RestauranteResponseCardDTO> getAllByNombre(int pageNo, int pageSize,String nombre) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return restauranteRepository.findAllByNombre(pageable,nombre)
+                .map(RestauranteMapper::toCardDTO);
     }
 
     /**
@@ -141,10 +147,11 @@ public class RestauranteServiceImpl implements IRestauranteService {
      * @return Lista de RestauranteResponseDTO con los restaurantes que tienen una promoción activa.
      */
     @Override
-    public List<RestauranteResponseCardDTO> findAllWithPromocionActivaAndCiudad(String ciudad) {
-        return restauranteRepository.findAllWithPromocionActivaAndCiudad(ciudad).stream()
-                .map(RestauranteMapper::toCardDTO)
-                .toList();
+    public Page<RestauranteResponseCardDTO> findAllWithPromocionActivaAndCiudad(int pageNo, int pageSize,String ciudad) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return restauranteRepository.findAllWithPromocionActivaAndCiudad(pageable,ciudad)
+                .map(RestauranteMapper::toCardDTO);
     }
 
     /**
@@ -162,14 +169,10 @@ public class RestauranteServiceImpl implements IRestauranteService {
         if (!restauranteRepository.existsByIdAndImagen_Id(dto.id(), dto.logo().id())) {
             throw new BadRequestException("La imagen ya está asociada a otro restaurante");
         }
-        if (!restauranteRepository.existsByIdAndDireccion_Id(dto.id(),dto.direccion().id())) {
-            throw new BadRequestException("La dirección ya está asociada a otro restaurante");
-        }
 
         restaurante.setActivo(dto.activo());
         restaurante.setRazonSocial(dto.razonSocial());
         ImagenMapper.applyUpdate(dto.logo(),restaurante.getImagen());
-        DireccionMapper.applyUpdate(dto.direccion(),restaurante.getDireccion());
 
         restauranteRepository.save(restaurante);
     }
@@ -187,39 +190,5 @@ public class RestauranteServiceImpl implements IRestauranteService {
             throw new NotFoundException("El restaurante a borrar no fue encontrado");
         }
         restauranteRepository.deleteById(id);
-    }
-
-    /**
-     * Agrega o modifica horarios de atención a un restaurante.
-     *
-     * @param idRestaurante ID del restaurante al que se le agregarán o modificarán los horarios.
-     * @param horarios Lista de horarios de atención a agregar.
-     * @throws NotFoundException si el restaurante no se encuentra.
-     */
-    @Transactional
-    @Override
-    public void adHorariosAtencion(Long idRestaurante, List<HorarioAtencionDTO> horarios) throws NotFoundException, BadRequestException {
-        Restaurante restaurante = restauranteRepository.findRestauranteById(idRestaurante)
-                .orElseThrow(() -> new NotFoundException("El restaurante no fue encontrado"));
-
-        for (HorarioAtencionDTO dto : horarios) {
-            if (dto.id()!= null) {
-                HorarioAtencion original = horarioAtencionRepository.findById(dto.id())
-                        .orElseThrow(() -> new NotFoundException("Horario de atención con ID " + dto.id() + " no encontrado"));
-
-                // Verificamos que pertenezca al restaurante
-                if (!restaurante.getHorariosAtencion().contains(original)) {
-                    throw new BadRequestException("El horario con ID " + dto.id() + " no pertenece al restaurante con ID " + idRestaurante);
-                }
-            }
-        }
-
-        var list = horarios.stream()
-                .map(HorarioAtencionMapper::toEntity)
-                .collect(Collectors.toSet());
-
-        restaurante.getHorariosAtencion().clear();
-        restaurante.getHorariosAtencion().addAll(list);
-        restauranteRepository.save(restaurante);
     }
 }

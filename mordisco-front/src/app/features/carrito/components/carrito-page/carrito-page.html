@@ -1,0 +1,185 @@
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8 mt-20 pb-96">
+  
+  <nav class="flex items-center gap-2 text-sm text-gray-600">
+    <a routerLink="/home" class="hover:text-primary-600 transition-colors">
+      Inicio
+    </a>
+    <span class="text-gray-400">/</span>
+    <span class="text-gray-900 font-semibold">Mi Carrito</span>
+  </nav>
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-bold text-primary-600 mb-2">
+        Mi Carrito
+      </h1>
+      @if (resumen().restauranteNombre) {
+        <p class="text-gray-600">
+          Pedido de {{ resumen().restauranteNombre }}
+        </p>
+      }
+    </div>
+    
+    @if (tieneItems()) {
+      <button 
+        (click)="vaciarCarrito()"
+        class="btn-ghost text-red-600 hover:bg-red-50">
+        <mat-icon>delete_sweep</mat-icon>
+        Vaciar Carrito
+      </button>
+    }
+  </div>
+
+  @if (tieneItems()) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Lista de productos -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-4">
+            Productos ({{ resumen().cantidadItems }})
+          </h2>
+          
+          <ul class="space-y-4">
+            @for (item of items(); track item.productoId) {
+              <li class="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
+                <!-- Imagen -->
+                <div class="shrink-0">
+                  <img 
+                    [src]="item.imagen.url" 
+                    [alt]="item.nombre"
+                    class="w-24 h-24 rounded-lg object-cover">
+                </div>
+                
+                <!-- Info del producto -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="flex-1">
+                      <h3 class="text-lg font-bold text-gray-900 mb-1">
+                        {{ item.nombre }}
+                      </h3>
+                      @if (item.descripcion) {
+                        <p class="text-sm text-gray-600 line-clamp-2 mb-2">
+                          {{ item.descripcion }}
+                        </p>
+                      }
+                      <p class="text-lg font-bold text-primary-600">
+                        ${{ item.precio | number:'1.2-2' }}
+                      </p>
+                    </div>
+                    
+                    <!-- Botón eliminar -->
+                    <button 
+                      (click)="eliminarProducto(item.productoId)"
+                      class="text-red-600 hover:text-red-700 transition-colors">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                  
+                  <!-- Controles de cantidad -->
+                  <div class="flex items-center gap-3 mt-3">
+                    <button 
+                      (click)="decrementar(item.productoId)"
+                      class="w-8 h-8 rounded-lg bg-gray-200 hover:bg-gray-300 
+                             flex items-center justify-center transition-colors">
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                    
+                    <input 
+                      type="number" 
+                      [value]="item.cantidad"
+                      (change)="actualizarCantidad(item.productoId, $event)"
+                      min="1"
+                      class="w-16 text-center px-2 py-1 border border-gray-300 rounded-lg
+                             focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    
+                    <button 
+                      (click)="incrementar(item.productoId)"
+                      class="w-8 h-8 rounded-lg bg-primary-600 hover:bg-primary-700 
+                             flex items-center justify-center transition-colors">
+                      <mat-icon class="text-white">add</mat-icon>
+                    </button>
+                    
+                    <span class="ml-auto text-lg font-bold text-gray-900">
+                      ${{ (item.precio * item.cantidad) | number:'1.2-2' }}
+                    </span>
+                  </div>
+                  
+                  @if (!item.disponible) {
+                    <div class="mt-2 flex items-center gap-2 text-red-600">
+                      <mat-icon class="text-base">warning</mat-icon>
+                      <span class="text-sm font-semibold">Producto no disponible</span>
+                    </div>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+        
+        <!-- Botón continuar comprando -->
+        <button 
+          (click)="continuarComprando()"
+          class="w-full btn-outline">
+          <mat-icon>arrow_back</mat-icon>
+          Continuar Comprando
+        </button>
+      </div>
+      
+      <!-- Resumen del pedido -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl shadow-md p-6 sticky top-24">
+          <h2 class="text-xl font-bold text-gray-900 mb-4">
+            Resumen del Pedido
+          </h2>
+          
+          <div class="space-y-3 mb-4">
+            <div class="flex items-center justify-between text-gray-700">
+              <span>Subtotal ({{ resumen().cantidadItems }} items)</span>
+              <span class="font-semibold">${{ resumen().subtotal | number:'1.2-2' }}</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-gray-700">
+              <span>Costo de envío</span>
+              <span class="font-semibold">${{ resumen().costoEnvio | number:'1.2-2' }}</span>
+            </div>
+            
+            <div class="border-t border-gray-300 pt-3 mt-3">
+              <div class="flex items-center justify-between">
+                <span class="text-lg font-bold text-gray-900">Total</span>
+                <span class="text-2xl font-bold text-primary-600">
+                  ${{ resumen().total | number:'1.2-2' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Botón checkout -->
+          <button 
+            (click)="irACheckout()"
+            class="w-full btn-primary">
+            <mat-icon>payment</mat-icon>
+            Proceder al Pago
+          </button>
+          
+        </div>
+      </div>
+    </div>
+  } @else {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <mat-icon class="empty-icon">shopping_cart</mat-icon>
+      <h3 class="empty-title">Tu carrito está vacío</h3>
+      <p class="empty-description">
+        Agrega productos a tu carrito para continuar con tu pedido
+      </p>
+      <button 
+        (click)="continuarComprando()"
+        class="btn-primary mt-6">
+        <mat-icon>restaurant</mat-icon>
+        Ver Restaurantes
+      </button>
+    </div>
+  }
+</div>

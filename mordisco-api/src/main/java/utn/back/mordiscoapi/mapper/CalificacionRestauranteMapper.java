@@ -1,13 +1,13 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
-import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionDTO;
+import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionResponseDTO;
 import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionRestauranteDTO;
 import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionRestauranteResponseDTO;
 import utn.back.mordiscoapi.model.entity.CalificacionRestaurante;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 import utn.back.mordiscoapi.model.entity.Usuario;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 import java.time.LocalDateTime;
 
@@ -42,10 +42,11 @@ public class CalificacionRestauranteMapper {
      * @return el DTO de calificación de restaurante con los datos de la entidad
      */
     public static CalificacionRestauranteResponseDTO toDTO(CalificacionRestaurante c){
+        var usuario = c.getUsuario().getNombre() + ' ' + c.getUsuario().getApellido();
         return new CalificacionRestauranteResponseDTO(c.getId(),
                 c.getFechaHora(),
-                new CalificacionDTO(
-                        c.getUsuario().getId(),
+                new CalificacionResponseDTO(
+                        usuario,
                         c.getPuntaje(),
                         c.getComentario()
                 ));

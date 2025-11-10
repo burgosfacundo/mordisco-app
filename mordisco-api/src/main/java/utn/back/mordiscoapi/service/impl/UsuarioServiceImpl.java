@@ -3,35 +3,43 @@ package utn.back.mordiscoapi.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.config.AppProperties;
 import utn.back.mordiscoapi.mapper.UsuarioMapper;
-import utn.back.mordiscoapi.model.dto.usuario.ChangePasswordDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
+import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
+import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
+import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.RolRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
+import utn.back.mordiscoapi.security.jwt.utils.JwtUtil;
+import utn.back.mordiscoapi.service.interf.IEmailService;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
+    private final JwtUtil jwtUtil;
     private final UsuarioRepository repository;
     private final RolRepository rolRepository;
     private final AuthUtils authUtils;
+    private final AppProperties appProperties;
+    private final IEmailService emailService;
     final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
@@ -52,10 +60,10 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
      * @return una página de usuarios proyectados.
      */
     @Override
-    public List<UsuarioResponseDTO> findAll() {
-        return repository.findAll().stream()
-                .map(UsuarioMapper::toUsuarioResponseDTO)
-                .toList();
+    public Page<UsuarioCardDTO> findAll(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return repository.findAll(pageable)
+                .map(UsuarioMapper::toUsuarioCardDTO);
     }
 
     /**
@@ -104,7 +112,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     }
 
     @Override
-    public UsuarioResponseDTO updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
+    public void updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         var userAuthenticated = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("No autenticado"));
 
@@ -115,7 +123,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         user.setApellido(Sanitize.collapseSpaces(dto.apellido()));
         user.setTelefono(Sanitize.collapseSpaces(dto.telefono()));
 
-        return UsuarioMapper.toUsuarioResponseDTO(user);
+        repository.save(user);
     }
 
     /**
@@ -150,7 +158,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
      */
     @Transactional
     @Override
-    public void changePassword(ChangePasswordDTO dto) throws NotFoundException, BadRequestException {
+    public void changePassword(ChangePasswordDTO dto) throws NotFoundException, BadRequestException, InternalServerErrorException {
         var userAuthenticated = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("No autenticado"));
 
@@ -163,6 +171,8 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         }
 
         usuario.setPassword(passwordEncoder.encode(dto.newPassword()));
+        String loginLink = appProperties.getFrontendUrl() + "/login";
+        emailService.sendPasswordChangeAlertEmail(usuario.getEmail(), usuario.getNombre(), loginLink);
     }
 
     /**
@@ -172,13 +182,13 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
      * @throws NotFoundException si el rol no se encuentra.
      */
     @Override
-    public List<UsuarioResponseDTO> findByRolId(Long id) throws NotFoundException {
+    public Page<UsuarioCardDTO> findByRolId(int pageNo,int pageSize,Long id) throws NotFoundException {
         if (!rolRepository.existsById(id)){
             throw new NotFoundException("Rol no encontrado");
         }
-        return repository.findUsuarioByRol_Id(id).stream()
-                .map(UsuarioMapper::toUsuarioResponseDTO)
-                .toList();
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return repository.findUsuarioByRol_Id(pageable,id)
+                .map(UsuarioMapper::toUsuarioCardDTO);
     }
 
     /**
@@ -192,4 +202,67 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         return repository.findByEmail(username).orElseThrow(
                 () -> new UsernameNotFoundException("El email no se encuentra registrado."));
     }
+
+
+    @Transactional
+    public void requestPasswordRecovery(RecoverPasswordDTO dto)
+            throws NotFoundException, InternalServerErrorException {
+
+        Usuario usuario = repository.findByEmail(dto.email())
+                .orElseThrow(() -> new NotFoundException("No existe una cuenta con ese email"));
+
+        // Generar token JWT especial para recuperación (válido por 1 hora)
+        String recoveryToken = jwtUtil.generateRecoveryPasswordToken(usuario);
+
+        // Construir URL de recuperación
+        String resetUrl = appProperties.getFrontendUrl() + "/reset-password?token=" + recoveryToken;
+
+        // Enviar email
+        emailService.sendPasswordResetEmail(
+                usuario.getEmail(),
+                usuario.getNombre(),
+                resetUrl
+        );
+
+        log.info("📧 Email de recuperación enviado a: {}", usuario.getEmail());
+    }
+
+    /**
+     * Restablece la contraseña usando el token
+     */
+    @Transactional
+    public void resetPassword(ResetPasswordDTO dto)
+            throws BadRequestException, NotFoundException {
+
+        // Validar token
+        if (!jwtUtil.isTokenValid(dto.token())) {
+            throw new BadRequestException("El token es inválido o ha expirado");
+        }
+
+        // Extraer email del token
+        String email = jwtUtil.extractUserName(dto.token());
+
+        Usuario usuario = repository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        // Cambiar contraseña
+        usuario.setPassword(passwordEncoder.encode(dto.newPassword()));
+        repository.save(usuario);
+
+        // Enviar email de confirmación
+        try {
+            String loginLink = appProperties.getFrontendUrl() + "/login";
+
+            emailService.sendPasswordChangeAlertEmail(
+                    usuario.getEmail(),
+                    usuario.getNombre(),
+                    loginLink
+            );
+        } catch (Exception e) {
+            log.warn("No se pudo enviar email de confirmación: {}", e.getMessage());
+        }
+
+        log.info("✅ Contraseña restablecida para: {}", email);
+    }
 }
+

@@ -1,0 +1,77 @@
+<div class="min-h-screen flex items-center justify-center px-4 py-8 bg-linear-to-br from-green-50 to-blue-50">
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Verificando pago...</p>
+    </div>
+  } @else if (pedido()) {
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-8 space-y-6 animate-in fade-in slide-up">
+      
+      <!-- Ícono de éxito -->
+      <div class="flex justify-center">
+        <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
+          <mat-icon class="text-green-600 text-6xl">check_circle</mat-icon>
+        </div>
+      </div>
+      
+      <!-- Título -->
+      <div class="text-center space-y-2">
+        <h1 class="text-3xl font-bold text-gray-900">
+          ¡Pago Exitoso!
+        </h1>
+        <p class="text-lg text-gray-600">
+          Tu pedido ha sido confirmado
+        </p>
+      </div>
+      
+      <!-- Información del pedido -->
+      <div class="bg-gray-50 rounded-xl p-6 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600">Número de pedido</span>
+          <span class="font-bold text-gray-900">#{{ pedido()!.id }}</span>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600">Restaurante</span>
+          <span class="font-bold text-gray-900">{{ pedido()!.restaurante.razonSocial }}</span>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600">Total pagado</span>
+          <span class="font-bold text-primary-600 text-xl">
+            ${{ pedido()!.total | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+      
+      <!-- Mensaje informativo -->
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+          <mat-icon class="text-blue-600">info</mat-icon>
+          <div class="flex-1">
+            <p class="text-sm text-blue-900">
+              Tu pedido está siendo preparado. Te notificaremos cuando esté listo para ser enviado o retirado.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Botones -->
+      <div class="space-y-3 pt-4">
+        <button 
+          (click)="irAMisPedidos()"
+          class="w-full btn-primary">
+          <mat-icon>receipt_long</mat-icon>
+          Ver Mis Pedidos
+        </button>
+        
+        <button 
+          (click)="irAlInicio()"
+          class="w-full btn-outline">
+          <mat-icon>home</mat-icon>
+          Volver al Inicio
+        </button>
+      </div>
+    </div>
+  }
+</div>

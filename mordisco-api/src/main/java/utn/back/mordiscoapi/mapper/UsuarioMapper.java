@@ -3,11 +3,12 @@ package utn.back.mordiscoapi.mapper;
 import lombok.experimental.UtilityClass;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import utn.back.mordiscoapi.model.dto.pedido.UsuarioPedidoDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioCardDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 
 @UtilityClass
@@ -49,6 +50,16 @@ public class UsuarioMapper {
         );
     }
 
+    public static UsuarioCardDTO toUsuarioCardDTO(Usuario usuario) {
+        return new UsuarioCardDTO(
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getApellido(),
+                usuario.getEmail(),
+                usuario.getRol().getNombre()
+        );
+    }
+
     /**
      * Convierte una entidad de usuario a un DTO de usuario.
      * @param usuario la entidad de usuario a convertir
@@ -58,7 +69,9 @@ public class UsuarioMapper {
         return new UsuarioPedidoDTO(
                 usuario.getId(),
                 usuario.getNombre(),
-                usuario.getApellido()
+                usuario.getApellido(),
+                usuario.getEmail(),
+                usuario.getTelefono()
         );
     }
 }

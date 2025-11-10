@@ -7,18 +7,18 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionRequestDTO;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.service.interf.IPromocionService;
 
-import java.util.List;
 
 @Tag(name = "Promociones", description = "Operaciones relacionadas con las promociones de los restaurantes") // Anotación para documentar la API con Swagger
 @RestController
@@ -43,10 +43,10 @@ public class PromocionController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.restauranteId())")
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody @Valid
-                                       PromocionRequestDTO dto) throws BadRequestException {
+    public ResponseEntity<Void> save(@RequestBody @Valid
+                                     PromocionRequestDTO dto) throws BadRequestException {
         service.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Promoción creada exitosamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -63,8 +63,11 @@ public class PromocionController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<PromocionProjection>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<PromocionProjection>> findAll(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page,size));
     }
 
     /**
@@ -106,11 +109,11 @@ public class PromocionController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.restauranteId())")
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable Long id,
-                                        @RequestBody @Valid PromocionRequestDTO dto)
+    public ResponseEntity<Void> update(@PathVariable Long id,
+                                       @RequestBody @Valid PromocionRequestDTO dto)
             throws NotFoundException, BadRequestException {
         service.update(id,dto);
-        return ResponseEntity.ok().body("Promoción actualizada exitosamente");
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -146,10 +149,12 @@ public class PromocionController {
     })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or (hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante))")
-    @GetMapping("restaurante/{idRestaurante}")
-    public ResponseEntity<List<PromocionResponseDTO>> listarPromoByIdRestaurante(@PathVariable
-                                                                                     Long idRestaurante) throws NotFoundException {
-        return ResponseEntity.ok(service.listarPromoPorRestaurante(idRestaurante));
+    @GetMapping("/restaurantes/{idRestaurante}")
+    public ResponseEntity<Page<PromocionResponseDTO>> listarPromoByIdRestaurante(
+            @PathVariable Long idRestaurante,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(service.listarPromoPorRestaurante(page,size,idRestaurante));
     }
 
 }

@@ -5,7 +5,7 @@ import utn.back.mordiscoapi.model.dto.promocion.PromocionRequestDTO;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
 import utn.back.mordiscoapi.model.entity.Promocion;
 import utn.back.mordiscoapi.model.entity.Restaurante;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 @UtilityClass // Anotación de lombok para indicar que esta clase es una clase de utilidad
 public class PromocionMapper {

@@ -7,20 +7,18 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionDTO;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
 import utn.back.mordiscoapi.service.interf.IRestauranteService;
-
-import java.util.List;
 
 @Tag(name = "Restaurante", description = "Operaciones relacionadas con los restaurantes")
 @RestController
@@ -81,11 +79,11 @@ public class RestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @usuarioSecurity.puedeAccederAUsuario(#dto.idUsuario())")
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody
+    public ResponseEntity<Void> save(@RequestBody
                                        @Valid
                                        RestauranteCreateDTO dto) {
         restauranteService.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Restaurante guardado correctamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -98,8 +96,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping
-    public ResponseEntity<List<RestauranteResponseDTO>> findAll() {
-        return ResponseEntity.ok(restauranteService.getAll());
+    public ResponseEntity<Page<RestauranteResponseDTO>> findAll(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(restauranteService.getAll(page,size));
     }
 
     /**
@@ -113,8 +114,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/estado")
-    public ResponseEntity<List<RestauranteResponseDTO>> getAllByEstado(@RequestParam Boolean estado) {
-        List<RestauranteResponseDTO> lista = restauranteService.getAllByEstado(estado);
+    public ResponseEntity<Page<RestauranteResponseDTO>> getAllByEstado(
+            @RequestParam Boolean estado,
+            @RequestParam int page,
+            @RequestParam int size) {
+        Page<RestauranteResponseDTO> lista = restauranteService.getAllByEstado(page,size,estado);
         return ResponseEntity.ok(lista);
     }
 
@@ -129,8 +133,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/ciudades")
-    public ResponseEntity<List<RestauranteResponseCardDTO>> getAllByCiudad(@RequestParam String ciudad) {
-        return ResponseEntity.ok(restauranteService.getAllByCiudad(ciudad));
+    public ResponseEntity<Page<RestauranteResponseCardDTO>> getAllByCiudad(
+            @RequestParam String ciudad,
+            @RequestParam int page,
+            @RequestParam int size) {
+        return ResponseEntity.ok(restauranteService.getAllByCiudad(page,size,ciudad));
     }
 
     /**
@@ -144,8 +151,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/nombre")
-    public ResponseEntity<List<RestauranteResponseCardDTO>> getAllByNombre(@RequestParam String nombre) {
-        return ResponseEntity.ok().body(restauranteService.getAllByNombre(nombre));
+    public ResponseEntity<Page<RestauranteResponseCardDTO>> getAllByNombre(
+            @RequestParam String nombre,
+            @RequestParam int page,
+            @RequestParam int size) {
+        return ResponseEntity.ok().body(restauranteService.getAllByNombre(page,size,nombre));
     }
 
     /**
@@ -158,8 +168,11 @@ public class RestauranteController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/promociones")
-    public ResponseEntity<List<RestauranteResponseCardDTO>> findAllWithPromocionActivaAndCiudad(@RequestParam String ciudad) {
-        return ResponseEntity.ok(restauranteService.findAllWithPromocionActivaAndCiudad(ciudad));
+    public ResponseEntity<Page<RestauranteResponseCardDTO>> findAllWithPromocionActivaAndCiudad(
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam String ciudad) {
+        return ResponseEntity.ok(restauranteService.findAllWithPromocionActivaAndCiudad(page,size,ciudad));
     }
 
     /**
@@ -181,9 +194,9 @@ public class RestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#dto.id)")
     @PutMapping("/update")
-    public ResponseEntity<String> update(@RequestBody @Valid RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException {
+    public ResponseEntity<Void> update(@RequestBody @Valid RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException {
         restauranteService.update(dto);
-        return ResponseEntity.ok("El restaurante se actualizo exitosamente");
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -207,31 +220,5 @@ public class RestauranteController {
     public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException{
         restauranteService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Función para agregar o modificar horarios de atención al restaurante.
-     *
-     * @param id del restaurante al que se le agregarán o modificarán los horarios.
-     * @param horarios Lista de horarios a agregar.
-     * @return Respuesta HTTP con un mensaje de éxito.
-     * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
-     */
-    @Operation(summary = "Agregar horarios de atención al restaurante", description = "Recibe un ID de restaurante y una lista de horarios para agregar. " +
-            "**El propio dueño del restaurante puede acceder a su restaurante para agregar horarios**")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Horarios agregados exitosamente al restaurante"),
-            @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
-    @PutMapping("/{id}/horarios")
-    public ResponseEntity<String> addHorarios(@PathVariable Long id,
-                                              @Valid @RequestBody List<HorarioAtencionDTO> horarios)
-            throws NotFoundException, BadRequestException {
-        restauranteService.adHorariosAtencion(id, horarios);
-        return ResponseEntity.ok("Horarios agregados exitosamente al restaurante");
     }
 }

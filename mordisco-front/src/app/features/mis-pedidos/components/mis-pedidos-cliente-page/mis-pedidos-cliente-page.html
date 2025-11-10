@@ -1,0 +1,119 @@
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8 mt-20">
+  
+  <!-- Header -->
+  <div class="text-center space-y-2">
+    <h1 class="titulo-hero">Mis Pedidos</h1>
+    <p class="text-gray-600 text-lg">Historial completo de tus pedidos</p>
+  </div>
+
+  <!-- Tabs de filtros -->
+  <mat-tab-group 
+    (selectedIndexChange)="onTabChange($event)"
+    class="custom-tabs">
+    
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="flex items-center gap-2">
+          <mat-icon>all_inbox</mat-icon>
+          <span>Todos</span>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="flex items-center gap-2">
+          <mat-icon class="text-yellow-600">schedule</mat-icon>
+          <span>Pendientes</span>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="flex items-center gap-2">
+          <mat-icon class="text-blue-600">restaurant</mat-icon>
+          <span>En Preparación</span>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="flex items-center gap-2">
+          <mat-icon class="text-purple-600">local_shipping</mat-icon>
+          <span>En Camino</span>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="flex items-center gap-2">
+          <mat-icon class="text-green-600">check_circle</mat-icon>
+          <span>Entregados</span>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <div class="flex items-center gap-2">
+          <mat-icon class="text-red-600">cancel</mat-icon>
+          <span>Cancelados</span>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Contenido -->
+  <div class="mt-8">
+    @if (isLoading()) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando pedidos...</p>
+      </div>
+    } @else {
+      @if (pedidos().length > 0) {
+        <!-- Grid de pedidos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (pedido of pedidos(); track pedido.id) {
+            <app-detalle-pedido-component
+              [pedidoResponse]="pedido"
+              (onCancelar)="cancelarPedido($event)"
+              (onVerDetalles)="verDetalle($event)"
+              class="block">
+            </app-detalle-pedido-component>
+          }
+        </div>
+
+        <!-- Paginador -->
+        <div class="flex justify-center mt-8">
+          <mat-paginator
+            [length]="totalElements"
+            [pageSize]="size"
+            [pageIndex]="page"
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            (page)="onPageChange($event)"
+            class="bg-white rounded-xl shadow-md">
+          </mat-paginator>
+        </div>
+      } @else {
+        <!-- Empty State -->
+        <div class="empty-state">
+          <mat-icon class="empty-icon">receipt_long</mat-icon>
+          <h3 class="empty-title">No tienes pedidos</h3>
+          <p class="empty-description">
+            Cuando realices un pedido, aparecerá aquí
+          </p>
+          <button 
+            (click)="navegarAHome()"
+            class="btn-primary mt-6">
+            <mat-icon>restaurant</mat-icon>
+            Ver Restaurantes
+          </button>
+        </div>
+      }
+    }
+  </div>
+</div>

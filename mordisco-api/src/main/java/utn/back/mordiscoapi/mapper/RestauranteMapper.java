@@ -1,14 +1,16 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import utn.back.mordiscoapi.model.dto.pedido.RestaurantePedidoDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 
+@Slf4j
 @UtilityClass
 public class RestauranteMapper {
     /**
@@ -17,6 +19,7 @@ public class RestauranteMapper {
      * @return la entidad de restaurante con los datos del DTO
      */
     public static Restaurante toEntity(RestauranteCreateDTO dto) {
+        log.debug(dto.toString());
         Usuario usuario = Usuario.builder()
                 .id(dto.idUsuario())
                 .build();
@@ -32,8 +35,7 @@ public class RestauranteMapper {
                 .codigoPostal(Sanitize.trimToNull(dto.direccion().codigoPostal()))
                 .ciudad(Sanitize.collapseSpaces(dto.direccion().ciudad()))
                 .referencias(Sanitize.trimToNull(dto.direccion().referencias()))
-                .latitud(dto.direccion().latitud())
-                .longitud(dto.direccion().longitud())
+                .usuario(usuario)
                 .build();
         return Restaurante.builder()
                 .razonSocial(Sanitize.trimToNull(dto.razonSocial()))
@@ -66,9 +68,6 @@ public class RestauranteMapper {
                 r.getActivo(),
                 imagen,
                 r.getMenu() == null ? null : r.getMenu().getId(),
-                r.getPromociones().stream().map(PromocionMapper::toDTO).toList(),
-                r.getHorariosAtencion().stream().map(HorarioAtencionMapper::toDTO).toList(),
-                r.getCalificaciones().stream().map(CalificacionRestauranteMapper::toDTO).toList(),
                 estrellas,
                 direccion
                 );

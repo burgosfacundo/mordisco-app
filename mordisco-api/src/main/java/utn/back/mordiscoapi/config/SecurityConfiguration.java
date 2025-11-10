@@ -50,6 +50,11 @@ public class SecurityConfiguration {
             "/api/usuarios/save",
             "/api/auth/login",
             "/api/auth/refresh",
+            "/api/auth/logout",
+            "/api/usuarios/recover-password",
+            "/api/usuarios/reset-password",
+            "/api/ws/**",
+            "/ws/**",
 
             // Endpoints públicos de consulta
             "/api/restaurantes/{id}",
@@ -58,8 +63,11 @@ public class SecurityConfiguration {
             "/api/restaurantes/ciudad",
             "/api/restaurantes/nombre",
             "/api/restaurantes/promociones",
+            "/api/restaurantes/horarios/{idRestaurante}",
             "/api/menus/{restauranteId}",
             "/api/promociones/{id}",
+            "/api/productos",
+            "/api/productos{id}",
 
             "/api/public/**"
     };
@@ -101,22 +109,18 @@ public class SecurityConfiguration {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of(
-                "http://localhost:4200",
-                "https://mordisco.com",
-                "https://admin.mordisco.com"
-        ));
-
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-XSRF-TOKEN"));
-        config.setExposedHeaders(List.of("Authorization", "X-XSRF-TOKEN"));
-        config.setAllowCredentials(true);
-        config.setMaxAge(3600L);
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 

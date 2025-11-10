@@ -1,14 +1,16 @@
 package utn.back.mordiscoapi.service.interf;
 
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import org.springframework.data.domain.Page;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionRestauranteDTO;
 import utn.back.mordiscoapi.model.projection.CalificacionRestauranteProjection;
 
-import java.util.List;
 
 public interface ICalificacionRestaurante {
     void save(CalificacionRestauranteDTO dto) throws NotFoundException, BadRequestException;
-    List<CalificacionRestauranteProjection> findAll();
+    Page<CalificacionRestauranteProjection> findAll(int pageNo, int pageSize);
     void delete(Long aLong) throws NotFoundException;
+
+    Page<CalificacionRestauranteProjection> findAllByIdRestaurante(int page, int size, Long idRestaurante);
 }

@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../../../auth/services/auth-service';
+import { AuthService } from '../../../shared/services/auth-service';
 
 export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
   return (route: ActivatedRouteSnapshot) => {
@@ -9,12 +9,19 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
     
     const user = authService.currentUser();
     
-    if (user && allowedRoles.includes(user.role)) {
+    // Si no hay usuario autenticado, redirigir a login
+    if (!user) {
+      router.navigate(['/login']);
+      return false;
+    }
+    
+    // Verificar si el rol del usuario está en la lista de roles permitidos
+    if (user.role && allowedRoles.includes(user.role)) {
       return true;
     }
     
-    // Redirigir a página de no autorizado
-    router.navigate(['/unauthorized']);
+    // Si no tiene el rol necesario, redirigir a home
+    router.navigate(['/home']);
     return false;
   };
 };

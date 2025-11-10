@@ -7,19 +7,19 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
-import utn.back.mordiscoapi.model.dto.usuario.ChangePasswordDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
-import utn.back.mordiscoapi.model.dto.usuario.UsuarioUpdateDTO;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
+import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
+import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
 
-import java.util.List;
 
 @Tag(name = "Usuarios", description = "Operaciones relacionadas a usuarios")
 @RestController
@@ -42,11 +42,11 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody
+    public ResponseEntity<Void> save(@RequestBody
                                        @Valid
                                        UsuarioCreateDTO dto) throws NotFoundException {
         service.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Usuario guardado correctamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -64,8 +64,11 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<UsuarioCardDTO>> findAll(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page,size));
     }
 
     /**
@@ -124,9 +127,10 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/me")
-    public ResponseEntity<UsuarioResponseDTO> updateMe(@RequestBody @Valid UsuarioUpdateDTO dto)
+    public ResponseEntity<Void> updateMe(@RequestBody @Valid UsuarioUpdateDTO dto)
             throws NotFoundException, BadRequestException {
-        return ResponseEntity.ok(service.updateMe(dto));
+        service.updateMe(dto);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -149,13 +153,13 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN")
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updatePerfil(@PathVariable
+    public ResponseEntity<Void> updatePerfil(@PathVariable
                                                Long id,
                                                @RequestBody
                                                @Valid
                                                UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException {
         service.update(id,dto);
-        return ResponseEntity.ok().body("Usuario actualizado exitosamente");
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -223,11 +227,29 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/password")
-    public ResponseEntity<String> changePassword(
+    public ResponseEntity<Void> changePassword(
             @RequestBody @Valid
-            ChangePasswordDTO dto) throws NotFoundException, BadRequestException {
+            ChangePasswordDTO dto) throws NotFoundException, BadRequestException, InternalServerErrorException {
         service.changePassword(dto);
-        return ResponseEntity.ok().body("Contraseña actualizada exitosamente");
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/recover-password")
+    public ResponseEntity<Void> recoverPassword(
+            @Valid @RequestBody RecoverPasswordDTO dto) throws NotFoundException, InternalServerErrorException, BadRequestException {
+        service.requestPasswordRecovery(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Restablecer contraseña con token
+     * POST /api/auth/reset-password
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @Valid @RequestBody ResetPasswordDTO dto) throws BadRequestException, NotFoundException {
+        service.resetPassword(dto);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -248,8 +270,11 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/rol/{id}")
-    public ResponseEntity<List<UsuarioResponseDTO>> findByRolId(@PathVariable Long id)
+    public ResponseEntity<Page<UsuarioCardDTO>> findByRolId(
+            @PathVariable Long id,
+            @RequestParam int page,
+            @RequestParam int size)
             throws NotFoundException {
-        return ResponseEntity.ok(service.findByRolId(id));
+        return ResponseEntity.ok(service.findByRolId(page,size,id));
     }
 }

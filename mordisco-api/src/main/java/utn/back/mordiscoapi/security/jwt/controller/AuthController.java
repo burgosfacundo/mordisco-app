@@ -17,7 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.security.jwt.utils.JwtUtil;
 import utn.back.mordiscoapi.security.jwt.model.dto.AuthRequest;

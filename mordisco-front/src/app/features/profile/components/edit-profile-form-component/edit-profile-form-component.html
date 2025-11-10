@@ -1,0 +1,82 @@
+<form [formGroup]="editarPerfil" (ngSubmit)="manejarModificacion()" class="space-y-6">
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <fieldset class="form-field">
+      <label for="nombreEditado" class="form-label">Nombre</label>
+      <input 
+        type="text" 
+        id="nombreEditado" 
+        placeholder="Ingresa tu nombre" 
+        formControlName="nombre" 
+        class="form-input"
+        [class.border-red-500]="getError('nombre')"
+        [class.focus:ring-red-500]="getError('nombre')"
+      >
+      @if (getError('nombre')) {
+        <p class="form-error">{{ getError('nombre') }}</p>
+      }
+    </fieldset>    
+
+    <fieldset class="form-field">
+      <label for="apellidoEditado" class="form-label">Apellido</label>
+      <input 
+        type="text" 
+        id="apellidoEditado" 
+        placeholder="Ingresa tu apellido" 
+        formControlName="apellido" 
+        class="form-input"
+        [class.border-red-500]="getError('apellido')"
+        [class.focus:ring-red-500]="getError('apellido')"
+      >
+      @if (getError('apellido')) {
+        <p class="form-error">{{ getError('apellido') }}</p>
+      }
+    </fieldset> 
+  </div>
+     
+  <fieldset class="form-field">
+    <label for="telefonoEditado" class="form-label">Teléfono</label>
+    <input 
+      type="tel"  
+      id="telefonoEditado" 
+      placeholder="+54 9 223 1234567" 
+      formControlName="telefono"  
+      class="form-input"
+      [class.border-red-500]="getError('telefono')"
+      [class.focus:ring-red-500]="getError('telefono')"
+    >
+    @if (getError('telefono')) {
+      <p class="form-error">{{ getError('telefono') }}</p>
+    }
+  </fieldset>
+
+  <div class="flex flex-col sm:flex-row gap-4 pt-6">
+    <button 
+      type="button"
+      [routerLink]="['/profile']"
+      class="btn-outline flex-1 order-2 sm:order-1">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      Cancelar
+    </button>
+    
+    <button 
+      type="submit" 
+      [disabled]="editarPerfil.invalid || isSubmitting()" 
+      class="btn-primary flex-1 order-1 sm:order-2">
+      @if (isSubmitting()) {
+        <span class="inline-flex items-center justify-center gap-2">
+          <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          Guardando...
+        </span>
+      } @else {
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        Guardar Cambios
+      }
+    </button>
+  </div> 
+
+</form>

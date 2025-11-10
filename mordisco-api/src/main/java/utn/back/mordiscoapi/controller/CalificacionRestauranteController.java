@@ -7,17 +7,17 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import utn.back.mordiscoapi.exception.BadRequestException;
-import utn.back.mordiscoapi.exception.NotFoundException;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
+import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.calificacionRestaurante.CalificacionRestauranteDTO;
 import utn.back.mordiscoapi.model.projection.CalificacionRestauranteProjection;
 import utn.back.mordiscoapi.service.interf.ICalificacionRestaurante;
 
-import java.util.List;
 
 @Tag(name = "CalificacionRestaurante", description = "Operaciones relacionadas con las calificaciones de los restaurantes")
 @RestController
@@ -44,11 +44,11 @@ public class CalificacionRestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('CLIENTE') and @calificacionSecurity.puedeAccederADtoConCalificacion(#dto)")
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody
-                                       @Valid
-                                       CalificacionRestauranteDTO dto) throws BadRequestException, NotFoundException {
+    public ResponseEntity<Void> save(@RequestBody
+                                     @Valid
+                                     CalificacionRestauranteDTO dto) throws BadRequestException, NotFoundException {
         service.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Calificación restaurante creada exitosamente");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -64,8 +64,22 @@ public class CalificacionRestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<CalificacionRestauranteProjection>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<CalificacionRestauranteProjection>> findAll(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(service.findAll(page,size));
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#idRestaurante))")
+    @GetMapping("/{idRestaurante}")
+    public ResponseEntity<Page<CalificacionRestauranteProjection>> findAllByIdRestaurante(
+            @RequestParam int page,
+            @RequestParam int size,
+            @PathVariable Long idRestaurante
+    ) {
+        return ResponseEntity.ok(service.findAllByIdRestaurante(page,size,idRestaurante));
     }
 
 
@@ -84,8 +98,8 @@ public class CalificacionRestauranteController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('CLIENTE') and @calificacionSecurity.esAutorDeCalificacion(#id)")
     @DeleteMapping ("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable
-                                             Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteById(@PathVariable
+                                           Long id) throws NotFoundException {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

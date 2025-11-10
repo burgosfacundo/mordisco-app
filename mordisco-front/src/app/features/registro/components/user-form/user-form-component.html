@@ -1,0 +1,142 @@
+<form 
+    [formGroup]="userForm" 
+    (ngSubmit)="onSubmit()" 
+    class="form-container"
+>
+    <!-- Fila 1: Nombre y Apellido -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 form-field">
+        <fieldset>
+            <label for="nombre" class="form-label">Nombre</label>
+            <input 
+                type="text" 
+                id="nombre" 
+                placeholder="Ingrese el nombre"
+                formControlName="nombre" 
+                class="form-input"
+                [class.border-red-500]="getError"
+                [class.focus:ring-red-500]="getError"
+            >
+            @if (getError('nombre')) {
+                <p class="form-error">{{ getError('nombre') }}</p>
+            }
+        </fieldset>
+
+        <fieldset>
+            <label for="apellido" class="form-label">Apellido</label>
+            <input 
+                type="text" 
+                id="apellido" 
+                placeholder="Ingrese el apellido"
+                formControlName="apellido" 
+                class="form-input"
+                [class.border-red-500]="getError"
+                [class.focus:ring-red-500]="getError"
+            >
+            @if (getError('apellido')) {
+                <p class="form-error">{{ getError('apellido') }}</p>
+            }
+        </fieldset>
+    </div>
+
+    <!-- Fila 2: Teléfono y Tipo de registro -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 form-field">
+        <fieldset>
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input 
+                type="text" 
+                id="telefono" 
+                placeholder="+54 9 223 123456"
+                formControlName="telefono" 
+                class="form-input"
+                [class.border-red-500]="getError"
+                [class.focus:ring-red-500]="getError"
+            >
+            @if (getError('apellido')) {
+                <p class="form-error">{{ getError('apellido') }}</p>
+            }
+        </fieldset>
+
+        <fieldset>
+            <label for="rolId" class="form-label">¿Cómo querés registrarte?</label>
+            <select 
+                id="rolId"
+                formControlName="rolId" 
+                class="form-input"
+                [class.border-red-500]="userForm.get('rolId')?.invalid && userForm.get('rolId')?.touched"
+            >
+                <option value="" disabled selected>Seleccionar tipo</option>
+                <option [value]="2">Cliente</option>
+                <option [value]="3">Restaurante</option>
+            </select>
+            @if (userForm.get('rolId')?.touched && userForm.controls['rolId'].errors?.['required']) {
+                <p class="form-error">*Obligatorio</p>
+            }
+        </fieldset>
+    </div>
+
+    <!-- Fila 3: Email (campo completo) -->
+    <fieldset class="form-field">
+        <label for="email" class="form-label">Email</label>
+        <input 
+            type="email" 
+            id="email" 
+            placeholder="Ingresa tu email"
+            formControlName="email" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('email')) {
+            <p class="form-error">{{ getError('email') }}</p>
+        }
+    </fieldset>
+
+    <!-- Fila 4: Contraseña (campo completo) -->
+    <fieldset class="form-field">
+        <label for="password" class="form-label">Contraseña</label>
+        <input 
+            type="password" 
+            id="password" 
+            placeholder="Ingresa tu contraseña"
+            formControlName="password" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('password')) {
+            <p class="form-error">{{ getError('password') }}</p>
+        }
+    </fieldset>
+
+    <!-- Botón de submit -->
+    <div style="margin-top: 24px;">
+        <button 
+            type="submit" 
+            [disabled]="userForm.invalid || isSubmitting()" 
+            class="form-button"
+        >
+            @if (isSubmitting()) {
+                <span class="inline-flex items-center justify-center gap-2">
+                    <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    Registrando...
+                </span>
+            } @else {
+                Registrarse
+            }
+        </button>
+    </div>
+
+    <!-- Link a login -->
+    <div class="text-center" style="margin-top: 20px;">
+        <p class="text-stone-700" style="font-size: 14px;">
+            ¿Ya tenés cuenta? 
+            <a 
+                routerLink="/login" 
+                class="font-semibold hover:underline transition-colors"
+                style="color: #E3291D;"
+            >
+                Iniciá sesión aquí
+            </a>
+        </p>
+    </div>
+</form>

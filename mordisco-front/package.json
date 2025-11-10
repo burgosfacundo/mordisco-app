@@ -30,7 +30,13 @@
     "@angular/material": "^20.2.9",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
+    "@stomp/stompjs": "^7.2.1",
+    "@tailwindcss/postcss": "^4.1.16",
+    "postcss": "^8.5.6",
     "rxjs": "~7.8.0",
+    "sockjs": "^0.3.24",
+    "sockjs-client": "^1.6.1",
+    "tailwindcss": "^4.1.16",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
@@ -39,6 +45,7 @@
     "@angular/cli": "^20.3.5",
     "@angular/compiler-cli": "^20.3.0",
     "@types/jasmine": "~5.1.0",
+    "@types/sockjs-client": "^1.5.4",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -46,5 +53,11 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.2"
-  }
+  },
+  "description": "This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
 }

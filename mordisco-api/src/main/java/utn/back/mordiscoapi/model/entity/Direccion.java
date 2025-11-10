@@ -39,6 +39,28 @@ public class Direccion {
     @Column(nullable = false, length = 50)
     private String ciudad;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+
+
+    public String toSnapshot() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(calle).append(" ").append(numero);
+
+        if (piso != null && !piso.isEmpty()) {
+            sb.append(", Piso ").append(piso);
+            if (depto != null && !depto.isEmpty()) {
+                sb.append(" ").append(depto);
+            }
+        }
+
+        sb.append(", ").append(ciudad).append(" (").append(codigoPostal).append(")");
+
+        if (referencias != null && !referencias.isEmpty()) {
+            sb.append(" - ").append(referencias);
+        }
+
+        return sb.toString();
+    }
 }

@@ -1,0 +1,57 @@
+<article class="bg-white rounded-xl shadow-md overflow-hidden 
+                transition-all duration-300 hover:shadow-xl hover:-translate-y-1
+                flex flex-col h-full group">
+  
+  <!-- Imagen del producto -->
+  <div class="relative aspect-square overflow-hidden bg-gray-200">
+    <img 
+      [src]="producto.imagen.url" 
+      [alt]="producto.nombre"
+      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+    
+    <!-- Badge si está en el carrito -->
+    @if (enCarrito) {
+      <div class="absolute top-3 right-3 px-3 py-1 rounded-full 
+                  bg-green-500 text-white text-xs font-bold shadow-lg">
+        En carrito ({{ cantidad }})
+      </div>
+    }
+  </div>
+
+  <!-- Info del producto -->
+  <div class="flex flex-col flex-1 p-4">
+    <!-- Nombre -->
+    <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 min-h-14">
+      {{ producto.nombre }}
+    </h3>
+    
+    <!-- Descripción -->
+    @if (producto.descripcion) {
+      <p class="text-sm text-gray-600 mb-3 line-clamp-2">
+        {{ producto.descripcion }}
+      </p>
+    }
+    
+    <!-- Precio y botón -->
+    <div class="mt-auto pt-3 border-t border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-500">Precio</p>
+          <p class="text-2xl font-bold text-primary-600">
+            ${{ producto.precio | number:'1.2-2' }}
+          </p>
+        </div>
+        
+        <button 
+          (click)="onAgregar()"
+          [disabled]="!producto.disponible"
+          class="w-12 h-12 rounded-full bg-primary-600 hover:bg-primary-700
+                 disabled:bg-gray-300 disabled:cursor-not-allowed
+                 text-white flex items-center justify-center
+                 transition-all duration-200 hover:scale-110 active:scale-95">
+          <mat-icon>{{ enCarrito ? 'add' : 'add_shopping_cart' }}</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</article>

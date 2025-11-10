@@ -23,5 +23,9 @@ public class HorarioAtencion {
 
     @Column (nullable = false)
     private LocalTime horaCierre;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurante_id", nullable = false)
+    private Restaurante restaurante;
 }
 

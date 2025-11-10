@@ -1,0 +1,258 @@
+<div class="w-full max-w-7xl mx-auto px-4 py-25">
+  
+  <div class="mb-8 text-center">
+    <h1 class="text-3xl font-bold text-primary-600 mb-2">
+      {{ isEditMode ? 'Editar Restaurante' : 'Nuevo Restaurante' }}
+    </h1>
+    <p class="text-gray-600">
+      {{ isEditMode ? 'Modifica los datos del restaurante' : 'Crea tu restaurante en Mordisco' }}
+    </p>
+  </div>
+
+  <form [formGroup]="restauranteForm" (ngSubmit)="onSubmit()">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <div class="bg-white rounded-2xl shadow-lg p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-primary-500">
+          Datos del Restaurante
+        </h2>
+        
+        <div class="space-y-6">
+          <fieldset class="form-field">
+            <label for="razonSocial" class="form-label">Razón Social</label>
+            <input 
+              type="text" 
+              id="razonSocial" 
+              placeholder="Nombre de tu restaurante"
+              formControlName="razonSocial" 
+              class="form-input"
+              [class.border-red-500]="getError('razonSocial')"
+              [class.focus:ring-red-500]="getError('razonSocial')"
+            >
+            @if (getError('razonSocial')) {
+              <p class="form-error">{{ getError('razonSocial') }}</p>
+            }
+          </fieldset>
+
+          <fieldset class="form-field">
+            <label for="activo" class="form-label">Estado</label>
+            <select 
+              id="activo"
+              formControlName="activo" 
+              class="form-input"
+              [class.border-red-500]="getError('activo')"
+              [class.focus:ring-red-500]="getError('activo')"
+            >
+              <option [value]="true">Activo</option>
+              <option [value]="false">Inactivo</option>
+            </select>
+            @if (getError('activo')) {
+              <p class="form-error">{{ getError('activo') }}</p>
+            }
+          </fieldset>
+
+          <fieldset class="form-field">
+            <label for="logoUrl" class="form-label">URL del Logo</label>
+            <input 
+              type="url"
+              id="logoUrl"
+              formControlName="logoUrl"
+              placeholder="https://ejemplo.com/logo.png"
+              class="form-input"
+              [class.border-red-500]="getError('logoUrl')"
+              [class.focus:ring-red-500]="getError('logoUrl')"
+            >
+            @if (getError('logoUrl')) {
+              <p class="form-error">{{ getError('logoUrl') }}</p>
+            }
+
+            <!-- Preview del Logo -->
+          @if (restauranteForm.get('logoUrl')?.valid && restauranteForm.get('logoUrl')?.value) {
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p class="text-xs font-semibold text-gray-700 mb-3">Vista previa:</p>
+              <div class="w-full max-w-sm mx-auto rounded-lg overflow-hidden shadow-md">
+                <img 
+                  [src]="restauranteForm.get('logoUrl')?.value" 
+                  [alt]="restauranteForm.get('razonSocial')?.value || 'Restaurante Logo'"
+                  class="w-full h-64 object-cover"
+                  (error)="$event.target.src='https://via.placeholder.com/400x300?text=Imagen+no+disponible'">
+              </div>
+            </div>
+          }
+          </fieldset>
+
+        </div>
+      </div>
+
+      @if (!isEditMode) {
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+          <h2 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-primary-500">
+            Dirección del Restaurante
+          </h2>
+
+          <div class="space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+              <fieldset class="form-field">
+                <label for="calle" class="form-label">Calle</label>
+                <input 
+                  type="text" 
+                  id="calle" 
+                  formControlName="calle"
+                  placeholder="Av. Colón"
+                  class="form-input"
+                  [class.border-red-500]="getError('calle')"
+                  [class.focus:ring-red-500]="getError('calle')"
+                >
+                @if (getError('calle')) {
+                  <p class="form-error">{{ getError('calle') }}</p>
+                }
+              </fieldset>
+
+              <fieldset class="form-field">
+                <label for="numero" class="form-label">Número</label>
+                <input 
+                  type="text" 
+                  id="numero" 
+                  formControlName="numero"
+                  placeholder="1234"
+                  class="form-input"
+                  [class.border-red-500]="getError('numero')"
+                  [class.focus:ring-red-500]="getError('numero')"
+                >
+                @if (getError('numero')) {
+                  <p class="form-error">{{ getError('numero') }}</p>
+                }
+              </fieldset>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <fieldset class="form-field">
+                <label for="piso" class="form-label">Piso <span class="text-gray-400 text-xs">(opcional)</span></label>
+                <input 
+                  type="text" 
+                  id="piso" 
+                  formControlName="piso"
+                  placeholder="3"
+                  class="form-input"
+                  [class.border-red-500]="getError('piso')"
+                  [class.focus:ring-red-500]="getError('piso')"
+                >
+                @if (getError('piso')) {
+                  <p class="form-error">{{ getError('piso') }}</p>
+                }
+              </fieldset>
+
+              <fieldset class="form-field">
+                <label for="depto" class="form-label">Depto <span class="text-gray-400 text-xs">(opcional)</span></label>
+                <input 
+                  type="text" 
+                  id="depto" 
+                  formControlName="depto"
+                  placeholder="A"
+                  class="form-input"
+                  [class.border-red-500]="getError('depto')"
+                  [class.focus:ring-red-500]="getError('depto')"
+                >
+                @if (getError('depto')) {
+                  <p class="form-error">{{ getError('depto') }}</p>
+                }
+              </fieldset>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <fieldset class="form-field">
+                <label for="codigoPostal" class="form-label">Código Postal</label>
+                <input 
+                  type="text" 
+                  id="codigoPostal" 
+                  formControlName="codigoPostal"
+                  placeholder="7600"
+                  class="form-input"
+                  [class.border-red-500]="getError('codigoPostal')"
+                  [class.focus:ring-red-500]="getError('codigoPostal')"
+                >
+                @if (getError('codigoPostal')) {
+                  <p class="form-error">{{ getError('codigoPostal') }}</p>
+                }
+              </fieldset>
+
+              <fieldset class="form-field">
+                <label for="ciudad" class="form-label">Ciudad</label>
+                <input 
+                  type="text" 
+                  id="ciudad" 
+                  formControlName="ciudad"
+                  placeholder="Mar del Plata"
+                  class="form-input"
+                  [class.border-red-500]="getError('ciudad')"
+                  [class.focus:ring-red-500]="getError('ciudad')"
+                >
+                @if (getError('ciudad')) {
+                  <p class="form-error">{{ getError('ciudad') }}</p>
+                }
+              </fieldset>
+            </div>
+
+            <fieldset class="form-field">
+              <label for="referencias" class="form-label">Referencias <span class="text-gray-400 text-xs">(opcional)</span></label>
+              <textarea 
+                id="referencias" 
+                formControlName="referencias"
+                rows="3"
+                placeholder="Entre calle X y Y, frente a la plaza..."
+                class="form-input resize-none"
+                [class.border-red-500]="getError('referencias')"
+                [class.focus:ring-red-500]="getError('referencias')"
+              ></textarea>
+              @if (getError('referencias')) {
+                <p class="form-error">{{ getError('referencias') }}</p>
+              }
+            </fieldset>
+          </div>
+        </div>
+      } @else {
+        <div class="hidden lg:flex items-center justify-center bg-linear-to-br from-primary-50 to-white rounded-2xl shadow-lg p-8">
+          <div class="text-center">
+            <svg class="w-32 h-32 mx-auto text-primary-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <p class="text-gray-500 text-lg">
+              La dirección se gestiona desde<br>la página principal
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-4 mt-8">
+      <button 
+        type="button"
+        (click)="onCancel()"
+        class="btn-outline flex-1 order-2 sm:order-1">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Cancelar
+      </button>
+      <button 
+        type="submit"
+        [disabled]="restauranteForm.invalid || isSubmitting"
+        class="btn-primary flex-1 order-1 sm:order-2">
+        @if (isSubmitting) {
+          <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Guardando...
+        } @else {
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          {{ isEditMode ? 'Actualizar Restaurante' : 'Crear Restaurante' }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

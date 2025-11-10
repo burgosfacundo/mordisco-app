@@ -8,6 +8,10 @@ public record UsuarioPedidoDTO(
     @Schema(description = "Nombre del cliente", example = "Juan")
     String nombre,
     @Schema(description = "Apellido del cliente", example = "Pérez")
-    String apellido
+    String apellido,
+    @Schema(description = "Email del cliente", example = "juan@gmail.com")
+    String email,
+    @Schema(description = "Teléfono del cliente", example = "+541112345678")
+    String telefono
 ) {
 }

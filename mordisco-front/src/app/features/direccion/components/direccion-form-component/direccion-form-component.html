@@ -1,0 +1,140 @@
+<form [formGroup]="formDirecciones" (ngSubmit)="guardarDireccion()" class="space-y-4"> 
+     <!-- Header del formulario -->
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-bold text-gray-900">
+      {{ isEditMode() ? 'Editar Dirección' : ' Nueva Dirección' }}
+    </h3>
+  </div>  
+
+    <!-- Calle y Número (en fila) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2">
+        <fieldset>
+            <label for="calleID" class="form-label">Calle</label>
+            <input 
+            type="text" 
+            id="calleID" 
+            formControlName="calle" 
+            placeholder="Ej: Av. Libertador"
+            class="form-input"
+            [class.border-red-500]="getError('calle')"
+            [class.focus:ring-red-500]="getError('calle')">
+            @if (getError('calle')) {
+            <p class="form-error">{{ getError('calle') }}</p>
+            }
+        </fieldset>
+        </div>
+    <div>
+
+  <fieldset>
+    <label for="numeroID" class="form-label">Número</label>
+    <input 
+      type="text" 
+      id="numeroID" 
+      formControlName="numero" 
+      placeholder="1234"
+      class="form-input"
+      [class.border-red-500]="getError('numero')"
+      [class.focus:ring-red-500]="getError('numero')">
+    @if (getError('numero')) {
+      <p class="form-error">{{ getError('numero') }}</p>
+    }
+  </fieldset>
+    </div>
+  </div>  
+  <!-- Piso y Depto (en fila) -->
+  <div class="grid grid-cols-2 gap-4">
+    <fieldset>
+      <label for="pisoID" class="form-label">Piso (opcional)</label>
+      <input 
+        type="text" 
+        id="pisoID" 
+        formControlName="piso" 
+        placeholder="Ej: 5"
+        class="form-input"
+        [class.border-red-500]="getError('piso')"
+        [class.focus:ring-red-500]="getError('piso')">
+      @if (getError('piso')) {
+        <p class="form-error">{{ getError('piso') }}</p>
+      }
+    </fieldset><fieldset>
+  <label for="deptoID" class="form-label">Depto (opcional)</label>
+  <input 
+    type="text" 
+    id="deptoID" 
+    formControlName="depto" 
+    placeholder="Ej: A"
+    class="form-input"
+    [class.border-red-500]="getError('depto')"
+    [class.focus:ring-red-500]="getError('depto')">
+  @if (getError('depto')) {
+    <p class="form-error">{{ getError('depto') }}</p>
+  }
+</fieldset>
+  </div>  <!-- Ciudad y CP (en fila) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <fieldset>
+      <label for="ciudadID" class="form-label">Ciudad</label>
+      <input 
+        type="text" 
+        id="ciudadID" 
+        formControlName="ciudad" 
+        placeholder="Ej: Mar del Plata"
+        class="form-input"
+        [class.border-red-500]="getError('ciudad')"
+        [class.focus:ring-red-500]="getError('ciudad')">
+      @if (getError('ciudad')) {
+        <p class="form-error">{{ getError('ciudad') }}</p>
+      }
+    </fieldset><fieldset>
+  <label for="codigoPostalID" class="form-label">Código Postal</label>
+  <input 
+    type="text" 
+    id="codigoPostalID" 
+    formControlName="codigoPostal" 
+    placeholder="7600"
+    class="form-input"
+    [class.border-red-500]="getError('codigoPostal')"
+    [class.focus:ring-red-500]="getError('codigoPostal')">
+  @if (getError('codigoPostal')) {
+    <p class="form-error">{{ getError('codigoPostal') }}</p>
+  }
+</fieldset>
+  </div>  <!-- Referencias -->
+  <fieldset>
+    <label for="referenciasID" class="form-label">Referencias (opcional)</label>
+    <textarea
+      id="referenciasID" 
+      formControlName="referencias" 
+      placeholder="Ej: Portón negro, timbre del primer piso"
+      rows="3"
+      class="form-input"
+      [class.border-red-500]="getError('referencias')"
+      [class.focus:ring-red-500]="getError('referencias')">
+    </textarea>
+    @if (getError('referencias')) {
+      <p class="form-error">{{ getError('referencias') }}</p>
+    }
+  </fieldset>  <!-- Botones -->
+  <div class="flex gap-3 pt-4">
+    <button 
+      type="submit" 
+      [disabled]="formDirecciones.invalid || isSubmitting()"
+      class="flex-1 btn-primary">
+      @if (isSubmitting()) {
+        <span class="inline-flex items-center gap-2">
+          <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          {{ isEditMode() ? 'Actualizando...' : 'Guardando...' }}
+        </span>
+      } @else {
+        {{ isEditMode() ? 'Actualizar' : 'Guardar' }} Dirección
+      }
+    </button><button 
+  type="button" 
+  (click)="cancelar()"
+  [disabled]="isSubmitting()"
+  class="flex-1 btn-outline">
+  {{ isEditMode() ? ' Cancelar' : 'Limpiar' }}
+</button>
+  </div>
+</form>

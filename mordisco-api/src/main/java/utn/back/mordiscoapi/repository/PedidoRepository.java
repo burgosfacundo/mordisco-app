@@ -1,6 +1,8 @@
 package utn.back.mordiscoapi.repository;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,18 +11,17 @@ import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.model.entity.Pedido;
 
-import java.util.List;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido,Long> {
 
-    List<Pedido> findAllByRestaurante_Id(@Param("id")Long id);
+    Page<Pedido> findAllByRestaurante_Id(Pageable pageable, @Param("id")Long id);
 
-    List<Pedido> findAllByCliente_IdAndEstado(@Param("id") Long id, @Param("estado") EstadoPedido estado);
+    Page<Pedido> findAllByCliente_IdAndEstado(Pageable pageable,@Param("id") Long id, @Param("estado") EstadoPedido estado);
 
-    List<Pedido> findAllByCliente_Id(Long id);
+    Page<Pedido> findAllByCliente_Id(Pageable pageable,Long id);
 
-    List<Pedido> findAllByRestaurante_IdAndEstado(@Param("id")Long id, @Param("estado") EstadoPedido estado);
+    Page<Pedido> findAllByRestaurante_IdAndEstado(Pageable pageable,@Param("id")Long id, @Param("estado") EstadoPedido estado);
 
     @Modifying
     @Transactional
@@ -32,4 +33,9 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
     boolean existsByCliente_IdAndRestaurante_Id(Long clienteId, Long restauranteId);
 
     boolean existsByIdAndCliente_Id(Long id, Long clienteId);
+    @Modifying
+    @Query("""
+            UPDATE Pedido p SET p.direccionEntrega = NULL
+            WHERE p.direccionEntrega.id = :direccionId""")
+    void desasociarDireccion(@Param("direccionId") Long direccionId);
 }

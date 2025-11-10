@@ -1,0 +1,172 @@
+<article class="bg-white rounded-xl shadow-md overflow-hidden 
+                transition-all duration-300 hover:shadow-xl hover:-translate-y-1
+                flex flex-col h-full">
+  <!-- Header con ID y Estado -->
+  <div class="bg-linear-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Pedido</p>
+        <p class="text-2xl font-bold text-gray-900">#{{ pedido?.id }}</p>
+      </div>
+      <!-- <span [class]="getEstadoBadgeClass()">
+        {{ getEstadoLabel() }}
+      </span> -->
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="p-6 flex-1 flex flex-col space-y-4">
+    <!-- Cliente -->
+    <div class="flex items-start gap-3">
+      <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Cliente</p>
+        <p class="text-sm font-semibold text-gray-900 truncate">
+          {{ pedido?.cliente?.nombre }} {{ pedido?.cliente?.apellido }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Dirección -->
+    <div class="flex items-start gap-3">
+      <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Dirección de entrega</p>
+        <p class="text-sm font-semibold text-gray-900">
+          {{ pedido?.direccionEntrega?.calle || 'Sin dirección' }} {{ pedido?.direccionEntrega?.numero || '' }}
+        </p>
+        @if (pedido?.direccionEntrega?.ciudad) {
+          <p class="text-xs text-gray-600 mt-0.5">
+            {{ pedido?.direccionEntrega?.ciudad }}
+          </p>
+        }
+      </div>
+    </div>
+
+    @if (!isRestaurante) {
+      <!-- Restaurante -->
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Restaurante</p>
+          <p class="text-sm font-semibold text-gray-900 truncate">
+            {{ pedido?.restaurante?.razonSocial || 'Sin restaurante' }}
+          </p>
+        </div>
+      </div>
+    }
+
+
+    <!-- Tipo de Entrega -->
+    <div class="flex items-start gap-3">
+      <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          @if (pedido?.tipoEntrega === 'DELIVERY') {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          } @else {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          }
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Tipo de entrega</p>
+        <p class="text-sm font-semibold text-gray-900">
+          {{ pedido?.tipoEntrega === 'DELIVERY' ? 'A domicilio' : 'Retiro en local' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Fecha y Hora -->
+    <div class="flex items-start gap-3">
+      <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Fecha del pedido</p>
+        <p class="text-sm font-semibold text-gray-900">
+          {{ pedido?.fechaHora | date:'dd/MM/yyyy - HH:mm' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Total -->
+    <div class="mt-4 pt-4 border-t border-gray-200">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total</span>
+        <span class="text-2xl font-bold text-primary-600">
+          ${{ pedido?.total | number:'1.2-2' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer con botones de acción -->
+  <div class="px-6 pb-6 pt-2 space-y-2">
+    <!-- Botones para RESTAURANTE -->
+    @if (isRestaurante) {
+      @if (pedido?.estado === 'PENDIENTE') {
+        <button 
+          (click)="onAceptarPedido()"
+          class="w-full py-2.5 rounded-lg
+                 bg-green-50 text-green-700 font-semibold text-sm
+                 hover:bg-green-100 active:scale-95
+                 transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+          Aceptar Pedido
+        </button>
+        <button 
+          (click)="onRechazarPedido()"
+          class="w-full py-2.5 rounded-lg
+                 bg-red-50 text-red-700 font-semibold text-sm
+                 hover:bg-red-100 active:scale-95
+                 transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+          Rechazar Pedido
+        </button>
+      } @else if (pedido?.estado === 'EN_PROCESO') {
+        <button 
+          (click)="onMarcarEnCamino()"
+          class="w-full py-2.5 rounded-lg
+                 bg-blue-50 text-blue-700 font-semibold text-sm
+                 hover:bg-blue-100 active:scale-95
+                 transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          Marcar En Camino
+        </button>
+      }
+    } 
+
+    <!-- Botón Ver Detalle (para todos) -->
+    <button 
+      [routerLink]="['/restaurante/pedidos/detalle', pedido?.id]"
+      class="w-full py-2.5 rounded-lg
+             bg-primary-50 text-primary-700 font-semibold text-sm
+             hover:bg-primary-100 active:scale-95
+             transition-all duration-200
+             focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+      Ver Detalles
+    </button>
+  </div>
+</article>

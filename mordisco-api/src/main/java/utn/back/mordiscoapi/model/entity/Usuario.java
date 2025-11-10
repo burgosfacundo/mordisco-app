@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import utn.back.mordiscoapi.security.jwt.model.entity.RefreshToken;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -15,7 +16,7 @@ import java.util.Collections;
         uniqueConstraints = {
                 @UniqueConstraint(name = "UK_usuario_telefono", columnNames = "telefono"),
                 @UniqueConstraint(name = "UK_usuario_email", columnNames = "email")
-})
+        })
 @Getter
 @Setter
 @AllArgsConstructor @NoArgsConstructor
@@ -39,8 +40,7 @@ public class Usuario implements UserDetails {
     @Column (nullable = false)
     private String password;
 
-    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Direccion> direcciones;
 
     @ManyToOne
@@ -53,6 +53,8 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CalificacionRestaurante> calificacionesRestaurante;
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<RefreshToken> refreshTokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -85,4 +87,15 @@ public class Usuario implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public void addDireccion(Direccion d) {
+        direcciones.add(d);
+        d.setUsuario(this);
+    }
+
+    public void removeDireccion(Direccion d) {
+        direcciones.remove(d);
+        d.setUsuario(null);
+    }
+
 }

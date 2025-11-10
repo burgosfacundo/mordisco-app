@@ -3,7 +3,7 @@ package utn.back.mordiscoapi.mapper;
 import lombok.experimental.UtilityClass;
 import utn.back.mordiscoapi.model.dto.usuario.RolDTO;
 import utn.back.mordiscoapi.model.entity.Rol;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 @UtilityClass
 public class RolMapper {

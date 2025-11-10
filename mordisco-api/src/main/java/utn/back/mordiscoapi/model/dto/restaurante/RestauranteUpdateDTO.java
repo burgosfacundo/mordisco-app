@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import utn.back.mordiscoapi.model.dto.direccion.DireccionUpdateDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenUpdateDTO;
 
 public record RestauranteUpdateDTO(
@@ -24,9 +23,5 @@ public record RestauranteUpdateDTO(
         @NotNull(message = "El logo del restaurante es obligatorio")
         @Schema(description = "Logo del restaurante")
         @Valid
-        ImagenUpdateDTO logo,
-        @NotNull(message = "La dirección del restaurante es obligatoria")
-        @Schema(description = "Dirección del restaurante")
-        @Valid
-        DireccionUpdateDTO direccion) {
+        ImagenUpdateDTO logo) {
 }

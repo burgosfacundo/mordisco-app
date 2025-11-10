@@ -1,11 +1,750 @@
-/* You can add global styles to this file, and also import other style files */
-@import "./styles/global.css";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+@import 'tailwindcss';
 
-html, body {
-  height: 100%;
-  min-height: 100%;
-  overflow-y: auto;
-  margin: 0;
-  padding: 0;
+
+/* ============================
+   Theme Configuration
+   ============================ */
+
+@theme {
+  --color-bg: #fefaf0;
+  --color-text: #1f2328;
+
+  --color-primary-50:  #fff1f0;
+  --color-primary-100: #ffe1df;
+  --color-primary-200: #ffc0bc;
+  --color-primary-300: #ff9a94;
+  --color-primary-400: #ff6a5f;
+  --color-primary-500: #E3291D;
+  --color-primary-600: #c92016;
+  --color-primary-700: #a11912;
+  --color-primary-800: #7a130e;
+  --color-primary-900: #5a0e0a;
+
+--font-sans: "Montserrat", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui;
+  --font-display: "Montserrat", ui-sans-serif, system-ui;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  --spacing-navbar: 70px;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  
+
+  --color-bg-dark: #0c0a09;
+  --color-text-dark: #f5f5f5;
+
+  --breakpoint-xs: 375px;   /* Mobile S */
+  --breakpoint-sm: 425px;   /* Mobile L */
+  --breakpoint-md: 768px;   /* Tablet */
+  --breakpoint-lg: 1024px;  /* Laptop */
+  --breakpoint-xl: 1440px;  /* Desktop */
 }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* ============================
+   Base Styles
+   ============================ */
+:root {
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+body {
+  @apply flex flex-col min-h-screen bg-bg antialiased;
+}
+
+/* ============================
+   Clases Utilitarias
+   ============================ */
+@layer utilities {
+  /* ========== LAYOUT ========== */
+  .container-app {
+    @apply w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .main-content {
+    @apply mt-navbar min-h-[calc(100vh-var(--spacing-navbar))];
+  }
+
+
+ /* ========== CONTENEDORES ========== */
+  .contenedor-grande {
+    @apply flex-1 flex justify-center py-8 px-4 bg-gray-50 mt-navbar;
+  }
+
+  .contenedor-principal {
+    @apply w-full max-w-2xl bg-white shadow-sm border border-gray-200 rounded-2xl p-6;
+  }
+
+  .contenedor-cards {
+    @apply grid gap-6 w-full list-none p-0;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  /* ========== TÍTULOS ========== */
+  .titulo-hero {
+    @apply font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold 
+           text-center text-primary-500 tracking-tight mb-8;
+  }
+
+  .titulo-seccion {
+    @apply font-display text-2xl sm:text-3xl font-bold text-primary-500 
+           tracking-tight mb-6 pb-3 border-b-2 border-primary-500;
+  }
+
+  .subtitulo {
+    @apply font-display text-lg md:text-xl font-bold text-primary-500 
+           tracking-tight mb-4;
+  }
+
+/* ========== BUTTONS ========== */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 
+           px-6 py-3 rounded-xl font-semibold text-white
+           bg-primary-600 hover:bg-primary-700 
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+           active:scale-95 transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 
+           px-6 py-3 rounded-xl font-semibold
+           text-primary-600 border-2 border-primary-600
+           bg-transparent hover:bg-primary-600 hover:text-white
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+           active:scale-95 transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 
+           px-4 py-2 rounded-lg font-medium
+           text-primary-600 hover:bg-primary-50
+           transition-colors duration-200;
+  }
+
+  .btn-icon {
+    @apply inline-flex items-center justify-center
+           w-10 h-10 rounded-full
+           text-primary-600 hover:bg-primary-50
+           transition-colors duration-200;
+  }
+
+  /* ========== CUSTOM RADIO BUTTONS ========== */ 
+  :host ::ng-deep .mat-mdc-radio-button.custom-radio { 
+    display: block !important; 
+    width: 100%; 
+  } 
+
+  :host ::ng-deep .mat-mdc-radio-button.custom-radio .mdc-form-field { 
+    width: 100%; 
+  } 
+
+  :host ::ng-deep .mat-mdc-radio-button.custom-radio .mdc-radio { 
+    padding: 0 !important;
+  }
+
+/* ========== CARDS ========== */
+  .card-base {
+    @apply bg-white rounded-xl shadow-md overflow-hidden
+           transition-all duration-300 ease-out
+           hover:shadow-xl hover:-translate-y-1;
+  }
+
+
+  .card-restaurante {
+    @apply flex flex-col
+           w-full max-w-sm h-full;
+  }
+
+  .card-restaurante img {
+    @apply w-full h-full object-cover;
+  }
+
+  .card-direccion {
+    @apply flex flex-col h-full;
+  }
+
+  .card-direccion-content {
+    @apply p-5 space-y-4;
+  }
+
+   /* ========== BADGES ========== */
+  .badge-promocion {
+    @apply absolute top-3 right-3 z-10
+           px-3 py-1 rounded-full
+           text-xs font-bold uppercase tracking-wider
+           bg-linear-to-r from-yellow-500 to-yellow-600
+           text-white shadow-lg
+           animate-pulse;
+  }
+
+  .badge-rol {
+    @apply inline-flex items-center gap-1.5
+           px-2.5 py-1 rounded-full
+           text-xs font-semibold uppercase tracking-wide;
+  }
+
+  .badge-cliente {
+    @apply inline-flex items-center gap-1.5
+           px-2.5 py-1 rounded-full
+           text-xs font-semibold uppercase tracking-wide bg-blue-100 text-blue-700;
+  }
+
+  .badge-restaurante {
+    @apply inline-flex items-center gap-1.5
+           px-2.5 py-1 rounded-full
+           text-xs font-semibold uppercase tracking-wide bg-orange-100 text-orange-700;
+  }
+
+  .badge-admin {
+    @apply inline-flex items-center gap-1.5
+           px-2.5 py-1 rounded-full
+           text-xs font-semibold uppercase tracking-wide bg-purple-100 text-purple-700;
+  }
+
+
+/* ========== INPUTS ========== */
+  .input-base {
+    @apply w-full px-4 py-2.5 rounded-lg
+           border border-gray-300 bg-white
+           text-gray-900 placeholder:text-gray-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+           transition-all duration-200;
+  }
+
+  .input-search {
+    @apply w-full px-4 py-2.5 rounded-lg
+           border border-gray-300 bg-white
+           text-gray-900 placeholder:text-gray-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+           transition-all duration-200 pl-10 pr-10
+           bg-white/95 backdrop-blur-sm;
+  }
+
+  /* ========== LOADING ========== */
+  .loading-container {
+    @apply flex flex-col items-center justify-center
+           min-h-[400px] gap-4;
+  }
+
+  .loading-spinner {
+    @apply w-12 h-12 border-4 border-primary-200 border-t-primary-600
+           rounded-full animate-spin;
+  }
+
+  .loading-text {
+    @apply text-primary-600 font-semibold text-lg;
+  }
+
+  /* ========== EMPTY STATE ========== */
+  .empty-state {
+    @apply flex flex-col items-center justify-center
+           min-h-[400px] p-8 text-center
+           bg-linear-to-br from-white to-primary-50
+           rounded-2xl border-2 border-dashed border-primary-300;
+  }
+
+  .empty-icon {
+    @apply w-20 h-20 text-primary-400 mb-4;
+  }
+
+  .empty-title {
+    @apply text-xl font-bold text-gray-800 mb-2;
+  }
+
+  .empty-description {
+    @apply text-gray-600;
+  }
+
+
+  .grid-restaurantes {
+    @apply grid gap-6 w-full
+           grid-cols-1
+           sm:grid-cols-2
+           lg:grid-cols-3
+           xl:grid-cols-5
+           auto-rows-auto;
+  }
+
+  .grid-promociones {
+    @apply grid gap-5 w-full
+           grid-cols-1
+           sm:grid-cols-2
+           lg:grid-cols-5
+           xl:grid-cols-5;
+  }
+
+  .grid-direcciones {
+    @apply grid gap-6 w-full
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-3
+          auto-rows-fr;
+  }
+
+  /* ========== ANIMACIONES ========== */
+  .fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  .slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInUp { 
+    from { 
+      opacity: 0; 
+      transform: translateY(30px); 
+    } 
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    } 
+  }
+
+
+   /* ========== FORM ========== */
+  .form-container {
+    @apply w-full max-w-md mx-auto
+           bg-white rounded-2xl shadow-lg
+           p-6 sm:p-8;
+  }
+
+  .form-field {
+    @apply mb-4;
+  }
+
+  .form-label {
+    @apply block font-semibold text-gray-900 text-sm mb-2;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-2.5 rounded-lg
+           border border-gray-300 bg-white
+           text-gray-900 placeholder:text-gray-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+           transition-all duration-200;
+  }
+
+  .form-error {
+    @apply text-red-600 text-xs mt-1;
+  }
+
+  .form-button {
+    @apply w-full py-3 rounded-xl
+           font-bold uppercase tracking-wide text-white
+           bg-primary-500 hover:bg-primary-600
+           disabled:bg-red-200 disabled:cursor-not-allowed
+           transition-all duration-200;
+  }
+}
+
+
+/* ========== NAVBAR ========== */
+  .navbar-fixed {
+    @apply fixed top-0 left-0 right-0 z-50
+           h-navbar bg-linear-to-r from-primary-600 to-primary-700
+           shadow-lg;
+  }
+
+  .navbar-container {
+    @apply w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-full
+           flex items-center gap-4;
+  }
+
+  .navbar-brand {
+    @apply flex items-center gap-3 cursor-pointer
+           transition-transform duration-200
+           hover:scale-105;
+  }
+
+  .navbar-logo {
+    @apply h-[45px] w-auto object-contain;
+  }
+
+  .navbar-search {
+    @apply flex-1 max-w-md mt-1;
+  }
+
+  .navbar-city {
+    @apply min-w-[200px] mt-5;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .navbar-search {
+      @apply max-w-xs;
+    }
+    
+    .navbar-city {
+      @apply min-w-40;
+    }
+  }
+
+  .navbar-profile-btn {
+    @apply w-12 h-12 rounded-full
+           bg-white/20 hover:bg-white/30
+           flex items-center justify-center
+           font-bold text-white uppercase
+           transition-all duration-200;
+  }
+
+/* ========== SNACKBAR PERSONALIZADOS ========== */
+  :host ::ng-deep .snackbar-success {
+    background-color: #10b981 !important;
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-success .mat-mdc-snack-bar-label {
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-error {
+    background-color: #ef4444 !important;
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-error .mat-mdc-snack-bar-label {
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-info {
+    background-color: #3b82f6 !important;
+    color: white !important;
+  }
+
+  :host ::ng-deep .snackbar-info .mat-mdc-snack-bar-label {
+    color: white !important;
+  }
+
+  :host ::ng-deep .mat-mdc-snack-bar-container {
+    --mdc-snackbar-container-color: #323232;
+    --mat-snack-bar-button-color: #fff;
+  }
+
+  /* ========== FOOTER ========== */
+  .footer-container {
+    @apply w-full h-navbar bg-[#fff7f6] border-t-2 border-primary-500
+           py-3 px-3;
+  }
+
+  .footer-content {
+    @apply w-full max-w-[1400px] mx-auto px-4 sm:px-4 lg:px-2
+           flex flex-col items-center gap-1
+           text-center text-gray-700;
+  }
+
+  .footer-company {
+    @apply font-bold text-primary-600 text-lg;
+  }
+
+  .footer-links {
+    @apply flex flex-wrap justify-center items-center gap-6;
+  }
+
+  .footer-link {
+    @apply text-sm cursor-pointer
+           text-gray-700 hover:text-primary-600
+           transition-colors duration-200;
+  }
+
+  /* ========== TIME PICKER ========== */
+.time-picker-container {
+  @apply flex items-center justify-center gap-1.5;
+}
+
+.time-input-wrapper {
+  @apply flex flex-col items-center gap-1;
+}
+
+.time-input {
+  @apply w-11 h-11 text-center text-lg font-semibold rounded-md border
+         transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-primary-200
+         [&::-webkit-inner-spin-button]:appearance-none 
+         [&::-webkit-outer-spin-button]:appearance-none;
+}
+
+.time-input-hour {
+  @apply border-primary-500 bg-primary-50;
+}
+
+.time-input-minute {
+  @apply border-gray-300 bg-gray-50;
+}
+
+.time-input-error {
+  @apply border-red-500! bg-red-50!;
+}
+
+.time-label {
+  @apply text-[0.55rem] font-medium text-gray-600;
+}
+
+.time-separator {
+  @apply text-xl font-bold text-gray-400 mb-3;
+}
+
+.time-error-container {
+  @apply mt-0.5 text-center;
+}
+/* ========== PEDIDO ESTADO BUTTONS ========== */
+.pedido-estado-container {
+  @apply flex flex-wrap gap-1 mt-1.5 pt-1.5 border-t border-gray-200;
+}
+
+.pedido-estado-btn {
+  @apply flex-1 min-w-[60px] py-1 px-1.5 rounded
+         font-semibold text-[0.55rem] uppercase tracking-wide
+         transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-1
+         disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.estado-activo {
+  @apply bg-primary-500 text-white shadow-sm
+         hover:bg-primary-600
+         focus:ring-primary-400;
+}
+
+.estado-inactivo {
+  @apply bg-gray-100 text-gray-500 
+         hover:bg-gray-200 hover:text-gray-700
+         focus:ring-gray-200;
+}
+
+/* Estilo especial para botón Cancelado cuando está activo */
+.pedido-estado-btn-cancelado.estado-activo {
+  @apply bg-red-500 hover:bg-red-600 focus:ring-red-400;
+}
+
+/* Responsive: columnas y fuente en móvil */
+@media (max-width: 640px) {
+  .pedido-estado-container {
+    @apply flex-col;
+  }
+
+  .pedido-estado-btn {
+    @apply w-full min-w-full text-[0.45rem] py-0.5 px-1;
+  }
+}
+/* ========== FILTRO PEDIDOS ========== */
+.filtro-pedidos-container {
+  @apply mb-3 p-2 bg-white rounded-lg shadow-sm border border-gray-200 inline-block max-w-fit;
+}
+
+.filtro-pedidos-field {
+  @apply flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2 sm:w-auto;
+}
+
+.filtro-pedidos-label {
+  @apply font-semibold text-gray-700 text-[11px] sm:min-w-[100px];
+}
+
+.filtro-pedidos-select {
+  @apply px-2 py-1.5 rounded-md
+         border border-gray-300 bg-white
+         text-gray-900 text-[12px] font-medium
+         focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400
+         transition-all duration-200
+         cursor-pointer
+         hover:border-primary-300
+         w-auto min-w-[120px];
+}
+
+.filtro-pedidos-badge {
+  @apply mt-1 flex justify-center sm:justify-start;
+}
+
+.badge-estado {
+  @apply inline-flex items-center gap-1
+         px-2 py-1 rounded-full
+         text-[10px] font-semibold uppercase tracking-wide
+         transition-all duration-200;
+}
+
+/* Estados */
+.badge-estado-todos      { @apply bg-gray-100 text-gray-700; }
+.badge-estado-pendiente  { @apply bg-yellow-100 text-yellow-700; }
+.badge-estado-en_proceso { @apply bg-blue-100 text-blue-700; }
+.badge-estado-en_camino  { @apply bg-purple-100 text-purple-700; }
+.badge-estado-recibido   { @apply bg-green-100 text-green-700; }
+.badge-estado-cancelado  { @apply bg-red-100 text-red-700; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .filtro-pedidos-container { @apply w-full; }
+  .filtro-pedidos-field { @apply flex-col w-full gap-1; }
+  .filtro-pedidos-select { @apply w-full text-[11px] py-1; }
+}
+
+ .restaurant-container {
+    @apply max-w-4xl mx-auto bg-white rounded-2xl overflow-hidden shadow-md;
+  }
+
+  .restaurant-header {
+    @apply flex flex-col md:flex-row gap-5 p-5;
+  }
+
+  .restaurant-logo {
+    @apply w-44 h-44 bg-black rounded-xl flex items-center justify-center shrink-0 mx-auto md:mx-0;
+  }
+
+  .restaurant-info {
+    @apply flex-1;
+  }
+
+  .restaurant-name {
+    @apply text-4xl font-bold mb-2 text-black font-display;
+  }
+
+  .restaurant-details {
+    @apply flex items-center gap-2 mb-3 text-gray-600 text-sm;
+  }
+
+  .restaurant-rating {
+    @apply flex items-center gap-3 mb-4;
+  }
+
+  .restaurant-buttons {
+    @apply flex gap-3 flex-wrap;
+  }
+
+  .restaurant-search-section {
+    @apply p-5 bg-gray-50;
+  }
+
+  .restaurant-search-wrapper {
+    @apply relative w-full;
+  }
+
+  .restaurant-search-icon {
+    @apply absolute left-4 top-1/2 transform -translate-y-1/2 text-xl text-gray-600;
+  }
+/* ============================
+   QUANTITY SELECTOR (Mini)
+   ============================ */
+
+@layer utilities {
+  /* Contenedor principal */
+  .quantity-container {
+    @apply flex items-center gap-2;
+  }
+
+  /* Label "Quantity" */
+  .quantity-label {
+    @apply text-base font-semibold text-black font-display;
+  }
+
+  /* Selector */
+  .quantity-selector {
+    @apply flex items-center gap-0
+           border border-gray-400 rounded-full
+           px-2 py-0.5 bg-white;
+  }
+
+  /* Botones - y + */
+  .quantity-btn {
+    @apply bg-transparent border-0
+           text-gray-500 text-base font-light
+           cursor-pointer px-2 py-0
+           transition-all duration-200
+           flex items-center justify-center
+           leading-none
+           hover:text-gray-700 hover:scale-110
+           active:scale-95
+           disabled:text-gray-300 disabled:cursor-not-allowed disabled:scale-100;
+  }
+
+  /* Valor numérico */
+  .quantity-value {
+    @apply text-sm font-semibold text-black
+           min-w-6 text-center
+           select-none;
+  }
+}
+
+/* Versión aún más compacta */
+@layer utilities {
+  .quantity-selector-compact {
+    @apply flex items-center gap-0
+           border border-gray-400 rounded-full
+           px-1.5 py-px bg-white;
+  }
+
+  .quantity-btn-compact {
+    @apply bg-transparent border-0
+           text-gray-500 text-sm font-light
+           cursor-pointer px-1 py-0
+           transition-all duration-200
+           flex items-center justify-center
+           leading-none
+           hover:text-gray-700 hover:scale-110
+           active:scale-95
+           disabled:text-gray-300 disabled:cursor-not-allowed disabled:scale-100;
+  }
+
+  .quantity-value-compact {
+    @apply text-sm font-semibold text-black
+           min-w-5 text-center
+           select-none;
+  }
+}
+/* ============================
+   Dark Mode
+   ============================ */
+.dark {
+  @apply bg-bg-dark text-text-dark;
+}
+
+.dark .card-base {
+  @apply bg-neutral-900 border border-neutral-800;
+}
+
+.dark .input-base,
+.dark .form-input {
+  @apply bg-neutral-900 border-neutral-700 text-white;
+}
+
+
+/* ============================
+   Responsive Typography
+   ============================ */
+@media (max-width: 425px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+}

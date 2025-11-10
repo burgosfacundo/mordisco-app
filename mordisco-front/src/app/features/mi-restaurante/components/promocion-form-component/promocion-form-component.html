@@ -1,0 +1,134 @@
+<div class="contenedor-grande">
+  <div class="contenedor-principal">
+    
+    <!-- Header -->
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl font-bold text-primary-600 mb-2">
+        {{ isEditMode ? 'Editar Promoción' : 'Nueva Promoción' }}
+      </h1>
+      <p class="text-gray-600">
+        {{ isEditMode ? 'Modifica los datos de la promoción' : 'Crea una nueva promoción para tu restaurante' }}
+      </p>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="promocionForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <!-- Descripción -->
+      <div class="form-field">
+        <label for="descripcion" class="form-label">
+          Descripción *
+        </label>
+        <textarea
+          id="descripcion"
+          formControlName="descripcion"
+          rows="3"
+          placeholder="Ej: 2x1 en hamburguesas todos los martes"
+          class="form-input resize-none"
+          >
+        </textarea>
+        @if (getError('descripcion')) {
+          <p class="form-error">
+            {{ getError('descripcion') }}
+          </p>
+        }
+      </div>
+
+      <!-- Descuento -->
+      <div class="form-field">
+        <label for="descuento" class="form-label">
+          Descuento (%) *
+        </label>
+        <div class="relative">
+          <input
+            id="descuento"
+            type="number"
+            formControlName="descuento"
+            min="1"
+            max="100"
+            step="0.01"
+            placeholder="Ej: 25"
+            class="form-input pr-12"
+          >
+          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">
+            %
+          </span>
+        </div>
+        @if (getError('descuento')) {
+          <p class="form-error">
+            {{ getError('descuento') }}
+          </p>
+        }
+      </div>
+
+      <!-- Fecha Inicio -->
+      <div class="form-field">
+        <label for="fechaInicio" class="form-label">
+          Fecha de Inicio *
+        </label>
+        <mat-form-field appearance="outline" class="w-full">
+          <input 
+            matInput 
+            [matDatepicker]="pickerInicio"
+            formControlName="fechaInicio"
+            placeholder="Selecciona una fecha">
+          <mat-datepicker-toggle 
+          matIconSuffix 
+          [for]="pickerInicio"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #pickerInicio></mat-datepicker>
+        </mat-form-field>
+        @if (getError('fechaInicio')) {
+          <p class="form-error -mt-4">
+            {{ getError('fechaInicio') }}
+          </p>
+        }
+      </div>
+
+      <!-- Fecha Fin -->
+      <div class="form-field">
+        <label for="fechaFin" class="form-label">
+          Fecha de Fin *
+        </label>
+        <mat-form-field appearance="outline" class="w-full">
+          <input 
+            matInput 
+            [matDatepicker]="pickerFin"
+            formControlName="fechaFin"
+            placeholder="Selecciona una fecha">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
+        @if (getError('fechaFin')) {
+          <p class="form-error -mt-4">
+            {{ getError('fechaFin') }}
+          </p>
+        }
+      </div>
+
+      <!-- Botones -->
+      <div class="flex flex-col sm:flex-row gap-4 pt-6">
+        <button 
+          type="button"
+          (click)="onCancel()"
+          class="btn-outline flex-1 order-2 sm:order-1">
+          Cancelar
+        </button>
+        <button 
+          type="submit"
+          [disabled]="isSubmitting"
+          class="btn-primary flex-1 order-1 sm:order-2">
+          @if (isSubmitting) {
+            <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Guardando...
+          } @else {
+            {{ isEditMode ? 'Actualizar Promoción' : 'Crear Promoción' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

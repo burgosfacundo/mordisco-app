@@ -1,11 +1,12 @@
 package utn.back.mordiscoapi.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import utn.back.mordiscoapi.model.entity.CalificacionRestaurante;
 import utn.back.mordiscoapi.model.projection.CalificacionRestauranteProjection;
 
-import java.util.List;
 
 public interface CalificacionRestauranteRepository extends JpaRepository<CalificacionRestaurante, Long> {
 
@@ -18,6 +19,8 @@ public interface CalificacionRestauranteRepository extends JpaRepository<Calific
         c.restaurante.id AS restauranteId,
         c.usuario.id AS usuarioId
     FROM CalificacionRestaurante c
-""")
-    List<CalificacionRestauranteProjection> findAllProjection();
+    """)
+    Page<CalificacionRestauranteProjection> findAllProjection(Pageable pageable);
+
+    Page<CalificacionRestauranteProjection> findAllByRestaurante_Id(Long idRestaurante,Pageable pageable);
 }

@@ -1,10 +1,11 @@
 package utn.back.mordiscoapi.mapper;
 
 import lombok.experimental.UtilityClass;
+import utn.back.mordiscoapi.model.dto.imagen.ImagenCreateDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenResponseDTO;
 import utn.back.mordiscoapi.model.dto.imagen.ImagenUpdateDTO;
 import utn.back.mordiscoapi.model.entity.Imagen;
-import utn.back.mordiscoapi.utils.Sanitize;
+import utn.back.mordiscoapi.common.util.Sanitize;
 
 @UtilityClass
 public class ImagenMapper {
@@ -26,5 +27,12 @@ public class ImagenMapper {
     public static void applyUpdate(ImagenUpdateDTO dto, Imagen target) {
         target.setUrl(Sanitize.trimToNull(dto.url()));
         target.setNombre(Sanitize.collapseSpaces(dto.nombre()));
+    }
+
+    public static Imagen toEntity(ImagenCreateDTO dto) {
+        return Imagen.builder()
+                .url(dto.url())
+                .nombre(dto.nombre())
+                .build();
     }
 }
