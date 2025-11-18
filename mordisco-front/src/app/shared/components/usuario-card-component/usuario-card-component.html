@@ -11,30 +11,30 @@
       </div>
       <div class="flex-1 min-w-0">
         <h3 class="text-white font-bold text-lg truncate">
-          {{ usuario.nombre }} {{ usuario.apellido }}
+          {{ usuario()?.nombre }} {{ usuario()?.apellido }}
         </h3>
         <p class="text-white text-sm truncate">
-          {{ usuario.email }}
+          {{ usuario()?.email }}
         </p>
         <p class="text-white text-sm truncate">
-          {{ usuario.telefono }}
+          {{ usuario()?.telefono }}
         </p>
       </div>
     </div>
   </div>
 
-    @if (usuario.rol) {
+    @if (usuario()?.rol) {
         <div class="p-6 flex-1 flex flex-col">
             <!-- Rol Badge -->
           <div class="mb-4">
-            <span [class]="'badge-' + usuario.rol.toLowerCase().replace('role_', '')">
-              {{ usuario.rol.replace('ROLE_', '') }}
+            <span [class]="'badge-' + usuario()!.rol!.toLowerCase().replace('role_', '')">
+              {{ usuario()!.rol!.replace('ROLE_', '') }}
             </span>
           </div>
 
               <!-- Botón de acción -->
           <button 
-            [routerLink]="['/admin/detalle/usuario', usuario.id]"
+            [routerLink]="['/admin/detalle/usuario', usuario()?.id]"
             class="mt-auto w-full py-2.5 rounded-lg
                   bg-blue-50 text-blue-700 font-semibold text-sm
                   hover:bg-blue-100 active:scale-95

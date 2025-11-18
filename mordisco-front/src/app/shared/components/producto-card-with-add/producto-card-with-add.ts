@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, output, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import ProductoResponse from '../../models/producto/producto-response';
@@ -9,11 +9,11 @@ import ProductoResponse from '../../models/producto/producto-response';
   templateUrl: './producto-card-with-add.html'
 })
 export class ProductoCardWithAdd{
-  @Input() producto!: ProductoResponse;
-  @Input() enCarrito = false;
-  @Input() cantidad = 0;
+  producto = input<ProductoResponse>();
+  enCarrito = input<boolean>(false);
+  cantidad = input<number>(0);
   
-  @Output() agregar = new EventEmitter<void>();
+  agregar = output<void>();
 
   onAgregar(): void {
     this.agregar.emit();

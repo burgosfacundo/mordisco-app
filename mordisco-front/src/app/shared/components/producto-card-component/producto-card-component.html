@@ -3,8 +3,8 @@
   <!-- Imagen del producto -->
   <div class="relative w-full h-48 overflow-hidden">
     <img 
-      [src]="producto?.imagen?.url" 
-      [alt]="producto?.imagen?.nombre"
+      [src]="producto()?.imagen?.url" 
+      [alt]="producto()?.imagen?.nombre"
       class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
   </div>
 
@@ -12,13 +12,13 @@
   <div class="p-6 flex-1 flex flex-col justify-between gap-4">
     <!-- Nombre del producto -->
     <h2 class="text-gray-900 font-bold text-lg leading-tight line-clamp-2">
-      {{ producto?.nombre }}
+      {{ producto()?.nombre }}
     </h2>
 
     <!-- Precio -->
     <div class="flex items-center justify-between">
       <span class="text-primary-600 font-bold text-2xl">
-        ${{ producto?.precio }}
+        ${{ producto()?.precio }}
       </span>
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, input, Input, OnChanges, OnInit, output, Output, signal, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
@@ -19,16 +19,16 @@ export class DireccionFormComponent implements OnInit , OnChanges{
   private snackBar = inject(MatSnackBar);
   protected validationService = inject(FormValidationService);
 
-  @Input() direccion?: DireccionResponse;
-  @Output() onSaved = new EventEmitter<void>();
-  @Output() onCancelled = new EventEmitter<void>();
+  direccion = input<DireccionResponse>();
+  onSaved = output<void>();
+  onCancelled = output<void>();
 
   formDirecciones!: FormGroup;
   protected isSubmitting = signal(false);
   protected isEditMode = signal(false);
 
   ngOnInit(): void {
-    if (this.direccion) {
+    if (this.direccion()) {
       this.isEditMode.set(true);
       this.initializeForm();
       this.loadDireccionData();
@@ -39,7 +39,7 @@ export class DireccionFormComponent implements OnInit , OnChanges{
   }
 
   ngOnChanges(_changes: SimpleChanges): void {
-       if (this.direccion) {
+       if (this.direccion()) {
       this.isEditMode.set(true);
       this.initializeForm();
       this.loadDireccionData();
@@ -62,16 +62,16 @@ export class DireccionFormComponent implements OnInit , OnChanges{
   }
 
   private loadDireccionData(): void {
-    if (!this.direccion) return;
+    if (!this.direccion()) return;
 
     this.formDirecciones.patchValue({
-      calle: this.direccion.calle,
-      numero: this.direccion.numero,
-      piso: this.direccion.piso || '',
-      depto: this.direccion.depto || '',
-      codigoPostal: this.direccion.codigoPostal,
-      referencias: this.direccion.referencias || '',
-      ciudad: this.direccion.ciudad
+      calle: this.direccion()?.calle,
+      numero: this.direccion()?.numero,
+      piso: this.direccion()?.piso || '',
+      depto: this.direccion()?.depto || '',
+      codigoPostal: this.direccion()?.codigoPostal,
+      referencias: this.direccion()?.referencias || '',
+      ciudad: this.direccion()?.ciudad
     });
   }
 
@@ -83,11 +83,12 @@ export class DireccionFormComponent implements OnInit , OnChanges{
 
     this.isSubmitting.set(true);
 
+    const dir = this.direccion()
     const direccionData: DireccionRequest = this.formDirecciones.value;
 
-    if (this.isEditMode() && this.direccion?.id) {
+    if (this.isEditMode() && dir?.id) {
       // Modo edición
-      this.direccionService.update(this.direccion.id, direccionData).subscribe({
+      this.direccionService.update(dir.id, direccionData).subscribe({
         next: () => {
           this.snackBar.open('✅ Dirección actualizada correctamente', 'Cerrar', { duration: 3000 });
           this.resetForm();
@@ -123,7 +124,6 @@ export class DireccionFormComponent implements OnInit , OnChanges{
 
   private resetForm(): void {
     this.formDirecciones.reset();
-    this.direccion = undefined;
     this.isEditMode.set(false);
     this.isSubmitting.set(false);
   }

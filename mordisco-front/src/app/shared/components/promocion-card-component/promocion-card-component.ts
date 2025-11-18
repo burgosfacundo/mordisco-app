@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, output, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import PromocionResponse from '../../models/promocion/promocion-response';
@@ -10,18 +10,18 @@ import PromocionResponse from '../../models/promocion/promocion-response';
   templateUrl: './promocion-card-component.html'
 })
 export class PromocionCardComponent {
-  @Input() promocion!: PromocionResponse;
-  @Input() showActions: boolean = false;
+  promocion = input<PromocionResponse>();
+  showActions = input<boolean>(false);
   
-  @Output() eliminar = new EventEmitter<number>();
-  @Output() editar = new EventEmitter<number>();
+  eliminar = output<number>();
+  editar = output<number>();
 
   getEstadoVigenciaClass(): string {
     const baseClasses = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide';
     
     const hoy = new Date();
-    const inicio = new Date(this.promocion.fechaInicio);
-    const fin = new Date(this.promocion.fechaFin);
+    const inicio = new Date(this.promocion()!.fechaInicio);
+    const fin = new Date(this.promocion()!.fechaFin);
     
     if (hoy < inicio) {
       return `${baseClasses} bg-blue-100 text-blue-700`;
@@ -34,8 +34,8 @@ export class PromocionCardComponent {
 
   getEstadoVigenciaLabel(): string {
     const hoy = new Date();
-    const inicio = new Date(this.promocion.fechaInicio);
-    const fin = new Date(this.promocion.fechaFin);
+    const inicio = new Date(this.promocion()!.fechaInicio);
+    const fin = new Date(this.promocion()!.fechaFin);
     
     if (hoy < inicio) {
       return 'Próximamente';
@@ -47,6 +47,6 @@ export class PromocionCardComponent {
   }
 
   onEliminar(): void {
-    this.eliminar.emit(this.promocion.id);
+    this.eliminar.emit(this.promocion()!.id);
   }
 }

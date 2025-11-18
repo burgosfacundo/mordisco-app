@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 
 @Component({
@@ -8,7 +8,7 @@ import HorarioAtencionResponse from '../../models/horario/horario-atencion-respo
 })
 export class HorarioCardComponent {
 
-    @Input() horario! : HorarioAtencionResponse
+    horario = input<HorarioAtencionResponse>()
 
   private readonly DIAS: { [key: string]: string } = {
     'MONDAY': 'Lunes',
@@ -21,7 +21,7 @@ export class HorarioCardComponent {
   };
 
   getDiaNombre() : string {
-    return this.DIAS[this.horario.dia] || this.horario.dia;
+    return this.DIAS[this.horario()!.dia] || this.horario()!.dia;
   }
 
     formatHora(hora: string): string {

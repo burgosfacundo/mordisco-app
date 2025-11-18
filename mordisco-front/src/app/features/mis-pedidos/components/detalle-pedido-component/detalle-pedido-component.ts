@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, input, Input, output, Output } from '@angular/core';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
@@ -11,15 +11,15 @@ import { MatIcon } from "@angular/material/icon";
   templateUrl: './detalle-pedido-component.html'
 })
 export class DetallePedidoComponent {
-  @Input() pedidoResponse?: PedidoResponse;
-  @Output() onCancelar = new EventEmitter<number>();
-  @Output() onVerDetalles = new EventEmitter<number>();
+  pedidoResponse = input<PedidoResponse>();
+  onCancelar = output<number>();
+  onVerDetalles = output<number>();
 
   readonly tipoEntregaEnum = TipoEntrega;
   readonly estadoPedidoEnum = EstadoPedido;
 
   getEstadoClasses(): string {
-    const estado = this.pedidoResponse?.estado;
+    const estado = this.pedidoResponse()?.estado;
     
     // Comparar con el enum correctamente
     if (estado === EstadoPedido.PENDIENTE) {
@@ -64,7 +64,7 @@ export class DetallePedidoComponent {
    * Construye la dirección completa como string
    */
   obtenerDireccionCompleta(): string {
-    const dir = this.pedidoResponse?.direccionEntrega;
+    const dir = this.pedidoResponse()?.direccionEntrega;
     if (!dir) return '';
 
     let direccion = `${dir.calle} ${dir.numero}`;
@@ -86,7 +86,7 @@ export class DetallePedidoComponent {
    * Determina si debe mostrar el botón de cancelar
    */
   mostrarBotonCancelar(): boolean {
-    const estado = this.pedidoResponse?.estado;
+    const estado = this.pedidoResponse()?.estado;
     return estado === EstadoPedido.PENDIENTE || estado === EstadoPedido.EN_PROCESO;
   }
 
@@ -101,8 +101,8 @@ export class DetallePedidoComponent {
    * Emite evento para cancelar pedido
    */
   cancelarPedido(): void {
-    if (this.pedidoResponse?.id) {
-      this.onCancelar.emit(this.pedidoResponse.id);
+    if (this.pedidoResponse()?.id) {
+      this.onCancelar.emit(this.pedidoResponse()!.id);
     }
   }
 
@@ -110,8 +110,8 @@ export class DetallePedidoComponent {
    * Emite evento para ver detalles
    */
   verDetalles(): void {
-    if (this.pedidoResponse?.id) {
-      this.onVerDetalles.emit(this.pedidoResponse.id);
+    if (this.pedidoResponse()?.id) {
+      this.onVerDetalles.emit(this.pedidoResponse()!.id);
     }
   }
 }

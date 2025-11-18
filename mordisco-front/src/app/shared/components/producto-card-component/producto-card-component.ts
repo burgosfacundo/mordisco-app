@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 import ProductoCard from '../../models/producto/producto-card';
 import ProductoResponse from '../../models/producto/producto-response';
 
@@ -8,8 +8,5 @@ import ProductoResponse from '../../models/producto/producto-response';
   templateUrl: './producto-card-component.html'
 })
 export class ProductoCardComponent {
-
-  @Input() producto? : ProductoCard
-
-
+  producto = input<ProductoCard>()
 }

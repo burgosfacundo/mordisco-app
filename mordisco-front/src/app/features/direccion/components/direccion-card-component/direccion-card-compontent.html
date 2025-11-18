@@ -12,15 +12,15 @@
     <div class="flex-1 min-w-0">
       <p class="text-sm text-gray-500 font-medium">Dirección</p>
       <p class="text-base font-bold text-gray-900">
-        {{ direccion?.calle }} {{ direccion?.numero }}
+        {{ direccion()?.calle }} {{ direccion()?.numero }}
       </p>
-      @if (direccion?.piso || direccion?.depto) {
+      @if (direccion()?.piso || direccion()?.depto) {
         <p class="text-sm text-gray-600">
-          @if (direccion?.piso) {
-            Piso {{ direccion?.piso }}
+          @if (direccion()?.piso) {
+            Piso {{ direccion()?.piso }}
           }
-          @if (direccion?.depto) {
-            {{ direccion?.depto }}
+          @if (direccion()?.depto) {
+            {{ direccion()?.depto }}
           }
         </p>
       }
@@ -33,19 +33,19 @@
   <div class="grid grid-cols-2 gap-3">
     <div>
       <p class="text-xs text-gray-500 font-medium">Ciudad</p>
-      <p class="text-sm font-semibold text-gray-900">{{ direccion?.ciudad }}</p>
+      <p class="text-sm font-semibold text-gray-900">{{ direccion()?.ciudad }}</p>
     </div>
     <div>
       <p class="text-xs text-gray-500 font-medium">Código Postal</p>
-      <p class="text-sm font-semibold text-gray-900">{{ direccion?.codigoPostal }}</p>
+      <p class="text-sm font-semibold text-gray-900">{{ direccion()?.codigoPostal }}</p>
     </div>
   </div>
 
   <!-- Referencias (si existen) -->
-  @if (direccion?.referencias) {
+  @if (direccion()?.referencias) {
     <div class="bg-gray-50 rounded-lg p-3">
       <p class="text-xs text-gray-500 font-medium mb-1">📍 Referencias</p>
-      <p class="text-sm text-gray-700 italic">{{ direccion?.referencias }}</p>
+      <p class="text-sm text-gray-700 italic">{{ direccion()?.referencias }}</p>
     </div>
   }
 </div>

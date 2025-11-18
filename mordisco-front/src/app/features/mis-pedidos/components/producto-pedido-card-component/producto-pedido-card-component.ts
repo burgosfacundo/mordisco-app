@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 import ProductoPedidoResponse from '../../../../shared/models/producto/producto-pedido-response';
 import { CommonModule } from '@angular/common';
 
@@ -9,10 +9,10 @@ import { CommonModule } from '@angular/common';
   templateUrl: './producto-pedido-card-component.html'
 })
 export class ProductoPedidoCardComponent {
-  @Input() producto?: ProductoPedidoResponse;
+  producto = input<ProductoPedidoResponse>();
 
   calcularSubtotal(): number {
-    if (!this.producto) return 0;
-    return this.producto.precioUnitario * this.producto.cantidad;
+    if (!this.producto()) return 0;
+    return this.producto()!.precioUnitario * this.producto()!.cantidad;
   }
 }

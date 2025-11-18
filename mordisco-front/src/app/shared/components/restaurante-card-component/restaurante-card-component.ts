@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, input, Input } from '@angular/core';
 import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
 import HorarioAtencion from '../../models/horario/horario-atencion-request';
 import { Router } from '@angular/router';
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   templateUrl: './restaurante-card-component.html'
 })
 export class RestauranteCardComponent {
-  @Input() restaurante! : RestauranteForCard;
+  restaurante = input<RestauranteForCard>()
   private router : Router = inject(Router)
 
   getHorarios(): string {
@@ -30,7 +30,7 @@ export class RestauranteCardComponent {
   private getHorarioDeHoy(): HorarioAtencion | undefined {
     const dias = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     const dia = dias[new Date().getDay()];
-    return this.restaurante.horariosDeAtencion.find(h => h.dia === dia);
+    return this.restaurante()?.horariosDeAtencion.find(h => h.dia === dia);
   }
 
   private nowInMinutes(): number {

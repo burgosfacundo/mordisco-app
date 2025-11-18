@@ -6,7 +6,7 @@
     <div class="flex items-center justify-between">
       <div>
         <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Pedido</p>
-        <p class="text-2xl font-bold text-gray-900">#{{ pedido?.id }}</p>
+        <p class="text-2xl font-bold text-gray-900">#{{ pedido()?.id }}</p>
       </div>
       <!-- <span [class]="getEstadoBadgeClass()">
         {{ getEstadoLabel() }}
@@ -27,7 +27,7 @@
       <div class="flex-1 min-w-0">
         <p class="text-xs text-gray-500 uppercase tracking-wide">Cliente</p>
         <p class="text-sm font-semibold text-gray-900 truncate">
-          {{ pedido?.cliente?.nombre }} {{ pedido?.cliente?.apellido }}
+          {{ pedido()?.cliente?.nombre }} {{ pedido()?.cliente?.apellido }}
         </p>
       </div>
     </div>
@@ -45,17 +45,17 @@
       <div class="flex-1 min-w-0">
         <p class="text-xs text-gray-500 uppercase tracking-wide">Dirección de entrega</p>
         <p class="text-sm font-semibold text-gray-900">
-          {{ pedido?.direccionEntrega?.calle || 'Sin dirección' }} {{ pedido?.direccionEntrega?.numero || '' }}
+          {{ pedido()?.direccionEntrega?.calle || 'Sin dirección' }} {{ pedido()?.direccionEntrega?.numero || '' }}
         </p>
-        @if (pedido?.direccionEntrega?.ciudad) {
+        @if (pedido()?.direccionEntrega?.ciudad) {
           <p class="text-xs text-gray-600 mt-0.5">
-            {{ pedido?.direccionEntrega?.ciudad }}
+            {{ pedido()?.direccionEntrega?.ciudad }}
           </p>
         }
       </div>
     </div>
 
-    @if (!isRestaurante) {
+    @if (!isRestaurante()) {
       <!-- Restaurante -->
       <div class="flex items-start gap-3">
         <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
@@ -67,7 +67,7 @@
         <div class="flex-1 min-w-0">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Restaurante</p>
           <p class="text-sm font-semibold text-gray-900 truncate">
-            {{ pedido?.restaurante?.razonSocial || 'Sin restaurante' }}
+            {{ pedido()?.restaurante?.razonSocial || 'Sin restaurante' }}
           </p>
         </div>
       </div>
@@ -78,7 +78,7 @@
     <div class="flex items-start gap-3">
       <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
         <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          @if (pedido?.tipoEntrega === 'DELIVERY') {
+          @if (pedido()?.tipoEntrega === 'DELIVERY') {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           } @else {
@@ -90,7 +90,7 @@
       <div class="flex-1 min-w-0">
         <p class="text-xs text-gray-500 uppercase tracking-wide">Tipo de entrega</p>
         <p class="text-sm font-semibold text-gray-900">
-          {{ pedido?.tipoEntrega === 'DELIVERY' ? 'A domicilio' : 'Retiro en local' }}
+          {{ pedido()?.tipoEntrega === 'DELIVERY' ? 'A domicilio' : 'Retiro en local' }}
         </p>
       </div>
     </div>
@@ -106,7 +106,7 @@
       <div class="flex-1 min-w-0">
         <p class="text-xs text-gray-500 uppercase tracking-wide">Fecha del pedido</p>
         <p class="text-sm font-semibold text-gray-900">
-          {{ pedido?.fechaHora | date:'dd/MM/yyyy - HH:mm' }}
+          {{ pedido()?.fechaHora | date:'dd/MM/yyyy - HH:mm' }}
         </p>
       </div>
     </div>
@@ -116,7 +116,7 @@
       <div class="flex items-center justify-between">
         <span class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total</span>
         <span class="text-2xl font-bold text-primary-600">
-          ${{ pedido?.total | number:'1.2-2' }}
+          ${{ pedido()?.total | number:'1.2-2' }}
         </span>
       </div>
     </div>
@@ -125,8 +125,8 @@
   <!-- Footer con botones de acción -->
   <div class="px-6 pb-6 pt-2 space-y-2">
     <!-- Botones para RESTAURANTE -->
-    @if (isRestaurante) {
-      @if (pedido?.estado === 'PENDIENTE') {
+    @if (isRestaurante()) {
+      @if (pedido()?.estado === 'PENDIENTE') {
         <button 
           (click)="onAceptarPedido()"
           class="w-full py-2.5 rounded-lg
@@ -145,7 +145,7 @@
                  focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
           Rechazar Pedido
         </button>
-      } @else if (pedido?.estado === 'EN_PROCESO') {
+      } @else if (pedido()?.estado === 'EN_PROCESO') {
         <button 
           (click)="onMarcarEnCamino()"
           class="w-full py-2.5 rounded-lg
@@ -160,7 +160,7 @@
 
     <!-- Botón Ver Detalle (para todos) -->
     <button 
-      [routerLink]="['/restaurante/pedidos/detalle', pedido?.id]"
+      [routerLink]="['/restaurante/pedidos/detalle', pedido()?.id]"
       class="w-full py-2.5 rounded-lg
              bg-primary-50 text-primary-700 font-semibold text-sm
              hover:bg-primary-100 active:scale-95

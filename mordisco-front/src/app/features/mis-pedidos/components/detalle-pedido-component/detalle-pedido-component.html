@@ -3,15 +3,15 @@
   <div class="bg-linear-to-r from-primary-500 to-primary-600 p-6">
     <div class="flex flex-col gap-3">
       <!-- Badges de estado y tipo de entrega -->
-      @if(pedidoResponse) { 
+      @if(pedidoResponse()) { 
         <div class="flex items-center gap-2 flex-wrap">
           <span [ngClass]="getEstadoClasses()" 
                 class="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
-            {{ fromatearEstado(pedidoResponse) }}
+            {{ fromatearEstado(pedidoResponse()!) }}
           </span>
           <span class="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide
                        bg-white text-primary-600 shadow-md">
-            {{ formatearEntrega(pedidoResponse) }}
+            {{ formatearEntrega(pedidoResponse()!) }}
           </span>
         </div>
       }
@@ -19,15 +19,15 @@
       <!-- Restaurante y fecha -->
       <div class="flex items-center justify-between">
         <h3 class="text-white font-bold text-lg truncate">
-          {{ pedidoResponse?.restaurante?.razonSocial }}
+          {{ pedidoResponse()?.restaurante?.razonSocial }}
         </h3>
         <span class="text-white/90 text-sm font-medium">
-          Pedido #{{ pedidoResponse?.id }}
+          Pedido #{{ pedidoResponse()?.id }}
         </span>
       </div>
       
       <div class="text-white/80 text-sm">
-        {{ pedidoResponse?.fechaHora | date:'dd/MM/yyyy HH:mm' }}
+        {{ pedidoResponse()?.fechaHora | date:'dd/MM/yyyy HH:mm' }}
       </div>
     </div>
   </div>
@@ -38,10 +38,10 @@
     <!-- Lista de productos -->
     <div class="border-b border-gray-200 pb-4">
       <h4 class="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">
-        Productos ({{ pedidoResponse?.productos?.length }})
+        Productos ({{ pedidoResponse()?.productos?.length }})
       </h4>
       <ul class="space-y-2">
-        @for (producto of pedidoResponse?.productos; track producto.idProducto) {
+        @for (producto of pedidoResponse()?.productos; track producto.idProducto) {
           <li class="flex items-center justify-between text-sm">
             <div class="flex items-center gap-2 flex-1 min-w-0">
               <span class="inline-flex items-center justify-center w-6 h-6 rounded-full 
@@ -59,7 +59,7 @@
     </div>
 
     <!-- Dirección de entrega (solo si es delivery Y tiene dirección) -->
-    @if (pedidoResponse?.tipoEntrega === tipoEntregaEnum.DELIVERY && pedidoResponse?.direccionEntrega) {
+    @if (pedidoResponse()?.tipoEntrega === tipoEntregaEnum.DELIVERY && pedidoResponse()?.direccionEntrega) {
       <div class="border-b border-gray-200 pb-4">
         <h4 class="font-semibold text-gray-900 mb-2 text-sm uppercase tracking-wide">
           Dirección de Entrega
@@ -67,16 +67,16 @@
         <p class="text-sm text-gray-700 leading-relaxed">
           {{ obtenerDireccionCompleta() }}
         </p>
-        @if (pedidoResponse?.direccionEntrega?.referencias) {
+        @if (pedidoResponse()?.direccionEntrega?.referencias) {
           <p class="text-xs text-gray-500 mt-1 italic"> 
-            Ref: {{ pedidoResponse?.direccionEntrega?.referencias }}
+            Ref: {{ pedidoResponse()?.direccionEntrega?.referencias }}
           </p>
         }
       </div>
     }
 
     <!-- Si es RETIRO_POR_LOCAL, mostrar dirección del restaurante -->
-    @if (pedidoResponse?.tipoEntrega === tipoEntregaEnum.RETIRO_POR_LOCAL) {
+    @if (pedidoResponse()?.tipoEntrega === tipoEntregaEnum.RETIRO_POR_LOCAL) {
       <div class="border-b border-gray-200 pb-4">
         <h4 class="font-semibold text-gray-900 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
           <mat-icon class="text-primary-600">store</mat-icon>
@@ -95,7 +95,7 @@
     <div class="flex items-center justify-between pt-2">
       <span class="font-bold text-gray-900 text-lg">Total:</span>
       <span class="font-bold text-primary-600 text-2xl">
-        ${{ pedidoResponse?.total | number:'1.2-2' }}
+        ${{ pedidoResponse()?.total | number:'1.2-2' }}
       </span>
     </div>
 

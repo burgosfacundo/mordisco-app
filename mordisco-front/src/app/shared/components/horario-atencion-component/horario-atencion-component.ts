@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, input } from '@angular/core';
 import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 import { CommonModule } from '@angular/common';
 
@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   templateUrl : './horario-atencion-component.html'
 })
 export class HorarioRestauranteComponent {
-  @Input() horario!: HorarioAtencionResponse;
+ horario = input<HorarioAtencionResponse>();
 
   private readonly DIAS: { [key: string]: string } = {
     'MONDAY': 'Lunes',
@@ -22,7 +22,7 @@ export class HorarioRestauranteComponent {
   };
 
   getDiaNombre(): string {
-    return this.DIAS[this.horario.dia] || this.horario.dia;
+    return this.DIAS[this.horario()!.dia] || this.horario()!.dia;
   }
 
   formatHora(hora: string): string {
@@ -34,7 +34,7 @@ export class HorarioRestauranteComponent {
   isAbierto(): boolean {
     const ahora = new Date();
     const diaActual = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'][ahora.getDay()];
-    return this.horario.dia === diaActual;
+    return this.horario()!.dia === diaActual;
   }
 
   getEstadoBadgeClass(): string {

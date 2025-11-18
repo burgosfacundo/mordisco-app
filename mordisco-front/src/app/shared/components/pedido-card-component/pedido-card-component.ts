@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import PedidoResponse from '../../models/pedido/pedido-response';
@@ -10,15 +10,15 @@ import PedidoResponse from '../../models/pedido/pedido-response';
   templateUrl: './pedido-card-component.html'
 })
 export class PedidoCardComponent {
-  @Input() pedido?: PedidoResponse;
-  @Input() isRestaurante: boolean = false;
+  pedido = input<PedidoResponse>();
+  isRestaurante = input<boolean>(false);
   
-  @Output() aceptarPedido = new EventEmitter<number>();
-  @Output() rechazarPedido = new EventEmitter<number>();
-  @Output() marcarEnCamino = new EventEmitter<number>();
+  aceptarPedido = output<number>();
+  rechazarPedido = output<number>();
+  marcarEnCamino = output<number>();
 
   getEstadoBadgeClass(): string {
-    const estado = this.pedido?.estado;
+    const estado = this.pedido()?.estado;
     
     const baseClasses = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide';
     
@@ -39,7 +39,7 @@ export class PedidoCardComponent {
   }
 
   getEstadoLabel(): string {
-    const estado = this.pedido?.estado;
+    const estado = this.pedido()?.estado;
     
     switch (estado) {
       case 'PENDIENTE':
@@ -58,20 +58,20 @@ export class PedidoCardComponent {
   }
 
   onAceptarPedido(): void {
-    if (this.pedido?.id) {
-      this.aceptarPedido.emit(this.pedido.id);
+    if (this.pedido()?.id) {
+      this.aceptarPedido.emit(this.pedido()!.id);
     }
   }
 
   onRechazarPedido(): void {
-    if (this.pedido?.id) {
-      this.rechazarPedido.emit(this.pedido.id);
+    if (this.pedido()?.id) {
+      this.rechazarPedido.emit(this.pedido()!.id);
     }
   }
 
   onMarcarEnCamino(): void {
-    if (this.pedido?.id) {
-      this.marcarEnCamino.emit(this.pedido.id);
+    if (this.pedido()?.id) {
+      this.marcarEnCamino.emit(this.pedido()!.id);
     }
   }
 }

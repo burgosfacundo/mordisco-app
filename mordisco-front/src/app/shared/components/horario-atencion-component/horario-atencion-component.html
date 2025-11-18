@@ -29,7 +29,7 @@
           <div class="flex-1">
             <p class="text-xs text-gray-500 uppercase tracking-wide">Horario de atención</p>
             <p class="text-lg font-bold text-gray-900">
-              {{ formatHora(horario.horaApertura) }} - {{ formatHora(horario.horaCierre) }}
+              {{ formatHora(horario()!.horaApertura) }} - {{ formatHora(horario()!.horaCierre) }}
             </p>
           </div>
         </div>
