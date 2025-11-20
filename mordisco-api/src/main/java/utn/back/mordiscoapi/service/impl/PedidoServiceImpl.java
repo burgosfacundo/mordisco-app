@@ -7,10 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import utn.back.mordiscoapi.enums.EstadoPago;
-import utn.back.mordiscoapi.enums.EstadoPedido;
-import utn.back.mordiscoapi.enums.MetodoPago;
-import utn.back.mordiscoapi.enums.TipoEntrega;
+import utn.back.mordiscoapi.enums.*;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.PedidoMapper;
@@ -19,6 +16,7 @@ import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.repository.*;
+import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 import utn.back.mordiscoapi.service.MercadoPagoService;
 import utn.back.mordiscoapi.service.NotificacionService;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
@@ -41,6 +39,8 @@ public class PedidoServiceImpl implements IPedidoService {
 
     private final MercadoPagoService mercadoPagoService;
     private final NotificacionService notificacionService;
+    private final ConfiguracionSistemaServiceImpl configuracionService;
+    private final AuthUtils authUtils;
 
     /**
      * Guarda un pedido y gestiona el pago
@@ -57,6 +57,12 @@ public class PedidoServiceImpl implements IPedidoService {
 
         Usuario cliente = usuarioRepository.findById(dto.idCliente())
                 .orElseThrow(() -> new NotFoundException("El cliente no existe"));
+
+        if (!restaurante.getActivo()) {
+            throw new BadRequestException(
+                    "El restaurante '" + restaurante.getRazonSocial() + "' no está aceptando pedidos en este momento"
+            );
+        }
 
         Pedido pedido = PedidoMapper.toEntity(dto);
         pedido.setEstado(EstadoPedido.PENDIENTE);
@@ -352,6 +358,111 @@ public class PedidoServiceImpl implements IPedidoService {
                 .monto(pedido.getTotal())
                 .estado(EstadoPago.PENDIENTE)
                 .build();
+    }
+
+    @Transactional
+    @Override
+    public void asignarRepartidor(Long pedidoId, Long repartidorId)
+            throws NotFoundException, BadRequestException {
+
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
+
+        Usuario repartidor = usuarioRepository.findById(repartidorId)
+                .orElseThrow(() -> new NotFoundException("Repartidor no encontrado"));
+
+        // Validaciones
+        if (!repartidor.isRepartidor()) {
+            throw new BadRequestException("El usuario no es un repartidor");
+        }
+
+        if (!pedido.puedeSerAceptadoPorRepartidor()) {
+            throw new BadRequestException(
+                    "El pedido no puede ser asignado. Estado actual: " + pedido.getEstado()
+            );
+        }
+
+        if (!TipoEntrega.DELIVERY.equals(pedido.getTipoEntrega())) {
+            throw new BadRequestException("Solo los pedidos de delivery necesitan repartidor");
+        }
+
+        // Asignar repartidor
+        pedido.setRepartidor(repartidor);
+        pedido.setFechaAceptacionRepartidor(LocalDateTime.now());
+
+        pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    @Override
+    public void marcarComoEntregado(Long pedidoId, Long repartidorId)
+            throws NotFoundException, BadRequestException {
+
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
+
+        // Validar que el repartidor sea el asignado
+        if (pedido.getRepartidor() == null ||
+                !pedido.getRepartidor().getId().equals(repartidorId)) {
+            throw new BadRequestException("Este pedido no está asignado a ti");
+        }
+
+        // Validar estado
+        if (pedido.getEstado() != EstadoPedido.EN_CAMINO) {
+            throw new BadRequestException(
+                    "Solo se pueden marcar como entregados pedidos EN_CAMINO"
+            );
+        }
+
+        // Marcar como entregado
+        pedido.setEstado(EstadoPedido.RECIBIDO);
+        pedido.setFechaEntrega(LocalDateTime.now());
+
+        pedidoRepository.save(pedido);
+
+
+        // TODO: Notificar al cliente
+        // TODO: Calcular ganancia del repartidor
+    }
+
+    @Override
+    public Page<PedidoResponseDTO> getPedidosDisponiblesParaRepartidor(
+            Double latitud, Double longitud, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Obtener radio máximo de entrega desde configuración
+        BigDecimal radioMaximo = configuracionService.getRadioMaximoEntrega();
+
+        // Query para pedidos EN_CAMINO sin repartidor asignado, cerca de la ubicación
+        return pedidoRepository.findPedidosDisponiblesParaRepartidor(
+                latitud, longitud, radioMaximo.doubleValue(), pageable
+        ).map(PedidoMapper::toDTO);
+    }
+
+    @Override
+    public PedidoResponseDTO getPedidoActivoRepartidor(Long id) throws NotFoundException, BadRequestException {
+        var pedido = pedidoRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Pedido no encontrado")
+        );
+
+        var userAuthenticated = authUtils.getUsuarioAutenticado().orElseThrow(
+                ()-> new NotFoundException("Usuario no encontrado")
+        );
+
+        if (!userAuthenticated.isRepartidor()) {
+            throw new BadRequestException("Usuario no es repartidor");
+        }
+
+        if (!userAuthenticated.getId().equals(pedido.getRepartidor().getId())) {
+            throw new BadRequestException("El pedido no te corresponde");
+        }
+
+        if (pedido.getEstado() != EstadoPedido.EN_CAMINO) {
+            throw new BadRequestException("Pedido no esta activo");
+        }
+
+        return PedidoMapper.toDTO(pedido);
     }
 }
 

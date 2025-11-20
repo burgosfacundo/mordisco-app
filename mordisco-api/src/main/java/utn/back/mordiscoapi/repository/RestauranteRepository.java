@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import utn.back.mordiscoapi.model.entity.Pedido;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -106,4 +106,31 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     boolean existsByIdAndDireccion_Id(Long id, Long direccionId);
 
     boolean existsByIdAndMenu_Id(Long id, Long menuId);
+
+    /**
+     * Cuenta los pedidos activos (PENDIENTE, EN_PROCESO, EN_CAMINO) de un restaurante
+     *
+     * @param restauranteId ID del restaurante
+     * @return Cantidad de pedidos activos
+     */
+    @Query("SELECT COUNT(p) FROM Pedido p " +
+            "WHERE p.restaurante.id = :restauranteId " +
+            "AND p.estado IN ('PENDIENTE', 'EN_PROCESO', 'EN_CAMINO')")
+    long countPedidosActivos(@Param("restauranteId") Long restauranteId);
+
+    /**
+     * Obtiene los pedidos activos de un restaurante (para mostrar al usuario)
+     *
+     * @param restauranteId ID del restaurante
+     * @param pageable Paginación
+     * @return Lista de pedidos activos
+     */
+    @Query("SELECT p FROM Pedido p " +
+            "WHERE p.restaurante.id = :restauranteId " +
+            "AND p.estado IN ('PENDIENTE', 'EN_PROCESO', 'EN_CAMINO') " +
+            "ORDER BY p.fechaHora DESC")
+    Page<Pedido> findPedidosActivosByRestaurante(
+            @Param("restauranteId") Long restauranteId,
+            Pageable pageable
+    );
 }

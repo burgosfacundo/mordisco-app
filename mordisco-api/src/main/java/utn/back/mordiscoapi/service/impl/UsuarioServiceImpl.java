@@ -15,9 +15,11 @@ import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.config.AppProperties;
+import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.mapper.UsuarioMapper;
 import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
 import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.RolRepository;
@@ -127,16 +129,50 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     }
 
     /**
-     * Elimina un usuario por su ID.
-     * @param id el ID del usuario a eliminar.
-     * @throws NotFoundException si el usuario no se encuentra.
+     * Elimina un usuario validando que no tenga pedidos activos
+     *
+     * @param id del usuario a eliminar
+     * @throws NotFoundException si no se encuentra el usuario
+     * @throws BadRequestException si el usuario tiene pedidos activos
      */
+    @Transactional
     @Override
-    public void delete(Long id) throws NotFoundException {
-        if(!repository.existsById(id)){
+    public void delete(Long id) throws NotFoundException, BadRequestException {
+        if (!repository.existsById(id)){
             throw new NotFoundException("Usuario no encontrado");
         }
+
+        long pedidosActivos = repository.countPedidosActivosComoCliente(id);
+
+        if (pedidosActivos > 0) {
+            String mensaje = String.format(
+                    "No se puede eliminar la cuenta. Tienes %d pedido%s activo%s. " +
+                            "Debe esperar a que se completen o cancelarlos antes de eliminar tu cuenta.",
+                    pedidosActivos,
+                    pedidosActivos == 1 ? "" : "s",
+                    pedidosActivos == 1 ? "" : "s"
+            );
+
+            throw new BadRequestException(mensaje);
+        }
+
         repository.deleteById(id);
+    }
+
+    /**
+     *  Obtiene los pedidos activos de un usuario como cliente
+     */
+    @Override
+    public Page<PedidoResponseDTO> getPedidosActivosComoCliente(Long usuarioId, int page, int size)
+            throws NotFoundException {
+
+        if (!repository.existsById(usuarioId)) {
+            throw new NotFoundException("Usuario no encontrado");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        return repository.findPedidosActivosComoCliente(usuarioId, pageable)
+                .map(PedidoMapper::toDTO);
     }
 
     @Override
@@ -146,6 +182,20 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
 
         if(!repository.existsById(userAuthenticated.getId())){
             throw new NotFoundException("Usuario no encontrado");
+        }
+
+        long pedidosActivos = repository.countPedidosActivosComoCliente(userAuthenticated.getId());
+
+        if (pedidosActivos > 0) {
+            String mensaje = String.format(
+                    "No se puede eliminar la cuenta. Tienes %d pedido%s activo%s. " +
+                            "Debe esperar a que se completen o cancelarlos antes de eliminar tu cuenta.",
+                    pedidosActivos,
+                    pedidosActivos == 1 ? "" : "s",
+                    pedidosActivos == 1 ? "" : "s"
+            );
+
+            throw new BadRequestException(mensaje);
         }
 
         repository.deleteById(userAuthenticated.getId());

@@ -1,5 +1,6 @@
 package utn.back.mordiscoapi.service.interf;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
@@ -19,4 +20,17 @@ public interface IPedidoService {
     Page<PedidoResponseDTO> findAllByCliente_Id(int pageNo,int pageSize,Long idCliente) throws NotFoundException;
     Page<PedidoResponseDTO> findAllByRestaurante_IdAndEstado(int pageNo,int pageSize,Long idRestaurante, EstadoPedido estado) throws NotFoundException;
     void cancelarPedido(Long id) throws NotFoundException, BadRequestException;
+
+    @Transactional
+    void asignarRepartidor(Long pedidoId, Long repartidorId)
+            throws NotFoundException, BadRequestException;
+
+    @Transactional
+    void marcarComoEntregado(Long pedidoId, Long repartidorId)
+            throws NotFoundException, BadRequestException;
+
+    Page<PedidoResponseDTO> getPedidosDisponiblesParaRepartidor(
+            Double latitud, Double longitud, int page, int size);
+
+    PedidoResponseDTO getPedidoActivoRepartidor(Long id) throws NotFoundException, BadRequestException;
 }

@@ -3,6 +3,7 @@ package utn.back.mordiscoapi.service.interf;
 import org.springframework.data.domain.Page;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
@@ -27,5 +28,8 @@ public interface IRestauranteService {
 
     void update(RestauranteUpdateDTO dto) throws NotFoundException, BadRequestException;
 
-    void delete(Long id) throws NotFoundException;
+    void delete(Long id) throws NotFoundException, BadRequestException;
+
+    Page<PedidoResponseDTO> getPedidosActivos(Long restauranteId, int page, int size)
+            throws NotFoundException;
 }

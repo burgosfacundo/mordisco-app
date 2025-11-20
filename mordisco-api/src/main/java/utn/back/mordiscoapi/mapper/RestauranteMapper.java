@@ -10,6 +10,7 @@ import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.common.util.Sanitize;
 
 
+
 @Slf4j
 @UtilityClass
 public class RestauranteMapper {
@@ -57,7 +58,7 @@ public class RestauranteMapper {
         if (r.getCalificaciones() != null && !r.getCalificaciones().isEmpty()) {
             estrellas = r.getCalificaciones()
                     .stream()
-                    .mapToInt(CalificacionRestaurante::getPuntaje)
+                    .mapToDouble(CalificacionPedido::getPuntajePromedio)
                     .average()
                     .orElse(0.0);
         }
@@ -84,7 +85,7 @@ public class RestauranteMapper {
         if (r.getCalificaciones() != null && !r.getCalificaciones().isEmpty()) {
             estrellas = r.getCalificaciones()
                     .stream()
-                    .mapToInt(CalificacionRestaurante::getPuntaje)
+                    .mapToDouble(CalificacionPedido::getPuntajePromedio)
                     .average()
                     .orElse(0.0);
         }

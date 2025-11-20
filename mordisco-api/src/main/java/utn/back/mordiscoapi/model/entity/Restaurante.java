@@ -44,7 +44,7 @@ public class Restaurante {
     private Set<HorarioAtencion> horariosAtencion;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<CalificacionRestaurante> calificaciones;
+    private List<CalificacionPedido> calificaciones;
 
     @OneToOne(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)

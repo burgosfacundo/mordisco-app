@@ -67,6 +67,7 @@
                 <option value="" disabled selected>Seleccionar tipo</option>
                 <option [value]="2">Cliente</option>
                 <option [value]="3">Restaurante</option>
+                <option [value]="4">Repartidor</option>
             </select>
             @if (userForm.get('rolId')?.touched && userForm.controls['rolId'].errors?.['required']) {
                 <p class="form-error">*Obligatorio</p>

@@ -7,9 +7,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.ImagenMapper;
+import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.mapper.ProductoMapper;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.producto.ProductoRequestDTO;
 import utn.back.mordiscoapi.model.dto.producto.ProductoResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.producto.ProductoResponseDTO;
@@ -53,10 +57,50 @@ public class ProductoServiceImpl implements IProductoService {
         repository.save(ProductoMapper.toEntity(menu, dto));
     }
 
+    /**
+     * 🆕 VAL-002: Elimina un producto validando que no tenga pedidos activos
+     *
+     * @param id del producto a eliminar
+     * @throws NotFoundException si no se encuentra el producto
+     * @throws BadRequestException si el producto está en pedidos activos
+     */
+    @Transactional
     @Override
-    public void delete(Long id) throws NotFoundException {
-        if (!repository.existsById(id)) throw new NotFoundException("Producto no encontrado");
+    public void delete(Long id) throws NotFoundException, BadRequestException {
+        if (!repository.existsById(id)) {
+            throw new NotFoundException("Producto no encontrado");
+        }
+
+        long pedidosActivos = repository.countPedidosActivosByProducto(id);
+
+        if (pedidosActivos > 0) {
+            String mensaje = String.format(
+                    "No se puede eliminar el producto. Está incluido en %d pedido%s activo%s. " +
+                            "Debe esperar a que se completen o cancelarlos antes de eliminarlo.",
+                    pedidosActivos,
+                    pedidosActivos == 1 ? "" : "s",
+                    pedidosActivos == 1 ? "" : "s"
+            );
+
+            throw new BadRequestException(mensaje);
+        }
+
         repository.deleteById(id);
+    }
+
+    /**
+     * 🆕 Obtiene los pedidos activos que contienen un producto
+     */
+    @Override
+    public Page<PedidoResponseDTO> getPedidosActivosByProducto(Long productoId, int page, int size)
+            throws NotFoundException {
+        if (!repository.existsById(productoId)) {
+            throw new NotFoundException("Producto no encontrado");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        return repository.findPedidosActivosByProducto(productoId, pageable)
+                .map(PedidoMapper::toDTO);
     }
 
     @Override

@@ -15,7 +15,8 @@ import java.util.Collections;
 @Table(name = "usuarios",
         uniqueConstraints = {
                 @UniqueConstraint(name = "UK_usuario_telefono", columnNames = "telefono"),
-                @UniqueConstraint(name = "UK_usuario_email", columnNames = "email")
+                @UniqueConstraint(name = "UK_usuario_email", columnNames = "email"),
+                @UniqueConstraint(name = "UK_usuario_cuil", columnNames = "cuil") // 🆕
         })
 @Getter
 @Setter
@@ -40,6 +41,12 @@ public class Usuario implements UserDetails {
     @Column (nullable = false)
     private String password;
 
+    @Column
+    private Double latitudActual;
+
+    @Column
+    private Double longitudActual;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Direccion> direcciones;
 
@@ -49,9 +56,6 @@ public class Usuario implements UserDetails {
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Restaurante restaurante;
-
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CalificacionRestaurante> calificacionesRestaurante;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
@@ -66,8 +70,10 @@ public class Usuario implements UserDetails {
     public String getUsername() {
         return this.email;
     }
+
     @Override
     public String getPassword(){ return this.password; }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -98,4 +104,7 @@ public class Usuario implements UserDetails {
         d.setUsuario(null);
     }
 
+    public boolean isRepartidor() {
+        return this.rol != null && "ROLE_REPARTIDOR".equals(this.rol.getNombre());
+    }
 }

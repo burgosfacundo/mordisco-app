@@ -38,4 +38,33 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
             UPDATE Pedido p SET p.direccionEntrega = NULL
             WHERE p.direccionEntrega.id = :direccionId""")
     void desasociarDireccion(@Param("direccionId") Long direccionId);
+
+
+    /**
+     * Encuentra pedidos disponibles para repartidores cerca de una ubicación
+     */
+    @Query(value =
+            "SELECT p.* FROM pedidos p " +
+                    "INNER JOIN direcciones d ON p.direccion_id = d.id " +
+                    "WHERE p.estado = 'EN_CAMINO' " +
+                    "AND p.tipo_entrega = 'DELIVERY' " +
+                    "AND p.repartidor_id IS NULL " +
+                    "AND d.latitud IS NOT NULL " +
+                    "AND d.longitud IS NOT NULL " +
+                    "AND ( " +
+                    "  6371 * acos( " +
+                    "    cos(radians(:latitud)) * cos(radians(d.latitud)) * " +
+                    "    cos(radians(d.longitud) - radians(:longitud)) + " +
+                    "    sin(radians(:latitud)) * sin(radians(d.latitud)) " +
+                    "  ) " +
+                    ") <= :radioKm " +
+                    "ORDER BY p.fecha_hora DESC",
+            nativeQuery = true
+    )
+    Page<Pedido> findPedidosDisponiblesParaRepartidor(
+            @Param("latitud") Double latitud,
+            @Param("longitud") Double longitud,
+            @Param("radioKm") Double radioKm,
+            Pageable pageable
+    );
 }

@@ -17,6 +17,7 @@ import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
 import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
 
@@ -163,25 +164,59 @@ public class UsuarioController {
     }
 
     /**
-     * Función para eliminar un usuario por su ID.
-     * @param id del usuario a eliminar.
-     * @return Respuesta HTTP con un mensaje de éxito.
-     * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
+     * Obtiene los pedidos activos de un usuario como cliente
      */
-    @Operation(summary = "Eliminar un usuario",
-            description = "Recibe un ID y elimina el usuario correspondiente." +
-                    "** El propio usuario autenticado puede borrar su información**")
+    @Operation(
+            summary = "Obtener pedidos activos del usuario",
+            description = "Retorna los pedidos en estado PENDIENTE, EN_PROCESO o EN_CAMINO del usuario. " +
+                    "Útil para saber por qué no se puede eliminar la cuenta. " +
+                    "**Rol necesario: Usuario propietario o ADMIN**"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204",description = "Usuario eliminado exitosamente"),
-            @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "200", description = "Pedidos activos obtenidos exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
+    @GetMapping("/{id}/pedidos-activos")
+    public ResponseEntity<Page<PedidoResponseDTO>> getPedidosActivos(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) throws NotFoundException {
+
+        return ResponseEntity.ok(service.getPedidosActivosComoCliente(id, page, size));
+    }
+
+    /**
+     * Elimina un usuario por su ID
+     * Ahora valida que no tenga pedidos activos
+     */
+    @Operation(
+            summary = "Eliminar usuario por ID",
+            description = """
+            Elimina un usuario si no tiene pedidos activos.
+            **Validación:**
+            - No se puede eliminar si tiene pedidos en estado PENDIENTE, EN_PROCESO o EN_CAMINO
+            - Si la validación falla, retorna error 400 con la cantidad de pedidos activos
+            **Consideraciones:**
+            - Si es un restaurante, validar que no tenga pedidos activos en su restaurante
+            - Si es un cliente, validar que no tenga pedidos activos como comprador
+            **Rol necesario: Usuario propietario o ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Usuario eliminado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "400", description = "No se puede eliminar: tiene pedidos activos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable
-                                         Long id) throws NotFoundException {
+    public ResponseEntity<Void> delete(@PathVariable Long id)
+            throws NotFoundException, BadRequestException {
+
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

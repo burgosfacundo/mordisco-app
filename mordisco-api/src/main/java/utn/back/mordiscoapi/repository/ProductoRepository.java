@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import utn.back.mordiscoapi.model.entity.Pedido;
 import utn.back.mordiscoapi.model.entity.Producto;
 
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
@@ -15,4 +17,18 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
         WHERE p.menu.id = :idMenu
         """)
     Page<Producto> findAllByIdMenu(Pageable pageable,Long idMenu);
+
+    @Query("SELECT COUNT(DISTINCT pp.pedido) FROM ProductoPedido pp " +
+            "WHERE pp.producto.id = :productoId " +
+            "AND pp.pedido.estado IN ('PENDIENTE', 'EN_PROCESO', 'EN_CAMINO')")
+    long countPedidosActivosByProducto(@Param("productoId") Long productoId);
+
+    @Query("SELECT DISTINCT pp.pedido FROM ProductoPedido pp " +
+            "WHERE pp.producto.id = :productoId " +
+            "AND pp.pedido.estado IN ('PENDIENTE', 'EN_PROCESO', 'EN_CAMINO') " +
+            "ORDER BY pp.pedido.fechaHora DESC")
+    Page<Pedido> findPedidosActivosByProducto(
+            @Param("productoId") Long productoId,
+            Pageable pageable
+    );
 }

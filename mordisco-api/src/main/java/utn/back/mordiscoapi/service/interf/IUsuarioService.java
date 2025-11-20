@@ -6,6 +6,7 @@ import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
 import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.*;
 
 public interface IUsuarioService {
@@ -13,7 +14,9 @@ public interface IUsuarioService {
     Page<UsuarioCardDTO> findAll(int pageNo, int pageSize);
     UsuarioResponseDTO findById(Long id) throws NotFoundException;
     UsuarioResponseDTO getMe() throws NotFoundException, BadRequestException;
-    void delete(Long id) throws NotFoundException;
+    void delete(Long id) throws NotFoundException, BadRequestException;
+    Page<PedidoResponseDTO> getPedidosActivosComoCliente(Long usuarioId, int page, int size)
+            throws NotFoundException;
     void deleteMe() throws NotFoundException, BadRequestException;
     void changePassword(ChangePasswordDTO dto) throws NotFoundException, BadRequestException, InternalServerErrorException;
     void requestPasswordRecovery(RecoverPasswordDTO dto) throws NotFoundException, InternalServerErrorException, BadRequestException ;

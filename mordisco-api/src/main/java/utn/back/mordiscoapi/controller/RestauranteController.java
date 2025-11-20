@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
@@ -200,25 +201,57 @@ public class RestauranteController {
     }
 
     /**
-     * Función para eliminar restaurante por su id.
-     *
-     * @param id del restaurante a eliminar.
-     * @return Respuesta HTTP con un mensaje de éxito.
-     * @throws NotFoundException Si no se encuentra el restaurante con el ID proporcionado.
+     * 🆕 Obtiene los pedidos activos de un restaurante
      */
-    @Operation(summary = "Eliminar restaurante por ID", description = "Recibe un id de un restaurante y lo borra. " +
-            "**El propio dueño del restaurante puede acceder a su restaurante para eliminarlo**")
+    @Operation(
+            summary = "Obtener pedidos activos de un restaurante",
+            description = "Retorna los pedidos en estado PENDIENTE, EN_PROCESO o EN_CAMINO. " +
+                    "Útil para saber por qué no se puede eliminar un restaurante. " +
+                    "**Rol necesario: ADMIN o propietario del restaurante**"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Elimina el restaurante correspondiente"),
-            @ApiResponse(responseCode = "404", description = "No se encontró el restaurante con el ID proporcionado"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "200", description = "Pedidos activos obtenidos exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Restaurante no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
+    @GetMapping("/{id}/pedidos-activos")
+    public ResponseEntity<Page<PedidoResponseDTO>> getPedidosActivos(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) throws NotFoundException {
+
+        return ResponseEntity.ok(restauranteService.getPedidosActivos(id, page, size));
+    }
+
+    /**
+     * Función para eliminar restaurante por su id.
+     */
+    @Operation(
+            summary = "Eliminar restaurante por ID",
+            description = """
+            Elimina un restaurante si no tiene pedidos activos.
+            **Validación:**
+            - No se puede eliminar si tiene pedidos en estado PENDIENTE, EN_PROCESO o EN_CAMINO
+            - Si la validación falla, retorna error 400 con la cantidad de pedidos activos
+            **Rol necesario: RESTAURANTE (propietario) o ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Restaurante eliminado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Restaurante no encontrado"),
+            @ApiResponse(responseCode = "400", description = "No se puede eliminar: tiene pedidos activos"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') and @restauranteSecurity.puedeAccederAPropioRestaurante(#id)")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException{
+    public ResponseEntity<Void> delete(@PathVariable Long id)
+            throws NotFoundException, BadRequestException {
+
         restauranteService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
+

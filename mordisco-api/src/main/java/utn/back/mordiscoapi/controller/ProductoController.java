@@ -1,6 +1,9 @@
 package utn.back.mordiscoapi.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -12,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.producto.ProductoRequestDTO;
 import utn.back.mordiscoapi.model.dto.producto.ProductoResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.producto.ProductoResponseDTO;
@@ -51,10 +55,57 @@ public class ProductoController {
     }
 
 
+    /**
+     * 🆕 Obtiene los pedidos activos que contienen un producto
+     */
+    @Operation(
+            summary = "Obtener pedidos activos que contienen un producto",
+            description = "Retorna los pedidos en estado PENDIENTE, EN_PROCESO o EN_CAMINO que incluyen este producto. " +
+                    "Útil para saber por qué no se puede eliminar un producto. " +
+                    "**Rol necesario: RESTAURANTE (propietario) o ADMIN**"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos activos obtenidos exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
+    @GetMapping("/{id}/pedidos-activos")
+    public ResponseEntity<Page<PedidoResponseDTO>> getPedidosActivos(
+            @PathVariable @Valid @Positive Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) throws NotFoundException {
+
+        return ResponseEntity.ok(service.getPedidosActivosByProducto(id, page, size));
+    }
+
+    /**
+     * Elimina un producto por su ID
+     * 🆕 Ahora valida que no esté en pedidos activos
+     */
+    @Operation(
+            summary = "Eliminar producto por ID",
+            description = """
+            Elimina un producto si no está en pedidos activos.
+            **Validación:**
+            - No se puede eliminar si está en pedidos en estado PENDIENTE, EN_PROCESO o EN_CAMINO
+            - Si la validación falla, retorna error 400 con la cantidad de pedidos activos
+            **Rol necesario: RESTAURANTE (propietario) o ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Producto eliminado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado"),
+            @ApiResponse(responseCode = "400", description = "No se puede eliminar: está en pedidos activos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@Valid @Positive @PathVariable Long id) throws NotFoundException {
+    public ResponseEntity<Void> delete(@Valid @Positive @PathVariable Long id)
+            throws NotFoundException, BadRequestException {
+
         service.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

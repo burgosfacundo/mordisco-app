@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.ImagenMapper;
+import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
@@ -64,8 +66,6 @@ public class RestauranteServiceImpl implements IRestauranteService {
                 () -> new NotFoundException("Restaurante no encontrado"));
 
         return RestauranteMapper.toDTO(rest);
-
-
     }
 
     /**
@@ -178,17 +178,48 @@ public class RestauranteServiceImpl implements IRestauranteService {
     }
 
     /**
-     * Elimina un restaurante por su ID.
+     * Elimina un restaurante validando que no tenga pedidos activos
      *
-     * @param id del restaurante a eliminar.
-     * @throws NotFoundException si no se encuentra el restaurante con el ID proporcionado.
+     * @param id del restaurante a eliminar
+     * @throws NotFoundException si no se encuentra el restaurante
      */
     @Transactional
     @Override
-    public void delete(Long id) throws NotFoundException {
-        if(!restauranteRepository.existsById(id)){
-            throw new NotFoundException("El restaurante a borrar no fue encontrado");
+    public void delete(Long id) throws NotFoundException, BadRequestException {
+        if (!restauranteRepository.existsById(id)) {
+            throw new NotFoundException("El restaurante no existe");
         }
+
+        long pedidosActivos = restauranteRepository.countPedidosActivos(id);
+
+        if (pedidosActivos > 0) {
+            String mensaje = String.format(
+                    "No se puede eliminar el restaurante. Tiene %d pedido%s activo%s. " +
+                            "Debe esperar a que se completen o cancelarlos antes de eliminarlo.",
+                    pedidosActivos,
+                    pedidosActivos == 1 ? "" : "s",
+                    pedidosActivos == 1 ? "" : "s"
+            );
+
+            throw new BadRequestException(mensaje);
+        }
+
         restauranteRepository.deleteById(id);
+    }
+
+    /**
+     *  Obtiene los pedidos activos de un restaurante (para mostrar al usuario por qué no puede eliminar)
+     */
+    @Override
+    public Page<PedidoResponseDTO> getPedidosActivos(Long restauranteId, int page, int size)
+            throws NotFoundException {
+
+        if (!restauranteRepository.existsById(restauranteId)) {
+            throw new NotFoundException("El restaurante no existe");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        return restauranteRepository.findPedidosActivosByRestaurante(restauranteId, pageable)
+                .map(PedidoMapper::toDTO);
     }
 }

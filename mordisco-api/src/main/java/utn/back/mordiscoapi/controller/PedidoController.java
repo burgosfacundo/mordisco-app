@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
@@ -18,6 +19,7 @@ import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
+import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
 
 
@@ -267,6 +269,99 @@ public class PedidoController {
             @RequestParam int page,
             @RequestParam int size) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllByRestaurante_IdAndEstado(page,size,id, estado));
+    }
+
+
+    /**
+     * 🆕 Obtener pedidos disponibles para repartidor
+     */
+    @Operation(
+            summary = "Obtener pedidos disponibles para repartidor",
+            description = """
+        Retorna pedidos en estado EN_CAMINO sin repartidor asignado,
+        filtrados por proximidad a la ubicación del repartidor.
+        **Rol necesario: REPARTIDOR**
+    """
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @GetMapping("/disponibles-repartidor")
+    public ResponseEntity<Page<PedidoResponseDTO>> getPedidosDisponibles(
+            @RequestParam Double latitud,
+            @RequestParam Double longitud,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return ResponseEntity.ok(
+                pedidoService.getPedidosDisponiblesParaRepartidor(latitud, longitud, page, size)
+        );
+    }
+
+
+    @Operation(
+            summary = "Aceptar pedido como repartidor",
+            description = """
+        Permite a un repartidor aceptar un pedido disponible.
+        **Validaciones:**
+        - El pedido debe estar EN_CAMINO
+        - No debe tener repartidor asignado
+        - El repartidor debe estar APROBADO
+        **Rol necesario: REPARTIDOR**
+    """
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @PostMapping("/{pedidoId}/aceptar-repartidor")
+    public ResponseEntity<Void> aceptarPedido(
+            @PathVariable Long pedidoId,
+            Authentication authentication) throws NotFoundException, BadRequestException {
+
+        Usuario repartidor = (Usuario) authentication.getPrincipal();
+        pedidoService.asignarRepartidor(pedidoId, repartidor.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 🆕 Marcar pedido como entregado
+     */
+    @Operation(
+            summary = "Marcar pedido como entregado",
+            description = """
+        Permite al repartidor confirmar que entregó el pedido.
+        **Validaciones:**
+        - El pedido debe estar asignado al repartidor
+        - El pedido debe estar EN_CAMINO
+        **Rol necesario: REPARTIDOR**
+    """
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @PutMapping("/{pedidoId}/entregar")
+    public ResponseEntity<Void> marcarComoEntregado(
+            @PathVariable Long pedidoId,
+            Authentication authentication) throws NotFoundException, BadRequestException {
+
+        Usuario repartidor = (Usuario) authentication.getPrincipal();
+        pedidoService.marcarComoEntregado(pedidoId, repartidor.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Obtener pedido activo del repartidor",
+            description = "Retorna el pedido que el repartidor tiene actualmente asignado y en curso"
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @GetMapping("/mi-pedido-activo")
+    public ResponseEntity<PedidoResponseDTO> getMiPedidoActivo(Authentication authentication)
+            throws NotFoundException, BadRequestException {
+
+        Usuario repartidor = (Usuario) authentication.getPrincipal();
+        PedidoResponseDTO pedido = pedidoService.getPedidoActivoRepartidor(repartidor.getId());
+
+        return ResponseEntity.ok(pedido);
     }
 }
 
