@@ -20,7 +20,6 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN  r.imagen
                 LEFT JOIN  r.promociones
                 LEFT JOIN  r.horariosAtencion
-                LEFT JOIN  r.calificaciones
                 LEFT JOIN  r.direccion
                 WHERE r.id = :id
             """)
@@ -33,7 +32,6 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN  r.imagen
                 LEFT JOIN  r.promociones
                 LEFT JOIN  r.horariosAtencion
-                LEFT JOIN  r.calificaciones
                 LEFT JOIN  r.direccion
                 WHERE r.usuario.id = :usuarioId
             """)
@@ -46,7 +44,6 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN  r.imagen
                 LEFT JOIN  r.promociones
                 LEFT JOIN  r.horariosAtencion
-                LEFT JOIN  r.calificaciones
                 LEFT JOIN  r.direccion
             """)
     Page<Restaurante> findAllRestaurante(Pageable pageable);
@@ -57,7 +54,6 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN  r.imagen
                 LEFT JOIN  r.promociones
                 LEFT JOIN  r.horariosAtencion
-                LEFT JOIN  r.calificaciones
                 LEFT JOIN  r.direccion
                 WHERE r.activo = :estadoRestaurante
             """)
@@ -69,7 +65,6 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             LEFT JOIN  r.imagen
             LEFT JOIN  r.promociones
             LEFT JOIN  r.horariosAtencion
-            LEFT JOIN  r.calificaciones
             LEFT JOIN  r.direccion
             WHERE r.direccion.ciudad = :ciudad
             AND r.activo = true
@@ -82,7 +77,6 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             LEFT JOIN  r.imagen
             LEFT JOIN  r.promociones
             LEFT JOIN  r.horariosAtencion
-            LEFT JOIN  r.calificaciones
             LEFT JOIN  r.direccion
             WHERE r.razonSocial LIKE %:nombre%
             """)
@@ -94,37 +88,21 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 LEFT JOIN r.imagen
                 LEFT JOIN r.promociones p
                 LEFT JOIN r.horariosAtencion
-                LEFT JOIN r.calificaciones
                 LEFT JOIN r.direccion
-                WHERE p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE
+                WHERE p.fechaInicio <= CURRENT_DATE
+                AND p.fechaFin >= CURRENT_DATE
                 AND r.direccion.ciudad = :ciudad
+                AND r.activo = true
                 """)
     Page<Restaurante> findAllWithPromocionActivaAndCiudad(Pageable pageable, @Param("ciudad") String ciudad);
 
     boolean existsByIdAndImagen_Id(Long id, Long imagenId);
 
-    boolean existsByIdAndDireccion_Id(Long id, Long direccionId);
-
-    boolean existsByIdAndMenu_Id(Long id, Long menuId);
-
-    /**
-     * Cuenta los pedidos activos (PENDIENTE, EN_PROCESO, EN_CAMINO) de un restaurante
-     *
-     * @param restauranteId ID del restaurante
-     * @return Cantidad de pedidos activos
-     */
     @Query("SELECT COUNT(p) FROM Pedido p " +
             "WHERE p.restaurante.id = :restauranteId " +
             "AND p.estado IN ('PENDIENTE', 'EN_PROCESO', 'EN_CAMINO')")
     long countPedidosActivos(@Param("restauranteId") Long restauranteId);
 
-    /**
-     * Obtiene los pedidos activos de un restaurante (para mostrar al usuario)
-     *
-     * @param restauranteId ID del restaurante
-     * @param pageable Paginación
-     * @return Lista de pedidos activos
-     */
     @Query("SELECT p FROM Pedido p " +
             "WHERE p.restaurante.id = :restauranteId " +
             "AND p.estado IN ('PENDIENTE', 'EN_PROCESO', 'EN_CAMINO') " +

@@ -48,13 +48,10 @@ public class CalificacionPedido {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "restaurante_id", nullable = false)
-    private Restaurante restaurante;
+    public Restaurante getRestaurante() {
+        return pedido != null ? pedido.getRestaurante() : null;
+    }
 
-    /**
-     * Calcula el puntaje promedio del pedido
-     */
     public Double getPuntajePromedio() {
         return (puntajeComida + puntajeTiempo + puntajePackaging) / 3.0;
     }

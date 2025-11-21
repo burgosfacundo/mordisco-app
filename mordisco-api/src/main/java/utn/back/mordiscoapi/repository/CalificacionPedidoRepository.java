@@ -47,6 +47,30 @@ public interface CalificacionPedidoRepository extends JpaRepository<Calificacion
     """)
     Double calcularPromedioRestaurante(@Param("restauranteId") Long restauranteId);
 
+    @Query("""
+        SELECT
+            AVG(cp.puntajeComida)
+        FROM CalificacionPedido cp
+        WHERE cp.pedido.restaurante.id = :restauranteId
+    """)
+    Double calcularPromedioComidaRestaurante(@Param("restauranteId") Long restauranteId);
+
+    @Query("""
+        SELECT
+            AVG(cp.puntajeTiempo)
+        FROM CalificacionPedido cp
+        WHERE cp.pedido.restaurante.id = :restauranteId
+    """)
+    Double calcularPromedioTiempoRestaurante(@Param("restauranteId") Long restauranteId);
+
+    @Query("""
+        SELECT
+            AVG(cp.puntajePackaging)
+        FROM CalificacionPedido cp
+        WHERE cp.pedido.restaurante.id = :restauranteId
+    """)
+    Double calcularPromedioPackagingRestaurante(@Param("restauranteId") Long restauranteId);
+
     /**
      * Contar calificaciones de un restaurante
      */
@@ -61,6 +85,16 @@ public interface CalificacionPedidoRepository extends JpaRepository<Calificacion
      */
     Page<CalificacionPedido> findByUsuarioIdOrderByFechaHoraDesc(
             Long usuarioId,
+            Pageable pageable
+    );
+
+    @Query("""
+        SELECT cp FROM CalificacionPedido cp
+        WHERE cp.usuario.id = :usuarioId
+        ORDER BY cp.fechaHora DESC
+    """)
+    Page<CalificacionPedido> findCalificacionesRealizadasPorCliente(
+            @Param("usuarioId") Long usuarioId,
             Pageable pageable
     );
 }

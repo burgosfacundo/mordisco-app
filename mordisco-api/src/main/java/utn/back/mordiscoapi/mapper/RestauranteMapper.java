@@ -20,14 +20,15 @@ public class RestauranteMapper {
      * @return la entidad de restaurante con los datos del DTO
      */
     public static Restaurante toEntity(RestauranteCreateDTO dto) {
-        log.debug(dto.toString());
         Usuario usuario = Usuario.builder()
                 .id(dto.idUsuario())
                 .build();
+
         Imagen imagen = Imagen.builder()
                 .url(Sanitize.collapseSpaces(dto.logo().url()))
                 .nombre(Sanitize.collapseSpaces(dto.logo().nombre()))
                 .build();
+
         Direccion direccion = Direccion.builder()
                 .calle(Sanitize.collapseSpaces(dto.direccion().calle()))
                 .numero(Sanitize.trimToNull(dto.direccion().numero()))
@@ -38,6 +39,7 @@ public class RestauranteMapper {
                 .referencias(Sanitize.trimToNull(dto.direccion().referencias()))
                 .usuario(usuario)
                 .build();
+
         return Restaurante.builder()
                 .razonSocial(Sanitize.trimToNull(dto.razonSocial()))
                 .imagen(imagen)
@@ -54,14 +56,6 @@ public class RestauranteMapper {
     public static RestauranteResponseDTO toDTO (Restaurante r){
         var imagen = ImagenMapper.toDTO(r.getImagen());
         var direccion = DireccionMapper.toDTO(r.getDireccion());
-        double estrellas = 0.0;
-        if (r.getCalificaciones() != null && !r.getCalificaciones().isEmpty()) {
-            estrellas = r.getCalificaciones()
-                    .stream()
-                    .mapToDouble(CalificacionPedido::getPuntajePromedio)
-                    .average()
-                    .orElse(0.0);
-        }
 
         return new RestauranteResponseDTO(
                 r.getId(),
@@ -69,9 +63,9 @@ public class RestauranteMapper {
                 r.getActivo(),
                 imagen,
                 r.getMenu() == null ? null : r.getMenu().getId(),
-                estrellas,
+                r.getPromedioCalificaciones(),
                 direccion
-                );
+        );
     }
 
     /**
@@ -81,14 +75,6 @@ public class RestauranteMapper {
      */
     public static RestauranteResponseCardDTO toCardDTO(Restaurante r){
         var imagen = ImagenMapper.toDTO(r.getImagen());
-        double estrellas = 0.0;
-        if (r.getCalificaciones() != null && !r.getCalificaciones().isEmpty()) {
-            estrellas = r.getCalificaciones()
-                    .stream()
-                    .mapToDouble(CalificacionPedido::getPuntajePromedio)
-                    .average()
-                    .orElse(0.0);
-        }
 
         return new RestauranteResponseCardDTO(
                 r.getId(),
@@ -96,7 +82,7 @@ public class RestauranteMapper {
                 r.getActivo(),
                 imagen,
                 r.getHorariosAtencion().stream().map(HorarioAtencionMapper::toDTO).toList(),
-                estrellas
+                r.getPromedioCalificaciones()
         );
     }
 

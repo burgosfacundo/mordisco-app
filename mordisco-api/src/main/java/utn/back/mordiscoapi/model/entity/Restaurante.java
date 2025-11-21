@@ -3,7 +3,9 @@ package utn.back.mordiscoapi.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -43,9 +45,6 @@ public class Restaurante {
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<HorarioAtencion> horariosAtencion;
 
-    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<CalificacionPedido> calificaciones;
-
     @OneToOne(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
     private Usuario usuario;
@@ -53,4 +52,46 @@ public class Restaurante {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "direccion_id", referencedColumnName = "id")
     private Direccion direccion;
+
+    @OneToMany(mappedBy = "restaurante", fetch = FetchType.LAZY)
+    private List<Pedido> pedidos = new ArrayList<>();
+
+    /**
+     * Obtiene las calificaciones del restaurante a través de sus pedidos
+     * @return Lista de calificaciones recibidas
+     */
+    public List<CalificacionPedido> getCalificaciones() {
+        if (pedidos == null || pedidos.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return pedidos.stream()
+                .map(Pedido::getCalificacionPedido)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    /**
+     * Calcula el promedio de calificaciones del restaurante
+     * @return Promedio de 1-5, o 0.0 si no tiene calificaciones
+     */
+    public Double getPromedioCalificaciones() {
+        List<CalificacionPedido> calificaciones = getCalificaciones();
+
+        if (calificaciones.isEmpty()) {
+            return 0.0;
+        }
+
+        return calificaciones.stream()
+                .mapToDouble(CalificacionPedido::getPuntajePromedio)
+                .average()
+                .orElse(0.0);
+    }
+
+    /**
+     * Cuenta el total de calificaciones recibidas
+     */
+    public Long getTotalCalificaciones() {
+        return (long) getCalificaciones().size();
+    }
 }

@@ -51,9 +51,7 @@ public class CalificacionController {
     public ResponseEntity<CalificacionPedidoResponseDTO> calificarPedido(
             @Valid @RequestBody CalificacionPedidoRequestDTO dto)
             throws NotFoundException, BadRequestException {
-
-        CalificacionPedidoResponseDTO response = calificacionService.calificarPedido(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(calificacionService.calificarPedido(dto));
     }
 
     @Operation(
@@ -67,7 +65,6 @@ public class CalificacionController {
     @GetMapping("/pedido/{pedidoId}")
     public ResponseEntity<CalificacionPedidoResponseDTO> getCalificacionPedido(
             @PathVariable Long pedidoId) throws NotFoundException {
-
         return ResponseEntity.ok(calificacionService.getCalificacionPedido(pedidoId));
     }
 
@@ -83,7 +80,6 @@ public class CalificacionController {
             @PathVariable Long restauranteId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-
         return ResponseEntity.ok(
                 calificacionService.getCalificacionesRestaurante(restauranteId, page, size)
         );
@@ -96,7 +92,6 @@ public class CalificacionController {
     @GetMapping("/restaurante/{restauranteId}/estadisticas")
     public ResponseEntity<EstadisticasRestauranteDTO> getEstadisticasRestaurante(
             @PathVariable Long restauranteId) throws NotFoundException {
-
         return ResponseEntity.ok(calificacionService.getEstadisticasRestaurante(restauranteId));
     }
 
@@ -109,7 +104,6 @@ public class CalificacionController {
     @DeleteMapping("/pedido/{calificacionId}")
     public ResponseEntity<Void> eliminarCalificacionPedido(@PathVariable Long calificacionId)
             throws NotFoundException, BadRequestException {
-
         calificacionService.eliminarCalificacionPedido(calificacionId);
         return ResponseEntity.noContent().build();
     }
@@ -140,9 +134,7 @@ public class CalificacionController {
     public ResponseEntity<CalificacionRepartidorResponseDTO> calificarRepartidor(
             @Valid @RequestBody CalificacionRepartidorRequestDTO dto)
             throws NotFoundException, BadRequestException {
-
-        CalificacionRepartidorResponseDTO response = calificacionService.calificarRepartidor(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(calificacionService.calificarRepartidor(dto));
     }
 
     @Operation(
@@ -156,7 +148,6 @@ public class CalificacionController {
             @PathVariable Long repartidorId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-
         return ResponseEntity.ok(
                 calificacionService.getCalificacionesRepartidor(repartidorId, page, size)
         );
@@ -171,7 +162,6 @@ public class CalificacionController {
     @GetMapping("/repartidor/{repartidorId}/estadisticas")
     public ResponseEntity<EstadisticasRepartidorDTO> getEstadisticasRepartidor(
             @PathVariable Long repartidorId) throws NotFoundException {
-
         return ResponseEntity.ok(calificacionService.getEstadisticasRepartidor(repartidorId));
     }
 
@@ -184,7 +174,6 @@ public class CalificacionController {
     @DeleteMapping("/repartidor/{calificacionId}")
     public ResponseEntity<Void> eliminarCalificacionRepartidor(@PathVariable Long calificacionId)
             throws NotFoundException, BadRequestException {
-
         calificacionService.eliminarCalificacionRepartidor(calificacionId);
         return ResponseEntity.noContent().build();
     }

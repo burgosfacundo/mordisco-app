@@ -23,6 +23,7 @@ public class CalificacionServiceImpl {
 
     private final CalificacionPedidoRepository calificacionPedidoRepository;
     private final CalificacionRepartidorRepository calificacionRepartidorRepository;
+    private final RestauranteRepository restauranteRepository;
     private final PedidoRepository pedidoRepository;
     private final UsuarioRepository usuarioRepository;
     private final AuthUtils authUtils;
@@ -50,14 +51,7 @@ public class CalificacionServiceImpl {
         validarCalificacionPedido(pedido, cliente);
 
         // Crear calificación
-        CalificacionPedido calificacion = CalificacionPedido.builder()
-                .puntajeComida(dto.puntajeComida())
-                .puntajeTiempo(dto.puntajeTiempo())
-                .puntajePackaging(dto.puntajePackaging())
-                .comentario(dto.comentario())
-                .pedido(pedido)
-                .usuario(cliente)
-                .build();
+        var calificacion = CalificacionMapper.toEntity(dto,pedido,cliente);
 
         calificacion = calificacionPedidoRepository.save(calificacion);
 
@@ -96,20 +90,21 @@ public class CalificacionServiceImpl {
     public EstadisticasRestauranteDTO getEstadisticasRestaurante(Long restauranteId)
             throws NotFoundException {
 
-        if (!pedidoRepository.existsById(restauranteId)) {
-            throw new NotFoundException("Restaurante no encontrado");
-        }
+        var restaurante = restauranteRepository.findById(restauranteId)
+                .orElseThrow(() -> new NotFoundException("Restaurante no encontrado"));
 
+        Double promedioComida = calificacionPedidoRepository.calcularPromedioComidaRestaurante(restauranteId);
+        Double promedioTiempo = calificacionPedidoRepository.calcularPromedioTiempoRestaurante(restauranteId);
+        Double promedioPackaging = calificacionPedidoRepository.calcularPromedioPackagingRestaurante(restauranteId);
         Double promedio = calificacionPedidoRepository.calcularPromedioRestaurante(restauranteId);
         Long total = calificacionPedidoRepository.contarCalificacionesRestaurante(restauranteId);
 
-        // TODO: Calcular promedios individuales por categoría
         return new EstadisticasRestauranteDTO(
                 restauranteId,
-                null, // Nombre del restaurante
-                promedio,
-                promedio,
-                promedio,
+                restaurante.getRazonSocial(),
+                promedioComida,
+                promedioTiempo,
+                promedioPackaging,
                 promedio != null ? promedio : 0.0,
                 total
         );
@@ -138,20 +133,9 @@ public class CalificacionServiceImpl {
         validarCalificacionRepartidor(pedido, cliente);
 
         // Crear calificación
-        CalificacionRepartidor calificacion = CalificacionRepartidor.builder()
-                .puntajeAtencion(dto.puntajeAtencion())
-                .puntajeComunicacion(dto.puntajeComunicacion())
-                .puntajeProfesionalismo(dto.puntajeProfesionalismo())
-                .comentario(dto.comentario())
-                .pedido(pedido)
-                .repartidor(pedido.getRepartidor())
-                .usuario(cliente)
-                .build();
+        CalificacionRepartidor calificacion = CalificacionMapper.toEntity(dto,pedido,cliente);
 
         calificacion = calificacionRepartidorRepository.save(calificacion);
-
-        log.info("✅ Repartidor #{} calificado por cliente #{} en pedido #{}",
-                pedido.getRepartidor().getId(), cliente.getId(), pedido.getId());
 
         return CalificacionMapper.toDTO(calificacion);
     }
@@ -175,20 +159,21 @@ public class CalificacionServiceImpl {
     @Transactional(readOnly = true)
     public EstadisticasRepartidorDTO getEstadisticasRepartidor(Long repartidorId)
             throws NotFoundException {
+        var repartidor = usuarioRepository.findById(repartidorId)
+                .orElseThrow(() -> new NotFoundException("Repartidor no encontrado"));
 
-        if (!usuarioRepository.existsById(repartidorId)) {
-            throw new NotFoundException("Repartidor no encontrado");
-        }
-
+        Double promedioAtencion = calificacionRepartidorRepository.calcularPromedioAtencionRepartidor(repartidorId);
+        Double promedioComunicacion = calificacionRepartidorRepository.calcularPromedioComunicacionRepartidor(repartidorId);
+        Double promedioProfesionalismo =calificacionRepartidorRepository.calcularPromedioProfesionalismoRepartidor(repartidorId);
         Double promedio = calificacionRepartidorRepository.calcularPromedioRepartidor(repartidorId);
         Long total = calificacionRepartidorRepository.countByRepartidorId(repartidorId);
 
         return new EstadisticasRepartidorDTO(
                 repartidorId,
-                null, // Nombre del repartidor
-                promedio,
-                promedio,
-                promedio,
+                repartidor.getNombre(),
+                promedioAtencion,
+                promedioComunicacion,
+                promedioProfesionalismo,
                 promedio != null ? promedio : 0.0,
                 total
         );
@@ -212,7 +197,6 @@ public class CalificacionServiceImpl {
         }
 
         calificacionPedidoRepository.delete(calificacion);
-        log.info("🗑️ Calificación de pedido #{} eliminada", calificacionId);
     }
 
     /**
@@ -233,7 +217,6 @@ public class CalificacionServiceImpl {
         }
 
         calificacionRepartidorRepository.delete(calificacion);
-        log.info("🗑️ Calificación de repartidor #{} eliminada", calificacionId);
     }
 
     // ========== VALIDACIONES ==========

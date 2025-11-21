@@ -4,7 +4,8 @@ import java.util.Arrays;
 
 public enum DataBaseConstraint {
 
-    CALIFICACION_RESTAURANTE("UK_calificacion_usuario_restaurante", "Ya calificaste este restaurante."),
+    CALIFICACION_PEDIDO("UK_calificacion_pedido_usuario", "Ya calificaste este pedido."),
+    CALIFICACION_REPARTIDOR_PEDIDO("UK_calificacion_repartidor_pedido","Ya calificaste el repartidor de este pedido."),
     IMAGEN_URL("UK_imagen_url", "La URL de la imagen ya está en uso."),
     RESTAURANTE_USUARIO("UK_restaurante_usuario", "Ese usuario ya está asignado a un restaurante."),
     RESTAURANTE_RAZON_SOCIAL("UK_restaurante_razon_social", "La razón social del restaurante ya está en uso."),
