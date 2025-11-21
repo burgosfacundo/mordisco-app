@@ -67,35 +67,88 @@
           </div>
         </div>
       </div>
+      @if (isUsuario === 'ROLE_CLIENTE' && pedido.estado === estadoPedidoEnum.RECIBIDO) {
+        <article class="bg-white rounded-xl shadow-md overflow-hidden 
+                        transition-all duration-300 hover:shadow-xl
+                        flex flex-col h-full p-6">
 
-      @if(isUsuario === 'ROLE_CLIENTE'){
-        @if (mostrarBotonCalificar()) {
-          @if(!yaCalificoPedido){
-            <button 
-            (click)="calificarPedido()"
-            class="mt-auto w-full py-2.5 rounded-lg
-                  bg-red-50 text-red-700 font-semibold text-sm
-                  hover:bg-red-100 active:scale-95
-                  transition-all duration-200
-                  focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-            Calificar pedido
-          </button>
-          }
-          @if(!yaCalificoRepartidor){
-            <button 
-            (click)="calificarRepartidor()"
-            class="mt-auto w-full py-2.5 rounded-lg
-                  bg-red-50 text-red-700 font-semibold text-sm
-                  hover:bg-red-100 active:scale-95
-                  transition-all duration-200
-                  focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-            Calificar repartidor
-          </button>
-          }
-        }
-      }  
-      
-       @if (isUsuario === 'ROLE_RESTAURANTE') {
+          <!-- Contenedor principal - se centra cuando solo hay un hijo -->
+          <div class="flex flex-row gap-4 items-stretch min-h-[220px]"
+              [class.justify-center]="pedido.tipoEntrega !== tipoEntregaEnum.DELIVERY">
+            
+            <!-- === Sección de Calificación del Pedido (50% del ancho o centrado) === -->
+            <div class="min-w-1/2 flex"
+                [class.flex-1]="pedido.tipoEntrega === tipoEntregaEnum.DELIVERY"
+                [class.w-full]="pedido.tipoEntrega !== tipoEntregaEnum.DELIVERY"
+                [class.max-w-md]="pedido.tipoEntrega !== tipoEntregaEnum.DELIVERY"> 
+              @if(!calificacionPedido){
+                <div class="flex flex-col items-center justify-center gap-3 p-4 bg-gradient-to-br from-red-50 to-white border-2 border-red-100 rounded-xl w-full">
+                  <div class="text-center mb-2">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">¿Cómo estuvo tu pedido?</h3>
+                    <p class="text-sm text-gray-600">Ayúdanos a mejorar</p>
+                  </div>
+                  <button 
+                    (click)="calificarPedido()"
+                    class="w-full py-3 px-6 rounded-lg
+                          bg-red-700 text-white font-semibold text-base shadow-md
+                          hover:bg-red-800 hover:shadow-lg active:scale-[0.98]
+                          transition-all duration-200
+                          focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    Calificar pedido
+                  </button>
+                </div>
+              }@else {
+                <div class="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-green-50 to-white border-2 border-green-100 rounded-xl w-full">
+                  <span class="text-base font-semibold text-gray-800 block mb-2">Pedido calificado</span>
+                  <p class="text-xs text-gray-600 mb-3">¡Gracias por tu opinión!</p>
+                  <div class="w-full max-w-md">
+                    <app-calificacion-component
+                      [calificacion]="calificacionPedido">
+                    </app-calificacion-component>
+                  </div>
+                  <button (click)="eliminarCalificacionPedido(calificacionPedido.id)" class="btn-ghost flex-1 text-red-600 hover:bg-red-50 mt-3">Eliminar calificacion</button>
+                </div>
+              }
+            </div>
+
+            <!-- === Sección de Calificación del Repartidor (50% del ancho - solo si es DELIVERY) === -->
+            @if(pedido.tipoEntrega === tipoEntregaEnum.DELIVERY){
+              <div class="flex-1 min-w-1/2 flex">
+                @if(!calificacionRepartidor){
+                  <div class="flex flex-col items-center justify-center gap-3 p-4 bg-gradient-to-br from-red-50 to-white border-2 border-red-100 rounded-xl w-full">
+                    <div class="text-center mb-2">
+                      <h3 class="text-lg font-semibold text-gray-800 mb-1">¿Cómo fue el servicio?</h3>
+                      <p class="text-sm text-gray-600">Califica al repartidor</p>
+                    </div>
+                    <button 
+                      (click)="calificarRepartidor()"
+                      class="w-full py-3 px-6 rounded-lg
+                            bg-red-700 text-white font-semibold text-base shadow-md
+                            hover:bg-red-800 hover:shadow-lg active:scale-[0.98]
+                            transition-all duration-200
+                            focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                      Calificar repartidor
+                    </button>
+                  </div>
+                }@else {
+                  <div class="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-green-50 to-white border-2 border-green-100 rounded-xl w-full">
+                    <span class="text-base font-semibold text-gray-800 block mb-2">Repartidor calificado</span>
+                    <p class="text-xs text-gray-600 mb-3">¡Gracias por tu feedback!</p>
+                    <div class="w-full max-w-md">
+                      <app-calificacion-component
+                        [calificacion]="calificacionRepartidor">
+                      </app-calificacion-component>
+                    </div>
+                    <button (click)="eliminarCalificacionRepartidor(calificacionRepartidor.id)" class="btn-ghost flex-1 text-red-600 hover:bg-red-50 mt-3">Eliminar calificacion</button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </article>
+    }
+    
+      @if (isUsuario === 'ROLE_RESTAURANTE') {
         <section class="space-y-4">
           <h2 class="titulo-seccion">
             Información del Cliente

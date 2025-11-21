@@ -1,13 +1,10 @@
-export default interface CalificacionRepartidorResponseDTO{
-    id : number,
-    pedidoId : number,
+import { ICalificacionBase } from "./ICalificacionBase";
+
+export default interface CalificacionRepartidorResponseDTO extends ICalificacionBase{
     repartidorId : number,
     repartidorNombre : string,
     puntajeAtencion : string,
     puntajeComunicacion : number,
     puntajeProfesionalismo : number,
-    puntajePromedio : number,
-    comentario : string,
-    fechaHora : string,
-    clienteNombre : string
+
 }      

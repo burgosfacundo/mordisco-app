@@ -61,7 +61,7 @@ export class CalificacionFormRepartidorComponent {
     this.cService.calificarRepartidor(calificacionRequest).subscribe({
       next : () => {
         this._snackBar.open('✅ Calificacion registrada correctamente', '',{duration: 3000})
-        this.router.navigate(['cliente/pedido/detalle',idPed])
+        this.router.navigate(['cliente/pedidos/detalle',idPed])
       },
       error:(e) => {
         console.error(e);

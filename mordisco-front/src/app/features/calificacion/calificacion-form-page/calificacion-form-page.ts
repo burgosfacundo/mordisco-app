@@ -14,11 +14,9 @@ export class CalificacionFormPage implements OnInit{
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
-  private cService = inject(CalificacionService)
   public pedidoId?: number;
-  yaCalificoPedido = false
-  yaCalificoRepartidor = false
   tipoCalificacion : string| null = null
+  
   ngOnInit(): void {
     this.obtenerPedidoID()
   }

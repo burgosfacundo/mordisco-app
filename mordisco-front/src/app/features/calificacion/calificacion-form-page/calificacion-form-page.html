@@ -5,7 +5,7 @@
     <div class="text-center space-y-2">
       <h1 class="titulo-hero">Crear calificacion</h1>
       <p class="text-gray-600 text-lg">
-        Califica que te pareció la comida de
+        Califica que te pareció
       </p>
     </div>
     @if(tipoCalificacion === 'pedido'){
@@ -17,8 +17,6 @@
           </app-calificacion-form-pedido-component>
         </div>
       </section>
-    }@else {
-      ya tenes hecha esta calificacion
     }
 
     @if(tipoCalificacion === 'repartidor'){
@@ -30,8 +28,6 @@
           </app-calificacion-form-repartidor-component>
         </div>
       </section>
-    }@else {
-      ya tenes hecha esta calificacion
     }
   </div>
 </main>    

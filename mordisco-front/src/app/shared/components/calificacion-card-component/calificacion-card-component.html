@@ -9,7 +9,8 @@
       </div>
       <div class="flex-1 min-w-0">
         <h3 class="text-white font-bold text-lg truncate">
-          {{ calificacionResp()?.puntajePromedio}}
+      {{ calificacionResp()?.puntajePromedio | number:'1.1-1' }}
+      
         </h3>
         <!-- Estrellas de calificación -->
         <div class="flex items-center gap-1 mt-1">
@@ -23,7 +24,6 @@
       </div>
     </div>
   </div>
-
   <!-- Contenido de la calificación -->
   <div class="p-6 flex-1 flex flex-col gap-4">
     <!-- Comentario -->

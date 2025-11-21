@@ -186,4 +186,9 @@ export class MiRestaurantePageComponent implements OnInit {
     this.sizeCalificacion = event.pageSize;
     this.cargarCalificaciones();
   }
+
+  calificacionPromedio1Dec(): number {
+    const prom = this.restaurante?.estrellas
+    return prom ? Number(prom.toFixed(1)) : 0;
+  }
 }

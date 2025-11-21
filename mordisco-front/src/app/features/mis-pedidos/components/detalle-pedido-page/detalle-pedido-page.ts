@@ -13,6 +13,9 @@ import { AuthService } from '../../../../shared/services/auth-service';
 import { CalificacionService } from '../../../../shared/services/calificacion/calificacion-service';
 import { CalificacionFormPedidoComponent } from '../../../calificacion/calificacion-form-pedido-component/calificacion-form-pedido-component';
 import { CalificacionFormRepartidorComponent } from '../../../calificacion/calificacion-form-repartidor-component/calificacion-form-repartidor-component';
+import CalificacionPedidoResponseDTO from '../../../../shared/models/calificacion/calificacion-pedido-response-dto';
+import CalificacionRepartidorResponseDTO from '../../../../shared/models/calificacion/calificacion-repartidor-response-dto';
+import { CalificacionComponent } from '../../../../shared/components/calificacion-component/calificacion-component';
 @Component({
   selector: 'app-detalle-pedido-page',
   standalone: true,
@@ -21,6 +24,7 @@ import { CalificacionFormRepartidorComponent } from '../../../calificacion/calif
     ProductoPedidoCardComponent,
     DireccionCardComponent,
     UsuarioCardComponent,
+    CalificacionComponent
 ],
   templateUrl: './detalle-pedido-page.html'
 })
@@ -35,8 +39,9 @@ export class DetallePedidoPage implements OnInit {
   protected pedido?: PedidoResponse;
   protected isLoading = true;
   protected isUsuario = this.authService.currentUser()?.role;
-  yaCalificoPedido = false
-  yaCalificoRepartidor = false
+ 
+  calificacionPedido? : CalificacionPedidoResponseDTO
+  calificacionRepartidor? : CalificacionRepartidorResponseDTO
   readonly tipoEntregaEnum = TipoEntrega;
   readonly estadoPedidoEnum = EstadoPedido;
 
@@ -144,7 +149,7 @@ export class DetallePedidoPage implements OnInit {
    */
   mostrarBotonCalificar(): boolean {
     const estado = this.pedido?.estado;
-    return estado === EstadoPedido.RECIBIDO && (!this.yaCalificoPedido|| !this.yaCalificoRepartidor); 
+    return estado === EstadoPedido.RECIBIDO && (!this.calificacionPedido|| !this.calificacionRepartidor); 
   }
 
   calificarPedido(): void {
@@ -157,8 +162,8 @@ export class DetallePedidoPage implements OnInit {
 
   obtenerCalificacionPedido(p : PedidoResponse) : void{
     this.cService.getCalificacionPedido(p.id).subscribe({
-      next:()=>{
-        this.yaCalificoPedido = true
+      next:(data)=>{
+        this.calificacionPedido = data
       },
       error:(e)=> {console.log(e)}
     })
@@ -166,10 +171,51 @@ export class DetallePedidoPage implements OnInit {
 
   obtenerCalificacionRepartidor(p : PedidoResponse) : void{
     this.cService.getCalificacionRepartidor(p.id).subscribe({
-      next:()=> {
-        this.yaCalificoRepartidor = true
+      next:(data)=> {
+        this.calificacionRepartidor = data
       },
       error:(e)=> {console.log(e)}
     })
   }
+
+  eliminarCalificacionRepartidor(id: number): void {
+    if (!confirm('¿Estás seguro de eliminar esta calificacion?')) {
+      return;
+    }
+
+    this.cService.eliminarCalificacionRepartidor(id).subscribe({
+      next: () => {
+        this._snackBar.open('✅ Calificacion eliminada correctamente', 'Cerrar', { duration: 3000 });
+        this.loadPedido();
+      },
+      error: (error) => {
+        console.error('Error al eliminar calificacion:', error);
+        this._snackBar.open('❌ Error al eliminar la calificacion', 'Cerrar', { duration: 4000 });
+      }
+    });
+  }
+  
+  eliminarCalificacionPedido(id: number): void {
+    if (!confirm('¿Estás seguro de eliminar esta calificacion?')) {
+      return;
+    }
+
+    this.cService.eliminarCalificacionPedido(id).subscribe({
+      next: () => {
+        this._snackBar.open('✅ Calificacion eliminada correctamente', 'Cerrar', { duration: 3000 });
+        this.reloadComponent();
+      },
+      error: (error) => {
+        console.error('Error al eliminar calificacion:', error);
+        this._snackBar.open('❌ Error al eliminar la calificacion', 'Cerrar', { duration: 4000 });
+      }
+    });
+  }
+
+  private reloadComponent(): void {
+    const currentUrl = this.router.url;
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+    this.router.navigateByUrl(currentUrl);
+  });
+}
 }
