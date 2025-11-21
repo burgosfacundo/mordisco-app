@@ -1,0 +1,37 @@
+<main class="pt-20">
+  <div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
+    
+    <!-- Header -->
+    <div class="text-center space-y-2">
+      <h1 class="titulo-hero">Crear calificacion</h1>
+      <p class="text-gray-600 text-lg">
+        Califica que te pareció la comida de
+      </p>
+    </div>
+    @if(tipoCalificacion === 'pedido'){
+      <!-- Formulario de calificacion de pedido -->
+      <section class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <app-calificacion-form-pedido-component
+          [pedido]="pedidoId">
+          </app-calificacion-form-pedido-component>
+        </div>
+      </section>
+    }@else {
+      ya tenes hecha esta calificacion
+    }
+
+    @if(tipoCalificacion === 'repartidor'){
+      <!-- Formulario de calificacion de repartidor -->
+      <section class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <app-calificacion-form-repartidor-component
+          [pedido]="pedidoId">
+          </app-calificacion-form-repartidor-component>
+        </div>
+      </section>
+    }@else {
+      ya tenes hecha esta calificacion
+    }
+  </div>
+</main>    

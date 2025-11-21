@@ -101,7 +101,7 @@ public class CalificacionController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('CLIENTE')")
-    @DeleteMapping("/pedido/{calificacionId}")
+    @DeleteMapping("/pedido/delete/{calificacionId}")
     public ResponseEntity<Void> eliminarCalificacionPedido(@PathVariable Long calificacionId)
             throws NotFoundException, BadRequestException {
         calificacionService.eliminarCalificacionPedido(calificacionId);
@@ -138,6 +138,21 @@ public class CalificacionController {
     }
 
     @Operation(
+            summary = "Obtener calificación de un repartidor",
+            description = "Retorna la calificación de un repartidor específico si existe"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Calificación encontrada"),
+            @ApiResponse(responseCode = "404", description = "El repartidor no tiene calificación")
+    })
+    @GetMapping("/repartidor/pedido/{pedidoId}")
+    public ResponseEntity<CalificacionRepartidorResponseDTO> getCalificacionRepartidor(
+            @PathVariable Long pedidoId) throws NotFoundException {
+
+        return ResponseEntity.ok(calificacionService.getCalificacionRepartidor(pedidoId));
+    }
+
+    @Operation(
             summary = "Obtener calificaciones de un repartidor",
             description = "Retorna todas las calificaciones recibidas por un repartidor"
     )
@@ -171,7 +186,7 @@ public class CalificacionController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('CLIENTE')")
-    @DeleteMapping("/repartidor/{calificacionId}")
+    @DeleteMapping("/repartidor/delete/{calificacionId}")
     public ResponseEntity<Void> eliminarCalificacionRepartidor(@PathVariable Long calificacionId)
             throws NotFoundException, BadRequestException {
         calificacionService.eliminarCalificacionRepartidor(calificacionId);

@@ -1,9 +1,10 @@
-import { Component, EventEmitter, input, Input, output, Output } from '@angular/core';
+import { Component, EventEmitter, inject, input, Input, output, Output } from '@angular/core';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from "@angular/material/icon";
+import { CalificacionService } from '../../../../shared/services/calificacion/calificacion-service';
 
 @Component({
   selector: 'app-detalle-pedido-component',
@@ -114,4 +115,6 @@ export class DetallePedidoComponent {
       this.onVerDetalles.emit(this.pedidoResponse()!.id);
     }
   }
+
+
 }

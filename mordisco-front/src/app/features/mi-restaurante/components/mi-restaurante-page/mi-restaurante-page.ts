@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
-import CalificacionRestauranteReponse from '../../../../shared/models/calificacion/calificacion-restaurante-response';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { HorarioService } from '../../../../shared/services/horario/horario-service';
@@ -17,6 +16,7 @@ import { RestauranteFormComponent } from "../form-restaurante-component/form-res
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import CalificacionPedidoResponseDTO from '../../../../shared/models/calificacion/calificacion-pedido-response-dto';
 
 @Component({
   selector: 'app-mi-restaurante-page',
@@ -43,7 +43,7 @@ export class MiRestaurantePageComponent implements OnInit {
   private router = inject(Router);
 
   restaurante?: RestauranteResponse;
-  calificaciones?: CalificacionRestauranteReponse[];
+  calificaciones?: CalificacionPedidoResponseDTO[];
   promociones?: PromocionResponse[];
   horariosDeAtencion?: HorarioAtencionResponse[];
 
@@ -101,7 +101,7 @@ export class MiRestaurantePageComponent implements OnInit {
     const idRestaurante = this.restaurante?.id;
     if (!idRestaurante) return;
 
-    this.calificacionService.getAllByRestauranteId(
+    this.calificacionService.getCalificacionesRestaurante(
       idRestaurante,
       this.pageCalificacion,
       this.sizeCalificacion

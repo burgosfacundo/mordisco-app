@@ -1,0 +1,90 @@
+<form [formGroup]="formCalificacionPedido" (ngSubmit)="manejarEnvioPedido()" class="space-y-4">
+   <!-- Header del formulario -->
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-bold text-gray-900">
+      Nueva calificacion
+    </h3>
+  </div>  
+    <fieldset> 
+    <label for="puntajeCom">Puntaje de la comida</label>
+    <select id="puntajeCom"
+        formControlName="puntajeComida" 
+        class="form-input"
+        [class.border-red-500]="formCalificacionPedido.get('puntajeComida')?.invalid && formCalificacionPedido.get('puntajeComida')?.touched">
+        <option value="" disabled selected>Seleccionar puntaje</option>
+        <option [value]="1">1 estrella</option>
+        <option [value]="2">2 estrellas</option>
+        <option [value]="3">3 estrellas</option>
+        <option [value]="4">4 estrellas</option>
+        <option [value]="5">5 estrellas</option>
+    </select>
+    @if (formCalificacionPedido.get('puntajeComida')?.touched && formCalificacionPedido.controls['puntajeComida'].errors?.['required']) {
+        <p class="form-error">*Obligatorio</p>
+    }
+  </fieldset>
+  <fieldset> 
+    <label for="puntajeTiem">Puntaje del packaging </label>
+    <select id="puntajeTiem"
+        formControlName="puntajeTiempo" 
+        class="form-input"
+        [class.border-red-500]="formCalificacionPedido.get('puntajeTiempo')?.invalid && formCalificacionPedido.get('puntajeTiempo')?.touched">
+        <option value="" disabled selected>Seleccionar puntaje</option>
+        <option [value]="1">1 estrella</option>
+        <option [value]="2">2 estrellas</option>
+        <option [value]="3">3 estrellas</option>
+        <option [value]="4">4 estrellas</option>
+        <option [value]="5">5 estrellas</option>
+    </select>
+    @if (formCalificacionPedido.get('puntajeTiempo')?.touched && formCalificacionPedido.controls['puntajeTiempo'].errors?.['required']) {
+        <p class="form-error">*Obligatorio</p>
+    }
+  </fieldset>
+  <fieldset> 
+    <label for="puntajePackaging">Puntaje del packaging </label>
+    <select id="puntajePackaging"
+        formControlName="puntajePackaging" 
+        class="form-input"
+        [class.border-red-500]="formCalificacionPedido.get('puntajePackaging')?.invalid && formCalificacionPedido.get('puntajePackaging')?.touched">
+        <option value="" disabled selected>Seleccionar puntaje</option>
+        <option [value]="1">1 estrella</option>
+        <option [value]="2">2 estrellas</option>
+        <option [value]="3">3 estrellas</option>
+        <option [value]="4">4 estrellas</option>
+        <option [value]="5">5 estrellas</option>
+    </select>
+    @if (formCalificacionPedido.get('puntajePackaging')?.touched && formCalificacionPedido.controls['puntajePackaging'].errors?.['required']) {
+        <p class="form-error">*Obligatorio</p>
+    }
+  </fieldset>
+  <fieldset>
+    <label for="coment">Comentario</label>
+    <input 
+        type="text" 
+        id="coment" 
+        placeholder="Ingrese el comentario aqui"
+        formControlName="comentario" 
+        class="form-input"
+        [class.border-red-500]="getError"
+        [class.focus:ring-red-500]="getError">
+        @if (getError('comentario')) {
+            <p class="form-error">{{ getError('comentario') }}</p>
+        }
+    </fieldset> 
+        <!-- Botón de submit -->
+    <div style="margin-top: 24px;">
+        <button 
+            type="submit" 
+            [disabled]="formCalificacionPedido.invalid || isSubmitting()" 
+            class="form-button"
+        >
+            @if (isSubmitting()) {
+                <span class="inline-flex items-center justify-center gap-2">
+                    <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    Enviando calificacion...
+                </span>
+            } @else {
+                Calificar
+            }
+        </button>
+    </div>   
+</form>

@@ -1,6 +1,6 @@
 import { Component, input, Input } from '@angular/core';
-import CalificacionRestauranteReponse from '../../models/calificacion/calificacion-restaurante-response';
 import { CommonModule } from '@angular/common';
+import CalificacionPedidoResponseDTO from '../../models/calificacion/calificacion-pedido-response-dto';
 
 @Component({
   selector: 'app-calificacion-component',
@@ -9,5 +9,5 @@ import { CommonModule } from '@angular/common';
   templateUrl : './calificacion-component.html'
 })
 export class CalificacionComponent {
-  calificacion = input<CalificacionRestauranteReponse>();
+  calificacion = input<CalificacionPedidoResponseDTO>();
 }

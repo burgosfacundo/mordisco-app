@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, output, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductoPedidoCardComponent } from '../producto-pedido-card-component/producto-pedido-card-component';
@@ -10,6 +10,9 @@ import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { CommonModule } from '@angular/common';
 import { UsuarioCardComponent } from "../../../../shared/components/usuario-card-component/usuario-card-component";
 import { AuthService } from '../../../../shared/services/auth-service';
+import { CalificacionService } from '../../../../shared/services/calificacion/calificacion-service';
+import { CalificacionFormPedidoComponent } from '../../../calificacion/calificacion-form-pedido-component/calificacion-form-pedido-component';
+import { CalificacionFormRepartidorComponent } from '../../../calificacion/calificacion-form-repartidor-component/calificacion-form-repartidor-component';
 @Component({
   selector: 'app-detalle-pedido-page',
   standalone: true,
@@ -17,12 +20,13 @@ import { AuthService } from '../../../../shared/services/auth-service';
     CommonModule,
     ProductoPedidoCardComponent,
     DireccionCardComponent,
-    UsuarioCardComponent
+    UsuarioCardComponent,
 ],
   templateUrl: './detalle-pedido-page.html'
 })
 export class DetallePedidoPage implements OnInit {
   private authService = inject(AuthService);
+  private cService = inject(CalificacionService)
   private _snackBar = inject(MatSnackBar);
   private pedidoService = inject(PedidoService);
   private route = inject(ActivatedRoute);
@@ -30,8 +34,9 @@ export class DetallePedidoPage implements OnInit {
 
   protected pedido?: PedidoResponse;
   protected isLoading = true;
-  protected isUsuarioRestaurante = this.authService.currentUser()?.role === 'ROLE_RESTAURANTE';
-  
+  protected isUsuario = this.authService.currentUser()?.role;
+  yaCalificoPedido = false
+  yaCalificoRepartidor = false
   readonly tipoEntregaEnum = TipoEntrega;
   readonly estadoPedidoEnum = EstadoPedido;
 
@@ -52,6 +57,7 @@ export class DetallePedidoPage implements OnInit {
       next: (data) => {
         this.pedido = data;
         this.isLoading = false;
+        this.setCalificados(this.pedido)
       },
       error: (error) => {
         console.error('Error al cargar pedido:', error);
@@ -60,6 +66,18 @@ export class DetallePedidoPage implements OnInit {
         this.router.navigate(['/restaurante/pedidos']);
       }
     });
+
+  }
+
+  setCalificados(p : PedidoResponse){
+    if(this.isUsuario === 'ROLE_CLIENTE'){
+      this.yaCalificoPedido = this.obtenerCalificacionPedido(p)
+      this.yaCalificoRepartidor = this.obtenerCalificacionRepartidor(p)
+      console.log("entro aca?")
+      console.log(this.pedido)
+      console.log(this.yaCalificoPedido)
+      console.log(this.yaCalificoRepartidor)
+    }
   }
 
   formatearEstado(estado: EstadoPedido): string {
@@ -123,5 +141,41 @@ export class DetallePedidoPage implements OnInit {
   }
   volver(): void {
     this.router.navigate(['/restaurante/pedidos']);
+  }
+
+    /**
+   * Determina si debe mostrar el botón de calificar
+   */
+  mostrarBotonCalificar(): boolean {
+    const estado = this.pedido?.estado;
+    return estado === EstadoPedido.RECIBIDO && (!this.yaCalificoPedido|| !this.yaCalificoRepartidor); 
+  }
+
+  calificarPedido(): void {
+    this.router.navigate(['cliente/calificar','pedido', this.pedido?.id]);
+  }
+
+  calificarRepartidor(): void {
+    this.router.navigate(['cliente/calificar','repartidor', this.pedido?.id]);
+  }
+
+  obtenerCalificacionPedido(p : PedidoResponse) : boolean{
+    let resp : boolean = false
+
+    this.cService.getCalificacionPedido(p.id).subscribe({
+      next:(data)=>{ if(data) resp=true},
+      error:(e)=> {console.log(e)}
+    })
+    return resp
+  }
+
+  obtenerCalificacionRepartidor(p : PedidoResponse) : boolean{
+    let resp : boolean = false
+
+    this.cService.getCalificacionRepartidor(p.id).subscribe({
+      next:(data)=>{ if(data) resp=true},
+      error:(e)=> {console.log(e)}
+    })
+    return resp
   }
 }

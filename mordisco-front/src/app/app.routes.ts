@@ -27,6 +27,7 @@ import { MisPedidosClientePage } from './features/mis-pedidos/components/mis-ped
 import { RecoverPasswordPage } from './features/auth/components/recover-password-page/recover-password-page';
 import { ResetPasswordPage } from './features/auth/components/reset-password-page/reset-password-page';
 import { RestauranteDireccionPage } from './features/mi-restaurante/components/restaurante-direccion-page/restaurante-direccion-page';
+import { CalificacionFormPage } from './features/calificacion/calificacion-form-page/calificacion-form-page';
 
 export const routes: Routes = [
   // ==========================================
@@ -113,14 +114,15 @@ export const routes: Routes = [
     path: 'cliente',
     canActivate: [authGuard, roleGuard(['ROLE_CLIENTE'])],
     children: [
-        { path: 'my-address',component: MyAddressPage },
+      { path: 'my-address',component: MyAddressPage },
       // Ver restaurante y menú
       { path: 'restaurante/:id', component: RestauranteDetallePage },
-      
       // Carrito y checkout
       { path: 'carrito', component: CarritoPage },
       { path: 'checkout', component: CheckoutPage },
-      
+      { path: 'calificar/:var/:id', component : CalificacionFormPage},
+      { path: 'calificar/:var/:id', component : CalificacionFormPage},
+
       // Confirmaciones de pago
       { path: 'pedidos/pago-exitoso', component: PagoExitosoPage },
       { path: 'pedidos/pago-fallido', component: PagoFallidoPage },

@@ -1,6 +1,6 @@
-import { Component, inject, Input } from '@angular/core';
-import CalificacionRequestDTO from '../../models/calificacion/calificacion-request-dto';
+import { Component, inject, input, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import CalificacionPedidoResponseDTO from '../../models/calificacion/calificacion-pedido-response-dto';
 
 @Component({
   selector: 'app-calificacion-card-component',
@@ -8,16 +8,18 @@ import { CommonModule } from '@angular/common';
   templateUrl: './calificacion-card-component.html'
 })
 export class CalificacionCardComponent {
-  @Input() calificacionRequest? : CalificacionRequestDTO
+   calificacionResp = input<CalificacionPedidoResponseDTO>()
 
-getInitials(): string {
-  const usuario = this.calificacionRequest?.calificacionDTO?.usuario || '';
-  const palabras = usuario.trim().split(' ');
-  
-  if (palabras.length >= 2) {
-    return (palabras[0][0] + palabras[1][0]).toUpperCase();
+  getInitials(): string {
+    
+    const nombre = this.calificacionResp()?.clienteNombre || '';
+    const primerNombre = nombre.trim().split(' ')[0] || '';
+    let iniciales = '';
+
+    if (primerNombre.length > 0) {
+      iniciales += primerNombre[0];
+    }
+
+    return iniciales.toUpperCase() || '?';
   }
-  return palabras[0]?.substring(0, 2).toUpperCase() || '?';
-}
-
 }

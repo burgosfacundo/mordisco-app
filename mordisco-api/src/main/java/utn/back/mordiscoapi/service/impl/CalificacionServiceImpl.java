@@ -70,6 +70,19 @@ public class CalificacionServiceImpl {
 
         return CalificacionMapper.toDTO(calificacion);
     }
+        /**
+     * Obtener calificacion de un repartidor
+     */
+    @Transactional(readOnly = true)
+    public CalificacionRepartidorResponseDTO getCalificacionRepartidor(Long pedidoId)
+            throws NotFoundException {
+
+        CalificacionRepartidor calificacion = calificacionRepartidorRepository.findByPedidoId(pedidoId)
+                .orElseThrow(() -> new NotFoundException("El repartidor no tiene calificación"));
+
+        return CalificacionMapper.toDTO(calificacion);
+    }
+
 
     /**
      * Obtener calificaciones de un restaurante (desde sus pedidos)

@@ -128,7 +128,7 @@ export class MisPedidosClientePage implements OnInit {
       }
     })
   }
-
+  
   navegarAHome() {
     this.router.navigate(['/home'])
   }

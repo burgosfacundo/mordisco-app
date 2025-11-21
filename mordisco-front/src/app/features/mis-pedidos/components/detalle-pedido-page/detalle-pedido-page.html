@@ -68,7 +68,34 @@
         </div>
       </div>
 
-       @if (isUsuarioRestaurante) {
+      @if(isUsuario === 'ROLE_CLIENTE'){
+        @if (mostrarBotonCalificar()) {
+          @if(!yaCalificoPedido){
+            <button 
+            (click)="calificarPedido()"
+            class="mt-auto w-full py-2.5 rounded-lg
+                  bg-red-50 text-red-700 font-semibold text-sm
+                  hover:bg-red-100 active:scale-95
+                  transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+            Calificar pedido
+          </button>
+          }
+          @if(!yaCalificoRepartidor){
+            <button 
+            (click)="calificarRepartidor()"
+            class="mt-auto w-full py-2.5 rounded-lg
+                  bg-red-50 text-red-700 font-semibold text-sm
+                  hover:bg-red-100 active:scale-95
+                  transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+            Calificar repartidor
+          </button>
+          }
+        }
+      }  
+      
+       @if (isUsuario === 'ROLE_RESTAURANTE') {
         <section class="space-y-4">
           <h2 class="titulo-seccion">
             Información del Cliente
@@ -76,7 +103,7 @@
           <app-usuario-card-component [usuario]="pedido.cliente"class="block" />
         </section>
       }
- 
+      
 
       <!-- Productos del Pedido -->
       <section class="space-y-4">
@@ -155,7 +182,7 @@
       }
 
     <div class="px-6 pb-6 pt-2 space-y-2">
-      @if (isUsuarioRestaurante) {
+      @if (isUsuario === 'ROLE_RESTAURANTE') {
         @if (pedido.estado === 'PENDIENTE') {
           <button 
             (click)="aceptarPedido()"
