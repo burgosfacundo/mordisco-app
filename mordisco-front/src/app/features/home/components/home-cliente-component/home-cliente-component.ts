@@ -91,7 +91,6 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
         this.restaurantes = [...data.content];
         this.lengthRestaurantes = data.totalElements;
         this.isLoadingRestaurantes = false;
-        
       },
       error: () => {
         this._snackBar.open('❌ Error al cargar los restaurantes','Cerrar' , { duration: 3000 });
@@ -106,7 +105,7 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
         this.lengthPromocion = data.totalElements;
         this.isLoadingPromocion = false;
       },
-      error: () => {
+      error: () => {        
         this._snackBar.open('❌ Error al cargar los restaurantes con promociones', 'Cerrar' , { duration: 3000 });
       }
     });

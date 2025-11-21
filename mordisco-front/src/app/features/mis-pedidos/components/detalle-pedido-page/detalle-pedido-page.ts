@@ -56,8 +56,8 @@ export class DetallePedidoPage implements OnInit {
     this.pedidoService.getById(Number(id)).subscribe({
       next: (data) => {
         this.pedido = data;
-        this.isLoading = false;
         this.setCalificados(this.pedido)
+        this.isLoading = false
       },
       error: (error) => {
         console.error('Error al cargar pedido:', error);
@@ -71,12 +71,8 @@ export class DetallePedidoPage implements OnInit {
 
   setCalificados(p : PedidoResponse){
     if(this.isUsuario === 'ROLE_CLIENTE'){
-      this.yaCalificoPedido = this.obtenerCalificacionPedido(p)
-      this.yaCalificoRepartidor = this.obtenerCalificacionRepartidor(p)
-      console.log("entro aca?")
-      console.log(this.pedido)
-      console.log(this.yaCalificoPedido)
-      console.log(this.yaCalificoRepartidor)
+      this.obtenerCalificacionPedido(p)
+      this.obtenerCalificacionRepartidor(p)
     }
   }
 
@@ -159,23 +155,21 @@ export class DetallePedidoPage implements OnInit {
     this.router.navigate(['cliente/calificar','repartidor', this.pedido?.id]);
   }
 
-  obtenerCalificacionPedido(p : PedidoResponse) : boolean{
-    let resp : boolean = false
-
+  obtenerCalificacionPedido(p : PedidoResponse) : void{
     this.cService.getCalificacionPedido(p.id).subscribe({
-      next:(data)=>{ if(data) resp=true},
+      next:()=>{
+        this.yaCalificoPedido = true
+      },
       error:(e)=> {console.log(e)}
     })
-    return resp
   }
 
-  obtenerCalificacionRepartidor(p : PedidoResponse) : boolean{
-    let resp : boolean = false
-
+  obtenerCalificacionRepartidor(p : PedidoResponse) : void{
     this.cService.getCalificacionRepartidor(p.id).subscribe({
-      next:(data)=>{ if(data) resp=true},
+      next:()=> {
+        this.yaCalificoRepartidor = true
+      },
       error:(e)=> {console.log(e)}
     })
-    return resp
   }
 }
