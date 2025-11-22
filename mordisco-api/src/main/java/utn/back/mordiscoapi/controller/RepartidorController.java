@@ -6,10 +6,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.repartidor.*;
 import utn.back.mordiscoapi.service.interf.IRepartidorService;
 
@@ -53,6 +55,61 @@ public class RepartidorController {
 
         return ResponseEntity.ok(repartidores);
     }
+
+
+    /**
+     * Traer todos los pedidos asignados a un repartidor
+     */
+    @Operation(
+            summary = "Traer todos los pedidos asignados a un repartidor",
+            description = """
+            Encuentra los pedidos entregados o pendientes a entregar de un repartidor especifico
+            Útil para:
+            - Mostrar el historial de pedidos de un repartidor espacifico
+            **Rol necesario: ADMIN o REPARTIDOR**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REPARTIDOR')")
+    @GetMapping("/pedidos/{id}")
+    public ResponseEntity<Page<PedidoResponseDTO>> getAllPedidosRepartidor(
+            @RequestParam int page,
+            @RequestParam int size,
+            @PathVariable Long id ) throws NotFoundException{
+        return ResponseEntity.ok(repartidorService.findPedidosByRepartidor(page,size,id));
+    }
+
+    /**
+     * Traer todos los pedidos en camino asignados a un repartidor
+     */
+    @Operation(
+            summary = "Traer todos los pedidos en camino asignados a un repartidor",
+            description = """
+            Encuentra los pedidos pendientes a entregar de un repartidor especifico
+            Útil para:
+            - Mostrar el historial de pedidos de un repartidor espacifico
+            **Rol necesario: ADMIN o REPARTIDOR**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REPARTIDOR')")
+    @GetMapping("/a-entregar/{id}")
+    public ResponseEntity<Page<PedidoResponseDTO>> getPedidosAEntregarRepartidor(
+            @RequestParam int page,
+            @RequestParam int size,
+            @PathVariable Long id ) throws NotFoundException{
+        return ResponseEntity.ok(repartidorService.findPedidosByRepartidor_EnCamino(page,size,id));
+    }
+
+
 
     /**
      * Obtener estadísticas del repartidor

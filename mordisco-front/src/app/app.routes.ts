@@ -28,6 +28,7 @@ import { RecoverPasswordPage } from './features/auth/components/recover-password
 import { ResetPasswordPage } from './features/auth/components/reset-password-page/reset-password-page';
 import { RestauranteDireccionPage } from './features/mi-restaurante/components/restaurante-direccion-page/restaurante-direccion-page';
 import { CalificacionFormPage } from './features/calificacion/calificacion-form-page/calificacion-form-page';
+import { EntregasPage } from './features/entregas/entregas-page/entregas-page';
 
 export const routes: Routes = [
   // ==========================================
@@ -141,7 +142,8 @@ export const routes: Routes = [
     path: 'repartidor',
     canActivate: [authGuard, roleGuard(['ROLE_REPARTIDOR'])],
     children: [
-      // Por implementar
+      { path: 'pedidos/detalle-entrega/:id', component: DetallePedidoPage },
+      {path : 'pedidos/historial', component : EntregasPage}
     ]
   },
 
@@ -152,7 +154,6 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [authGuard, roleGuard(['ROLE_ADMIN'])],
     children: [
-      // Por implementar
     ]
   },
 

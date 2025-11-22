@@ -51,8 +51,12 @@ export class PedidoService {
     return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/clientes/${clienteId}`,{ params })
   }
 
-    getAllByClienteYEstado(clienteId: number, estado : EstadoPedido,page: number, size: number): Observable<PaginationResponse<PedidoResponse>> {
+  getAllByClienteYEstado(clienteId: number, estado : EstadoPedido,page: number, size: number): Observable<PaginationResponse<PedidoResponse>> {
     const params = new HttpParams().set('estado', estado).set('page', page).set('size', size)
     return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/clientes/${clienteId}/state`,{ params })
+  }
+  
+  marcarComoEntregado(pedidoId: number) {
+    return this.http.put<void>(`${environment.apiUrl}/pedidos/${pedidoId}/entregar`, {});
   }
 }

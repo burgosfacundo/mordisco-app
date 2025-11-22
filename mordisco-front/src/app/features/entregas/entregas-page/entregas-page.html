@@ -1,0 +1,59 @@
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8 mt-20">
+  
+  <!-- Header -->
+  <div class="text-center space-y-2">
+    <h1 class="titulo-hero">Mis pedidos entregados</h1>
+    <p class="text-gray-600 text-lg">Historial completo de tus pedidos entregados</p>
+  </div>
+
+  <!-- Contenido -->
+  <div class="mt-8">
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando pedidos...</p>
+      </div>
+    } @else {
+      @if (!pedidos || pedidos.length > 0) {
+        <!-- Grid de pedidos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (pedido of pedidos; track pedido.id) {
+              <app-pedido-card-component
+                [isRepartidor]="true"
+                [pedido]="pedido"
+                (marcarRecibido)="marcarRecibido($event)"
+                class="block h-full">
+              </app-pedido-card-component>
+          }
+        </div>
+
+        <!-- Paginador -->
+        <div class="flex justify-center mt-8">
+          <mat-paginator
+            [length]="length"
+            [pageSize]="sizePedidos"
+            [pageIndex]="pagePedidos"
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            (page)="onPageChangePedidos($event)"
+            class="bg-white rounded-xl shadow-md">
+          </mat-paginator>
+        </div>
+      } @else {
+        <!-- Empty State -->
+        <div class="empty-state">
+          <mat-icon class="empty-icon">receipt_long</mat-icon>
+          <h3 class="empty-title">No tienes pedidos</h3>
+          <p class="empty-description">
+            Cuando hagas entrega de un pedido, aparecerá aquí
+          </p>
+          <button 
+            (click)="navegarAHome()"
+            class="btn-primary mt-6">
+            <mat-icon>restaurant</mat-icon>
+            Ver pedidos para repartir
+          </button>
+        </div>
+      }
+    }
+  </div>
+</div>

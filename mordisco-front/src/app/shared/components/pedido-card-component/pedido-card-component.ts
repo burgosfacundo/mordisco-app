@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, input, output } from '@angular/core';
+import { Component, Input, Output, EventEmitter, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import PedidoResponse from '../../models/pedido/pedido-response';
@@ -12,10 +12,12 @@ import PedidoResponse from '../../models/pedido/pedido-response';
 export class PedidoCardComponent {
   pedido = input<PedidoResponse>();
   isRestaurante = input<boolean>(false);
+  isRepartidor = input<boolean>(false);
   
   aceptarPedido = output<number>();
   rechazarPedido = output<number>();
   marcarEnCamino = output<number>();
+  marcarRecibido = output<number>();
 
   getEstadoBadgeClass(): string {
     const estado = this.pedido()?.estado;
@@ -74,4 +76,11 @@ export class PedidoCardComponent {
       this.marcarEnCamino.emit(this.pedido()!.id);
     }
   }
+
+  onMarcarRecibido(): void {
+    if (this.pedido()?.id) {
+      this.marcarRecibido.emit(this.pedido()!.id);
+    }
+  }
+
 }

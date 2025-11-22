@@ -73,27 +73,29 @@
       </div>
     }
 
+    @if(!isRepartidor()){
+      <!-- Tipo de Entrega -->
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            @if (pedido()?.tipoEntrega === 'DELIVERY') {
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            } @else {
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            }
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Tipo de entrega</p>
+          <p class="text-sm font-semibold text-gray-900">
+            {{ pedido()?.tipoEntrega === 'DELIVERY' ? 'A domicilio' : 'Retiro en local' }}
+          </p>
+        </div>
+      </div>
+    }
 
-    <!-- Tipo de Entrega -->
-    <div class="flex items-start gap-3">
-      <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          @if (pedido()?.tipoEntrega === 'DELIVERY') {
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-          } @else {
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-          }
-        </svg>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">Tipo de entrega</p>
-        <p class="text-sm font-semibold text-gray-900">
-          {{ pedido()?.tipoEntrega === 'DELIVERY' ? 'A domicilio' : 'Retiro en local' }}
-        </p>
-      </div>
-    </div>
 
     <!-- Fecha y Hora -->
     <div class="flex items-start gap-3">
@@ -111,7 +113,6 @@
       </div>
     </div>
 
-    <!-- Total -->
     <div class="mt-4 pt-4 border-t border-gray-200">
       <div class="flex items-center justify-between">
         <span class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total</span>
@@ -158,15 +159,31 @@
       }
     } 
 
-    <!-- Botón Ver Detalle (para todos) -->
-    <button 
-      [routerLink]="['/restaurante/pedidos/detalle', pedido()?.id]"
-      class="w-full py-2.5 rounded-lg
-             bg-primary-50 text-primary-700 font-semibold text-sm
-             hover:bg-primary-100 active:scale-95
-             transition-all duration-200
-             focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-      Ver Detalles
-    </button>
+    <!-- Botón Ver Detalle (para todos menos repartidor) -->
+    @if(!isRepartidor()){
+      <button 
+        [routerLink]="['/restaurante/pedidos/detalle', pedido()?.id]"
+        class="w-full py-2.5 rounded-lg
+              bg-primary-50 text-primary-700 font-semibold text-sm
+              hover:bg-primary-100 active:scale-95
+              transition-all duration-200
+              focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+        Ver Detalles
+      </button>
+    }@else {
+      @if (pedido()?.estado === 'EN_PROCESO') {
+        <!--Para asiganrse el pedido-->
+      } @else if (pedido()?.estado === 'EN_CAMINO') {
+          <button mat-raised-button color="primary" 
+          class="w-full py-2.5 rounded-lg
+                    bg-blue-50 text-blue-700 font-semibold text-sm
+                    hover:bg-blue-100 active:scale-95
+                    transition-all duration-200
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          (click)="onMarcarRecibido()">Marcar como entregado</button>
+    
+        }
+    } 
+
   </div>
 </article>

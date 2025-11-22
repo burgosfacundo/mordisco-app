@@ -4,6 +4,7 @@ import { AuthService } from '../../../../shared/services/auth-service';
 import { HomeRestauranteComponent } from '../home-restaurante-component/home-restaurante-component';
 import { HomeClienteComponent } from '../home-cliente-component/home-cliente-component';
 import { HomeAdminComponent } from '../home-admin-component/home-admin-component';
+import { HomeRepartidorComponent } from "../home-repartidor-component/home-repartidor-component";
 
 @Component({
   selector: 'app-home-page',
@@ -12,8 +13,9 @@ import { HomeAdminComponent } from '../home-admin-component/home-admin-component
     CommonModule,
     HomeRestauranteComponent,
     HomeClienteComponent,
-    HomeAdminComponent
-  ],
+    HomeAdminComponent,
+    HomeRepartidorComponent
+],
   templateUrl: './redirect-home-page.html'
 })
 export class HomePage implements OnInit {

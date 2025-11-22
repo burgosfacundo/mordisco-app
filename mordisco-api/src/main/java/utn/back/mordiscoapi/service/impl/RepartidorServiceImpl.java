@@ -2,8 +2,13 @@ package utn.back.mordiscoapi.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.mapper.PedidoMapper;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.repartidor.*;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.RepartidorRepository;
@@ -20,6 +25,39 @@ public class RepartidorServiceImpl implements IRepartidorService {
 
     private final RepartidorRepository repartidorRepository;
     private final UsuarioRepository usuarioRepository;
+
+    /**
+     * Lista todos los pedidos de un repartidor
+     * @param id el ID del repartidor a buscar sus pedidos.
+     * @throws NotFoundException si el repartidor no se encuentra.
+     */
+    @Override
+    public Page<PedidoResponseDTO> findPedidosByRepartidor (int pageNo, int pageSize,Long id) throws  NotFoundException{
+        if (!usuarioRepository.existsById(id)) {
+            throw new NotFoundException("Usuario no encontrado");
+        }
+        Pageable pageable = PageRequest.of(pageNo,pageSize);
+        return repartidorRepository
+                .findPedidosByRepartidor(id, pageable)
+                .map(PedidoMapper::toDTO);
+    }
+
+    /**
+     * Lista todos los pedidos de un repartidor en camino
+     * @param id el ID del repartidor a buscar sus pedidos.
+     * @throws NotFoundException si el repartidor no se encuentra.
+     */
+    @Override
+    public Page<PedidoResponseDTO> findPedidosByRepartidor_EnCamino (int pageNo, int pageSize,Long id) throws  NotFoundException{
+        if (!usuarioRepository.existsById(id)) {
+            throw new NotFoundException("Usuario no encontrado");
+        }
+        Pageable pageable = PageRequest.of(pageNo,pageSize);
+        return repartidorRepository
+                .findPedidosAEntregarByRepartidor(id, pageable)
+                .map(PedidoMapper::toDTO);
+    }
+
 
 
     @Override

@@ -109,7 +109,7 @@ export class NavBarConfigFactory {
           { label: 'Mi Perfil', icon: 'person', route: '/profile' },
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Entregas', icon: 'delivery_dining', route: '/repartidor/entregas' },
-          { label: 'Historial', icon: 'history', route: '/repartidor/historial' },
+          { label: 'Historial', icon: 'history', route: '/repartidor/pedidos/historial' },
           { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
         ]
       }
