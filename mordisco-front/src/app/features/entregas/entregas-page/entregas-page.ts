@@ -84,6 +84,10 @@ export class EntregasPage {
           }});
   }
 
+  verDetalle(pedidoId: number): void {
+    this.router.navigate(['/repartidor/pedidos/detalle', pedidoId])
+  }
+
   onPageChangePedidos(event: PageEvent): void {
     this.pagePedidos = event.pageIndex
     this.sizePedidos = event.pageSize;

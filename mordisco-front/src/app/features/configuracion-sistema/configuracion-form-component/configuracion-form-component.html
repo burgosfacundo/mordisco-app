@@ -1,0 +1,167 @@
+<form 
+    [formGroup]="configForm" 
+    (ngSubmit)="actualizarConfiguracion()" 
+    class="form-container"
+>
+    <fieldset class="form-field">
+        <label for="comisionPlataformaID" class="form-label">Comision para la plataforma</label>
+        <input 
+            type="text" 
+            id="comisionPlataformaID" 
+            placeholder="Ingresa comision de la plataforma"
+            formControlName="comisionPlataforma" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('comisionPlataforma')) {
+            <p class="form-error">{{ getError('comisionPlataforma') }}</p>
+        }
+    </fieldset>
+    <fieldset class="form-field">
+        <label for="radioMaximoEntregaID" class="form-label">Radio maximo de entrega</label>
+        <input 
+            type="text" 
+            id="radioMaximoEntregaID" 
+            placeholder="Ingresa radio maximo de la entrega"
+            formControlName="radioMaximoEntrega" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('radioMaximoEntrega')) {
+            <p class="form-error">{{ getError('radioMaximoEntrega') }}</p>
+        }
+    </fieldset>
+    <fieldset class="form-field">
+        <label for="tiempoMaximoEntregaID" class="form-label">Tiempo maximo de entrega</label>
+        <input 
+            type="text" 
+            id="tiempoMaximoEntregaID" 
+            placeholder="Ingresa tiempo maximo de la entrega"
+            formControlName="tiempoMaximoEntrega" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('tiempoMaximoEntrega')) {
+            <p class="form-error">{{ getError('tiempoMaximoEntrega') }}</p>
+        }
+    </fieldset>
+    <fieldset class="form-field">
+        <label for="costoBaseDeliveryID" class="form-label">Costo base de delivery</label>
+        <input 
+            type="text" 
+            id="costoBaseDeliveryID" 
+            placeholder="Ingresa costo base del delivery"
+            formControlName="costoBaseDelivery" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('costoBaseDelivery')) {
+            <p class="form-error">{{ getError('costoBaseDelivery') }}</p>
+        }
+    </fieldset>  
+    <fieldset class="form-field">
+        <label for="costoPorKilometroID" class="form-label">Costo por kilometro</label>
+        <input 
+            type="text" 
+            id="costoPorKilometroID" 
+            placeholder="Ingresa costo por kilometro"
+            formControlName="costoPorKilometro" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('costoPorKilometro')) {
+            <p class="form-error">{{ getError('costoPorKilometro') }}</p>
+        }
+    </fieldset>    
+    <fieldset class="form-field">
+        <label for="montoMinimoPedidoID" class="form-label">Monto minimo de pedido</label>
+        <input 
+            type="text" 
+            id="montoMinimoPedidoID" 
+            placeholder="Ingresa monto minimo por pedido"
+            formControlName="montoMinimoPedido" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('montoMinimoPedido')) {
+            <p class="form-error">{{ getError('montoMinimoPedido') }}</p>
+        }
+    </fieldset> 
+    <fieldset class="form-field">
+        <label for="porcentajeGananciasRepartidorID" class="form-label">Porcentaje de ganancias para el repartidor</label>
+        <input 
+            type="text" 
+            id="porcentajeGananciasRepartidorID" 
+            placeholder="Ingresa porcentaje de ganancia para repartidor"
+            formControlName="porcentajeGananciasRepartidor" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('porcentajeGananciasRepartidor')) {
+            <p class="form-error">{{ getError('porcentajeGananciasRepartidor') }}</p>
+        }
+    </fieldset>  
+    <fieldset class="form-field">
+        <label class="form-label">Modo mantenimiento
+            <label class="flex items-center gap-3 cursor-pointer mt-2 p-4 rounded-lg border-2 transition-all duration-200"
+                   [class.border-green-500]="configForm.get('modoMantenimiento')?.value"
+                   [class.bg-green-50]="configForm.get('modoMantenimiento')?.value"
+                   [class.border-gray-300]="!configForm.get('modoMantenimiento')?.value"
+                   [class.hover:bg-gray-50]="!configForm.get('modoMantenimiento')?.value">
+              <input 
+                type="checkbox" 
+                formControlName="modoMantenimiento"
+                class="w-5 h-5 rounded border-gray-300 text-green-600 
+                       focus:ring-2 focus:ring-green-500">
+              <div class="flex-1">
+                <span class="text-sm font-semibold block"
+                      [class.text-green-700]="configForm.get('modoMantenimiento')?.value"
+                      [class.text-gray-700]="!configForm.get('modoMantenimiento')?.value">
+                  {{ configForm.get('modoMantenimiento')?.value ? 'Modo mantenimiento activado' : 'Modo mantenimiento desactivado' }}
+                </span>
+              </div>
+            </label>
+        </label>
+    </fieldset>    
+    <fieldset class="form-field">
+        <label for="mensajeMantenimientoID" class="form-label">Mensaje de mantenimiento</label>
+        <input 
+            type="text" 
+            id="mensajeMantenimientoID" 
+            placeholder="Ingresa mensaje del mantenimiento"
+            formControlName="mensajeMantenimiento" 
+            class="form-input"
+            [class.border-red-500]="getError"
+            [class.focus:ring-red-500]="getError"
+        >
+        @if (getError('mensajeMantenimiento')) {
+            <p class="form-error">{{ getError('mensajeMantenimiento') }}</p>
+        }
+    </fieldset>   
+
+    <!-- Botón de submit -->
+    <div style="margin-top: 24px;">
+        <button 
+            type="submit" 
+            [disabled]="configForm.invalid || isSubmitting()" 
+            class="form-button"
+        >
+            @if (isSubmitting()) {
+                <span class="inline-flex items-center justify-center gap-2">
+                    <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    Guardando...
+                </span>
+            } @else {
+                Guardar Cambios
+            }
+        </button>
+    </div>
+
+</form>

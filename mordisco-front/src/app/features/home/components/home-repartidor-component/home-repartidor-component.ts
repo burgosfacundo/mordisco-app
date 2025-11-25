@@ -9,6 +9,7 @@ import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { PedidoCardComponent } from "../../../../shared/components/pedido-card-component/pedido-card-component";
 import {MatDialog} from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../../shared/store/ConfirmDialogComponent';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home-repartidor-component',
@@ -21,6 +22,7 @@ export class HomeRepartidorComponent {
   private authService = inject(AuthService);
   private repartidorService = inject(RepartidorService);
   private dialog = inject(MatDialog);
+  private router = inject(Router)
 
   pedidosPendientes?: PedidoResponse[];
 
@@ -83,6 +85,10 @@ export class HomeRepartidorComponent {
               { duration: 4000 }
             );
           }});
+  }
+
+  verDetalle(pedidoId: number): void {
+    this.router.navigate(['/repartidor/pedidos/detalle', pedidoId])
   }
 
   onPageChangePedidosEnCamino(event: PageEvent): void {

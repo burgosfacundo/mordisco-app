@@ -34,14 +34,15 @@
             <p class="text-2xl font-bold text-blue-900">{{ pedido.estado }}</p>
           </div>
         </div>
-
-        <!-- Tipo de Entrega -->
-        <div class="bg-linear-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
-          <div class="space-y-2">
-            <p class="text-orange-600 text-sm font-semibold uppercase tracking-wide">Tipo de Entrega</p>
-            <p class="text-2xl font-bold text-orange-900">{{ pedido.tipoEntrega }}</p>
+        @if(isUsuario !== 'ROLE_REPARTIDOR'){
+          <!-- Tipo de Entrega -->
+          <div class="bg-linear-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
+            <div class="space-y-2">
+              <p class="text-orange-600 text-sm font-semibold uppercase tracking-wide">Tipo de Entrega</p>
+              <p class="text-2xl font-bold text-orange-900">{{ pedido.tipoEntrega }}</p>
+            </div>
           </div>
-        </div>
+        }
 
         <!-- Total -->
         <div class="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">

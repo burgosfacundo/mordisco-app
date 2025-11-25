@@ -93,6 +93,7 @@ export class NavBarConfigFactory {
         { label: 'Ver Pedidos', icon: 'receipt_long', route: '/admin/pedidos' },
         { label: 'Ver Usuarios', icon: 'people', route: '/admin/usuarios' },
         { label: 'Estadísticas', icon: 'analytics', route: '/admin/estadisticas' },
+        { label: 'Configuracion del sistema', icon: 'settings', route: '/admin/configuracion' },        
         { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
       ]
     };

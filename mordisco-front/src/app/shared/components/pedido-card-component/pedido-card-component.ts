@@ -1,12 +1,11 @@
 import { Component, Input, Output, EventEmitter, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import PedidoResponse from '../../models/pedido/pedido-response';
 
 @Component({
   selector: 'app-pedido-card-component',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './pedido-card-component.html'
 })
 export class PedidoCardComponent {
@@ -18,6 +17,8 @@ export class PedidoCardComponent {
   rechazarPedido = output<number>();
   marcarEnCamino = output<number>();
   marcarRecibido = output<number>();
+  verDetalles = output<number>();
+
 
   getEstadoBadgeClass(): string {
     const estado = this.pedido()?.estado;
@@ -83,4 +84,9 @@ export class PedidoCardComponent {
     }
   }
 
+  onVerDetalles(): void {
+    if (this.pedido()?.id) {
+      this.verDetalles.emit(this.pedido()!.id);
+    }
+  }
 }
