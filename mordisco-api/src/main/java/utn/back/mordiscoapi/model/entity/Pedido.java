@@ -86,12 +86,12 @@ public class Pedido {
     }
 
     public boolean puedeSerCalificado() {
-        return EstadoPedido.RECIBIDO.equals(this.estado)
+        return EstadoPedido.COMPLETADO.equals(this.estado)
                 && this.calificacionPedido == null;
     }
 
     public boolean repartidorPuedeSerCalificado() {
-        return EstadoPedido.RECIBIDO.equals(this.estado)
+        return EstadoPedido.COMPLETADO.equals(this.estado)
                 && this.repartidor != null
                 && this.calificacionRepartidor == null;
     }

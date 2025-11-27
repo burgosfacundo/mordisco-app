@@ -1,11 +1,11 @@
-import { Component, EventEmitter, inject, input, Input, OnChanges, OnInit, output, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, inject, input, OnChanges, OnInit, output, signal, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { DireccionService } from '../../services/direccion-service';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import DireccionRequest from '../../../../shared/models/direccion/direccion-request';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
+import { NotificationService } from '../../../../core/services/notification-service';
 
 @Component({
   selector: 'app-direccion-form-component',
@@ -16,7 +16,7 @@ import DireccionResponse from '../../../../shared/models/direccion/direccion-res
 export class DireccionFormComponent implements OnInit , OnChanges{
   private fb = inject(FormBuilder);
   private direccionService = inject(DireccionService);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   protected validationService = inject(FormValidationService);
 
   direccion = input<DireccionResponse>();
@@ -90,13 +90,11 @@ export class DireccionFormComponent implements OnInit , OnChanges{
       // Modo edición
       this.direccionService.update(dir.id, direccionData).subscribe({
         next: () => {
-          this.snackBar.open('✅ Dirección actualizada correctamente', 'Cerrar', { duration: 3000 });
+          this.notificationService.success('✅ Dirección actualizada correctamente');
           this.resetForm();
           this.onSaved.emit();
         },
-        error: (error) => {
-          console.error('Error:', error);
-          this.snackBar.open('❌ Error al actualizar la dirección', 'Cerrar', { duration: 4000 });
+        error: () => {
           this.isSubmitting.set(false);
         }
       });
@@ -104,13 +102,11 @@ export class DireccionFormComponent implements OnInit , OnChanges{
       // Modo creación
       this.direccionService.save(direccionData).subscribe({
         next: () => {
-          this.snackBar.open('✅ Dirección guardada correctamente', 'Cerrar', { duration: 3000 });
+          this.notificationService.success('✅ Dirección guardada correctamente');
           this.resetForm();
           this.onSaved.emit();
         },
-        error: (error) => {
-          console.error('Error:', error);
-          this.snackBar.open('❌ Error al guardar la dirección', 'Cerrar', { duration: 4000 });
+        error: () => {
           this.isSubmitting.set(false);
         }
       });

@@ -2,413 +2,539 @@
 -- data.sql (ordered for FK integrity) --
 
 -- 1) roles
-INSERT INTO `roles` VALUES (1,'ROLE_ADMIN'),(2,'ROLE_CLIENTE'),(3,'ROLE_RESTAURANTE');
+INSERT INTO `roles` VALUES (1,'ROLE_ADMIN'),(2,'ROLE_CLIENTE'),(3,'ROLE_RESTAURANTE'),(4,'ROLE_REPARTIDOR');
 
--- 2) usuarios
-INSERT INTO `usuarios` VALUES 
-(1,'Pérez','admin@mordisco.com','Admin','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','1111111111',1),
-(2,'Alvarez','cliente1@mordisco.com','Juan','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333331',2),
-(3,'Benítez','cliente2@mordisco.com','Carla','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333332',2),
-(4,'Cabrera','cliente3@mordisco.com','Pedro','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333333',2),
-(5,'Castro','cliente4@mordisco.com','Ana','$2a$10$6w3FGuusuariosrolespromociones7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333334',2),
-(6,'González','cliente5@mordisco.com','Martín','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333335',2),
-(7,'Herrera','cliente6@mordisco.com','Sandra','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333336',2),
-(8,'Jiménez','cliente7@mordisco.com','Luis','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333337',2),
-(9,'Luna','cliente8@mordisco.com','Patricia','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333338',2),
-(10,'Martínez','cliente9@mordisco.com','Tomás','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333339',2),
-(11,'Moreno','cliente10@mordisco.com','Ricardo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333340',2),
-(12,'Navarro','cliente11@mordisco.com','Marta','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333341',2),
-(13,'Oliva','cliente12@mordisco.com','Raúl','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333342',2),
-(14,'Pérez','cliente13@mordisco.com','José','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333343',2),
-(15,'Ramírez','cliente14@mordisco.com','Verónica','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333344',2),
-(16,'Ríos','cliente15@mordisco.com','Estela','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333345',2),
-(17,'Rodríguez','cliente16@mordisco.com','Antonio','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333346',2),
-(18,'Sánchez','cliente17@mordisco.com','Elena','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333347',2),
-(19,'Torres','cliente18@mordisco.com','Diego','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333348',2),
-(20,'Vargas','cliente19@mordisco.com','Joaquín','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333349',2),
-(21,'Álvarez','cliente20@mordisco.com','Sofía','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333350',2),
-(22,'Bravo','cliente21@mordisco.com','Gabriela','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333351',2),
-(23,'Cano','cliente22@mordisco.com','Felipe','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333352',2),
-(24,'Castillo','cliente23@mordisco.com','Luisana','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333353',2),
-(25,'Domínguez','cliente24@mordisco.com','Pablo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333354',2),
-(26,'Gómez','cliente25@mordisco.com','Nicolás','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333355',2),
-(27,'Gutiérrez','cliente26@mordisco.com','Marina','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333356',2),
-(28,'López','cliente27@mordisco.com','Andrés','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333357',2),
-(29,'Méndez','cliente28@mordisco.com','Juanita','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333358',2),
-(30,'Paredes','cliente29@mordisco.com','Ricardo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333359',2),
-(31,'Suárez','cliente30@mordisco.com','Patricio','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333360',2),
-(32,'Paredes','dueno1@mordisco.com','Andrés','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333316',3),
-(33,'Quintero','dueno2@mordisco.com','Elena','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333317',3),
-(34,'Ramos','dueno3@mordisco.com','Esteban','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333318',3),
-(35,'Sánchez','dueno4@mordisco.com','Gabriela','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333319',3),
-(36,'Torres','dueno5@mordisco.com','Hugo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333320',3),
-(37,'Urbina','dueno6@mordisco.com','Isabel','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333321',3),
-(38,'Valdez','dueno7@mordisco.com','Javier','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333322',3),
-(39,'Vega','dueno8@mordisco.com','Laura','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333323',3),
-(40,'Zapata','dueno9@mordisco.com','Marcos','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333324',3),
-(41,'Acosta','dueno10@mordisco.com','Natalia','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333325',3),
-(42,'Blanco','dueno11@mordisco.com','Oscar','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333326',3),
-(43,'Campos','dueno12@mordisco.com','Paula','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333327',3),
-(44,'Díaz','dueno13@mordisco.com','Ricardo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333328',3),
-(45,'Estévez','dueno14@mordisco.com','Sofía','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333329',3),
-(46,'Flores','dueno15@mordisco.com','Tomás','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333330',3),
-(47,'Burgos','facu@example.com','Facu','$2a$10$fBN95Su0JN8T/HWqL/K9zuX6Yjp.FLVVBX/TYpxIayLTwqVlgHCsW','1234587',1),
-(48,'Bazan','lucre@hotmail.com','Lucre','$2a$10$G5ONGR1MENZxN65ekqYBreEt7VH9I8YHhyUvKEvBP1H7gI7wRDFO6','12546813',1);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (1,'Pérez','admin@mordisco.com','Admin','$2a$10$q.w4chhllSxhfEk.pSwX.OPunLp1cVyC.uJ1ddf8cOJDRtpqaPX/i','1111111111',1,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (2,'Alvarez','cliente1@mordisco.com','Juan','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333331',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (3,'Benítez','cliente2@mordisco.com','Carla','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333332',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (4,'Cabrera','cliente3@mordisco.com','Pedro','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333333',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (5,'Castro','cliente4@mordisco.com','Ana','$2a$10$6w3FGuusuariosrolespromociones7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333334',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (6,'González','cliente5@mordisco.com','Martín','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333335',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (7,'Herrera','cliente6@mordisco.com','Sandra','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333336',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (8,'Jiménez','cliente7@mordisco.com','Luis','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333337',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (9,'Luna','cliente8@mordisco.com','Patricia','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333338',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (10,'Martínez','cliente9@mordisco.com','Tomás','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333339',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (11,'Moreno','cliente10@mordisco.com','Ricardo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333340',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (12,'Navarro','cliente11@mordisco.com','Marta','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333341',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (13,'Oliva','cliente12@mordisco.com','Raúl','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333342',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (14,'Pérez','cliente13@mordisco.com','José','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333343',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (15,'Ramírez','cliente14@mordisco.com','Verónica','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333344',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (16,'Ríos','cliente15@mordisco.com','Estela','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333345',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (17,'Rodríguez','cliente16@mordisco.com','Antonio','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333346',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (18,'Sánchez','cliente17@mordisco.com','Elena','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333347',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (19,'Torres','cliente18@mordisco.com','Diego','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333348',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (20,'Vargas','cliente19@mordisco.com','Joaquín','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333349',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (21,'Álvarez','cliente20@mordisco.com','Sofía','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333350',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (22,'Bravo','cliente21@mordisco.com','Gabriela','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333351',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (23,'Cano','cliente22@mordisco.com','Felipe','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333352',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (24,'Castillo','cliente23@mordisco.com','Luisana','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333353',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (25,'Domínguez','cliente24@mordisco.com','Pablo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333354',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (26,'Gómez','cliente25@mordisco.com','Nicolás','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333355',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (27,'Gutiérrez','cliente26@mordisco.com','Marina','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333356',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (28,'López','cliente27@mordisco.com','Andrés','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333357',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (29,'Méndez','cliente28@mordisco.com','Juanita','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333358',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (30,'Paredes','cliente29@mordisco.com','Ricardo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333359',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (31,'Suárez','cliente30@mordisco.com','Patricio','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333360',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (32,'Paredes','dueno1@mordisco.com','Andrés','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333316',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (33,'Quintero','dueno2@mordisco.com','Elena','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333317',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (34,'Ramos','dueno3@mordisco.com','Esteban','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333318',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (35,'Sánchez','dueno4@mordisco.com','Gabriela','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333319',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (36,'Torres','dueno5@mordisco.com','Hugo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333320',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (37,'Urbina','dueno6@mordisco.com','Isabel','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333321',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (38,'Valdez','dueno7@mordisco.com','Javier','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333322',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (39,'Vega','dueno8@mordisco.com','Laura','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333323',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (40,'Zapata','dueno9@mordisco.com','Marcos','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333324',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (41,'Acosta','dueno10@mordisco.com','Natalia','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333325',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (42,'Blanco','dueno11@mordisco.com','Oscar','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333326',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (43,'Campos','dueno12@mordisco.com','Paula','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333327',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (44,'Díaz','dueno13@mordisco.com','Ricardo','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333328',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (45,'Estévez','dueno14@mordisco.com','Sofía','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333329',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (46,'Flores','dueno15@mordisco.com','Tomás','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333330',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (47,'Mandes','micaelamandes9@gmail.com','Micaela','$2a$10$DAHyE014bAxSgRMWnxu5Ye2ZNSqR7upTVu2GfDxHETHWJ0gw08yPS','2235010868',1,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (48,'m','mica@gmail.com','m','$2a$10$heVGPqg5m5f1GucJ6Rbiy..EyUw2bd6FB5Ymr.GLrS91CcZgo88qu','+5446488',2,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (49,'mandes','mel@gmail.com','melisa','$2a$10$KBj0Yj6LpYZlwWzw591.mOL1oP3LTuDnVtWVnoTvuERY1V3aIKKSC','+5492237860147',3,NULL,NULL);
+INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (50,'mandes','meli@gmail.com','melisa','$2a$10$KBj0Yj6LpYZlwWzw591.mOL1oP3LTuDnVtWVnoTvuERY1V3aIKKSC','+5492237860141',4,NULL,NULL);
 
--- 3) direcciones
-INSERT INTO `direcciones` VALUES 
-(1,'Av. Independencia','Mar del Plata','7600',NULL,-38.0032,-57.5521,'567',NULL,'Esquina con Rivadavia',2),
-(2,'Calle 12','Buenos Aires','1406','A',-34.6037,-58.3816,'245','5','Cerca del parque',3),
-(3,'Calle 45','La Plata','1900',NULL,-34.9205,-57.9536,'789',NULL,'Al lado de la estación',4),
-(4,'Boulevard Oroño','Rosario','2000','12',-32.9468,-60.6393,'1122','1','Frente al supermercado',5),
-(5,'Calle San Martín','Córdoba','5000',NULL,-31.4201,-64.1888,'334',NULL,'Próximo al hospital',6),
-(6,'Avenida Rivadavia','Buenos Aires','1033','4',-34.6118,-58.4173,'678','2','Edificio moderno',7),
-(7,'Pasaje Güemes','Mendoza','5500',NULL,-32.8908,-68.8272,'987',NULL,'Zona tranquila',8),
-(8,'Calle Bolívar','Salta','4400','7',-24.7821,-65.4232,'456','7','Cerca del museo',9),
-(9,'Calle Mitre','Santa Fe','3000',NULL,-31.6333,-60.7,'321',NULL,'Vista al río',10),
-(10,'Avenida Libertad','Tucumán','4000','3',-26.8083,-65.2176,'159','5','Zona comercial',11),
-(11,'Calle Roca','Neuquén','8300',NULL,-38.9517,-68.0597,'753',NULL,'Frente al colegio',12),
-(12,'Avenida Corrientes','Buenos Aires','1043','11',-34.6158,-58.437,'842','8','Cerca del teatro',13),
-(13,'Calle Sarmiento','Mar del Plata','7600',NULL,-38.0078,-57.5445,'215',NULL,'Zona céntrica',14),
-(14,'Avenida San Juan','San Juan','5400','5',-31.5375,-68.5364,'174','4','Cerca del centro',15),
-(15,'Calle Moreno','Resistencia','3500',NULL,-27.4517,-59.0317,'653',NULL,'Edificio antiguo',16),
-(16,'Boulevard Gálvez','Santa Fe','3000','2',-31.6327,-60.7001,'924','9','Zona residencial',17),
-(17,'Calle Córdoba','Córdoba','5000',NULL,-31.4167,-64.1833,'801',NULL,'Frente al parque',18),
-(18,'Avenida Pellegrini','Rosario','2000','10',-32.9465,-60.6398,'482','1','Zona universitaria',19),
-(19,'Calle San Luis','Mendoza','5500',NULL,-32.8899,-68.8287,'315',NULL,'Frente a la plaza',20),
-(20,'Avenida Belgrano','La Plata','1900','1',-34.9211,-57.9543,'129','3','Zona histórica',21),
-(21,'Calle España','Salta','4400',NULL,-24.7825,-65.4235,'464',NULL,'Cerca de la catedral',22),
-(22,'Avenida Uruguay','Buenos Aires','1406','6',-34.6045,-58.3792,'536','2','Zona comercial',23),
-(23,'Pasaje Mendoza','Tucumán','4000',NULL,-26.8079,-65.2183,'418',NULL,'Edificio nuevo',24),
-(24,'Calle 9 de Julio','Resistencia','3500','8',-27.4515,-59.0319,'722','7','Cerca de la plaza',25),
-(25,'Av. Colón','Mar del Plata','7600',NULL,-38.0055,-57.5426,'235',NULL,NULL,26),
-(26,'Av. Independencia','Mar del Plata','7600','D',-38.0055,-57.5426,'8455','8','Porton rojo',27),
-(27,'Av. 9 de Julio','Buenos Aires','1406',NULL,-38.0055,-57.5426,'774',NULL,NULL,28),
-(28,'Jujuy','Mar del Plata','7600',NULL,-38.0055,-57.5426,'2130',NULL,NULL,29),
-(29,'Mendoza','Resistencia','3500','A',-38.0055,-57.5426,'134','1',NULL,30),
-(30,'Av. Jorge Newbery','Mar del Plata','7600','52',-38.0055,-57.5426,'5005','Tilos','Barrio Rumenco',31),
-(31,'San Juan','Mar del Plata','7600',NULL,-38.0055,-57.5426,'628',NULL,'Rejas Verdes',32),
-(32,'Mitre','Mar del Plata','7600','C',-38.0055,-57.5426,'888',NULL,NULL,33),
-(33,'Catamarca','Resistencia','3500','B',-38.0055,-57.5426,'3951','10',NULL,34),
-(34,'Av. Paso','Mar del Plata','7600',NULL,-38.0055,-57.5426,'3575','1',NULL,35),
-(35,'Guemes','Salta','4400','A',-38.0055,-57.5426,'57','7','Edificio frente al banco',36),
-(36,'Olazabal','Mar del Plata','7600',NULL,-38.0055,-57.5426,'689',NULL,NULL,37),
-(37,'Alem','Salta','4400','B',-38.0055,-57.5426,'2588','3','Edificio Dumbledore',38),
-(38,'Tucuman','Mar del Plata','7600',NULL,-38.0055,-57.5426,'9996',NULL,NULL,39),
-(39,'La Rioja','Mar del Plata','7600',NULL,-38.0055,-57.5426,'667',NULL,'Rejas negras',40),
-(40,'Chaco','Mar del Plata','7600','C',-38.0055,-57.5426,'124',NULL,NULL,41),
-(41,'12 de Octubre','Salta','4400',NULL,-38.0055,-57.5426,'8100','8',NULL,42),
-(42,'Av. Libertad','Mar del Plata','7600',NULL,-38.0055,-57.5426,'901',NULL,NULL,43),
-(43,'Cordoba','Mar del Plata','7600',NULL,-38.0055,-57.5426,'7833',NULL,NULL,44),
-(44,'Av. Mar del Plata','Mendoza','5500',NULL,-38.0055,-57.5426,'1100',NULL,NULL,45),
-(45,'Italia','Mendoza','5500',NULL,-38.0055,-57.5426,'1414',NULL,NULL,46);
 
--- 4) imagenes
-INSERT INTO `imagenes` VALUES 
-(1,'Hamburguesa Clásica','https://www.serargentino.com/public/images/2021/01/16109941330-17-burger-773x458.jpg'),
-(2,'Pizza Margherita','https://resizer.glanacion.com/resizer/v2/la-pizza-margarita-lleva-los-colores-de-la-M7NX62ONAJGRHMGZQKL3UMOIG4.jpeg?auth=95a4f0c18b4249f8a85c43e89ed95fc56dbfa22ac852945962285bb3c2638680&width=1280&height=854&quality=70&smart=true'),
-(3,'Ensalada César','https://newmansown.com/wp-content/uploads/2022/03/Caesar-salad-with-croutons.jpg'),
-(4,'Papas Fritas','https://cocina-casera.com/wp-content/uploads/2023/01/patatas-fritas-crujientes-francesa-1.jpg'),
-(5,'Sushi Variado','https://www.albal.net/portal/pics/Recetas/Sushi-Albal2_Teaser-738x595.jpg'),
-(6,'Tacos al Pastor','https://thecommunalfeast.com/wp-content/uploads/2021/09/2A94FB4E-8797-4BBA-9192-478DB91729F0-scaled.jpeg'),
-(7,'Lasaña','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRjCnEj8ga3_zb4XhCuNyXm9oke8Q2ZDSGQA&s'),
-(8,'Pasta Bolognesa','https://www.unileverfoodsolutions.com.co/dam/global-ufs/mcos/NOLA/calcmenu/recipes/col-recipies/fruco-tomate-cocineros/BOLO%C3%91ESA%201200x709.png'),
-(9,'Croquetas de Pollo','https://www.196flavors.com/wp-content/uploads/2021/10/croquetas-de-pollo-2fp-500x375.jpg'),
-(10,'Bocadillo de Jamón y Queso','https://imag.bonviveur.com/torre-de-bocadillo-de-jamon-asado.jpg'),
-(11,'Hot Dog','https://imag.bonviveur.com/hot-dog.jpg'),
-(12,'Pechuga de Pollo a la Parrilla','https://cdn0.recetasgratis.net/es/posts/4/1/3/filete_de_pechuga_a_la_plancha_59314_orig.jpg'),
-(13,'Risotto de Champiñones','https://cocina-casera.com/wp-content/uploads/2023/03/rissoto-champinones.jpeg'),
-(14,'Ramen','https://images.getrecipekit.com/20230606152327-25_Instant_ramen.jpg?aspect_ratio=16:9&quality=90&'),
-(15,'Tarta de Espinaca y Queso','https://www.infobae.com/new-resizer/Ul00VvjTJX_xjxx-FFDIhJbqnmU=/arc-anglerfish-arc2-prod-infobae/public/YTVMREOSCFD3HB63C5DHCT3UNE.jpg'),
-(16,'Sopa de Tomate','https://www.justspices.es/media/recipe/sopa-de-tomate-sabrosa.jpg'),
-(17,'Empanadas de Carne','https://assets.unileversolutions.com/recipes-v2/237001.jpg'),
-(18,'Churrasco','https://enrilemoine.com/wp-content/uploads/2017/08/IMG_7918-1-scaled.jpg'),
-(19,'Ensalada Griega','https://mandolina.co/wp-content/uploads/2020/11/Ensalada-griega-1200x675.jpg'),
-(20,'Tartaleta de Frutas','https://www.recetaslider.cl/wp-content/uploads/2021/06/principal_5cb62c158aa1a.jpg'),
-(21,'Pizza Pepperoni','https://www.simplyrecipes.com/thmb/KE6iMblr3R2Db6oE8HdyVsFSj2A=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__simply_recipes__uploads__2019__09__easy-pepperoni-pizza-lead-3-1024x682-583b275444104ef189d693a64df625da.jpg'),
-(22,'Tequeños','https://i.ytimg.com/vi/O0gCQflnP9E/maxresdefault.jpg'),
-(23,'Pasta Alfredo','https://images.aws.nestle.recipes/resized/cc72869fabfc2bdfa036fd1fe0e2bad8_creamy_alfredo_pasta_long_left_1080_850.jpg'),
-(24,'Pollo al Curry','https://i.blogs.es/8c3360/pollo_curry/1366_2000.jpg'),
-(25,'Paella de Mariscos','https://recetas.encolombia.com/wp-content/uploads/2013/03/Paella-de-mariscos-e1363205500448.jpg'),
-(26,'Ceviche','https://lacocinalatina.club/wp-content/uploads/2024/05/Ceviche-Peruano-de-pescado-La-Cocina-Latina.jpg'),
-(27,'Sopa de Mariscos','https://imag.bonviveur.com/sopa-de-marisco-lista-para-servir.jpg'),
-(28,'Bife de Chorizo','https://comedera.com/wp-content/uploads/sites/9/2022/06/bife-de-chorizo.jpg'),
-(29,'Ceviche de Camarón','https://imag.bonviveur.com/ceviche-de-camaron.jpg'),
-(30,'Pasta Pesto','https://www.lavanguardia.com/files/og_thumbnail/uploads/2020/05/29/5ed11fb61d750.jpeg'),
-(31,'Gnocchi','https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480_1_5x/img/recipe/ras/Assets/3A94F682-EF98-4805-AF10-607A8B69FC74/Derivates/F4247BBE-40EB-4264-A845-14BA911AD0C8.jpg'),
-(32,'Ensalada de Atún','https://www.bancodealimentoschicago.org/wp-content/uploads/2024/05/Bean-Tuna-Salad-Web-1.jpg'),
-(33,'Arroz Frito','https://cocinaisraeli.com/wp-content/uploads/2024/03/arroz-chino-frito.jpg'),
-(34,'Pollo a la Parrilla','https://www.clarin.com/img/2022/03/21/LeCTEz82B_1200x630__1.jpg'),
-(35,'Hamburguesa Vegana','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREW-IjdYTRjQiwzaEqEdwrUmrQK9eDSdDPgg&s'),
-(36,'Tacos de Pescado','https://myplate-prod.azureedge.us/sites/default/files/styles/large/public/2020-10/FishTacos_527x323.jpg?itok=BFdk38Cq'),
-(37,'Milanesa de Pollo','https://static.bainet.es/clip/4374acfb-ad53-45dc-a7a8-162f033141eb_source-aspect-ratio_1600w_0.jpg'),
-(38,'Tarta de Manzana','https://imag.bonviveur.com/tarta-de-manzana.jpg'),
-(39,'Sopa de Lentejas','https://assets.epicurious.com/photos/63ceae6fd2744b6f0cb02154/4:3/w_4983,h_3737,c_limit/SopaDeLentejas_RECIPE_012023_46046.jpg'),
-(40,'Pasta Carbonara','https://imag.bonviveur.com/salsa-carbonara.jpg'),
-(41,'Ensalada Capresse','https://okdiario.com/img/2016/11/26/receta-de-ensalada-caprese.jpg'),
-(42,'Pizza Hawaiana','https://www.hola.com/horizon/landscape/a17cd68660e0-pizza-hawaiana-t.jpg'),
-(43,'Pollo Asado','https://sandersonfarms.com/wp-content/uploads/2017/04/Recipes_Roast_Chicken_with_Garlic_and_Lime_Hero_824x758-720x.jpg'),
-(44,'Tacos Vegetarianos','https://danzadefogones.com/wp-content/uploads/2015/04/Tacos-veganos-en-15-minutos-2.jpg'),
-(45,'Tarta de queso con frutas del bosque','https://www.hola.com/horizon/landscape/51e72d602478-frutos-rojos-adobe-t.jpg'),
-(46,'Restaurante Delicias','https://www.serargentino.com/public/images/2021/01/16109941330-17-burger-773x458.jpg'),
-(47,'La Buena Mesa','https://newmansown.com/wp-content/uploads/2022/03/Caesar-salad-with-croutons.jpg'),
-(48,'Sabor Natural','https://imag.bonviveur.com/hot-dog.jpg'),
-(49,'El Rincón Vegano','https://www.justspices.es/media/recipe/sopa-de-tomate-sabrosa.jpg'),
-(50,'Casa Tradicional','https://enrilemoine.com/wp-content/uploads/2017/08/IMG_7918-1-scaled.jpg'),
-(51,'Sabores del Mundo','https://i.ytimg.com/vi/O0gCQflnP9E/maxresdefault.jpg'),
-(52,'Cocina Urbana','https://i.blogs.es/8c3360/pollo_curry/1366_2000.jpg'),
-(53,'La Esquina Feliz','https://imag.bonviveur.com/sopa-de-marisco-lista-para-servir.jpg'),
-(54,'Bocados Caseros','https://www.clarin.com/img/2022/03/21/LeCTEz82B_1200x630__1.jpg'),
-(55,'Delicias al Paso','https://imag.bonviveur.com/tarta-de-manzana.jpg'),
-(56,'El Fogón de la Abuela','https://imag.bonviveur.com/salsa-carbonara.jpg'),
-(57,'El Jardín Secreto','https://okdiario.com/img/2016/11/26/receta-de-ensalada-caprese.jpg'),
-(58,'Rincón Gourmet','https://www.hola.com/horizon/landscape/51e72d602478-frutos-rojos-adobe-t.jpg'),
-(59,'Sabores y Aromas','https://imag.bonviveur.com/ceviche-de-camaron.jpg'),
-(60,'Fusión Latina','https://www.clarin.com/img/2022/03/21/LeCTEz82B_1200x630__1.jpg');
 
--- 5) menus
-INSERT INTO `menus` VALUES 
-(1,'Menú Clásico'),(2,'Menú Vegano'),(3,'Menú Infantil'),(4,'Menú Gourmet'),(5,'Menú Exprés'),
-(6,'Menú Sin Gluten'),(7,'Menú Vegetariano'),(8,'Menú Orgánico'),(9,'Menú Mediterráneo'),
-(10,'Menú Asiático'),(11,'Menú Mexicano'),(12,'Menú Italiano'),(13,'Menú Americano'),
-(14,'Menú Low Carb'),(15,'Menú Detox');
 
--- 6) restaurantes (depende de usuarios, imagenes, direcciones, menus según tu modelo)
-INSERT INTO `restaurantes` VALUES 
-(1,_binary '','Restaurante Delicias',31,46,1,32),
-(2,_binary '','La Buena Mesa',32,47,2,33),
-(3,_binary '','Sabor Natural',33,48,3,34),
-(4,_binary '','El Rincón Vegano',34,49,4,35),
-(5,_binary '','Casa Tradicional',35,50,5,36),
-(6,_binary '','Sabores del Mundo',36,51,6,37),
-(7,_binary '','Cocina Urbana',37,52,7,38),
-(8,_binary '','La Esquina Feliz',38,53,8,39),
-(9,_binary '','Bocados Caseros',39,54,9,40),
-(10,_binary '','Delicias al Paso',40,55,10,41),
-(11,_binary '','El Fogón de la Abuela',41,56,11,42),
-(12,_binary '','El Jardín Secreto',42,57,12,43),
-(13,_binary '','Rincón Gourmet',43,58,13,44),
-(14,_binary '','Sabores y Aromas',44,59,14,45),
-(15,_binary '','Fusión Latina',45,60,15,46);
 
--- 7) horarios_atencion (depende de restaurantes)
-INSERT INTO `horarios_atencion` VALUES 
-(1,'MONDAY','18:00:00.000000','23:00:00.000000',1),
-(2,'WEDNESDAY','18:00:00.000000','23:00:00.000000',1),
-(3,'TUESDAY','15:00:00.000000','23:00:00.000000',2),
-(4,'WEDNESDAY','15:00:00.000000','23:00:00.000000',2),
-(5,'MONDAY','11:00:00.000000','23:00:00.000000',3),
-(6,'TUESDAY','11:00:00.000000','23:00:00.000000',3),
-(7,'SATURDAY','11:00:00.000000','23:00:00.000000',4),
-(8,'SUNDAY','11:00:00.000000','23:00:00.000000',4),
-(9,'SATURDAY','12:00:00.000000','22:00:00.000000',5),
-(10,'SUNDAY','12:00:00.000000','22:00:00.000000',5),
-(11,'SATURDAY','11:00:00.000000','23:30:00.000000',6),
-(12,'SUNDAY','11:00:00.000000','23:30:00.000000',6),
-(13,'SATURDAY','10:00:00.000000','23:30:00.000000',7),
-(14,'SUNDAY','10:00:00.000000','23:30:00.000000',7),
-(15,'FRIDAY','10:00:00.000000','23:30:00.000000',8),
-(16,'SATURDAY','10:00:00.000000','23:30:00.000000',8),
-(17,'FRIDAY','10:00:00.000000','23:30:00.000000',9),
-(18,'SATURDAY','10:00:00.000000','23:30:00.000000',9),
-(19,'SATURDAY','12:00:00.000000','23:30:00.000000',10),
-(20,'SUNDAY','12:00:00.000000','23:30:00.000000',10),
-(21,'MONDAY','08:00:00.000000','15:30:00.000000',11),
-(22,'TUESDAY','08:00:00.000000','15:30:00.000000',11),
-(23,'SATURDAY','08:00:00.000000','15:30:00.000000',12),
-(24,'SUNDAY','08:00:00.000000','15:30:00.000000',12),
-(25,'SATURDAY','08:00:00.000000','16:30:00.000000',13),
-(26,'SUNDAY','08:00:00.000000','16:30:00.000000',13),
-(27,'SATURDAY','08:00:00.000000','16:30:00.000000',14),
-(28,'SUNDAY','08:00:00.000000','16:30:00.000000',14),
-(29,'SATURDAY','08:00:00.000000','23:30:00.000000',15),
-(30,'SUNDAY','08:00:00.000000','23:30:00.000000',15);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (1,'Av. Independencia','Mar del Plata','7600',NULL,-38.0032,-57.5521,'567',NULL,'Esquina con Rivadavia',2);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (2,'Calle 12','Buenos Aires','1406','A',-34.6037,-58.3816,'245','5','Cerca del parque',3);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (3,'Calle 45','La Plata','1900',NULL,-34.9205,-57.9536,'789',NULL,'Al lado de la estación',4);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (4,'Boulevard Oroño','Rosario','2000','12',-32.9468,-60.6393,'1122','1','Frente al supermercado',5);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (5,'Calle San Martín','Córdoba','5000',NULL,-31.4201,-64.1888,'334',NULL,'Próximo al hospital',6);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (6,'Avenida Rivadavia','Buenos Aires','1033','4',-34.6118,-58.4173,'678','2','Edificio moderno',7);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (7,'Pasaje Güemes','Mendoza','5500',NULL,-32.8908,-68.8272,'987',NULL,'Zona tranquila',8);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (8,'Calle Bolívar','Salta','4400','7',-24.7821,-65.4232,'456','7','Cerca del museo',9);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (9,'Calle Mitre','Santa Fe','3000',NULL,-31.6333,-60.7,'321',NULL,'Vista al río',10);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (10,'Avenida Libertad','Tucumán','4000','3',-26.8083,-65.2176,'159','5','Zona comercial',11);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (11,'Calle Roca','Neuquén','8300',NULL,-38.9517,-68.0597,'753',NULL,'Frente al colegio',12);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (12,'Avenida Corrientes','Buenos Aires','1043','11',-34.6158,-58.437,'842','8','Cerca del teatro',13);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (13,'Calle Sarmiento','Mar del Plata','7600',NULL,-38.0078,-57.5445,'215',NULL,'Zona céntrica',14);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (14,'Avenida San Juan','San Juan','5400','5',-31.5375,-68.5364,'174','4','Cerca del centro',15);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (15,'Calle Moreno','Resistencia','3500',NULL,-27.4517,-59.0317,'653',NULL,'Edificio antiguo',16);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (16,'Boulevard Gálvez','Santa Fe','3000','2',-31.6327,-60.7001,'924','9','Zona residencial',17);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (17,'Calle Córdoba','Córdoba','5000',NULL,-31.4167,-64.1833,'801',NULL,'Frente al parque',18);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (18,'Avenida Pellegrini','Rosario','2000','10',-32.9465,-60.6398,'482','1','Zona universitaria',19);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (19,'Calle San Luis','Mendoza','5500',NULL,-32.8899,-68.8287,'315',NULL,'Frente a la plaza',20);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (20,'Avenida Belgrano','La Plata','1900','1',-34.9211,-57.9543,'129','3','Zona histórica',21);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (21,'Calle España','Salta','4400',NULL,-24.7825,-65.4235,'464',NULL,'Cerca de la catedral',22);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (22,'Avenida Uruguay','Buenos Aires','1406','6',-34.6045,-58.3792,'536','2','Zona comercial',23);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (23,'Pasaje Mendoza','Tucumán','4000',NULL,-26.8079,-65.2183,'418',NULL,'Edificio nuevo',24);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (24,'Calle 9 de Julio','Resistencia','3500','8',-27.4515,-59.0319,'722','7','Cerca de la plaza',25);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (25,'Av. Colón','Mar del Plata','7600',NULL,-38.0055,-57.5426,'235',NULL,NULL,26);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (26,'Av. Independencia','Mar del Plata','7600','D',-38.0055,-57.5426,'8455','8','Porton rojo',27);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (27,'Av. 9 de Julio','Buenos Aires','1406',NULL,-38.0055,-57.5426,'774',NULL,NULL,28);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (28,'Jujuy','Mar del Plata','7600',NULL,-38.0055,-57.5426,'2130',NULL,NULL,29);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (29,'Mendoza','Resistencia','3500','A',-38.0055,-57.5426,'134','1',NULL,30);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (30,'Av. Jorge Newbery','Mar del Plata','7600','52',-38.0055,-57.5426,'5005','Tilos','Barrio Rumenco',31);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (31,'San Juan','Mar del Plata','7600',NULL,-38.0055,-57.5426,'628',NULL,'Rejas Verdes',32);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (32,'Mitre','Mar del Plata','7600','C',-38.0055,-57.5426,'888',NULL,NULL,33);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (33,'Catamarca','Resistencia','3500','B',-38.0055,-57.5426,'3951','10',NULL,34);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (34,'Av. Paso','Mar del Plata','7600',NULL,-38.0055,-57.5426,'3575','1',NULL,35);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (35,'Guemes','Salta','4400','A',-38.0055,-57.5426,'57','7','Edificio frente al banco',36);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (36,'Olazabal','Mar del Plata','7600',NULL,-38.0055,-57.5426,'689',NULL,NULL,37);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (37,'Alem','Salta','4400','B',-38.0055,-57.5426,'2588','3','Edificio Dumbledore',38);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (38,'Tucuman','Mar del Plata','7600',NULL,-38.0055,-57.5426,'9996',NULL,NULL,39);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (39,'La Rioja','Mar del Plata','7600',NULL,-38.0055,-57.5426,'667',NULL,'Rejas negras',40);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (40,'Chaco','Mar del Plata','7600','C',-38.0055,-57.5426,'124',NULL,NULL,41);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (41,'12 de Octubre','Salta','4400',NULL,-38.0055,-57.5426,'8100','8',NULL,42);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (42,'Av. Libertad','Mar del Plata','7600',NULL,-38.0055,-57.5426,'901',NULL,NULL,43);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (43,'Cordoba','Mar del Plata','7600',NULL,-38.0055,-57.5426,'7833',NULL,NULL,44);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (44,'Av. Mar del Plata','Mendoza','5500',NULL,-38.0055,-57.5426,'1100',NULL,NULL,45);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (45,'Italia','Mendoza','5500',NULL,-38.0055,-57.5426,'1414',NULL,NULL,46);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (46,'Maipu','Mar del plata','7600','',595,6952,'5570','','',47);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (47,'Maipu','Mar del plata','7600',NULL,-37.9776593,-57.5714547,'5570',NULL,NULL,48);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (48,'Chacabuco','Mar del plata','7600','A',-37.9775982,-57.5698148,'5460','2','Casa rejas bajas',48);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (49,'Alice','Mar del plata','7600',NULL,-37.9532668,-37.9532668,'5870',NULL,NULL,48);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (50,'Libertad','Mar del plata','7600',NULL,-37.9532668,-37.9532668,'8666',NULL,NULL,49);
+INSERT INTO direcciones (`id`,`calle`,`ciudad`,`codigo_postal`,`depto`,`latitud`,`longitud`,`numero`,`piso`,`referencias`,`usuario_id`) VALUES (51,'Libertad','Mar del plata','7607',NULL,-37.9586896,-57.6048671,'4366',NULL,NULL,48);
 
--- 8) productos (depende de imagenes, menus y posiblemente restaurantes)
-INSERT INTO `productos` VALUES 
-(1,'Hamburguesa Clásica con carne, lechuga, tomate y mayonesa.',_binary '','Hamburguesa Clásica',1200.00,1,1),
-(2,'Pizza Margherita con salsa de tomate, mozzarella y albahaca.',_binary '','Pizza Margherita',1500.00,2,1),
-(3,'Ensalada César con lechuga, pollo, crotones y aderezo César.',_binary '','Ensalada César',1000.00,3,1),
-(4,'Papas Fritas crujientes con sal.',_binary '','Papas Fritas',600.00,4,2),
-(5,'Sushi Variado con pescado fresco y arroz.',_binary '','Sushi Variado',1800.00,5,2),
-(6,'Tacos al Pastor con carne de cerdo, piña, cebolla y cilantro.',_binary '','Tacos al Pastor',900.00,6,3),
-(7,'Lasaña con carne y salsa bechamel.',_binary '','Lasaña',1700.00,7,3),
-(8,'Pasta a la Bolognesa con salsa de carne.',_binary '','Pasta Bolognesa',1300.00,8,3),
-(9,'Croquetas de Pollo con salsa de mostaza.',_binary '','Croquetas de Pollo',800.00,9,3),
-(10,'Bocadillo de Jamón y Queso',_binary '','Bocadillo',1100.00,10,4),
-(11,'Hot Dog con ketchup, mostaza y cebolla.',_binary '','Hot Dog',950.00,11,5),
-(12,'Pechuga de Pollo a la Parrilla con arroz.',_binary '','Pechuga de Pollo',1500.00,12,5),
-(13,'Risotto de Champiñones',_binary '','Risotto de Champiñones',1600.00,13,5),
-(14,'Ramen con caldo de pollo y fideos',_binary '','Ramen',1400.00,14,6),
-(15,'Tarta de Espinaca y Queso',_binary '','Tarta de Espinaca',1200.00,15,6),
-(16,'Sopa de Tomate con pan crujiente',_binary '','Sopa de Tomate',950.00,16,7),
-(17,'Empanadas de Carne',_binary '','Empanadas',700.00,17,7),
-(18,'Churrasco con ensalada de papas',_binary '','Churrasco',2100.00,18,7),
-(19,'Ensalada Griega con aceitunas y feta',_binary '','Ensalada Griega',1300.00,19,7),
-(20,'Tartaleta de Frutas',_binary '','Tartaleta de Frutas',800.00,20,8),
-(21,'Pizza Caliente de Pepperoni',_binary '','Pizza Pepperoni',1700.00,21,8),
-(22,'Tequeños con salsa de guacamole',_binary '','Tequeños',950.00,22,9),
-(23,'Pasta Alfredo con salsa de queso',_binary '','Pasta Alfredo',1400.00,23,10),
-(24,'Pollo al Curry con arroz basmati',_binary '','Pollo al Curry',1800.00,24,10),
-(25,'Paella de Mariscos',_binary '','Paella de Mariscos',2500.00,25,10),
-(26,'Ceviche de Pescado con limón y cilantro',_binary '','Ceviche',1300.00,26,11),
-(27,'Sopa de Mariscos',_binary '','Sopa de Mariscos',1600.00,27,11),
-(28,'Bife de Chorizo con puré de papas',_binary '','Bife de Chorizo',2200.00,28,12),
-(29,'Ceviche de Camarón con aguacate',_binary '','Ceviche de Camarón',1700.00,29,12),
-(30,'Pasta Pesto con albahaca y piñones',_binary '','Pasta Pesto',1400.00,30,12),
-(31,'Gnocchi con salsa de tomate y queso parmesano',_binary '','Gnocchi',1200.00,31,13),
-(32,'Ensalada de Atún con mayonesa y zanahorias',_binary '','Ensalada de Atún',1000.00,32,13),
-(33,'Arroz Frito con Pollo',_binary '','Arroz Frito',1200.00,33,13),
-(34,'Pollo a la Parrilla con puré de papas',_binary '','Pollo a la Parrilla',1500.00,34,14),
-(35,'Burgers Veganas con pan integral',_binary '','Hamburguesa Vegana',1300.00,35,14),
-(36,'Tacos de Pescado con salsa picante',_binary '','Tacos de Pescado',1000.00,36,14),
-(37,'Milanesa de Pollo con ensalada',_binary '','Milanesa de Pollo',1400.00,37,14),
-(38,'Tarta de Manzana con crema pastelera',_binary '','Tarta de Manzana',900.00,38,15),
-(39,'Sopa de Lentejas con verduras',_binary '','Sopa de Lentejas',850.00,39,15),
-(40,'Pasta Carbonara con bacon y crema',_binary '','Pasta Carbonara',1500.00,40,15),
-(41,'Ensalada Capresse con tomate, mozzarella y albahaca',_binary '','Ensalada Capresse',1200.00,41,15),
-(42,'Pizza Hawaiana con jamón y piña',_binary '','Pizza Hawaiana',1600.00,42,2),
-(43,'Pollo Asado con papas a la provenzal',_binary '','Pollo Asado',1800.00,43,1),
-(44,'Tacos Vegetarianos con vegetales y guacamole',_binary '','Tacos Vegetarianos',1100.00,44,8),
-(45,'Tarta de Queso con frutas del bosque',_binary '','Tarta de Queso',950.00,45,9);
 
--- 9) promociones (depende de restaurantes)
-INSERT INTO `promociones` VALUES 
-(1,'Descuento del 10% en todos los platos italianos',0.1,'2025-11-30','2025-06-01',1),
-(2,'Promoción 15% OFF en pizzas y pastas',0.15,'2025-12-25','2025-06-05',2),
-(3,'20% de descuento en ensaladas y platos frescos',0.2,'2025-11-10','2025-06-10',3),
-(4,'15% OFF en combos de hamburguesas',0.15,'2025-12-15','2025-05-25',4),
-(5,'10% descuento en sushi y productos del mar',0.1,'2025-12-20','2025-06-01',5),
-(6,'25% OFF en tacos al pastor',0.25,'2025-12-30','2025-06-07',6),
-(7,'Descuento del 5% en lasañas y pastas',0.05,'2025-12-05','2025-06-12',7),
-(8,'15% OFF en platos a la parrilla',0.15,'2025-12-30','2025-06-01',8),
-(9,'10% descuento en bocadillos y snacks',0.1,'2025-11-01','2025-06-10',9),
-(10,'20% OFF en comida rápida y delivery',0.2,'2025-12-30','2025-05-30',10),
-(11,'15% descuento en productos vegetarianos',0.15,'2025-11-25','2025-06-05',11),
-(12,'10% OFF en platos tradicionales',0.1,'2025-12-01','2025-06-01',12),
-(13,'5% de descuento en menús infantiles',0.05,'2025-11-10','2025-06-10',13),
-(14,'20% OFF en postres y tartas',0.2,'2025-12-15','2025-06-15',14),
-(15,'15% descuento en platos especiales del día',0.15,'2025-11-30','2025-06-01',15);
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (1,'Hamburguesa Clásica','https://cdn.example.com/img/hamburguesa_clasica.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (2,'Pizza Margherita','https://cdn.example.com/img/pizza_margherita.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (3,'Ensalada César','https://cdn.example.com/img/ensalada_cesar.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (4,'Papas Fritas','https://cdn.example.com/img/papas_fritas.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (5,'Sushi Variado','https://cdn.example.com/img/sushi_variado.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (6,'Tacos al Pastor','https://cdn.example.com/img/tacos_al_pastor.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (7,'Lasaña','https://cdn.example.com/img/lasana.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (8,'Pasta Bolognesa','https://cdn.example.com/img/pasta_bolognesa.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (9,'Croquetas de Pollo','https://cdn.example.com/img/croquetas_pollo.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (10,'Bocadillo de Jamón y Queso','https://cdn.example.com/img/bocadillo.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (11,'Hot Dog','https://cdn.example.com/img/hot_dog.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (12,'Pechuga de Pollo a la Parrilla','https://cdn.example.com/img/pechuga_pollo.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (13,'Risotto de Champiñones','https://cdn.example.com/img/risotto_champinones.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (14,'Ramen','https://cdn.example.com/img/ramen.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (15,'Tarta de Espinaca y Queso','https://cdn.example.com/img/tarta_espinaca.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (16,'Sopa de Tomate','https://cdn.example.com/img/sopa_tomate.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (17,'Empanadas de Carne','https://cdn.example.com/img/empanadas_carne.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (18,'Churrasco','https://cdn.example.com/img/churrasco.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (19,'Ensalada Griega','https://cdn.example.com/img/ensalada_griega.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (20,'Tartaleta de Frutas','https://cdn.example.com/img/tartaleta_frutas.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (21,'Pizza Pepperoni','https://cdn.example.com/img/pizza_pepperoni.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (22,'Tequeños','https://cdn.example.com/img/tequenos.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (23,'Pasta Alfredo','https://cdn.example.com/img/pasta_alfredo.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (24,'Pollo al Curry','https://cdn.example.com/img/pollo_curry.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (25,'Paella de Mariscos','https://cdn.example.com/img/paella_mariscos.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (26,'Ceviche','https://cdn.example.com/img/ceviche.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (27,'Sopa de Mariscos','https://cdn.example.com/img/sopa_mariscos.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (28,'Bife de Chorizo','https://cdn.example.com/img/bife_chorizo.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (29,'Ceviche de Camarón','https://cdn.example.com/img/ceviche_camaron.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (30,'Pasta Pesto','https://cdn.example.com/img/pasta_pesto.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (31,'Gnocchi','https://cdn.example.com/img/gnocchi.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (32,'Ensalada de Atún','https://cdn.example.com/img/ensalada_atun.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (33,'Arroz Frito','https://cdn.example.com/img/arroz_frito.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (34,'Pollo a la Parrilla','https://cdn.example.com/img/pollo_parrilla.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (35,'Hamburguesa Vegana','https://cdn.example.com/img/hamburguesa_vegana.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (36,'Tacos de Pescado','https://cdn.example.com/img/tacos_pescado.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (37,'Milanesa de Pollo','https://cdn.example.com/img/milanesa_pollo.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (38,'Tarta de Manzana','https://cdn.example.com/img/tarta_manzana.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (39,'Sopa de Lentejas','https://cdn.example.com/img/sopa_lentejas.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (40,'Pasta Carbonara','https://cdn.example.com/img/pasta_carbonara.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (41,'Ensalada Capresse','https://cdn.example.com/img/ensalada_capresse.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (42,'Pizza Hawaiana','https://cdn.example.com/img/pizza_hawaiana.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (43,'Pollo Asado','https://cdn.example.com/img/pollo_asado.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (44,'Tacos Vegetarianos','https://cdn.example.com/img/tacos_vegetarianos.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (45,'Tarta de Queso','https://cdn.example.com/img/tarta_queso.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (46,'Restaurante Delicias','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXdoIix9LRlAC7SdLwhLIxowIbdMlNfEFulw&s');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (47,'La Buena Mesa','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQApJ31lA3gf4CW9A7cyKrCZFt586yBdmdIg&s');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (48,'Sabor Natural','https://cdn.example.com/img/resto_nuevo67.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (49,'El Rincón Vegano','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2FptVQdBFV-0Gw0dR2IAT8xCaWA_cMj628w&s');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (50,'Casa Tradicional','https://cdn.example.com/img/resto_nuevo69.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (51,'Sabores del Mundo','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqk4VrW5v6wrL64fLm953xk_7-iHL3JiC5cg&s');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (52,'Cocina Urbana','https://cdn.example.com/img/resto_nuevo71.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (53,'La Esquina Feliz','https://cdn.example.com/img/resto_nuevo72.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (54,'Bocados Caseros','https://cdn.example.com/img/resto_nuevo73.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (55,'Delicias al Paso','https://cdn.example.com/img/resto_nuevo74.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (56,'El Fogón de la Abuela','https://cdn.example.com/img/resto_nuevo75.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (57,'El Jardín Secreto','https://cdn.example.com/img/resto_nuevo76.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (58,'Rincón Gourmet','https://cdn.example.com/img/resto_nuevo77.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (59,'Sabores y Aromas','https://cdn.example.com/img/resto_nuevo78.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (60,'Fusión Latina','https://cdn.example.com/img/resto_nuevo79.png');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (61,'Daryl Logo','https://www.hola.com/horizon/landscape/ec878ddab16b-cuidardgatito-t.jpg');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (62,'Sanchipapa','https://recetinas.com/wp-content/uploads/2017/10/salchipapas.jpg');
+INSERT INTO imagenes (`id`,`nombre`,`url`) VALUES (63,'pancho','https://www.corrienteshoy.com/galeria/fotos/2021/08/28/o_1630205743.jpg');
 
--- 10) pedidos (depende de usuarios, direcciones, restaurantes)
-INSERT INTO `pedidos` VALUES 
-(1,'PENDIENTE','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',9800.00,5,31,1),
-(2,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',3550.00,6,5,1),
-(3,'EN_CAMINO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',5800.00,7,32,2),
-(4,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',1500.00,8,7,2),
-(5,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',12500.00,9,8,2),
-(6,'CANCELADO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',9870.00,10,33,3),
-(7,'PENDIENTE','2025-06-11 09:11:02.000000','DELIVERY',1500.00,11,10,3),
-(8,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',12500.00,12,13,3),
-(9,'CANCELADO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',9000.00,13,34,4),
-(10,'PENDIENTE','2025-06-11 09:11:02.000000','DELIVERY',1990.00,14,13,4),
-(11,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',4500.00,15,14,4),
-(12,'EN_PROCESO','2025-06-11 09:11:02.000000','DELIVERY',12500.00,16,15,4),
-(13,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',9800.00,17,16,4),
-(14,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',1650.00,18,17,5),
-(15,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',13600.00,19,35,5),
-(16,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',9780.00,20,19,5),
-(17,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',2400.00,2,36,6),
-(18,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',3500.00,3,36,6),
-(19,'PENDIENTE','2025-06-11 09:11:02.000000','DELIVERY',4400.00,4,3,6),
-(20,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',3550.00,5,4,6),
-(21,'CANCELADO','2025-06-11 09:11:02.000000','DELIVERY',13600.00,21,20,7),
-(22,'RECIBIDO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',9000.00,22,37,7),
-(23,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',1650.00,23,22,8),
-(24,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',13600.00,24,38,8),
-(25,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',9780.00,25,24,8),
-(26,'RECIBIDO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',9000.00,26,39,9),
-(27,'CANCELADO','2025-06-11 09:11:02.000000','DELIVERY',1650.00,27,26,9),
-(28,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',13600.00,28,39,9),
-(29,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',9780.00,29,28,9),
-(30,'RECIBIDO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',9000.00,1,40,10),
-(31,'CANCELADO','2025-06-11 09:11:02.000000','DELIVERY',1650.00,2,1,10),
-(32,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',13600.00,3,40,10),
-(33,'RECIBIDO','2025-06-11 09:11:02.000000','DELIVERY',9780.00,4,3,10),
-(34,'RECIBIDO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',9870.00,5,41,11),
-(35,'CANCELADO','2025-06-11 09:11:02.000000','DELIVERY',1650.00,6,5,12),
-(36,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',13600.00,7,42,12),
-(37,'EN_CAMINO','2025-06-11 09:11:02.000000','DELIVERY',9780.00,8,7,12),
-(38,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',136.00,9,43,13),
-(39,'EN_CAMINO','2025-06-11 09:11:02.000000','DELIVERY',9780.00,10,9,13),
-(40,'EN_CAMINO','2025-06-11 09:11:02.000000','DELIVERY',9780.00,11,10,14),
-(41,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',6980.00,12,44,14),
-(42,'EN_CAMINO','2025-06-11 09:11:02.000000','DELIVERY',10200.00,13,12,14),
-(43,'EN_CAMINO','2025-06-11 09:11:02.000000','DELIVERY',9780.00,14,13,15),
-(44,'CANCELADO','2025-06-11 09:11:02.000000','DELIVERY',9780.00,15,14,15),
-(45,'EN_PROCESO','2025-06-11 09:11:02.000000','RETIRO_POR_LOCAL',6980.00,16,45,15),
-(46,'EN_CAMINO','2025-06-11 09:11:02.000000','DELIVERY',10200.00,17,16,15),
-(47,'PENDIENTE','2025-06-11 09:26:30.097107','DELIVERY',1000.00,8,25,3),
-(48,'PENDIENTE','2025-06-11 09:26:50.627696','RETIRO_POR_LOCAL',2500.00,2,31,1),
-(49,'PENDIENTE','2025-06-11 09:31:09.234508','RETIRO_POR_LOCAL',2500.00,2,31,1),
-(50,'PENDIENTE','2025-06-11 09:55:26.883669','RETIRO_POR_LOCAL',3700.00,2,31,1);
 
--- 11) productos_pedidos (depende de pedidos y productos)
-INSERT INTO `productos_pedidos` VALUES 
-(1,2,253.00,1,14),(2,1,369.00,1,15),(3,2,1000.00,2,15),(4,1,1200.00,2,14),(5,1,369.00,3,14),(6,3,300.00,4,15),
-(7,2,1000.00,4,14),(8,1,1200.00,5,1),(9,2,200.00,5,2),(10,3,369.00,6,3),(11,3,300.00,6,43),(12,2,1000.00,6,1),
-(13,1,1200.00,6,2),(14,1,200.00,7,4),(15,5,369.00,7,5),(16,1,300.00,8,42),(17,4,1000.00,8,4),(18,5,1200.00,8,5),
-(19,2,200.00,9,42),(20,4,369.00,9,4),(21,5,300.00,9,5),(22,2,1000.00,10,6),(23,7,1200.00,10,7),(24,2,200.00,10,8),
-(25,1,369.00,11,9),(26,1,300.00,12,8),(27,2,1000.00,13,10),(28,3,1200.00,14,10),(29,6,300.00,15,10),(30,9,1200.00,16,10),
-(31,10,200.00,17,10),(32,1,369.00,18,11),(33,3,300.00,19,12),(34,2,1000.00,19,13),(35,1,1200.00,20,11),(36,3,200.00,20,12),
-(37,1,369.00,20,13),(38,3,300.00,21,16),(39,2,1000.00,21,17),(40,1,1200.00,22,18),(41,3,200.00,22,19),(42,1,369.00,22,17),
-(43,3,300.00,23,20),(44,2,1000.00,23,21),(45,1,1200.00,23,44),(46,1,369.00,24,20),(47,3,300.00,25,21),(48,2,1000.00,25,44),
-(49,1,1200.00,25,20),(50,1,369.00,26,22),(51,3,300.00,26,45),(52,1,1200.00,27,22),(53,3,200.00,27,45),(54,1,369.00,28,22),
-(55,2,1000.00,28,45),(56,1,1200.00,29,22),(57,3,300.00,30,23),(58,2,1000.00,30,24),(59,1,1200.00,31,25),(60,3,200.00,31,23),
-(61,1,369.00,32,24),(62,3,300.00,33,25),(63,2,1000.00,33,23),(64,1,1200.00,33,24),(65,3,200.00,33,25),(66,1,369.00,34,26),
-(67,3,300.00,34,27),(68,2,1000.00,35,28),(69,1,1200.00,35,29),(70,3,200.00,35,30),(71,1,369.00,36,28),(72,3,300.00,36,29),
-(73,2,1000.00,37,30),(74,1,1200.00,37,28),(75,3,200.00,38,31),(76,1,369.00,38,32),(77,3,300.00,39,33),(78,2,1000.00,39,31),
-(79,1,1200.00,39,32),(80,3,200.00,40,34),(81,1,369.00,40,35),(82,3,300.00,41,36),(83,2,1000.00,41,37),(84,1,1200.00,41,34),
-(85,3,200.00,42,35),(86,1,369.00,43,38),(87,3,300.00,43,39),(88,2,1000.00,43,40),(89,1,1200.00,43,41),(90,3,200.00,44,38),
-(91,1,369.00,44,39),(92,3,300.00,45,40),(93,2,1000.00,46,41),(94,1,1200.00,46,38),(95,3,200.00,46,39),(96,1,1000.00,47,32),
-(97,1,1500.00,48,2),(98,1,1000.00,48,3),(99,1,1500.00,49,2),(100,1,1000.00,49,3),(101,1,1200.00,50,1),(102,1,1500.00,50,2),
-(103,1,1000.00,50,3);
 
--- 12) calificaciones_restaurante (depende de restaurantes y usuarios)
-INSERT INTO `calificaciones_restaurante` VALUES 
-(1,'Muy buena la comida, llegó calentita.','2025-06-11 09:11:02.000000',5,1,5),
-(2,'Entrega rápida y sin errores.','2025-06-11 09:11:02.000000',5,1,6),
-(3,'Todo en su punto, como siempre.','2025-06-03 20:45:00.000000',4,2,7),
-(4,'Tardo muchisimo en llegar','2025-06-03 20:45:00.000000',2,2,8),
-(5,'Todo fresco y sabroso.','2025-06-03 20:45:00.000000',5,2,9),
-(6,'Pedido fácil y entrega puntual.','2025-06-03 20:45:00.000000',5,3,10),
-(7,'Mal cerrado, se derramó todo.','2025-06-03 20:45:00.000000',1,3,11),
-(8,'Muy buena opción para pedir desde casa.','2025-06-03 20:45:00.000000',3,3,12),
-(9,'Faltaban cosas del pedido.','2025-06-03 20:45:00.000000',1,4,13),
-(10,'La comida llegó fría.','2025-06-03 20:45:00.000000',2,4,14),
-(11,'Me salvó la cena.','2025-06-03 20:45:00.000000',4,4,15),
-(12,'Llegó justo a tiempo.','2025-06-03 20:45:00.000000',5,4,16),
-(13,'Comida rica y bien embalada.','2025-06-03 20:45:00.000000',5,4,17),
-(14,'Muy poca cantidad para el precio.','2025-06-03 20:45:00.000000',3,5,18),
-(15,'No era lo que pedí.','2025-06-03 20:45:00.000000',1,5,19),
-(16,'Perfecto para un almuerzo rápido.','2025-06-03 20:45:00.000000',5,5,20),
-(17,'No venía con cubiertos.','2025-06-03 20:45:00.000000',3,6,2),
-(18,'Pedí sin picante y vino picante.','2025-06-03 20:45:00.000000',1,6,3),
-(19,'Llegó caliente y recién hecho.','2025-06-03 20:45:00.000000',5,6,4),
-(20,'Buena relación precio-calidad en delivery.','2025-06-03 20:45:00.000000',5,6,5),
-(21,'Se mantiene bien el sabor aunque sea para llevar.','2025-06-03 20:45:00.000000',3,7,21),
-(22,'Muy grasoso, no me gustó.','2025-06-03 20:45:00.000000',1,7,22),
-(23,'Sabor casero, ¡un 10!','2025-06-03 20:45:00.000000',5,8,23),
-(24,'Todo llegó completo, bien cerrado.','2025-06-03 20:45:00.000000',5,8,24),
-(25,'Me encantó, repetiría sin dudas.','2025-06-03 20:45:00.000000',5,8,25),
-(26,'Ideal para pedir en familia.','2025-06-03 20:45:00.000000',5,9,26),
-(27,'Nada fresco, parecía recalentado.','2025-06-03 20:45:00.000000',2,9,27),
-(28,'Se mezclaron los sabores.','2025-06-03 20:45:00.000000',3,9,28),
-(29,'Llegó antes de lo esperado.','2025-06-03 20:45:00.000000',5,9,29),
-(30,'El packaging conserva bien la comida','2025-06-03 20:45:00.000000',5,10,1),
-(31,'Poca seriedad en la entrega.','2025-06-03 20:45:00.000000',2,10,2),
-(32,'Bien, repetiría','2025-06-03 20:45:00.000000',3,10,3),
-(33,'El pedido llegó incompleto.','2025-06-03 20:45:00.000000',1,10,4),
-(34,'Llegó caliente y recién hecho.','2025-06-03 20:45:00.000000',5,11,5),
-(35,'Mucha demora, sin aviso.','2025-06-03 20:45:00.000000',2,12,6),
-(36,'No llegó en buen estado.','2025-06-03 20:45:00.000000',3,12,7),
-(37,'El envase venía abierto.','2025-06-03 20:45:00.000000',1,12,8),
-(38,'Todo llegó tal como lo pedí.','2025-06-03 20:45:00.000000',5,13,9),
-(39,'Se nota que cuidan cada detalle.','2025-06-03 20:45:00.000000',5,13,10),
-(40,'Todo revuelto dentro de la bolsa.','2025-06-03 20:45:00.000000',1,14,11),
-(41,'Ya es mi lugar de confianza para pedir.','2025-06-03 20:45:00.000000',4,14,12),
-(42,'Pedido rápido y comida deliciosa.','2025-06-03 20:45:00.000000',5,14,13),
-(43,'El pan llegó húmedo y feo.','2025-06-03 20:45:00.000000',1,15,14),
-(44,'¡Recién hecho, se notaba!','2025-06-03 20:45:00.000000',4,15,15),
-(45,'El mejor delivery de la zona.','2025-06-03 20:45:00.000000',5,15,16),
-(46,'Se nota que cuidan cada detalle.','2025-06-03 20:45:00.000000',5,15,17);
+INSERT INTO `menus` (`id`,`nombre`) VALUES (1,'Menú Clásico');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (2,'Menú Vegano');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (3,'Menú Infantil');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (4,'Menú Gourmet');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (5,'Menú Exprés');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (6,'Menú Sin Gluten');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (7,'Menú Vegetariano');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (8,'Menú Orgánico');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (9,'Menú Mediterráneo');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (10,'Menú Asiático');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (11,'Menú Mexicano');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (12,'Menú Italiano');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (13,'Menú Americano');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (14,'Menú Low Carb');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (15,'Menú Detox');
+INSERT INTO `menus` (`id`,`nombre`) VALUES (16,'Menu Daryl');
+
+
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (1,'Hamburguesa Clásica con carne, lechuga, tomate y mayonesa.',1,'Hamburguesa Clásica',1200.00,1,1);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (2,'Pizza Margherita con salsa de tomate, mozzarella y albahaca.',1,'Pizza Margherita',1500.00,2,1);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (3,'Ensalada César con lechuga, pollo, crotones y aderezo César.',1,'Ensalada César',1000.00,3,1);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (4,'Papas Fritas crujientes con sal.',1,'Papas Fritas',600.00,4,2);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (5,'Sushi Variado con pescado fresco y arroz.',1,'Sushi Variado',1800.00,5,2);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (6,'Tacos al Pastor con carne de cerdo, piña, cebolla y cilantro.',1,'Tacos al Pastor',900.00,6,3);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (7,'Lasaña con carne y salsa bechamel.',1,'Lasaña',1700.00,7,3);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (8,'Pasta a la Bolognesa con salsa de carne.',1,'Pasta Bolognesa',1300.00,8,3);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (9,'Croquetas de Pollo con salsa de mostaza.',1,'Croquetas de Pollo',800.00,9,3);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (10,'Bocadillo de Jamón y Queso',1,'Bocadillo',1100.00,10,4);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (11,'Hot Dog con ketchup, mostaza y cebolla.',1,'Hot Dog',950.00,11,5);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (12,'Pechuga de Pollo a la Parrilla con arroz.',1,'Pechuga de Pollo',1500.00,12,5);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (13,'Risotto de Champiñones',1,'Risotto de Champiñones',1600.00,13,5);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (14,'Ramen con caldo de pollo y fideos',1,'Ramen',1400.00,14,6);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (15,'Tarta de Espinaca y Queso',1,'Tarta de Espinaca',1200.00,15,6);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (16,'Sopa de Tomate con pan crujiente',1,'Sopa de Tomate',950.00,16,7);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (17,'Empanadas de Carne',1,'Empanadas',700.00,17,7);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (18,'Churrasco con ensalada de papas',1,'Churrasco',2100.00,18,7);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (19,'Ensalada Griega con aceitunas y feta',1,'Ensalada Griega',1300.00,19,7);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (20,'Tartaleta de Frutas',1,'Tartaleta de Frutas',800.00,20,8);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (21,'Pizza Caliente de Pepperoni',1,'Pizza Pepperoni',1700.00,21,8);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (22,'Tequeños con salsa de guacamole',1,'Tequeños',950.00,22,9);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (23,'Pasta Alfredo con salsa de queso',1,'Pasta Alfredo',1400.00,23,10);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (24,'Pollo al Curry con arroz basmati',1,'Pollo al Curry',1800.00,24,10);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (25,'Paella de Mariscos',1,'Paella de Mariscos',2500.00,25,10);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (26,'Ceviche de Pescado con limón y cilantro',1,'Ceviche',1300.00,26,11);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (27,'Sopa de Mariscos',1,'Sopa de Mariscos',1600.00,27,11);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (28,'Bife de Chorizo con puré de papas',1,'Bife de Chorizo',2200.00,28,12);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (29,'Ceviche de Camarón con aguacate',1,'Ceviche de Camarón',1700.00,29,12);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (30,'Pasta Pesto con albahaca y piñones',1,'Pasta Pesto',1400.00,30,12);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (31,'Gnocchi con salsa de tomate y queso parmesano',1,'Gnocchi',1200.00,31,13);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (32,'Ensalada de Atún con mayonesa y zanahorias',1,'Ensalada de Atún',1000.00,32,13);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (33,'Arroz Frito con Pollo',1,'Arroz Frito',1200.00,33,13);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (34,'Pollo a la Parrilla con puré de papas',1,'Pollo a la Parrilla',1500.00,34,14);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (35,'Burgers Veganas con pan integral',1,'Hamburguesa Vegana',1300.00,35,14);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (36,'Tacos de Pescado con salsa picante',1,'Tacos de Pescado',1000.00,36,14);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (37,'Milanesa de Pollo con ensalada',1,'Milanesa de Pollo',1400.00,37,14);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (38,'Tarta de Manzana con crema pastelera',1,'Tarta de Manzana',900.00,38,15);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (39,'Sopa de Lentejas con verduras',1,'Sopa de Lentejas',850.00,39,15);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (40,'Pasta Carbonara con bacon y crema',1,'Pasta Carbonara',1500.00,40,15);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (41,'Ensalada Capresse con tomate, mozzarella y albahaca',1,'Ensalada Capresse',1200.00,41,15);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (42,'Pizza Hawaiana con jamón y piña',1,'Pizza Hawaiana',1600.00,42,2);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (43,'Pollo Asado con papas a la provenzal',1,'Pollo Asado',1800.00,43,1);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (44,'Tacos Vegetarianos con vegetales y guacamole',1,'Tacos Vegetarianos',1100.00,44,8);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (45,'Tarta de Queso con frutas del bosque',1,'Tarta de Queso',950.00,45,9);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (46,'Salchicha con papa',1,'Sanchipapa',200.00,62,16);
+INSERT INTO productos (`id`,`descripcion`,`disponible`,`nombre`,`precio`,`imagen_id`,`menu_id`) VALUES (47,'Panchito rico',1,'Pancho',150.00,63,16);
+
+
+
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (1,1,'Restaurante Delicias',31,46,1,32);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (2,1,'La Buena Mesa',32,47,2,33);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (3,1,'Sabor Natural',33,48,3,34);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (4,1,'El Rincón Vegano',34,49,4,35);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (5,1,'Casa Tradicional',35,50,5,36);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (6,1,'Sabores del Mundo',36,51,6,37);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (7,1,'Cocina Urbana',37,52,7,38);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (8,1,'La Esquina Feliz',38,53,8,39);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (9,1,'Bocados Caseros',39,54,9,40);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (10,1,'Delicias al Paso',40,55,10,41);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (11,1,'El Fogón de la Abuela',41,56,11,42);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (12,1,'El Jardín Secreto',42,57,12,43);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (13,1,'Rincón Gourmet',43,58,13,44);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (14,1,'Sabores y Aromas',44,59,14,45);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (15,1,'Fusión Latina',45,60,15,46);
+INSERT INTO restaurantes (`id`,`activo`,`razon_social`,`direccion_id`,`imagen_id`,`menu_id`,`usuario_id`) VALUES (16,1,'Daryl ',50,61,16,49);
+
+
+
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (1,'MONDAY','18:00:00.000000','23:00:00.000000',1);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (2,'WEDNESDAY','18:00:00.000000','23:00:00.000000',1);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (3,'THURSDAY','18:00:00.000000','23:00:00.000000',1);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (4,'FRIDAY','18:00:00.000000','23:00:00.000000',1);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (5,'SATURDAY','18:00:00.000000','23:00:00.000000',1);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (6,'SUNDAY','18:00:00.000000','23:00:00.000000',1);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (7,'TUESDAY','15:00:00.000000','23:00:00.000000',2);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (8,'WEDNESDAY','15:00:00.000000','23:00:00.000000',2);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (9,'THURSDAY','15:00:00.000000','23:00:00.000000',2);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (10,'FRIDAY','15:00:00.000000','23:00:00.000000',2);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (11,'SATURDAY','15:00:00.000000','23:00:00.000000',2);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (12,'SUNDAY','15:00:00.000000','23:00:00.000000',2);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (13,'MONDAY','11:00:00.000000','23:00:00.000000',3);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (14,'TUESDAY','11:00:00.000000','23:00:00.000000',3);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (15,'WEDNESDAY','11:00:00.000000','23:00:00.000000',3);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (16,'THURSDAY','11:00:00.000000','23:00:00.000000',3);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (17,'FRIDAY','11:00:00.000000','23:00:00.000000',3);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (18,'SATURDAY','11:00:00.000000','23:00:00.000000',3);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (19,'SUNDAY','11:00:00.000000','23:00:00.000000',3);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (20,'MONDAY','11:00:00.000000','23:00:00.000000',4);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (21,'TUESDAY','11:00:00.000000','23:00:00.000000',4);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (22,'WEDNESDAY','11:00:00.000000','23:00:00.000000',4);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (23,'THURSDAY','11:00:00.000000','23:00:00.000000',4);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (24,'FRIDAY','11:00:00.000000','23:00:00.000000',4);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (25,'SATURDAY','11:00:00.000000','23:00:00.000000',4);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (26,'SUNDAY','11:00:00.000000','23:00:00.000000',4);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (27,'MONDAY','12:00:00.000000','22:00:00.000000',5);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (28,'TUESDAY','12:00:00.000000','22:00:00.000000',5);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (29,'THURSDAY','12:00:00.000000','22:00:00.000000',5);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (30,'FRIDAY','12:00:00.000000','22:00:00.000000',5);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (31,'SATURDAY','12:00:00.000000','22:00:00.000000',5);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (32,'SUNDAY','12:00:00.000000','22:00:00.000000',5);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (33,'MONDAY','11:00:00.000000','23:30:00.000000',6);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (34,'TUESDAY','11:00:00.000000','23:30:00.000000',6);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (35,'WEDNESDAY','11:00:00.000000','23:30:00.000000',6);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (36,'THURSDAY','11:00:00.000000','23:30:00.000000',6);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (37,'FRIDAY','11:00:00.000000','23:30:00.000000',6);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (38,'SATURDAY','11:00:00.000000','23:30:00.000000',6);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (39,'SUNDAY','11:00:00.000000','23:30:00.000000',6);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (40,'MONDAY','10:00:00.000000','23:30:00.000000',7);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (41,'TUESDAY','10:00:00.000000','23:30:00.000000',7);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (42,'WEDNESDAY','10:00:00.000000','23:30:00.000000',7);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (43,'THURSDAY','10:00:00.000000','23:30:00.000000',7);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (44,'FRIDAY','10:00:00.000000','23:30:00.000000',7);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (45,'SATURDAY','10:00:00.000000','23:30:00.000000',7);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (46,'SUNDAY','10:00:00.000000','23:30:00.000000',7);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (47,'TUESDAY','10:00:00.000000','23:30:00.000000',8);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (48,'WEDNESDAY','10:00:00.000000','23:30:00.000000',8);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (49,'THURSDAY','10:00:00.000000','23:30:00.000000',8);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (50,'FRIDAY','10:00:00.000000','23:30:00.000000',8);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (51,'SATURDAY','10:00:00.000000','23:30:00.000000',8);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (52,'SUNDAY','10:00:00.000000','23:30:00.000000',8);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (53,'MONDAY','10:00:00.000000','23:30:00.000000',9);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (54,'TUESDAY','10:00:00.000000','23:30:00.000000',9);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (55,'WEDNESDAY','10:00:00.000000','23:30:00.000000',9);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (56,'FRIDAY','10:00:00.000000','23:30:00.000000',9);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (57,'SATURDAY','10:00:00.000000','23:30:00.000000',9);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (58,'SUNDAY','10:00:00.000000','23:30:00.000000',9);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (59,'MONDAY','12:00:00.000000','23:30:00.000000',10);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (60,'TUESDAY','12:00:00.000000','23:30:00.000000',10);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (61,'WEDNESDAY','12:00:00.000000','23:30:00.000000',10);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (62,'THURSDAY','12:00:00.000000','23:30:00.000000',10);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (63,'FRIDAY','12:00:00.000000','23:30:00.000000',10);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (64,'SATURDAY','12:00:00.000000','23:30:00.000000',10);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (65,'SUNDAY','12:00:00.000000','23:30:00.000000',10);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (66,'MONDAY','08:00:00.000000','15:30:00.000000',11);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (67,'TUESDAY','08:00:00.000000','15:30:00.000000',11);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (68,'WEDNESDAY','08:00:00.000000','15:30:00.000000',11);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (69,'THURSDAY','08:00:00.000000','15:30:00.000000',11);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (70,'FRIDAY','08:00:00.000000','15:30:00.000000',11);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (71,'SATURDAY','08:00:00.000000','15:30:00.000000',11);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (72,'SUNDAY','08:00:00.000000','15:30:00.000000',11);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (73,'TUESDAY','08:00:00.000000','15:30:00.000000',12);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (74,'WEDNESDAY','08:00:00.000000','15:30:00.000000',12);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (75,'THURSDAY','08:00:00.000000','15:30:00.000000',12);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (76,'FRIDAY','08:00:00.000000','15:30:00.000000',12);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (77,'SATURDAY','08:00:00.000000','15:30:00.000000',12);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (78,'SUNDAY','08:00:00.000000','15:30:00.000000',12);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (79,'MONDAY','08:00:00.000000','16:30:00.000000',13);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (80,'TUESDAY','08:00:00.000000','16:30:00.000000',13);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (81,'WEDNESDAY','08:00:00.000000','16:30:00.000000',13);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (82,'THURSDAY','08:00:00.000000','16:30:00.000000',13);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (83,'FRIDAY','08:00:00.000000','16:30:00.000000',13);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (84,'SATURDAY','08:00:00.000000','16:30:00.000000',13);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (85,'SUNDAY','08:00:00.000000','16:30:00.000000',13);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (86,'MONDAY','08:00:00.000000','16:30:00.000000',14);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (87,'TUESDAY','08:00:00.000000','16:30:00.000000',14);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (88,'THURSDAY','08:00:00.000000','16:30:00.000000',14);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (89,'FRIDAY','08:00:00.000000','16:30:00.000000',14);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (90,'SATURDAY','08:00:00.000000','16:30:00.000000',14);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (91,'SUNDAY','08:00:00.000000','16:30:00.000000',14);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (92,'MONDAY','08:00:00.000000','23:30:00.000000',15);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (93,'TUESDAY','08:00:00.000000','23:30:00.000000',15);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (94,'WEDNESDAY','08:00:00.000000','23:30:00.000000',15);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (95,'THURSDAY','08:00:00.000000','23:30:00.000000',15);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (96,'FRIDAY','08:00:00.000000','23:30:00.000000',15);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (97,'SATURDAY','08:00:00.000000','23:30:00.000000',15);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (98,'SUNDAY','08:00:00.000000','23:30:00.000000',15);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (107,'MONDAY','11:30:00.000000','21:30:00.000000',16);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (108,'SUNDAY','15:30:00.000000','23:40:00.000000',16);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (109,'THURSDAY','09:00:00.000000','23:15:00.000000',16);
+INSERT INTO horarios_atencion (`id`,`dia`,`hora_apertura`,`hora_cierre`,`restaurante_id`) VALUES (110,'TUESDAY','09:30:00.000000','23:30:00.000000',16);
+
+
+
+
+
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (1,'EN_PREPARACION','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',2400.00,2,36,6,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (2,'LISTO_PARA_RETIRAR','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',3500.00,3,36,6,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (3,'PENDIENTE','2025-06-09 17:28:49.000000','DELIVERY',4400.00,4,3,6,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (4,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',3550.00,5,4,6,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (5,'PENDIENTE','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',9800.00,5,31,1,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (6,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',3550.00,6,5,1,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (7,'LISTO_PARA_RETIRAR','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',5800.00,7,32,2,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (8,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',1500.00,8,7,2,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (9,'LISTO_PARA_ENTREGAR','2025-06-09 17:28:49.000000','DELIVERY',12500.00,9,8,2,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (10,'CANCELADO','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',9870.00,10,33,3,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (11,'PENDIENTE','2025-06-09 17:28:49.000000','DELIVERY',1500.00,11,10,3,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (12,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',12500.00,12,13,3,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (13,'CANCELADO','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',9000.00,13,34,4,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (14,'LISTO_PARA_ENTREGAR','2025-06-09 17:28:49.000000','DELIVERY',1990.00,14,13,4,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (15,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',4500.00,15,14,4,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (16,'EN_PREPARACION','2025-06-09 17:28:49.000000','DELIVERY',12500.00,16,15,4,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (17,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',9800.00,17,16,4,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (18,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',1650.00,18,17,5,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (19,'EN_PREPARACION','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',13600.00,19,35,5,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (20,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',9780.00,20,19,5,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (21,'CANCELADO','2025-06-09 17:28:49.000000','DELIVERY',13600.00,21,20,7,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (22,'COMPLETADO','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',9000.00,22,37,7,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (23,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',1650.00,23,22,8,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (24,'LISTO_PARA_RETIRAR','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',13600.00,24,38,8,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (25,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',9780.00,25,24,8,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (26,'COMPLETADO','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',9000.00,26,39,9,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (27,'CANCELADO','2025-06-09 17:28:49.000000','DELIVERY',1650.00,27,26,9,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (28,'EN_PREPARACION','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',13600.00,28,39,9,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (29,'LISTO_PARA_ENTREGAR','2025-06-09 17:28:49.000000','DELIVERY',9780.00,29,28,9,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (30,'COMPLETADO','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',9000.00,1,40,10,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (31,'CANCELADO','2025-06-09 17:28:49.000000','DELIVERY',1650.00,2,1,10,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (32,'EN_PREPARACION','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',13600.00,3,40,10,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (33,'COMPLETADO','2025-06-09 17:28:49.000000','DELIVERY',9780.00,4,3,10,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (34,'COMPLETADO','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',9870.00,5,41,11,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (35,'CANCELADO','2025-06-09 17:28:49.000000','DELIVERY',1650.00,6,5,12,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (36,'EN_PREPARACION','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',13600.00,7,42,12,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (37,'EN_CAMINO','2025-06-09 17:28:49.000000','DELIVERY',9780.00,8,7,12,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (38,'EN_PREPARACION','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',136.00,9,43,13,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (39,'EN_CAMINO','2025-06-09 17:28:49.000000','DELIVERY',9780.00,10,9,13,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (40,'EN_CAMINO','2025-06-09 17:28:49.000000','DELIVERY',9780.00,11,10,14,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (41,'EN_PREPARACION','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',6980.00,12,44,14,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (42,'EN_CAMINO','2025-06-09 17:28:49.000000','DELIVERY',10200.00,13,12,14,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (43,'LISTO_PARA_ENTREGAR','2025-06-09 17:28:49.000000','DELIVERY',9780.00,14,13,15,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (44,'CANCELADO','2025-06-09 17:28:49.000000','DELIVERY',9780.00,15,14,15,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (45,'LISTO_PARA_RETIRAR','2025-06-09 17:28:49.000000','RETIRO_POR_LOCAL',6980.00,16,45,15,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (46,'EN_CAMINO','2025-06-09 17:28:49.000000','DELIVERY',10200.00,17,16,15,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (47,'EN_CAMINO','2025-11-04 21:18:30.000000','DELIVERY',10987.00,48,48,16,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (48,'LISTO_PARA_ENTREGAR','2025-11-04 21:18:30.000000','DELIVERY',887.00,48,49,16,NULL,NULL,NULL,NULL,NULL,50);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (49,'EN_PREPARACION','2025-11-04 21:18:30.000000','DELIVERY',10987.00,48,47,16,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (54,'CANCELADO','2025-11-09 19:39:46.898962','RETIRO_POR_LOCAL',6300.00,48,31,1,'San Juan 628, Mar del Plata (7600) - Rejas Verdes',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (59,'PENDIENTE','2025-11-09 20:48:50.152420','DELIVERY',2400.00,48,47,2,'Maipu 5570, Mar del plata (7600)',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (60,'CANCELADO','2025-11-09 20:50:37.062289','DELIVERY',300.00,48,47,16,'Maipu 5570, Mar del plata (7600)',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (61,'CANCELADO','2025-11-09 20:53:48.534517','DELIVERY',1050.00,48,47,16,'Maipu 5570, Mar del plata (7600)',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO pedidos (`id`,`estado`,`fecha_hora`,`tipo_entrega`,`total`,`usuario_id`,`direccion_id`,`restaurante_id`,`direccion_snapshot`,`costo_delivery`,`distancia_km`,`fecha_aceptacion_repartidor`,`fecha_entrega`,`repartidor_id`) VALUES (62,'EN_PREPARACION','2025-11-09 21:27:38.602864','DELIVERY',300.00,48,47,16,'Maipu 5570, Mar del plata (7600)',NULL,NULL,NULL,NULL,NULL);
+
+
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (1,2,253.00,1,14);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (2,1,369.00,1,15);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (3,2,1000.00,2,15);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (4,1,1200.00,2,14);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (5,1,369.00,3,14);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (6,3,300.00,4,15);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (7,2,1000.00,4,14);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (8,1,1200.00,5,1);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (9,2,200.00,5,2);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (10,3,369.00,6,3);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (11,3,300.00,6,43);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (12,2,1000.00,6,1);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (13,1,1200.00,6,2);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (14,1,200.00,7,4);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (15,5,369.00,7,5);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (16,1,300.00,8,42);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (17,4,1000.00,8,4);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (18,5,1200.00,8,5);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (19,2,200.00,9,42);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (20,4,369.00,9,4);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (21,5,300.00,9,5);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (22,2,1000.00,10,6);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (23,7,1200.00,10,7);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (24,2,200.00,10,8);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (25,1,369.00,11,9);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (26,1,300.00,12,8);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (27,2,1000.00,13,10);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (28,3,1200.00,14,10);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (29,6,300.00,15,10);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (30,9,1200.00,16,10);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (31,10,200.00,17,10);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (32,1,369.00,18,11);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (33,3,300.00,19,12);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (34,2,1000.00,19,13);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (35,1,1200.00,20,11);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (36,3,200.00,20,12);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (37,1,369.00,20,13);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (38,3,300.00,21,16);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (39,2,1000.00,21,17);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (40,1,1200.00,22,18);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (41,3,200.00,22,19);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (42,1,369.00,22,17);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (43,3,300.00,23,20);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (44,2,1000.00,23,21);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (45,1,1200.00,23,44);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (46,1,369.00,24,20);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (47,3,300.00,25,21);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (48,2,1000.00,25,44);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (49,1,1200.00,25,20);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (50,1,369.00,26,22);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (51,3,300.00,26,45);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (52,1,1200.00,27,22);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (53,3,200.00,27,45);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (54,1,369.00,28,22);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (55,2,1000.00,28,45);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (56,1,1200.00,29,22);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (57,3,300.00,30,23);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (58,2,1000.00,30,24);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (59,1,1200.00,31,25);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (60,3,200.00,31,23);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (61,1,369.00,32,24);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (62,3,300.00,33,25);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (63,2,1000.00,33,23);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (64,1,1200.00,33,24);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (65,3,200.00,33,25);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (66,1,369.00,34,26);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (67,3,300.00,34,27);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (68,2,1000.00,35,28);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (69,1,1200.00,35,29);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (70,3,200.00,35,30);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (71,1,369.00,36,28);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (72,3,300.00,36,29);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (73,2,1000.00,37,30);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (74,1,1200.00,37,28);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (75,3,200.00,38,31);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (76,1,369.00,38,32);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (77,3,300.00,39,33);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (78,2,1000.00,39,31);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (79,1,1200.00,39,32);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (80,3,200.00,40,34);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (81,1,369.00,40,35);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (82,3,300.00,41,36);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (83,2,1000.00,41,37);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (84,1,1200.00,41,34);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (85,3,200.00,42,35);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (86,1,369.00,43,38);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (87,3,300.00,43,39);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (88,2,1000.00,43,40);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (89,1,1200.00,43,41);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (90,3,200.00,44,38);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (91,1,369.00,44,39);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (92,3,300.00,45,40);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (93,2,1000.00,46,41);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (94,1,1200.00,46,38);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (95,3,200.00,46,39);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (104,4,1200.00,54,1);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (105,1,1500.00,54,2);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (112,1,600.00,59,4);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (113,1,1800.00,59,5);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (114,2,150.00,60,47);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (115,7,150.00,61,47);
+INSERT INTO productos_pedidos (`id`,`cantidad`,`precio_unitario`,`pedido_id`,`producto_id`) VALUES (116,2,150.00,62,47);
+
+
+
+INSERT INTO pagos (`id`,`estado`,`fecha_actualizacion`,`fecha_creacion`,`mercadopago_payment_id`,`mercadopago_payment_type`,`mercadopago_preference_id`,`mercadopago_status`,`mercadopago_status_detail`,`metodo_pago`,`monto`,`pedido_id`) VALUES (5,'PENDIENTE',NULL,'2025-11-09 19:39:46.898962',NULL,NULL,NULL,NULL,NULL,'EFECTIVO',6300.00,54);
+INSERT INTO pagos (`id`,`estado`,`fecha_actualizacion`,`fecha_creacion`,`mercadopago_payment_id`,`mercadopago_payment_type`,`mercadopago_preference_id`,`mercadopago_status`,`mercadopago_status_detail`,`metodo_pago`,`monto`,`pedido_id`) VALUES (10,'PENDIENTE',NULL,'2025-11-09 20:48:50.162947',NULL,NULL,NULL,NULL,NULL,'EFECTIVO',2400.00,59);
+INSERT INTO pagos (`id`,`estado`,`fecha_actualizacion`,`fecha_creacion`,`mercadopago_payment_id`,`mercadopago_payment_type`,`mercadopago_preference_id`,`mercadopago_status`,`mercadopago_status_detail`,`metodo_pago`,`monto`,`pedido_id`) VALUES (11,'PENDIENTE',NULL,'2025-11-09 20:50:37.062289',NULL,NULL,NULL,NULL,NULL,'EFECTIVO',300.00,60);
+INSERT INTO pagos (`id`,`estado`,`fecha_actualizacion`,`fecha_creacion`,`mercadopago_payment_id`,`mercadopago_payment_type`,`mercadopago_preference_id`,`mercadopago_status`,`mercadopago_status_detail`,`metodo_pago`,`monto`,`pedido_id`) VALUES (12,'PENDIENTE',NULL,'2025-11-09 20:53:48.539944',NULL,NULL,NULL,NULL,NULL,'EFECTIVO',1050.00,61);
+INSERT INTO pagos (`id`,`estado`,`fecha_actualizacion`,`fecha_creacion`,`mercadopago_payment_id`,`mercadopago_payment_type`,`mercadopago_preference_id`,`mercadopago_status`,`mercadopago_status_detail`,`metodo_pago`,`monto`,`pedido_id`) VALUES (13,'PENDIENTE',NULL,'2025-11-09 21:27:38.606893',NULL,NULL,NULL,NULL,NULL,'EFECTIVO',300.00,62);

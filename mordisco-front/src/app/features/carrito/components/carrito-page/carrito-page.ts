@@ -1,9 +1,11 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { CarritoService } from '../../../../shared/services/carrito/carrito-service';
+import { NotificationService } from '../../../../core/services/notification-service';
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
   selector: 'app-carrito-page',
@@ -13,7 +15,8 @@ import { CarritoService } from '../../../../shared/services/carrito/carrito-serv
 })
 export class CarritoPage {
   private router = inject(Router)
-  private snackBar = inject(MatSnackBar)
+  private notificationService = inject(NotificationService)
+  private dialog = inject(MatDialog)
   protected carritoService = inject(CarritoService)
 
   // Computed values
@@ -45,18 +48,32 @@ export class CarritoPage {
   eliminarProducto(productoId: number): void {
     const item = this.carritoService.obtenerProducto(productoId)
     
-    if (confirm(`¿Eliminar "${item?.nombre}" del carrito?`)) {
-      this.carritoService.eliminarProducto(productoId)
-      this.snackBar.open('Producto eliminado del carrito', 'Cerrar', { duration: 2000 })
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: `¿Eliminar "${item?.nombre}" del carrito?` }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.carritoService.eliminarProducto(productoId)
+        this.notificationService.success('Producto eliminado del carrito')
+      }
+    });
   }
 
   vaciarCarrito(): void {
-    if (confirm('¿Estás seguro de vaciar el carrito? Esta acción no se puede deshacer.')) {
-      this.carritoService.vaciarCarrito()
-      this.snackBar.open('Carrito vaciado', 'Cerrar', { duration: 2000 })
-      this.router.navigate(['/home'])
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro de vaciar el carrito? Esta acción no se puede deshacer.' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.carritoService.vaciarCarrito()
+        this.notificationService.success('Carrito vaciado')
+        this.router.navigate(['/home'])
+      }
+    });
   }
 
   continuarComprando(): void {
@@ -68,10 +85,8 @@ export class CarritoPage {
     const validacion = this.carritoService.validarDisponibilidad()
     
     if (!validacion.valido) {
-      this.snackBar.open(
-        `Los siguientes productos no están disponibles: ${validacion.productosNoDisponibles.join(', ')}`,
-        'Cerrar',
-        { duration: 5000 }
+      this.notificationService.error(
+        `Los siguientes productos no están disponibles: ${validacion.productosNoDisponibles.join(', ')}`
       )
       return
     }

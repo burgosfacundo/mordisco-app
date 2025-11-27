@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MenuService } from '../../../../shared/services/menu/menu-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { AuthService } from '../../../../shared/services/auth-service';
@@ -7,10 +8,11 @@ import ProductoResponse from '../../../../shared/models/producto/producto-respon
 import { ProductoCardComponent } from "../../../../shared/components/producto-card-component/producto-card-component";
 import MenuResponse from '../../../../shared/models/menu/menu-response';
 import { ProductoService } from '../../../../shared/services/productos/producto-service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MenuFormComponent } from "../menu-form-component/menu-form-component";
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Router, RouterLink } from '@angular/router';
+import { NotificationService } from '../../../../core/services/notification-service';
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
   selector: 'app-mi-menu-page',
@@ -21,7 +23,8 @@ import { Router, RouterLink } from '@angular/router';
 export class MiMenuPage implements OnInit {
   private aus = inject(AuthService);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
+  private dialog = inject(MatDialog);
   private mService = inject(MenuService);
   private rService = inject(RestauranteService);
   private pService = inject(ProductoService);
@@ -42,7 +45,6 @@ export class MiMenuPage implements OnInit {
     const userId = this.aus.currentUser()?.userId;
     
     if (!userId) {
-      this.snackBar.open('❌ Usuario no autenticado', 'Cerrar', { duration: 3000 });
       this.router.navigate(['/login']);
       return;
     }
@@ -54,7 +56,7 @@ export class MiMenuPage implements OnInit {
     this.rService.getByUsuario(userId).subscribe({
       next: (restaurante) => {
         if (!restaurante) {
-          this.mostrarError('⚠️ Primero debes crear tu restaurante');
+          this.notificationService.warning('⚠️ Primero debes crear tu restaurante');
           this.router.navigate(['/restaurante']);
           return;
         }
@@ -65,7 +67,7 @@ export class MiMenuPage implements OnInit {
         this.verificarMenu(restaurante.id);
       },
       error: () => {
-        this.mostrarError('⚠️ Primero debes crear tu restaurante');
+        this.notificationService.warning('⚠️ Primero debes crear tu restaurante');
         this.router.navigate(['/restaurante']);
         this.isLoading = false;
       }
@@ -112,7 +114,6 @@ export class MiMenuPage implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.mostrarError('❌ Error al cargar los productos');
         this.isLoading = false;
       }
     });
@@ -126,7 +127,6 @@ export class MiMenuPage implements OnInit {
 
   agregarProducto(): void {
     if (!this.menu?.id) {
-      this.snackBar.open('⚠️ Error: Menú no disponible', 'Cerrar', { duration: 3000 });
       return;
     }
     this.router.navigate(['/restaurante/menu/producto/nuevo', this.menu.id]);
@@ -137,24 +137,24 @@ export class MiMenuPage implements OnInit {
   }
 
   confirmarEliminacion(id: number): void {
-    if (confirm('⚠️ ¿Estás seguro de eliminar este producto?')) {
-      this.eliminarProducto(id);
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro de eliminar este producto?' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.eliminarProducto(id);
+      }
+    });
   }
 
   private eliminarProducto(id: number): void {
     this.pService.delete(id).subscribe({
       next: () => {
-        this.snackBar.open('✅ Producto eliminado', 'Cerrar', { duration: 3000 });
+        this.notificationService.success('✅ Producto eliminado');
         this.cargarProductos();
-      },
-      error: () => {
-        this.mostrarError('❌ Error al eliminar el producto');
       }
     });
-  }
-
-  private mostrarError(mensaje: string): void {
-    this.snackBar.open(mensaje, 'Cerrar', { duration: 3000 });
   }
 }

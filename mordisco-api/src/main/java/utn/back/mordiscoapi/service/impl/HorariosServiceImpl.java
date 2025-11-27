@@ -6,10 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.common.util.HorarioValidator;
 import utn.back.mordiscoapi.mapper.HorarioAtencionMapper;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionRequestDTO;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionResponseDTO;
+import utn.back.mordiscoapi.model.entity.HorarioAtencion;
 import utn.back.mordiscoapi.repository.HorarioRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.service.interf.IHorarioService;
@@ -24,13 +27,30 @@ public class HorariosServiceImpl implements IHorarioService {
     private final RestauranteRepository restauranteRepository;
 
     @Override
-    public Long save(Long idRestaurante, HorarioAtencionRequestDTO horario) throws NotFoundException {
+    public Long save(Long idRestaurante, HorarioAtencionRequestDTO horario) throws NotFoundException, BadRequestException {
         var restaurante = restauranteRepository.findById(idRestaurante).orElseThrow(
                 () -> new NotFoundException("Restaurante no encontrado")
         );
-        var hor = HorarioAtencionMapper.toEntity(restaurante,horario);
-        repository.save(hor);
-        return hor.getId();
+
+        List<HorarioAtencion> horariosExistentes = repository.findAllByRestauranteId(idRestaurante);
+
+        // Validar que no haya solapamiento
+        try {
+            HorarioValidator.validarNoSolapamiento(
+                    horario.dia(),
+                    horario.horaApertura(),
+                    horario.horaCierre(),
+                    horariosExistentes,
+                    null // null porque es creación
+            );
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+
+        HorarioAtencion h = HorarioAtencionMapper.toEntity(restaurante, horario);
+        repository.save(h);
+
+        return h.getId();
     }
 
     @Override
@@ -41,11 +61,30 @@ public class HorariosServiceImpl implements IHorarioService {
     }
 
     @Override
-    public void update(Long idHorario, HorarioAtencionRequestDTO dto) throws NotFoundException {
+    public void update(Long idHorario, HorarioAtencionRequestDTO dto) throws NotFoundException, BadRequestException {
         var horario = repository.findById(idHorario).orElseThrow(
                 () -> new NotFoundException("Horario no encontrado")
         );
 
+        Long restauranteId = horario.getRestaurante().getId();
+
+        // Obtener todos los horarios del restaurante
+        List<HorarioAtencion> horariosExistentes = repository.findAllByRestauranteId(restauranteId);
+
+        // Validar solapamiento (excluyendo el horario actual)
+        try {
+            HorarioValidator.validarNoSolapamiento(
+                    dto.dia(),
+                    dto.horaApertura(),
+                    dto.horaCierre(),
+                    horariosExistentes,
+                    idHorario // excluir el horario que se está actualizando
+            );
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+
+        // Si pasa la validación, actualizar
         HorarioAtencionMapper.applyUpdate(dto, horario);
         repository.save(horario);
     }

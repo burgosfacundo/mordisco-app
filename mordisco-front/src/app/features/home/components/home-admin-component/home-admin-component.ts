@@ -1,5 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import { UserService } from '../../../registro/services/user-service';
 import UserCard from '../../../../shared/models/user/user-card';
@@ -17,7 +16,6 @@ import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
   templateUrl: './home-admin-component.html'
 })
 export class HomeAdminComponent implements OnInit {
-  private _snackBar = inject(MatSnackBar);
   private restauranteService = inject(RestauranteService);
   private pedidoService = inject(PedidoService);
   private usuarioService = inject(UserService);
@@ -63,7 +61,6 @@ export class HomeAdminComponent implements OnInit {
         this.isLoadingRestaurantes = false;
       },
       error: () => {
-        this._snackBar.open('Error al cargar los restaurantes', 'Cerrar', { duration: 3000 });
         this.isLoadingRestaurantes = false;
       }
     });
@@ -78,7 +75,6 @@ export class HomeAdminComponent implements OnInit {
         this.isLoadingPedidos = false;
       },
       error: () => {
-        this._snackBar.open('Error al cargar los pedidos', 'Cerrar', { duration: 3000 });
         this.isLoadingPedidos = false;
       }
     });
@@ -95,7 +91,6 @@ export class HomeAdminComponent implements OnInit {
         this.isLoadingUsuarios = false;
       },
       error: () => {
-        this._snackBar.open('Error al cargar los usuarios', 'Cerrar', { duration: 3000 });
         this.isLoadingUsuarios = false;
       }
     });

@@ -1,4 +1,4 @@
-import { ICalificacionBase } from "./ICalificacionBase";
+import { ICalificacionBase } from "./calificacion-base";
 
 export default interface CalificacionPedidoResponseDTO extends ICalificacionBase{
     puntajeComida : number,

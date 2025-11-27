@@ -1,8 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { ConfiguracionSistemaService } from '../../../shared/services/configuracionSistema/configuracion-sistema-service';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import ConfiguracionSistemaResponseDTO from '../../../shared/models/configuracion/ConfiguracionSistemaResponseDTO';
+import ConfiguracionSistemaResponseDTO from '../../../shared/models/configuracion/configuracion-sistema-response-dto';
 
 @Component({
   selector: 'app-configuracion-page',
@@ -13,7 +12,6 @@ import ConfiguracionSistemaResponseDTO from '../../../shared/models/configuracio
 export class ConfiguracionPage {
   private csSerive = inject(ConfiguracionSistemaService)
   private router = inject(Router)
-  private _snackBar = inject(MatSnackBar)
   config? : ConfiguracionSistemaResponseDTO 
 
   ngOnInit(): void {
@@ -21,7 +19,6 @@ export class ConfiguracionPage {
       next: u => this.config = u,
       error: (error) => {
         console.log(error);
-        this.openSnackBar('❌ Ocurrió un error al cargar la configuracion')
         this.router.navigate(['/'])
       }
     })
@@ -30,10 +27,5 @@ export class ConfiguracionPage {
   editarConfiguracion(){
     this.router.navigate(['admin/configuracion/edit'])
   }
-
-  private openSnackBar(message: string, action: string = 'Cerrar'): void {
-    this._snackBar.open(message, action, { duration: 3000 });
-  }
-
 }
 

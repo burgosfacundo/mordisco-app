@@ -8,8 +8,8 @@ import { HorarioService } from '../../../../shared/services/horario/horario-serv
 import HorarioAtencionResponse from '../../../../shared/models/horario/horario-atencion-response';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import HorarioAtencionRequest from '../../../../shared/models/horario/horario-atencion-request';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NotificationService } from '../../../../core/services/notification-service';
 
 @Component({
   selector: 'app-horario-form-component',
@@ -19,7 +19,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 export class HorarioFormComponent implements OnInit{
 
   private fb : FormBuilder = inject(FormBuilder)
-  private _snackbar : MatSnackBar = inject(MatSnackBar)
+  private notificationService = inject(NotificationService)
   private validationService : FormValidationService = inject(FormValidationService)
   private aus : AuthService = inject(AuthService)
   private rService : RestauranteService = inject(RestauranteService)
@@ -110,11 +110,13 @@ export class HorarioFormComponent implements OnInit{
         this.hService.update(this.formHorarioAtencion.value.id,horarioParaBackend).subscribe({
           next:()=>{
             this.hService.clearHorarioToEdit()
-            this._snackbar.open("✅ Horario editado correctamente",'',{duration: 3000})
+            this.notificationService.success("✅ Horario editado correctamente")
             this.router.navigate(['/restaurante/horarios'])
-          },error:()=> { this.hService.clearHorarioToEdit()
-            this._snackbar.open("❌ No se ha podido editar el horario",'',{duration: 3000})}})
+          },error:()=> { 
+            this.hService.clearHorarioToEdit()
             this.router.navigate(['/restaurante/horarios'])
+          }
+        })
       }else{
         horarioParaBackend = {
           dia: this.formHorarioAtencion.value.dia, 
@@ -124,11 +126,11 @@ export class HorarioFormComponent implements OnInit{
 
         if(this.restaurante){
           this.hService.save(horarioParaBackend, this.restaurante?.id).subscribe({
-            next:(data)=>{console.log(data),
-              this._snackbar.open("✅ Horario creado correctamente",'',{duration: 3000})
+            next:()=>{
+              this.notificationService.success("✅ Horario creado correctamente")
               this.router.navigate(['/restaurante/horarios'])
-            },error:(e)=>{ console.log(e),
-            this._snackbar.open("❌ No se ha podido crear el horario", "Continuar", { duration: 3000 })
+            },
+            error:()=>{
             this.router.navigate(['/restaurante/horarios'])
           }
           })

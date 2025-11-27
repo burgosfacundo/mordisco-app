@@ -1,6 +1,5 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import ProductoCard from '../../models/producto/producto-card';
-import ProductoResponse from '../../models/producto/producto-response';
 
 @Component({
   selector: 'app-producto-card-component',

@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import ConfiguracionSistemaResponseDTO from '../../models/configuracion/ConfiguracionSistemaResponseDTO';
+import ConfiguracionSistemaResponseDTO from '../../models/configuracion/configuracion-sistema-response-dto';
 import { environment } from '../../../../environments/environment';
-import ConfiguracionSistemaRequestDTO from '../../models/configuracion/ConfiguracionSistemaRequestDTO';
+import ConfiguracionSistemaRequestDTO from '../../models/configuracion/configuracion-sistema-request-dto';
 
 @Injectable({
   providedIn: 'root'

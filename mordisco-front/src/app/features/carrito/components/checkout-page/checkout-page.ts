@@ -2,7 +2,6 @@ import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
@@ -13,6 +12,7 @@ import { CrearPedidoRequest } from '../../../../shared/models/pedido/crear-pedid
 import { CarritoService } from '../../../../shared/services/carrito/carrito-service';
 import { MetodoPago } from '../../../../shared/models/enums/metodo-pago';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
+import { NotificationService } from '../../../../core/services/notification-service';
 
 @Component({
   selector: 'app-checkout-page',
@@ -30,7 +30,7 @@ import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
 export class CheckoutPage implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   private carritoService = inject(CarritoService);
   private pedidoService = inject(PedidoService);
   private direccionService = inject(DireccionService);
@@ -74,7 +74,7 @@ export class CheckoutPage implements OnInit {
 
   ngOnInit(): void {
     if (!this.carritoService.tieneItems()) {
-      this.snackBar.open('El carrito está vacío', 'Cerrar', { duration: 3000 });
+      this.notificationService.success('El carrito está vacío');
       this.router.navigate(['/cliente/carrito']);
       return;
     }
@@ -116,7 +116,6 @@ export class CheckoutPage implements OnInit {
     const userId = this.authService.currentUser()?.userId;
     
     if (!userId) {
-      this.snackBar.open('Error: Usuario no autenticado', 'Cerrar', { duration: 3000 });
       this.router.navigate(['/login']);
       return;
     }
@@ -133,8 +132,7 @@ export class CheckoutPage implements OnInit {
         
         this.isLoading.set(false);
       },
-      error: (error) => {
-        this.snackBar.open('Error al cargar direcciones', 'Cerrar', { duration: 3000 });
+      error: () => {
         this.isLoading.set(false);
       }
     });
@@ -145,13 +143,9 @@ export class CheckoutPage implements OnInit {
       this.checkoutForm.markAllAsTouched();
       
       if (this.tipoEntregaActual() === TipoEntrega.DELIVERY && !this.checkoutForm.get('direccionId')?.value) {
-        this.snackBar.open('Por favor selecciona una dirección de entrega', 'Cerrar', { 
-          duration: 3000 
-        });
+        this.notificationService.error('Por favor selecciona una dirección de entrega');
       } else {
-        this.snackBar.open('Por favor completa todos los campos requeridos', 'Cerrar', { 
-          duration: 3000 
-        });
+        this.notificationService.error('Por favor completa todos los campos requeridos')
       }
       return;
     }
@@ -162,8 +156,13 @@ export class CheckoutPage implements OnInit {
     const userId = this.authService.currentUser()?.userId;
     const resumen = this.resumenConEnvio();
 
-    if (!userId || !resumen.restauranteId) {
-      this.snackBar.open('Error al procesar el pedido', 'Cerrar', { duration: 3000 });
+    if (!userId) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (!resumen.restauranteId) {
+      this.notificationService.error('Error al procesar el pedido');
       this.isProcessing.set(false);
       return;
     }
@@ -185,30 +184,21 @@ export class CheckoutPage implements OnInit {
     this.pedidoService.crearPedido(request).subscribe({
       next: (response) => {
         if (formValue.metodoPago === MetodoPago.MERCADO_PAGO && response.initPoint) {
-          this.snackBar.open('Redirigiendo a Mercado Pago...', 'Cerrar', { duration: 2000 });
+          this.notificationService.success('Redirigiendo a Mercado Pago...');
  
           this.carritoService.vaciarCarrito();
           const urlPago = response.sandboxInitPoint || response.initPoint;
           window.location.href = urlPago;
           
         } else if (formValue.metodoPago === MetodoPago.EFECTIVO) {
-          this.snackBar.open('✅ Pedido confirmado - Pago en efectivo al recibir', 'Cerrar', { 
-            duration: 4000 
-          });
+          this.notificationService.success('✅ Pedido confirmado - Pago en efectivo al recibir');
           this.carritoService.vaciarCarrito();
           this.router.navigate(['/cliente/pedidos']);
         }
-        
+
         this.isProcessing.set(false);
       },
-      error: (error) => {
-        console.error('❌ Detalle del error:', error.error);
-        
-        this.snackBar.open(
-          error.error?.message || 'Error al procesar el pedido', 
-          'Cerrar', 
-          { duration: 4000 }
-        );
+      error: () => {
         this.isProcessing.set(false);
       }
     });

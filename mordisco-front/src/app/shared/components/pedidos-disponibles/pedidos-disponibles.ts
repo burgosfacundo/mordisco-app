@@ -1,30 +1,42 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { interval, startWith, Subscription, switchMap } from 'rxjs';
+import { Component, EventEmitter, inject, OnDestroy, OnInit, Output, signal } from '@angular/core';
+import { interval, startWith, Subscription, switchMap, catchError, of } from 'rxjs';
 import PedidoResponse from '../../models/pedido/pedido-response';
 import { PedidoService } from '../../services/pedido/pedido-service';
-import { EstadoPedido } from '../../models/enums/estado-pedido';
+import { GeolocationService } from '../../services/geolocation/geolocation-service';
+import { Ubicacion } from '../../models/ubicacion/ubicacion.model';
+import { NotificationService } from '../../../core/services/notification-service';
+import { ConfirmationService } from '../../../core/services/confirmation-service';
+
+interface PedidoConDistancia extends PedidoResponse {
+  distanciaKm?: number;
+  distanciaFormateada?: string;
+}
 
 @Component({
   selector: 'app-pedidos-disponibles',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './pedidos-disponibles.html'
-
 })
 export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
-  pedidosDisponibles = signal<PedidoResponse[]>([]);
+  private pedidoService = inject(PedidoService);
+  private geolocationService = inject(GeolocationService);
+  private notificationService = inject(NotificationService);
+  private confirmationService = inject(ConfirmationService);
+
+  pedidosDisponibles = signal<PedidoConDistancia[]>([]);
   isLoading = signal<boolean>(true);
   lastUpdate = signal<Date>(new Date());
+  ubicacionActual = signal<Ubicacion | null>(null);
+  errorUbicacion = signal<string | null>(null);
+  
   private refreshSubscription?: Subscription;
 
-  constructor( private pService : PedidoService
-    // private ubicacionService: UbicacionService
-  ) {}
+  @Output() pedidoAceptado = new EventEmitter<number>();
 
   ngOnInit(): void {
-    this.iniciarAutoRefresh();
+    this.obtenerUbicacionYCargarPedidos();
   }
 
   ngOnDestroy(): void {
@@ -32,22 +44,52 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Obtiene la ubicación del repartidor y luego carga los pedidos
+   */
+  private obtenerUbicacionYCargarPedidos(): void {
+    if (!this.geolocationService.soportaGeolocation()) {
+      this.errorUbicacion.set('Tu navegador no soporta geolocalización');
+      this.isLoading.set(false);
+      this.notificationService.error('Tu navegador no soporta geolocalización');
+      return;
+    }
+
+    this.geolocationService.obtenerUbicacionActual().subscribe({
+      next: (ubicacion) => {
+        this.ubicacionActual.set(ubicacion);
+        this.errorUbicacion.set(null);
+        this.iniciarAutoRefresh();
+      },
+      error: (error) => {
+        this.errorUbicacion.set(error.message);
+        this.isLoading.set(false);
+        this.notificationService.error(error.message);
+      }
+    });
+  }
+
+  /**
    * Inicia el auto-refresh cada 30 segundos
    */
   private iniciarAutoRefresh(): void {
+    const ubicacion = this.ubicacionActual();
+    if (!ubicacion) return;
+
     this.refreshSubscription = interval(30000) 
       .pipe(
         startWith(0),
-        switchMap(() => this.cargarPedidosDisponibles())
+        switchMap(() => this.cargarPedidosDisponibles(ubicacion)),
+        catchError(error => {
+          console.error('Error al cargar pedidos:', error);
+          this.notificationService.error('Error al cargar pedidos disponibles');
+          return of({ content: [], totalElements: 0 });
+        })
       )
       .subscribe({
-        next: (pedidos) => {
-          this.pedidosDisponibles.set(pedidos);
+        next: (response) => {
+          const pedidosConDistancia = this.calcularDistancias(response.content, ubicacion);
+          this.pedidosDisponibles.set(pedidosConDistancia);
           this.lastUpdate.set(new Date());
-          this.isLoading.set(false);
-        },
-        error: (error) => {
-          console.error('Error al cargar pedidos:', error);
           this.isLoading.set(false);
         }
       });
@@ -56,43 +98,111 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
   /**
    * Carga los pedidos disponibles desde el servicio
    */
-  private async cargarPedidosDisponibles(): Promise<PedidoResponse[]> {
-    // llamada real al servicio
-    // const ubicacionActual = await this.ubicacionService.obtenerUbicacionActual();
-    // return this.pService.obtenerPedidosDisponibles(ubicacionActual);
+  private cargarPedidosDisponibles(ubicacion: Ubicacion) {
+    return this.pedidoService.getPedidosDisponibles(
+      ubicacion.latitud,
+      ubicacion.longitud,
+      0,
+      20
+    );
+  }
 
-    // Datos de ejemplo para demostración
-    return this.obtenerPedidosMock();
+  /**
+   * Calcula las distancias y ordena los pedidos
+   */
+  private calcularDistancias(pedidos: PedidoResponse[], ubicacionActual: Ubicacion): PedidoConDistancia[] {
+    const pedidosConDistancia: PedidoConDistancia[] = pedidos.map(pedido => {
+      if (pedido.direccionEntrega?.latitud && pedido.direccionEntrega?.longitud) {
+        const distanciaKm = this.geolocationService.calcularDistancia(
+          ubicacionActual,
+          {
+            latitud: pedido.direccionEntrega.latitud,
+            longitud: pedido.direccionEntrega.longitud
+          }
+        );
+        
+        return {
+          ...pedido,
+          distanciaKm,
+          distanciaFormateada: this.geolocationService.formatearDistancia(distanciaKm)
+        };
+      }
+      return pedido;
+    });
+
+    // Ordenar por distancia (más cercanos primero)
+    return pedidosConDistancia.sort((a, b) => {
+      if (!a.distanciaKm && !b.distanciaKm) return 0;
+      if (!a.distanciaKm) return 1;
+      if (!b.distanciaKm) return -1;
+      return a.distanciaKm - b.distanciaKm;
+    });
   }
 
   /**
    * Recarga manual de pedidos
    */
   recargarPedidos(): void {
+    const ubicacion = this.ubicacionActual();
+    if (!ubicacion) {
+      this.obtenerUbicacionYCargarPedidos();
+      return;
+    }
+
     this.isLoading.set(true);
-    this.cargarPedidosDisponibles().then(pedidos => {
-      this.pedidosDisponibles.set(pedidos);
-      this.lastUpdate.set(new Date());
-      this.isLoading.set(false);
+    this.cargarPedidosDisponibles(ubicacion).subscribe({
+      next: (response) => {
+        const pedidosConDistancia = this.calcularDistancias(response.content, ubicacion);
+        this.pedidosDisponibles.set(pedidosConDistancia);
+        this.lastUpdate.set(new Date());
+        this.isLoading.set(false);
+        this.notificationService.success('Pedidos actualizados');
+      },
+      error: (error) => {
+        console.error('Error al recargar pedidos:', error);
+        this.isLoading.set(false);
+      }
     });
   }
 
   /**
    * Acepta un pedido disponible
    */
-  onAceptarPedido(pedido: PedidoResponse): void {
-    if (confirm(`¿Deseas aceptar el pedido #${pedido.id}?`)) {
-      // Aquí irá la llamada al servicio
-      // this.pedidosService.aceptarPedido(pedido.id).subscribe({
-      //   next: () => {
-      //     this.recargarPedidos();
-      //   }
-      // });
-      
-      console.log('Pedido aceptado:', pedido.id);
-      // Recargar lista después de aceptar
-      this.recargarPedidos();
-    }
+  onAceptarPedido(pedido: PedidoConDistancia): void {
+    const distanciaInfo = pedido.distanciaFormateada 
+      ? `Distancia: ${pedido.distanciaFormateada}`
+      : '';
+
+    this.confirmationService.confirm({
+      title: 'Aceptar Pedido',
+      message: `¿Deseas aceptar el pedido #${pedido.id}?${distanciaInfo ? '\n\n' + distanciaInfo : ''}`,
+      type: 'info'
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        this.aceptarPedido(pedido.id);
+      }
+    });
+  }
+
+  /**
+   * Llama al servicio para aceptar el pedido
+   */
+  private aceptarPedido(pedidoId: number): void {
+    this.pedidoService.aceptarPedido(pedidoId).subscribe({
+      next: () => {
+        this.notificationService.success(`✅ Pedido #${pedidoId} aceptado exitosamente`);
+        
+        // Emitir evento para que el componente padre actualice
+        this.pedidoAceptado.emit(pedidoId);
+        
+        // Recargar lista de pedidos disponibles
+        this.recargarPedidos();
+      },
+      error: (error) => {
+        console.error('Error al aceptar pedido:', error);
+        // El error ya se maneja en el interceptor
+      }
+    });
   }
 
   /**
@@ -105,11 +215,5 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
     if (diff < 60) return `Hace ${diff}s`;
     const minutos = Math.floor(diff / 60);
     return `Hace ${minutos}m`;
-  }
-
-  private obtenerPedidosMock(): PedidoResponse[] {
-    return [
-   
-    ];
   }
 }

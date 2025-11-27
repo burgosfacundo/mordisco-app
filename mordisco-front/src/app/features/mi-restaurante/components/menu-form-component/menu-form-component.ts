@@ -1,11 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { MenuService } from '../../../../shared/services/menu/menu-service';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NotificationService } from '../../../../core/services/notification-service';
 
 @Component({
   selector: 'app-menu-form',
@@ -16,7 +16,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 export class MenuFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   private menuService = inject(MenuService);
   private authService = inject(AuthService);
   private restauranteService = inject(RestauranteService);
@@ -45,7 +45,6 @@ export class MenuFormComponent implements OnInit {
     const userId = this.authService.currentUser()?.userId;
     
     if (!userId) {
-      this.snackBar.open('❌ Usuario no autenticado', 'Cerrar', { duration: 3000 });
       this.router.navigate(['/login']);
       return;
     }
@@ -55,7 +54,6 @@ export class MenuFormComponent implements OnInit {
         this.restauranteId = restaurante.id;
       },
       error: () => {
-        this.snackBar.open('❌ No se encontró el restaurante', 'Cerrar', { duration: 3000 });
         this.router.navigate(['/restaurante']);
       }
     });
@@ -68,7 +66,6 @@ export class MenuFormComponent implements OnInit {
     }
 
     if (!this.restauranteId) {
-      this.snackBar.open('❌ ID de restaurante no disponible', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -77,12 +74,10 @@ export class MenuFormComponent implements OnInit {
 
     this.menuService.save(this.restauranteId, nombreMenu).subscribe({
       next: () => {
-        this.snackBar.open('✅ Menú creado exitosamente', 'Cerrar', { duration: 3000 });
+        this.notificationService.success('✅ Menú creado exitosamente');
         this.router.navigate(['/restaurante']);
       },
-      error: (error) => {
-        console.error('Error al crear menú:', error);
-        this.snackBar.open('❌ Error al crear el menú', 'Cerrar', { duration: 3000 });
+      error: () => {
         this.isSubmitting = false;
       }
     });

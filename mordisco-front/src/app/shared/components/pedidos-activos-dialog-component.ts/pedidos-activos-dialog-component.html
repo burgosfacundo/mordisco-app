@@ -1,0 +1,86 @@
+<div class="dialog-container">
+  <!-- Header -->
+  <div class="flex items-start gap-4 mb-6">
+    <!-- Icono de advertencia -->
+    <div class="shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+      <svg class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          stroke-width="2" 
+          [attr.d]="getIconPath()" />
+      </svg>
+    </div>
+
+    <!-- Título y descripción -->
+    <div class="flex-1">
+      <h2 class="text-xl font-bold text-gray-900 mb-2">
+        {{ getTitle() }}
+      </h2>
+      <p class="text-gray-600" [innerHTML]="getDescription()"></p>
+    </div>
+
+    <!-- Botón cerrar -->
+    <button 
+      mat-icon-button 
+      (click)="cerrar()"
+      class="text-gray-400 hover:text-gray-600">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido -->
+  <div class="space-y-6">
+    <!-- Información adicional -->
+    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-blue-500 fshrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <p class="text-sm font-semibold text-blue-700 mb-2">
+            ¿Qué puedes hacer?
+          </p>
+          <ul class="space-y-2">
+            @for (option of getOptions(); track option) {
+              <li class="flex items-start gap-2 text-sm text-blue-600">
+                <svg class="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ option }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje del error original -->
+    @if (data.message) {
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <p class="text-xs font-mono text-gray-600">
+          {{ data.message }}
+        </p>
+      </div>
+    }
+  </div>
+
+  <!-- Acciones -->
+  <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t">
+    <button 
+      mat-button 
+      (click)="cerrar()"
+      class="text-gray-600">
+      Cancelar
+    </button>
+    
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="verPedidos()"
+      class="bg-primary-600 hover:bg-primary-700">
+      <mat-icon class="mr-2">visibility</mat-icon>
+      {{ getActionLabel() }}
+    </button>
+  </div>
+</div>

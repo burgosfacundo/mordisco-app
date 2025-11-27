@@ -8,9 +8,10 @@
         <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Pedido</p>
         <p class="text-2xl font-bold text-gray-900">#{{ pedido()?.id }}</p>
       </div>
-      <!-- <span [class]="getEstadoBadgeClass()">
+      <span [class]="getEstadoBadgeClass()">
+        <span class="material-icons text-sm">{{ getEstadoIcon() }}</span>
         {{ getEstadoLabel() }}
-      </span> -->
+      </span>
     </div>
   </div>
 
@@ -149,7 +150,7 @@
   <div class="px-6 pb-6 pt-2 space-y-2">
     <!-- Botones para RESTAURANTE -->
     @if (isRestaurante()) {
-      @if (pedido()?.estado === 'PENDIENTE') {
+      @if (pedido()?.estado === EstadoPedido.PENDIENTE) {
         <button 
           (click)="onAceptarPedido()"
           class="w-full py-2.5 rounded-lg
@@ -168,32 +169,51 @@
                  focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
           Rechazar Pedido
         </button>
-      } @else if (pedido()?.estado === 'EN_PROCESO') {
+      } @else if (pedido()?.estado === EstadoPedido.EN_PREPARACION) {
         <button 
-          (click)="onMarcarEnCamino()"
+          (click)="onAvanzarEstado()"
           class="w-full py-2.5 rounded-lg
                  bg-blue-50 text-blue-700 font-semibold text-sm
                  hover:bg-blue-100 active:scale-95
                  transition-all duration-200
                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          Marcar como {{ getSiguienteEstadoLabel() }}
+        </button>
+      } @else if (pedido()?.estado === EstadoPedido.LISTO_PARA_ENTREGAR) {
+        <button 
+          (click)="onAvanzarEstado()"
+          class="w-full py-2.5 rounded-lg
+                 bg-purple-50 text-purple-700 font-semibold text-sm
+                 hover:bg-purple-100 active:scale-95
+                 transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
           Marcar En Camino
         </button>
       }
     } 
 
     @if(isRepartidor()) {
-      @if (pedido()?.estado === 'EN_PROCESO') {
-        <!--Para asiganrse el pedido-->
-      } @else if (pedido()?.estado === 'EN_CAMINO') {
-          <button mat-raised-button color="primary" 
+      @if (pedido()?.estado === EstadoPedido.LISTO_PARA_ENTREGAR) {
+        <!-- Para asignarse el pedido -->
+        <button 
           class="w-full py-2.5 rounded-lg
-                    bg-blue-50 text-blue-700 font-semibold text-sm
-                    hover:bg-blue-100 active:scale-95
-                    transition-all duration-200
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          (click)="onMarcarRecibido()">Marcar como entregado</button>
-    
-        }
+                 bg-blue-50 text-blue-700 font-semibold text-sm
+                 hover:bg-blue-100 active:scale-95
+                 transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          Tomar Pedido
+        </button>
+      } @else if (pedido()?.estado === EstadoPedido.EN_CAMINO) {
+        <button 
+          class="w-full py-2.5 rounded-lg
+                 bg-green-50 text-green-700 font-semibold text-sm
+                 hover:bg-green-100 active:scale-95
+                 transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          (click)="onMarcarRecibido()">
+          Marcar como Entregado
+        </button>
+      }
     } 
 
     <!-- Botón Ver Detalle (para todos) -->

@@ -38,8 +38,8 @@ export class PedidoService {
     return this.http.put<string>(`${environment.apiUrl}/pedidos/state/${id}?nuevoEstado=${estado}`,{});
   }
 
-  cancel(id : number) : Observable<string>{
-    return this.http.put<string>(`${environment.apiUrl}/pedidos/cancelar/${id}`,{})
+  cancel(id : number, motivo?: string) : Observable<PedidoResponse>{
+    return this.http.put<PedidoResponse>(`${environment.apiUrl}/pedidos/cancelar/${id}`, { motivo })
   }
 
   crearPedido(request: CrearPedidoRequest): Observable<MercadoPagoPreferenceResponse> {
@@ -56,7 +56,27 @@ export class PedidoService {
     return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/clientes/${clienteId}/state`,{ params })
   }
   
-  marcarComoEntregado(pedidoId: number) {
+  marcarComoEntregado(pedidoId: number): Observable<void> {
     return this.http.put<void>(`${environment.apiUrl}/pedidos/${pedidoId}/entregar`, {});
+  }
+
+  getPedidosDisponibles(latitud: number, longitud: number, page: number = 0, size: number = 10): Observable<PaginationResponse<PedidoResponse>> {
+    const params = new HttpParams()
+      .set('latitud', latitud.toString())
+      .set('longitud', longitud.toString())
+      .set('page', page.toString())
+      .set('size', size.toString());
+    
+    return this.http.get<PaginationResponse<PedidoResponse>>(
+      `${environment.apiUrl}/pedidos/disponibles-repartidor`,
+      { params }
+    );
+  }
+
+  aceptarPedido(pedidoId: number): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiUrl}/pedidos/${pedidoId}/aceptar-repartidor`,
+      {}
+    );
   }
 }

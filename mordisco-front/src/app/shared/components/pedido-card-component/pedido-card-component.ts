@@ -1,6 +1,14 @@
-import { Component, Input, Output, EventEmitter, input, output, inject } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import PedidoResponse from '../../models/pedido/pedido-response';
+import { 
+  EstadoPedido, 
+  ESTADO_PEDIDO_LABELS, 
+  ESTADO_PEDIDO_COLORS, 
+  ESTADO_PEDIDO_ICONS,
+  getSiguienteEstado
+} from '../../models/enums/estado-pedido';
+import { TipoEntrega } from '../../models/enums/tipo-entrega';
 
 @Component({
   selector: 'app-pedido-card-component',
@@ -15,49 +23,44 @@ export class PedidoCardComponent {
   
   aceptarPedido = output<number>();
   rechazarPedido = output<number>();
-  marcarEnCamino = output<number>();
+  cambiarEstado = output<{ pedidoId: number, nuevoEstado: EstadoPedido }>();
   marcarRecibido = output<number>();
   verDetalles = output<number>();
 
+  // Exponer enums para el template
+  EstadoPedido = EstadoPedido;
+  TipoEntrega = TipoEntrega;
 
   getEstadoBadgeClass(): string {
-    const estado = this.pedido()?.estado;
+    const estado = this.pedido()?.estado as EstadoPedido;
+    if (!estado) return 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-gray-100 text-gray-700';
     
     const baseClasses = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide';
+    const colorClasses = ESTADO_PEDIDO_COLORS[estado] || 'bg-gray-100 text-gray-700';
     
-    switch (estado) {
-      case 'PENDIENTE':
-        return `${baseClasses} bg-yellow-100 text-yellow-700`;
-      case 'EN_PROCESO':
-        return `${baseClasses} bg-blue-100 text-blue-700`;
-      case 'EN_CAMINO':
-        return `${baseClasses} bg-purple-100 text-purple-700`;
-      case 'RECIBIDO':
-        return `${baseClasses} bg-green-100 text-green-700`;
-      case 'CANCELADO':
-        return `${baseClasses} bg-red-100 text-red-700`;
-      default:
-        return `${baseClasses} bg-gray-100 text-gray-700`;
-    }
+    return `${baseClasses} ${colorClasses}`;
   }
 
   getEstadoLabel(): string {
-    const estado = this.pedido()?.estado;
+    const estado = this.pedido()?.estado as EstadoPedido;
+    return estado ? ESTADO_PEDIDO_LABELS[estado] : 'Desconocido';
+  }
+
+  getEstadoIcon(): string {
+    const estado = this.pedido()?.estado as EstadoPedido;
+    return estado ? ESTADO_PEDIDO_ICONS[estado] : 'help_outline';
+  }
+
+  getSiguienteEstadoLabel(): string | null {
+    const pedido = this.pedido();
+    if (!pedido) return null;
     
-    switch (estado) {
-      case 'PENDIENTE':
-        return 'Pendiente';
-      case 'EN_PROCESO':
-        return 'En Proceso';
-      case 'EN_CAMINO':
-        return 'En Camino';
-      case 'RECIBIDO':
-        return 'Recibido';
-      case 'CANCELADO':
-        return 'Cancelado';
-      default:
-        return 'Desconocido';
-    }
+    const siguienteEstado = getSiguienteEstado(
+      pedido.estado as EstadoPedido,
+      pedido.tipoEntrega as TipoEntrega
+    );
+    
+    return siguienteEstado ? ESTADO_PEDIDO_LABELS[siguienteEstado] : null;
   }
 
   onAceptarPedido(): void {
@@ -72,9 +75,20 @@ export class PedidoCardComponent {
     }
   }
 
-  onMarcarEnCamino(): void {
-    if (this.pedido()?.id) {
-      this.marcarEnCamino.emit(this.pedido()!.id);
+  onAvanzarEstado(): void {
+    const pedido = this.pedido();
+    if (!pedido?.id) return;
+    
+    const siguienteEstado = getSiguienteEstado(
+      pedido.estado as EstadoPedido,
+      pedido.tipoEntrega as TipoEntrega
+    );
+    
+    if (siguienteEstado) {
+      this.cambiarEstado.emit({ 
+        pedidoId: pedido.id, 
+        nuevoEstado: siguienteEstado 
+      });
     }
   }
 
@@ -88,5 +102,13 @@ export class PedidoCardComponent {
     if (this.pedido()?.id) {
       this.verDetalles.emit(this.pedido()!.id);
     }
+  }
+
+  mostrarBotonAvanzar(): boolean {
+    const pedido = this.pedido();
+    if (!pedido || !this.isRestaurante()) return false;
+    
+    const estado = pedido.estado as EstadoPedido;
+    return estado === EstadoPedido.EN_PREPARACION;
   }
 }

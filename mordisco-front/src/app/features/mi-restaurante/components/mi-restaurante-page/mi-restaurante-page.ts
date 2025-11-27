@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
@@ -17,6 +17,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import CalificacionPedidoResponseDTO from '../../../../shared/models/calificacion/calificacion-pedido-response-dto';
+import { NotificationService } from '../../../../core/services/notification-service';
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
   selector: 'app-mi-restaurante-page',
@@ -39,7 +41,8 @@ export class MiRestaurantePageComponent implements OnInit {
   private horarioService = inject(HorarioService);
   private promocionService = inject(PromocionService);
   private calificacionService = inject(CalificacionService);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
+  private dialog = inject(MatDialog);
   private router = inject(Router);
 
   restaurante?: RestauranteResponse;
@@ -67,7 +70,6 @@ export class MiRestaurantePageComponent implements OnInit {
     const userId = this.authService.currentUser()?.userId;
 
     if (!userId) {
-      this.snackBar.open('❌ No se encontró información del usuario', 'Cerrar', { duration: 3000 });
       this.authService.logout();
       return;
     }
@@ -142,22 +144,23 @@ export class MiRestaurantePageComponent implements OnInit {
 
   onEliminarPromocion(promocionId: number): void {
     if (!promocionId || !this.restaurante?.id) {
-      this.snackBar.open('❌ Datos insuficientes para eliminar la promoción', 'Cerrar', { duration: 3000 });
       return;
     }
 
-    if (!confirm('¿Estás seguro de eliminar esta promoción?')) {
-      return;
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro de eliminar esta promoción?' }
+    });
 
-    this.promocionService.delete(this.restaurante.id, promocionId).subscribe({
-      next: () => {
-        this.snackBar.open('✅ Promoción eliminada correctamente', 'Cerrar', { duration: 3000 });
-        this.cargarPromociones();
-      },
-      error: () => {
-        this.snackBar.open('❌ Error al eliminar la promoción', 'Cerrar', { duration: 4000 });
-      }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== true) return;
+
+      this.promocionService.delete(this.restaurante!.id, promocionId).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Promoción eliminada correctamente');
+          this.cargarPromociones();
+        }
+      });
     });
   }
 

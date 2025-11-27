@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../../registro/services/user-service';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NotificationService } from '../../../../core/services/notification-service';
 
 @Component({
   selector: 'app-edit-profile-form-component',
@@ -13,7 +13,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 export class EditProfileFormComponent {
   private fb = inject(FormBuilder);
   private validationService : FormValidationService = inject(FormValidationService)
-  private _snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
   private userService = inject(UserService)
 
@@ -27,10 +27,11 @@ export class EditProfileFormComponent {
 
  private inicializarFormulario(): void {
     this.editarPerfil = this.fb.group({
-      nombre: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
-      apellido: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
+      nombre: ['', [Validators.required, Validators.minLength(2),Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
+      apellido: ['', [Validators.required, Validators.minLength(2),Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
       telefono: ['', [
         Validators.required,
+        Validators.minLength(10),
         Validators.maxLength(15),
         Validators.pattern(/^\+\d{1,3}(?:\s?\d){6,14}$/)
       ]]
@@ -47,7 +48,6 @@ export class EditProfileFormComponent {
         });
       },
       error: () => {
-        this._snackBar.open('❌ Ocurrió un error al cargar los datos del perfil','',{duration: 3000})
         this.router.navigate(['/'])
       }
     });
@@ -63,12 +63,8 @@ export class EditProfileFormComponent {
 
     this.userService.updateMe(this.editarPerfil.value).subscribe({
       next: () => {
-        this._snackBar.open('✅ Perfil actualizado correctamente','',{duration: 3000});
+        this.notificationService.success('✅ Perfil actualizado correctamente')
         this.router.navigate(['/profile'])
-      },
-      error: (e) => {
-        console.error(e);
-        this._snackBar.open('❌ Ocurrió un error al actualizar el perfil','',{duration: 3000});
       }
     });
   }

@@ -81,7 +81,7 @@ public class PagoService {
 
             if (nuevoEstadoPago == EstadoPago.APROBADO) {
                 // Pago aprobado -> Pedido EN_PROCESO
-                pedido.setEstado(EstadoPedido.EN_PROCESO);
+                pedido.setEstado(EstadoPedido.EN_PREPARACION);
                 pedidoRepository.save(pedido);
 
                 // Notificar al restaurante

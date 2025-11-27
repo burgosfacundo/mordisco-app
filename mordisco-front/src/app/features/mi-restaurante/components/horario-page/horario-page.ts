@@ -1,13 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { HorarioCardComponent } from "../../../../shared/components/horario-card-component/horario-card-component";
 import { AuthService } from '../../../../shared/services/auth-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { HorarioService } from '../../../../shared/services/horario/horario-service';
 import HorarioAtencionResponse from '../../../../shared/models/horario/horario-atencion-response';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { NotificationService } from '../../../../core/services/notification-service';
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
   selector: 'app-horario-page',
@@ -19,7 +20,8 @@ export class HorarioPage implements OnInit{
   private aus : AuthService = inject(AuthService)
   private rService : RestauranteService = inject(RestauranteService)
   private router : Router = inject(Router)
-  private _snackBar : MatSnackBar = inject(MatSnackBar)
+  private notificationService = inject(NotificationService)
+  private dialog = inject(MatDialog)
   private hService : HorarioService= inject(HorarioService)
 
   arrHorarios? : HorarioAtencionResponse[]
@@ -39,10 +41,12 @@ export class HorarioPage implements OnInit{
   }
   
   listarHorarios(id : number){
+
     this.hService.getAllByRestauranteId(id).subscribe({
-      next:(data) => this.arrHorarios=data
-      ,error:(e)=> {
-        this._snackBar.open('❌ Error al cargar los horarios','Cerrar' , { duration: 3000 });
+      next:(data) =>{ 
+        this.arrHorarios=data,
+        this.isLoading = false;
+      },error:()=> {
         this.router.navigate(['/'])
       }
     })
@@ -51,11 +55,11 @@ export class HorarioPage implements OnInit{
   encontrarRestaurante(id : number){
     if(this.idCurrUser){
     this.rService.getByUsuario(id).subscribe({
-      next: (r)=> {console.log(r.id),
+      next: (r)=> {
         this.restauranteLeido=r
         this.listarHorarios(this.restauranteLeido.id)
       },
-      error:()=> {console.log("No encontre el usuario"),
+      error:()=> {
         this.aus.logout()
       }
       })
@@ -73,32 +77,35 @@ export class HorarioPage implements OnInit{
 
   confirmarEliminacion(id: number | undefined): void {
     if (!id) return;
-       const confirmar = confirm('¿Estás seguro de eliminar este horario?');
-    if (confirmar) {
-      this.eliminarHorario(id);
-    }
+    
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro de eliminar este horario?' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.eliminarHorario(id);
+      }
+    });
   }
 
   eliminarHorario(id : number | undefined){
    if(!this.idCurrUser || !id){
-        this.openSnackBar('❌ Ocurrió un error al cargar el perfil')
         this.router.navigate(['/'])
         return
     }
 
     this.hService.delete(id).subscribe({
-      next :(data) => {console.log(data),
-        this.openSnackBar('Horario eliminado correctamente')
+      next :() => {
+        this.notificationService.success('Horario eliminado correctamente')
         if(this.restauranteLeido?.id){
           this.listarHorarios(this.restauranteLeido?.id)
         }
       },
-      error: (e)=> {console.log(e),
-        this.openSnackBar('❌ Ocurrió un error al eliminar el horario')}
+      error:()=> {
+        this.router.navigate(['/'])
+      }
     })
   }
-
-  private openSnackBar(message: string, action: string = 'Cerrar'): void {
-    this._snackBar.open(message, action, { duration: 3000 });
-  } 
 }

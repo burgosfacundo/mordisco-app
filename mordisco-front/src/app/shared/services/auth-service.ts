@@ -5,11 +5,13 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../../features/auth/models/auth-response';
 import { LoginRequest } from '../../features/auth/models/login-request';
+import { CarritoService } from './carrito/carrito-service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private carritoService = inject(CarritoService);
   
   private readonly API_URL = `${environment.apiUrl}/auth`;
   private readonly ACCESS_TOKEN_KEY = 'access_token';
@@ -231,6 +233,9 @@ export class AuthService {
     
     this.currentUser.set(null);
     this.isAuthenticated.set(false);
+    
+    // Limpiar el carrito para evitar problemas de memoria y privacidad
+    this.carritoService.vaciarCarrito();
     
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);

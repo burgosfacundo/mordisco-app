@@ -1,9 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { CalificacionService } from '../../../shared/services/calificacion/calificacion-service';
 import { CalificacionFormRepartidorComponent } from '../calificacion-form-repartidor-component/calificacion-form-repartidor-component';
 import { CalificacionFormPedidoComponent } from '../calificacion-form-pedido-component/calificacion-form-pedido-component';
+import { NotificationService } from '../../../core/services/notification-service';
 
 @Component({
   selector: 'app-calificacion-form-page',
@@ -13,7 +12,7 @@ import { CalificacionFormPedidoComponent } from '../calificacion-form-pedido-com
 export class CalificacionFormPage implements OnInit{
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   public pedidoId?: number;
   tipoCalificacion : string| null = null
   
@@ -26,7 +25,6 @@ export class CalificacionFormPage implements OnInit{
     this.tipoCalificacion = this.route.snapshot.paramMap.get('var')
 
     if (!idPedido || !this.tipoCalificacion) {
-      this.snackBar.open('ID pedido inválido', 'Cerrar', { duration: 3000 });
       this.router.navigate(['/home']);
       return;
     }

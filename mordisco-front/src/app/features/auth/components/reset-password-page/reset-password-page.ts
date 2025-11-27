@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { environment } from '../../../../../environments/environment';
+import { NotificationService } from '../../../../core/services/notification-service';
 
 @Component({
     selector: 'app-reset-password-page',
@@ -18,17 +18,15 @@ export class ResetPasswordPage implements OnInit {
     private http = inject(HttpClient);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
-    private snackBar = inject(MatSnackBar);
+    private notificationService = inject(NotificationService);
     protected validationService = inject(FormValidationService);
     protected resetForm!: FormGroup;
     isSubmitting = signal(false);
     private token: string = '';
 
     ngOnInit(): void {
-        // Obtener token de la URL
         this.token = this.route.snapshot.queryParamMap.get('token') || '';
         if (!this.token) {
-            this.snackBar.open('❌ Token inválido o expirado', 'Cerrar', { duration: 3000 });
             this.router.navigate(['/login']);
             return;
         }
@@ -75,16 +73,7 @@ export class ResetPasswordPage implements OnInit {
 
         this.http.post<string>(`${environment.apiUrl}/usuarios/reset-password`,payload).subscribe({
             next: () => {
-                this.snackBar.open('✅ Contraseña restablecida correctamente', 'Cerrar', { duration: 3000 });
-            },
-            error: (error) => {
-                console.error('Error:', error);
-                this.snackBar.open(
-                error.error?.message || '❌ Error al restablecer la contraseña',
-                'Cerrar',
-                { duration: 4000 }
-                );
-                this.isSubmitting.set(false);
+                this.notificationService.success('✅ Contraseña restablecida correctamente');
             },
             complete: () => {
                 this.isSubmitting.set(false);

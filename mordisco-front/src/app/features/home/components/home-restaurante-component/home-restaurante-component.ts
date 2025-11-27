@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { PedidoCardComponent } from '../../../../shared/components/pedido-card-component/pedido-card-component';
@@ -10,6 +9,8 @@ import RestauranteResponse from '../../../../shared/models/restaurante/restauran
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { Router } from '@angular/router';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
+import { NotificationService } from '../../../../core/services/notification-service';
+import { ConfirmationService } from '../../../../core/services/confirmation-service';
 
 @Component({
   selector: 'app-home-restaurante-component',
@@ -18,11 +19,12 @@ import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
   templateUrl: './home-restaurante-component.html'
 })
 export class HomeRestauranteComponent implements OnInit {
-  private _snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
+  private confirmationService = inject(ConfirmationService);
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
   private restauranteService = inject(RestauranteService);
-  private router = inject(Router)
+  private router = inject(Router);
 
   pedidosPendientes?: PedidoResponse[];
 
@@ -42,7 +44,6 @@ export class HomeRestauranteComponent implements OnInit {
     const user = this.authService.currentUser();
     
     if (!user?.userId) {
-      this._snackBar.open('❌ No se encontró información del usuario', 'Cerrar' , { duration: 3000 });
       this.authService.logout();
       return;
     }
@@ -53,7 +54,7 @@ export class HomeRestauranteComponent implements OnInit {
         this.loadPedidosPendientes(r.id)
       },
       error: () => {
-        this.router.navigate(['/mi-restaurante'])
+        this.router.navigate(['/restaurante'])
         this.isLoading = false
       }
     });
@@ -68,66 +69,67 @@ export class HomeRestauranteComponent implements OnInit {
           this.isLoading = false;
         },
         error: () => {
-          this._snackBar.open('❌ Error al cargar los pedidos pendientes', 'Cerrar' , { duration: 3000 });
           this.isLoading = false;
         }
       });
   }
 
   aceptarPedido(pedidoId: number): void {
-    if (!confirm('¿Aceptar este pedido?')) return;
+    this.confirmationService.confirm({
+      title: 'Aceptar Pedido',
+      message: '¿Estás seguro de aceptar este pedido?',
+      confirmText: 'Sí, aceptar',
+      cancelText: 'Cancelar',
+      type: 'info'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pedidoService.changeState(pedidoId, EstadoPedido.EN_PROCESO).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido aceptado', 'Cerrar', { duration: 3000 });
-        this.loadRestauranteData(); // Recargar pedidos
-      },
-      error: (error) => {
-        console.error('Error al aceptar pedido:', error);
-        this._snackBar.open(
-          error.error?.message || 'No se pudo aceptar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        );
-      }
+      this.pedidoService.changeState(pedidoId, EstadoPedido.EN_PREPARACION).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Pedido aceptado');
+          this.loadRestauranteData();
+        }
+      });
     });
   }
 
   rechazarPedido(pedidoId: number): void {
-    if (!confirm('¿Rechazar/Cancelar este pedido?')) return;
+    this.confirmationService.confirm({
+      title: 'Rechazar Pedido',
+      message: '¿Estás seguro de rechazar/cancelar este pedido?',
+      confirmText: 'Sí, rechazar',
+      cancelText: 'No, mantener',
+      type: 'danger'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pedidoService.cancel(pedidoId).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido cancelado', 'Cerrar', { duration: 3000 });
-        this.loadRestauranteData();
-      },
-      error: (error) => {
-        console.error('Error al cancelar pedido:', error);
-        this._snackBar.open(
-          error.error?.message || 'No se pudo cancelar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        );
-      }
+      this.pedidoService.cancel(pedidoId).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Pedido cancelado');
+          this.loadRestauranteData();
+        }
+      });
     });
   }
 
-  marcarEnCamino(pedidoId: number): void {
-    if (!confirm('¿Marcar pedido como "En Camino"?')) return;
+  cambiarEstado(event: { pedidoId: number, nuevoEstado: EstadoPedido }): void {
+    const estadoLabel = event.nuevoEstado.replace(/_/g, ' ').toLowerCase();
+    
+    this.confirmationService.confirm({
+      title: 'Cambiar Estado',
+      message: `¿Cambiar estado del pedido a "${estadoLabel}"?`,
+      confirmText: 'Sí, cambiar',
+      cancelText: 'Cancelar',
+      type: 'warning'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pedidoService.changeState(pedidoId, EstadoPedido.EN_CAMINO).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido marcado como "En Camino"', 'Cerrar', { duration: 3000 });
-        this.loadRestauranteData();
-      },
-      error: (error) => {
-        console.error('Error al actualizar pedido:', error);
-        this._snackBar.open(
-          error.error?.message || 'No se pudo actualizar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        );
-      }
+      this.pedidoService.changeState(event.pedidoId, event.nuevoEstado).subscribe({
+        next: () => {
+          this.notificationService.success(`✅ Estado actualizado a "${estadoLabel}"`);
+          this.loadRestauranteData();
+        }
+      });
     });
   }
 

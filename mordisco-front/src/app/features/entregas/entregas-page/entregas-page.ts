@@ -1,11 +1,11 @@
-import { Component, inject, input, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Component, inject, input } from '@angular/core';
+import { NotificationService } from '../../../core/services/notification-service';
 import { PedidoService } from '../../../shared/services/pedido/pedido-service';
 import { AuthService } from '../../../shared/services/auth-service';
 import { RepartidorService } from '../../../shared/services/repartidor/repartidor-service';
 import { MatDialog } from '@angular/material/dialog';
 import PedidoResponse from '../../../shared/models/pedido/pedido-response';
-import { ConfirmDialogComponent } from '../../../shared/store/ConfirmDialogComponent';
+import { ConfirmDialogComponent } from '../../../shared/store/confirm-dialog-component';
 import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { PedidoCardComponent } from "../../../shared/components/pedido-card-component/pedido-card-component";
 import { MatIcon } from "@angular/material/icon";
@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
   templateUrl: './entregas-page.html',
 })
 export class EntregasPage {
-  private _snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   private router = inject(Router)
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
@@ -46,7 +46,6 @@ export class EntregasPage {
     }
 
     if (!userId) {
-      this._snackBar.open('❌ No se encontró información del usuario', 'Cerrar' , { duration: 3000 });
       this.authService.logout();
       return;
     }
@@ -57,9 +56,9 @@ export class EntregasPage {
           this.length = data.totalElements;
           this.isLoading = false;
         },error: () => {
-          this._snackBar.open('❌ Error al cargar los pedidos', 'Cerrar' , { duration: 3000 });
-          this.isLoading = false;}
-        });
+          this.isLoading = false;
+        }
+    });
   }
 
   marcarRecibido(pedidoID : number) {
@@ -78,17 +77,10 @@ export class EntregasPage {
   guardarAceptacion(pedidoId : number) {
     this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
           next: () => {
-            this._snackBar.open('✅ Pedido marcado como "Recibido"', 'Cerrar', { duration: 3000 });
+            this.notificationService.success('✅ Pedido marcado como "Recibido"');
             this.loadPedidos();
-          },
-          error: (error) => {
-            console.error('Error al actualizar pedido:', error);
-            this._snackBar.open(
-              error.error?.message || 'No se pudo actualizar el pedido',
-              'Cerrar',
-              { duration: 4000 }
-            );
-          }});
+          }
+    });
   }
 
   verDetalle(pedidoId: number): void {

@@ -1,7 +1,6 @@
 import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +9,8 @@ import { AuthService } from '../../../../shared/services/auth-service';
 import { DetallePedidoComponent } from '../../../mis-pedidos/components/detalle-pedido-component/detalle-pedido-component';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
+import { NotificationService } from '../../../../core/services/notification-service';
+import { ConfirmationService } from '../../../../core/services/confirmation-service';
 
 @Component({
   selector: 'app-mis-pedidos-cliente-page',
@@ -27,7 +28,8 @@ import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 export class MisPedidosClientePage implements OnInit {
   private pedidoService = inject(PedidoService)
   private authService = inject(AuthService)
-  private snackBar = inject(MatSnackBar)
+  private notificationService = inject(NotificationService)
+  private confirmationService = inject(ConfirmationService)
   private router = inject(Router)
 
   pedidos = signal<PedidoResponse[]>([])
@@ -56,7 +58,6 @@ export class MisPedidosClientePage implements OnInit {
     }
 
     if (!userId) {
-      this.snackBar.open('Error: Usuario no autenticado', 'Cerrar', { duration: 3000 })
       this.router.navigate(['/login'])
       return
     }
@@ -70,9 +71,7 @@ export class MisPedidosClientePage implements OnInit {
           this.totalElements = response.totalElements
           this.isLoading.set(false)
         },
-        error: (error) => {
-          console.error('Error al cargar pedidos:', error)
-          this.snackBar.open('Error al cargar pedidos', 'Cerrar', { duration: 3000 })
+        error: () => {
           this.isLoading.set(false)
         }
       });
@@ -83,9 +82,7 @@ export class MisPedidosClientePage implements OnInit {
           this.totalElements = response.totalElements
           this.isLoading.set(false)
         },
-        error: (error) => {
-          console.error('Error al cargar pedidos:', error)
-          this.snackBar.open('Error al cargar pedidos', 'Cerrar', { duration: 3000 })
+        error: () => {
           this.isLoading.set(false)
         }
       });
@@ -96,9 +93,10 @@ export class MisPedidosClientePage implements OnInit {
     const estados: (EstadoPedido | 'TODOS')[] = [
       'TODOS',
       EstadoPedido.PENDIENTE,
-      EstadoPedido.EN_PROCESO,
+      EstadoPedido.EN_PREPARACION,
+      EstadoPedido.LISTO_PARA_RETIRAR,
       EstadoPedido.EN_CAMINO,
-      EstadoPedido.RECIBIDO,
+      EstadoPedido.COMPLETADO,
       EstadoPedido.CANCELADO
     ]
 
@@ -118,22 +116,22 @@ export class MisPedidosClientePage implements OnInit {
   }
 
   cancelarPedido(pedidoId: number): void {
-    if (!confirm('¿Estás seguro de cancelar este pedido?')) return
+    this.confirmationService.confirm({
+      title: 'Cancelar Pedido',
+      message: '¿Estás seguro de cancelar este pedido?',
+      confirmText: 'Sí, cancelar',
+      cancelText: 'No, mantener',
+      type: 'danger'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pedidoService.cancel(pedidoId).subscribe({
-      next: () => {
-        this.snackBar.open('✅ Pedido cancelado', 'Cerrar', { duration: 3000 })
-        this.cargarPedidos()
-      },
-      error: (error) => {
-        console.error('Error al cancelar pedido:', error)
-        this.snackBar.open(
-          error.error?.message || 'No se pudo cancelar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        )
-      }
-    })
+      this.pedidoService.cancel(pedidoId).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Pedido cancelado');
+          this.cargarPedidos();
+        }
+      });
+    });
   }
   
   navegarAHome() {

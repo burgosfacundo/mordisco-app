@@ -1,0 +1,28 @@
+.dialog-container {
+  min-width: 500px;
+  max-width: 600px;
+  padding: 24px;
+}
+
+@media (max-width: 640px) {
+  .dialog-container {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* Animaciones */
+.dialog-container {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

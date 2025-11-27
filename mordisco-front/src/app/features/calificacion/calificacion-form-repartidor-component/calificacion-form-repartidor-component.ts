@@ -1,11 +1,10 @@
 import { Component, inject, input, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { CalificacionService } from '../../../shared/services/calificacion/calificacion-service';
 import { FormValidationService } from '../../../shared/services/form-validation-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import CalificacionRepartidorRequestDTO from '../../../shared/models/calificacion/calificacion-repartidor-request-dto';
-import PedidoResponse from '../../../shared/models/pedido/pedido-response';
+import { NotificationService } from '../../../core/services/notification-service';
 
 @Component({
   selector: 'app-calificacion-form-repartidor-component',
@@ -15,7 +14,7 @@ import PedidoResponse from '../../../shared/models/pedido/pedido-response';
 export class CalificacionFormRepartidorComponent {
 
   private router = inject(Router)
-  private _snackBar = inject(MatSnackBar)
+  private notificationService = inject(NotificationService)
   private cService = inject(CalificacionService)
   private validationService = inject(FormValidationService)
   private fb = inject(FormBuilder)
@@ -45,7 +44,6 @@ export class CalificacionFormRepartidorComponent {
     const idPed = Number(this.pedido())
 
     if(!idPed){
-      this._snackBar.open('❌ ID no válido', 'Cerrar', { duration: 3000 });
       this.router.navigate(['/pedidos']);
       return;
     }
@@ -60,12 +58,10 @@ export class CalificacionFormRepartidorComponent {
   
     this.cService.calificarRepartidor(calificacionRequest).subscribe({
       next : () => {
-        this._snackBar.open('✅ Calificacion registrada correctamente', '',{duration: 3000})
+        this.notificationService.success('✅ Calificacion registrada correctamente')
         this.router.navigate(['cliente/pedidos/detalle',idPed])
       },
-      error:(e) => {
-        console.error(e);
-        this._snackBar.open('❌ Ocurrió un error. Intentelo en unos minutos', '',{duration: 3000})
+      error:() => {
         this.router.navigate(['cliente/pedidos']);
       }
     })

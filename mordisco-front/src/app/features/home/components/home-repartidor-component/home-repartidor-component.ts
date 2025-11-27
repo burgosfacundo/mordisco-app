@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import { AuthService } from '../../../../shared/services/auth-service';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
@@ -7,22 +6,28 @@ import RestauranteResponse from '../../../../shared/models/restaurante/restauran
 import { RepartidorService } from '../../../../shared/services/repartidor/repartidor-service';
 import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { PedidoCardComponent } from "../../../../shared/components/pedido-card-component/pedido-card-component";
-import {MatDialog} from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../../../shared/store/ConfirmDialogComponent';
+import { MatDialog} from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 import { Router } from '@angular/router';
+import { NotificationService } from '../../../../core/services/notification-service';
+import { PedidosDisponiblesComponent } from '../../../../shared/components/pedidos-disponibles/pedidos-disponibles';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home-repartidor-component',
-  imports: [PedidoCardComponent, MatPaginator],
+  imports: [PedidoCardComponent, MatPaginator, PedidosDisponiblesComponent, CommonModule],
   templateUrl: './home-repartidor-component.html',
 })
 export class HomeRepartidorComponent {
-  private _snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
   private repartidorService = inject(RepartidorService);
   private dialog = inject(MatDialog);
   private router = inject(Router)
+
+  // Tab activa
+  tabActiva: 'disponibles' | 'asignados' = 'disponibles';
 
   pedidosPendientes?: PedidoResponse[];
 
@@ -38,11 +43,29 @@ export class HomeRepartidorComponent {
     this.loadPedidosEnCamino();
   }
 
+  /**
+   * Cambia entre tabs
+   */
+  cambiarTab(tab: 'disponibles' | 'asignados'): void {
+    this.tabActiva = tab;
+    if (tab === 'asignados') {
+      this.loadPedidosEnCamino();
+    }
+  }
+
+  /**
+   * Maneja el evento cuando se acepta un pedido desde pedidos-disponibles
+   */
+  onPedidoAceptado(pedidoId: number): void {
+    // Cambiar a la tab de asignados y recargar
+    this.tabActiva = 'asignados';
+    this.loadPedidosEnCamino();
+  }
+
   private loadPedidosEnCamino(): void {
     const user = this.authService.currentUser();
     
     if (!user?.userId) {
-      this._snackBar.open('❌ No se encontró información del usuario', 'Cerrar' , { duration: 3000 });
       this.authService.logout();
       return;
     }
@@ -53,9 +76,9 @@ export class HomeRepartidorComponent {
           this.length = data.totalElements;
           this.isLoading = false;
         },error: () => {
-          this._snackBar.open('❌ Error al cargar los pedidos pendientes', 'Cerrar' , { duration: 3000 });
-          this.isLoading = false;}
-        });
+          this.isLoading = false;
+        }
+    });
   }
 
   marcarRecibido(pedidoID : number) {
@@ -74,17 +97,10 @@ export class HomeRepartidorComponent {
   guardarAceptacion(pedidoId : number) {
     this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
           next: () => {
-            this._snackBar.open('✅ Pedido marcado como "Recibido"', 'Cerrar', { duration: 3000 });
+            this.notificationService.success('✅ Pedido marcado como "Recibido"');
             this.loadPedidosEnCamino();
-          },
-          error: (error) => {
-            console.error('Error al actualizar pedido:', error);
-            this._snackBar.open(
-              error.error?.message || 'No se pudo actualizar el pedido',
-              'Cerrar',
-              { duration: 4000 }
-            );
-          }});
+          }
+    });
   }
 
   verDetalle(pedidoId: number): void {

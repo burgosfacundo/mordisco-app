@@ -169,34 +169,121 @@ public class PedidoServiceImpl implements IPedidoService {
      * @throws NotFoundException si el pedido no se encuentra.
      * @throws BadRequestException si hay un error al actualizar el pedido.
      */
+    @Transactional
     @Override
-    public void changeState(Long id, EstadoPedido nuevoEstado) throws NotFoundException, BadRequestException {
+    public void changeState(Long id, EstadoPedido nuevoEstado)
+            throws NotFoundException, BadRequestException {
+
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
 
         EstadoPedido estadoActual = pedido.getEstado();
 
+        // Validar que el nuevo estado sea diferente
         if (estadoActual == nuevoEstado) {
             throw new BadRequestException("El pedido ya se encuentra en ese estado");
         }
 
-        if (!estadoActual.puedeCambiarA(nuevoEstado)) {
-            throw new BadRequestException("No se puede cambiar de " + estadoActual + " a " + nuevoEstado);
+        // ✅ VALIDAR SEGÚN TIPO DE ENTREGA
+        if (!estadoActual.puedeCambiarA(nuevoEstado, pedido.getTipoEntrega())) {
+            throw new BadRequestException(
+                    String.format("No se puede cambiar de '%s' a '%s' para pedidos de tipo '%s'",
+                            estadoActual.getDisplayName(),
+                            nuevoEstado.getDisplayName(),
+                            pedido.getTipoEntrega())
+            );
         }
 
-        if (nuevoEstado == EstadoPedido.CANCELADO && !estadoActual.esCancelable()) {
-            throw new BadRequestException("No se puede cancelar un pedido en estado " + estadoActual);
-        }
+        // ✅ VALIDACIONES ESPECÍFICAS POR ESTADO
+        validarCambioEstadoEspecifico(pedido, nuevoEstado);
 
+        // Actualizar estado
         pedido.setEstado(nuevoEstado);
-        pedidoRepository.changeState(id, nuevoEstado);
+        pedidoRepository.save(pedido);
 
-        notificacionService.notificarCambioEstadoACliente(pedido);
-
-        log.info("✅ Pedido #{} cambió de {} a {} y cliente notificado",
-                id, estadoActual, nuevoEstado);
-
+        // Notificar según el nuevo estado
+        // notificarCambioEstado(pedido, nuevoEstado);
     }
+
+    /**
+            * Validaciones específicas según el nuevo estado
+     */
+    private void validarCambioEstadoEspecifico(Pedido pedido, EstadoPedido nuevoEstado)
+            throws BadRequestException {
+
+        switch (nuevoEstado) {
+            case EN_CAMINO -> {
+                // Solo válido para DELIVERY
+                if (pedido.getTipoEntrega() != TipoEntrega.DELIVERY) {
+                    throw new BadRequestException(
+                            "El estado 'EN_CAMINO' solo es válido para pedidos de delivery"
+                    );
+                }
+                // Debe tener repartidor asignado
+                if (pedido.getRepartidor() == null) {
+                    throw new BadRequestException(
+                            "No se puede marcar EN_CAMINO sin asignar un repartidor"
+                    );
+                }
+            }
+            case LISTO_PARA_RETIRAR -> {
+                // Solo válido para RETIRO_POR_LOCAL
+                if (pedido.getTipoEntrega() != TipoEntrega.RETIRO_POR_LOCAL) {
+                    throw new BadRequestException(
+                            "El estado 'LISTO_PARA_RETIRAR' solo es válido para pedidos de retiro por local"
+                    );
+                }
+            }
+            case LISTO_PARA_ENTREGAR -> {
+                // Solo válido para DELIVERY
+                if (pedido.getTipoEntrega() != TipoEntrega.DELIVERY) {
+                    throw new BadRequestException(
+                            "El estado 'LISTO_PARA_ENTREGAR' solo es válido para pedidos de delivery"
+                    );
+                }
+            }
+            case COMPLETADO -> {
+                // Validar estado anterior correcto
+                boolean estadoValidoParaCompletar = switch (pedido.getTipoEntrega()) {
+                    case RETIRO_POR_LOCAL -> pedido.getEstado() == EstadoPedido.LISTO_PARA_RETIRAR;
+                    case DELIVERY -> pedido.getEstado() == EstadoPedido.EN_CAMINO;
+                };
+
+                if (!estadoValidoParaCompletar) {
+                    throw new BadRequestException(
+                            String.format("No se puede completar un pedido de %s que está en estado %s",
+                                    pedido.getTipoEntrega(), pedido.getEstado())
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Notifica según el nuevo estado y tipo de entrega
+
+    private void notificarCambioEstado(Pedido pedido, EstadoPedido nuevoEstado) {
+        switch (nuevoEstado) {
+            case LISTO_PARA_RETIRAR ->
+                    notificacionService.notificarPedidoListoParaRetirar(pedido);
+
+            case LISTO_PARA_ENTREGAR ->
+                    notificacionService.notificarRepartidoresCercanos(pedido);
+
+            case EN_CAMINO ->
+                    notificacionService.notificarPedidoEnCamino(pedido);
+
+            case COMPLETADO ->
+                    notificacionService.notificarPedidoCompletado(pedido);
+
+            case CANCELADO ->
+                    notificacionService.notificarPedidoCancelado(pedido);
+
+            default ->
+                    notificacionService.notificarCambioEstadoACliente(pedido);
+        }
+    }*/
+
 
     /**
      * Lista los pedidos de un cliente por el estado
@@ -415,7 +502,7 @@ public class PedidoServiceImpl implements IPedidoService {
         }
 
         // Marcar como entregado
-        pedido.setEstado(EstadoPedido.RECIBIDO);
+        pedido.setEstado(EstadoPedido.COMPLETADO);
         pedido.setFechaEntrega(LocalDateTime.now());
 
         pedidoRepository.save(pedido);

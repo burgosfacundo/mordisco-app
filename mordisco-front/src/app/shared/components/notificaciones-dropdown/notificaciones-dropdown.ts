@@ -1,13 +1,15 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NotificacionService } from '../../services/notificacion/notificacion-service';
 import { AuthService } from '../../services/auth-service';
+import { ConfirmDialogComponent } from '../../store/confirm-dialog-component';
 
 @Component({
   selector: 'app-notificaciones-dropdown',
@@ -27,6 +29,7 @@ export class NotificacionesDropdownComponent {
   private notifService = inject(NotificacionService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   // Computed del servicio
   notificaciones = this.notifService.notificaciones;
@@ -51,9 +54,16 @@ export class NotificacionesDropdownComponent {
   }
 
   limpiarTodas(): void {
-    if (confirm('¿Estás seguro de eliminar todas las notificaciones?')) {
-      this.notifService.limpiarTodas();
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro de eliminar todas las notificaciones?' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.notifService.limpiarTodas();
+      }
+    });
   }
 
   getIconoPorTipo(tipo: string): string {

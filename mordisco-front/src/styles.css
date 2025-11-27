@@ -210,6 +210,12 @@ body {
            text-xs font-semibold uppercase tracking-wide bg-purple-100 text-purple-700;
   }
 
+    .badge-repartidor {
+    @apply inline-flex items-center gap-1.5
+           px-2.5 py-1 rounded-full
+           text-xs font-semibold uppercase tracking-wide bg-green-100 text-green-700;
+  }
+
 
 /* ========== INPUTS ========== */
   .input-base {

@@ -120,9 +120,11 @@ public class NotificacionService {
     private String formatearEstado(EstadoPedido estado) {
         return switch (estado) {
             case PENDIENTE -> "Pendiente";
-            case EN_PROCESO -> "En Preparación";
+            case EN_PREPARACION -> "En Preparación";
+            case LISTO_PARA_ENTREGAR ->  "Listo para entregar";
+            case LISTO_PARA_RETIRAR ->  "Listo para retirar";
             case EN_CAMINO -> "En Camino";
-            case RECIBIDO -> "Entregado";
+            case COMPLETADO -> "Entregado";
             case CANCELADO -> "Cancelado";
         };
     }

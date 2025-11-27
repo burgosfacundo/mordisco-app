@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, output, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import ProductoResponse from '../../models/producto/producto-response';

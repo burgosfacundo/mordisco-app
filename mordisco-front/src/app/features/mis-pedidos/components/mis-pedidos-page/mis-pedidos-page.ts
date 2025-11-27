@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +11,8 @@ import { AuthService } from '../../../../shared/services/auth-service';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
+import { ConfirmationService } from '../../../../core/services/confirmation-service';
+import { NotificationService } from '../../../../core/services/notification-service';
 
 @Component({
   selector: 'app-mis-pedidos-page',
@@ -30,8 +31,9 @@ export class MisPedidosPage implements OnInit {
   private pService = inject(PedidoService);
   private rService = inject(RestauranteService);
   private auS = inject(AuthService);
-  private _snackBar = inject(MatSnackBar);
   private router = inject(Router);
+  private confirmationService = inject(ConfirmationService);
+  private notificationService = inject(NotificationService);
 
   arrPedidos?: PedidoResponse[];
   restaurante?: RestauranteResponse;
@@ -52,7 +54,6 @@ export class MisPedidosPage implements OnInit {
     const userId = this.auS.getCurrentUser()?.userId;
 
     if (!userId) {
-      this._snackBar.open('Error: Usuario no autenticado', 'Cerrar', { duration: 3000 });
       this.router.navigate(['/login']);
       return;
     }
@@ -62,9 +63,7 @@ export class MisPedidosPage implements OnInit {
         this.restaurante = data;
         this.cargarPedidos();
       },
-      error: (e) => {
-        console.error('Error al cargar restaurante:', e);
-        this._snackBar.open('Error al cargar el restaurante', 'Cerrar', { duration: 3000 });
+      error: () => {
         this.isLoadingPedidos = false;
       }
     });
@@ -87,7 +86,6 @@ export class MisPedidosPage implements OnInit {
           this.isLoadingPedidos = false;
         },
         error: () => {
-          this._snackBar.open('Error al cargar pedidos', 'Cerrar', { duration: 3000 });
           this.isLoadingPedidos = false;
         }
       });
@@ -104,7 +102,6 @@ export class MisPedidosPage implements OnInit {
           this.isLoadingPedidos = false;
         },
         error: () => {
-          this._snackBar.open('Error al cargar pedidos', 'Cerrar', { duration: 3000 });
           this.isLoadingPedidos = false;
         }
       });
@@ -115,9 +112,11 @@ export class MisPedidosPage implements OnInit {
     const estados: (EstadoPedido | 'TODOS')[] = [
       'TODOS',
       EstadoPedido.PENDIENTE,
-      EstadoPedido.EN_PROCESO,
+      EstadoPedido.EN_PREPARACION,
+      EstadoPedido.LISTO_PARA_RETIRAR,
+      EstadoPedido.LISTO_PARA_ENTREGAR,
       EstadoPedido.EN_CAMINO,
-      EstadoPedido.RECIBIDO,
+      EstadoPedido.COMPLETADO,
       EstadoPedido.CANCELADO
     ];
 
@@ -133,59 +132,58 @@ export class MisPedidosPage implements OnInit {
   }
 
   aceptarPedido(pedidoId: number): void {
-    if (!confirm('¿Aceptar este pedido?')) return;
+    this.confirmationService.confirm({
+      title: 'Aceptar Pedido',
+      message: '¿Estás seguro de aceptar este pedido?',
+      confirmText: 'Aceptar',
+      type: 'info'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pService.changeState(pedidoId, EstadoPedido.EN_PROCESO).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido aceptado', 'Cerrar', { duration: 3000 });
-        this.cargarPedidos();
-      },
-      error: (error) => {
-        console.error('Error al aceptar pedido:', error);
-        this._snackBar.open(
-          error.error?.message || 'No se pudo aceptar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        );
-      }
+      this.pService.changeState(pedidoId, EstadoPedido.EN_PREPARACION).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Pedido aceptado');
+          this.cargarPedidos();
+        }
+      });
     });
   }
 
   rechazarPedido(pedidoId: number): void {
-    if (!confirm('¿Rechazar/Cancelar este pedido?')) return;
+    this.confirmationService.confirm({
+      title: 'Rechazar Pedido',
+      message: '¿Estás seguro de rechazar/cancelar este pedido? Esta acción no se puede deshacer.',
+      confirmText: 'Rechazar',
+      type: 'danger'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pService.cancel(pedidoId).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido cancelado', 'Cerrar', { duration: 3000 });
-        this.cargarPedidos();
-      },
-      error: (error) => {
-        console.error('Error al cancelar pedido:', error);
-        this._snackBar.open(
-          error.error?.message || 'No se pudo cancelar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        );
-      }
+      this.pService.cancel(pedidoId).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Pedido rechazado');
+          this.cargarPedidos();
+        }
+      });
     });
   }
 
-  marcarEnCamino(pedidoId: number): void {
-    if (!confirm('¿Marcar pedido como "En Camino"?')) return;
+  cambiarEstado(event: { pedidoId: number, nuevoEstado: EstadoPedido }): void {
+    const estadoLabel = event.nuevoEstado.replace(/_/g, ' ').toLowerCase();
+    
+    this.confirmationService.confirm({
+      title: 'Cambiar Estado',
+      message: `¿Cambiar estado del pedido a "${estadoLabel}"?`,
+      confirmText: 'Cambiar',
+      type: 'warning'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pService.changeState(pedidoId, EstadoPedido.EN_CAMINO).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido marcado como "En Camino"', 'Cerrar', { duration: 3000 });
-        this.cargarPedidos();
-      },
-      error: (error) => {
-        console.error('Error al actualizar pedido:', error);
-        this._snackBar.open(
-          error.error?.message || 'No se pudo actualizar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        );
-      }
+      this.pService.changeState(event.pedidoId, event.nuevoEstado).subscribe({
+        next: () => {
+          this.notificationService.success(`✅ Estado actualizado a "${estadoLabel}"`);
+          this.cargarPedidos();
+        }
+      });
     });
   }
 }

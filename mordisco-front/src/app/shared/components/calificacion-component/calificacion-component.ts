@@ -1,8 +1,6 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import CalificacionPedidoResponseDTO from '../../models/calificacion/calificacion-pedido-response-dto';
-import CalificacionRepartidorResponseDTO from '../../models/calificacion/calificacion-repartidor-response-dto';
-import { ICalificacionBase } from '../../models/calificacion/ICalificacionBase';
+import { ICalificacionBase } from '../../models/calificacion/calificacion-base';
 
 @Component({
   selector: 'app-calificacion-component',

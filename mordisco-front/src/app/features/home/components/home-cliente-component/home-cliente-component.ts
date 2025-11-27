@@ -1,10 +1,8 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { RestauranteCardComponent } from '../../../../shared/components/restaurante-card-component/restaurante-card-component';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import RestauranteForCard from '../../../../shared/models/restaurante/restaurante-for-card';
-import { Router } from '@angular/router';
 import { CarritoFlotanteComponent } from "../../../../shared/components/carrito-flotante-component/carrito-flotante-component";
 
 @Component({
@@ -13,9 +11,7 @@ import { CarritoFlotanteComponent } from "../../../../shared/components/carrito-
   templateUrl: './home-cliente-component.html'
 })
 export class HomeClienteComponent  implements OnInit , OnDestroy{
-  private router = inject(Router);
   private eventListeners: (() => void)[] = [];
-  private _snackBar = inject(MatSnackBar);
   private restauranteService = inject(RestauranteService);
   private originalRestaurantes?: RestauranteForCard[];
   restaurantes?: RestauranteForCard[];
@@ -91,9 +87,6 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
         this.restaurantes = [...data.content];
         this.lengthRestaurantes = data.totalElements;
         this.isLoadingRestaurantes = false;
-      },
-      error: () => {
-        this._snackBar.open('❌ Error al cargar los restaurantes','Cerrar' , { duration: 3000 });
       }
     });
   }
@@ -104,9 +97,6 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
        this.restaurantesPromociones = data.content
         this.lengthPromocion = data.totalElements;
         this.isLoadingPromocion = false;
-      },
-      error: () => {        
-        this._snackBar.open('❌ Error al cargar los restaurantes con promociones', 'Cerrar' , { duration: 3000 });
       }
     });
   }

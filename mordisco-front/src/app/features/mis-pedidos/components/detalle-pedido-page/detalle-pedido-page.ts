@@ -1,21 +1,22 @@
-import { Component, EventEmitter, inject, OnInit, output, Output } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductoPedidoCardComponent } from '../producto-pedido-card-component/producto-pedido-card-component';
 import { DireccionCardComponent } from '../../../direccion/components/direccion-card-component/direccion-card-component';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
-import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
+import { EstadoPedido, ESTADO_PEDIDO_LABELS } from '../../../../shared/models/enums/estado-pedido';
 import { CommonModule } from '@angular/common';
 import { UsuarioCardComponent } from "../../../../shared/components/usuario-card-component/usuario-card-component";
 import { AuthService } from '../../../../shared/services/auth-service';
 import { CalificacionService } from '../../../../shared/services/calificacion/calificacion-service';
-import { CalificacionFormPedidoComponent } from '../../../calificacion/calificacion-form-pedido-component/calificacion-form-pedido-component';
-import { CalificacionFormRepartidorComponent } from '../../../calificacion/calificacion-form-repartidor-component/calificacion-form-repartidor-component';
 import CalificacionPedidoResponseDTO from '../../../../shared/models/calificacion/calificacion-pedido-response-dto';
 import CalificacionRepartidorResponseDTO from '../../../../shared/models/calificacion/calificacion-repartidor-response-dto';
 import { CalificacionComponent } from '../../../../shared/components/calificacion-component/calificacion-component';
+import { NotificationService } from '../../../../core/services/notification-service';
+import { ConfirmationService } from '../../../../core/services/confirmation-service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 @Component({
   selector: 'app-detalle-pedido-page',
   standalone: true,
@@ -31,10 +32,12 @@ import { CalificacionComponent } from '../../../../shared/components/calificacio
 export class DetallePedidoPage implements OnInit {
   private authService = inject(AuthService);
   private cService = inject(CalificacionService)
-  private _snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   private pedidoService = inject(PedidoService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private confirmationService = inject(ConfirmationService);
+  private dialog = inject(MatDialog);
 
   protected pedido?: PedidoResponse;
   protected isLoading = true;
@@ -53,7 +56,6 @@ export class DetallePedidoPage implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     
     if (!id) {
-      this._snackBar.open('❌ ID de pedido no válido', 'Cerrar', { duration: 3000 });
       this.router.navigate(['/restaurante/pedidos']);
       return;
     }
@@ -64,9 +66,7 @@ export class DetallePedidoPage implements OnInit {
         this.setCalificados(this.pedido)
         this.isLoading = false
       },
-      error: (error) => {
-        console.error('Error al cargar pedido:', error);
-        this._snackBar.open('❌ Error al cargar el pedido', 'Cerrar', { duration: 3000 });
+      error: () => {
         this.isLoading = false;
         this.router.navigate(['/restaurante/pedidos']);
       }
@@ -82,14 +82,7 @@ export class DetallePedidoPage implements OnInit {
   }
 
   formatearEstado(estado: EstadoPedido): string {
-    const estados: Record<EstadoPedido, string> = {
-      [EstadoPedido.PENDIENTE]: 'Pendiente',
-      [EstadoPedido.EN_PROCESO]: 'En Proceso',
-      [EstadoPedido.EN_CAMINO]: 'En Camino',
-      [EstadoPedido.RECIBIDO]: 'Entregado',
-      [EstadoPedido.CANCELADO]: 'Cancelado'
-    };
-    return estados[estado] || String(estado);
+    return ESTADO_PEDIDO_LABELS[estado] || String(estado);
   }
 
   formatearEntrega(pedido: PedidoResponse): string {
@@ -97,47 +90,59 @@ export class DetallePedidoPage implements OnInit {
   }
 
   aceptarPedido(): void {
-    if (!this.pedido?.id || !confirm('¿Aceptar este pedido?')) return;
+    this.confirmationService.confirm({
+      title: 'Aceptar Pedido',
+      message: '¿Estás seguro de aceptar este pedido?',
+      confirmText: 'Sí, aceptar',
+      cancelText: 'Cancelar',
+      type: 'info'
+    }).subscribe(confirmed => {
+      if (!confirmed || !this.pedido?.id) return;
 
-    this.pedidoService.changeState(this.pedido.id, EstadoPedido.EN_PROCESO).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido aceptado', 'Cerrar', { duration: 3000 });
-        this.loadPedido();
-      },
-      error: (error) => {
-        console.error('Error:', error);
-        this._snackBar.open('No se pudo aceptar el pedido', 'Cerrar', { duration: 4000 });
-      }
+      this.pedidoService.changeState(this.pedido.id, EstadoPedido.EN_PREPARACION).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Pedido aceptado');
+          this.loadPedido();
+        }
+      });
     });
   }
 
   rechazarPedido(): void {
-    if (!this.pedido?.id || !confirm('¿Rechazar/Cancelar este pedido?')) return;
+    this.confirmationService.confirm({
+      title: 'Rechazar Pedido',
+      message: '¿Estás seguro de rechazar/cancelar este pedido?',
+      confirmText: 'Sí, rechazar',
+      cancelText: 'No, mantener',
+      type: 'danger'
+    }).subscribe(confirmed => {
+      if (!confirmed || !this.pedido?.id) return;
 
-    this.pedidoService.cancel(this.pedido.id).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido cancelado', 'Cerrar', { duration: 3000 });
-        this.loadPedido();
-      },
-      error: (error) => {
-        console.error('Error:', error);
-        this._snackBar.open('No se pudo cancelar el pedido', 'Cerrar', { duration: 4000 });
-      }
+      this.pedidoService.cancel(this.pedido.id).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Pedido cancelado');
+          this.loadPedido();
+        }
+      });
     });
   }
 
   marcarEnCamino(): void {
-    if (!this.pedido?.id || !confirm('¿Marcar como "En Camino"?')) return;
+    this.confirmationService.confirm({
+      title: 'Cambiar Estado',
+      message: '¿Marcar este pedido como "En Camino"?',
+      confirmText: 'Sí, marcar',
+      cancelText: 'Cancelar',
+      type: 'warning'
+    }).subscribe(confirmed => {
+      if (!confirmed || !this.pedido?.id) return;
 
-    this.pedidoService.changeState(this.pedido.id, EstadoPedido.EN_CAMINO).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido marcado como "En Camino"', 'Cerrar', { duration: 3000 });
-        this.loadPedido();
-      },
-      error: (error) => {
-        console.error('Error:', error);
-        this._snackBar.open('No se pudo actualizar el pedido', 'Cerrar', { duration: 4000 });
-      }
+      this.pedidoService.changeState(this.pedido.id, EstadoPedido.EN_CAMINO).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Pedido marcado como "En Camino"');
+          this.loadPedido();
+        }
+      });
     });
   }
   volver(): void {
@@ -149,7 +154,7 @@ export class DetallePedidoPage implements OnInit {
    */
   mostrarBotonCalificar(): boolean {
     const estado = this.pedido?.estado;
-    return estado === EstadoPedido.RECIBIDO && (!this.calificacionPedido|| !this.calificacionRepartidor); 
+    return estado === EstadoPedido.COMPLETADO && (!this.calificacionPedido|| !this.calificacionRepartidor); 
   }
 
   calificarPedido(): void {
@@ -164,8 +169,7 @@ export class DetallePedidoPage implements OnInit {
     this.cService.getCalificacionPedido(p.id).subscribe({
       next:(data)=>{
         this.calificacionPedido = data
-      },
-      error:(e)=> {console.log(e)}
+      }
     })
   }
 
@@ -173,42 +177,43 @@ export class DetallePedidoPage implements OnInit {
     this.cService.getCalificacionRepartidor(p.id).subscribe({
       next:(data)=> {
         this.calificacionRepartidor = data
-      },
-      error:(e)=> {console.log(e)}
+      }
     })
   }
 
   eliminarCalificacionRepartidor(id: number): void {
-    if (!confirm('¿Estás seguro de eliminar esta calificacion?')) {
-      return;
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro de eliminar esta calificación?' }
+    });
 
-    this.cService.eliminarCalificacionRepartidor(id).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Calificacion eliminada correctamente', 'Cerrar', { duration: 3000 });
-        this.loadPedido();
-      },
-      error: (error) => {
-        console.error('Error al eliminar calificacion:', error);
-        this._snackBar.open('❌ Error al eliminar la calificacion', 'Cerrar', { duration: 4000 });
-      }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== true) return;
+
+      this.cService.eliminarCalificacionRepartidor(id).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Calificacion eliminada correctamente');
+          this.loadPedido();
+        }
+      });
     });
   }
   
   eliminarCalificacionPedido(id: number): void {
-    if (!confirm('¿Estás seguro de eliminar esta calificacion?')) {
-      return;
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro de eliminar esta calificación?' }
+    });
 
-    this.cService.eliminarCalificacionPedido(id).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Calificacion eliminada correctamente', 'Cerrar', { duration: 3000 });
-        this.reloadComponent();
-      },
-      error: (error) => {
-        console.error('Error al eliminar calificacion:', error);
-        this._snackBar.open('❌ Error al eliminar la calificacion', 'Cerrar', { duration: 4000 });
-      }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== true) return;
+
+      this.cService.eliminarCalificacionPedido(id).subscribe({
+        next: () => {
+          this.notificationService.success('✅ Calificacion eliminada correctamente');
+          this.reloadComponent();
+        }
+      });
     });
   }
 

@@ -1,11 +1,11 @@
-import { Component, inject, input, Input } from '@angular/core';
-import { Router, RouterLink } from "@angular/router";
+import { Router } from "@angular/router";
+import { Component, inject, input } from '@angular/core';
 import UserCard from '../../models/user/user-card';
 import UserPedido from '../../models/user/user-pedido';
 
 @Component({
   selector: 'app-usuario-card-component',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './usuario-card-component.html'
 })
 export class UsuarioCardComponent {

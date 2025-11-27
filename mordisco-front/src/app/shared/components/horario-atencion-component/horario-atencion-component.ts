@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 import { CommonModule } from '@angular/common';
 

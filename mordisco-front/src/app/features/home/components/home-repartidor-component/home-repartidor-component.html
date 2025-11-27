@@ -1,4 +1,4 @@
-<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
   
   <!-- Hero Section -->
   <div class="bg-linear-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-white shadow-xl">
@@ -7,6 +7,7 @@
         <h1 class="text-3xl md:text-4xl font-bold mb-2">
           ¡Bienvenido de vuelta!
         </h1>
+        <p class="text-primary-100">Gestiona tus entregas y acepta nuevos pedidos</p>
       </div>
       <div class="flex items-center gap-4">
         <div class="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-4">
@@ -17,68 +18,118 @@
     </div>
   </div>
 
-
-  <!-- Sección Pedidos Pendientes -->
-  <section class="space-y-6">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-        <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-      <h2 class="titulo-seccion border-0 mb-0">
-        Tus pedidos pendientes a entregar
-      </h2>
-    </div>
-
-    @if (isLoading) {
-      <div class="loading-container">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">Cargando pedidos...</p>
-      </div>
-    } @else {
-      @if (pedidosPendientes && pedidosPendientes.length > 0) {
-        <!-- Lista de Pedidos -->
-        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (pedido of pedidosPendientes; track pedido.id) {
-            <li class="fade-in">
-              <app-pedido-card-component 
-                [isRepartidor]="true"
-                [pedido]="pedido"
-                (marcarRecibido)="marcarRecibido($event)"
-                (verDetalles)="verDetalle($event)"
-                class="block h-full">
-              </app-pedido-card-component>
-            </li>
-          }
-        </ul>
-
-        <!-- Paginador -->
-        <div class="flex justify-center mt-8">
-          <mat-paginator
-            [length]="length"
-            [pageSize]="sizePedidos"
-            [pageIndex]="pagePedidos"
-            (page)="onPageChangePedidosEnCamino($event)"
-            class="bg-white rounded-xl shadow-md">
-          </mat-paginator>
+  <!-- Tabs Navigation -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="flex border-b border-gray-200">
+      <button
+        (click)="cambiarTab('disponibles')"
+        [class.border-primary-600]="tabActiva === 'disponibles'"
+        [class.text-primary-600]="tabActiva === 'disponibles'"
+        [class.bg-primary-50]="tabActiva === 'disponibles'"
+        [class.text-gray-600]="tabActiva !== 'disponibles'"
+        class="flex-1 px-6 py-4 font-semibold text-center border-b-2 transition-all duration-200 hover:bg-gray-50">
+        <div class="flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <span>Pedidos Disponibles</span>
         </div>
-      } @else {
-        <!-- Empty State -->
-        <div class="empty-state">
-          <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      </button>
+      
+      <button
+        (click)="cambiarTab('asignados')"
+        [class.border-primary-600]="tabActiva === 'asignados'"
+        [class.text-primary-600]="tabActiva === 'asignados'"
+        [class.bg-primary-50]="tabActiva === 'asignados'"
+        [class.text-gray-600]="tabActiva !== 'asignados'"
+        class="flex-1 px-6 py-4 font-semibold text-center border-b-2 transition-all duration-200 hover:bg-gray-50">
+        <div class="flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h3 class="empty-title">
-            ¡Todo al día!
-          </h3>
-          <p class="empty-description">
-            No hay pedidos pendientes en este momento
-          </p>
+          <span>Mis Pedidos</span>
+          @if (pedidosPendientes && pedidosPendientes.length > 0) {
+            <span class="bg-primary-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
+              {{ pedidosPendientes.length }}
+            </span>
+          }
         </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab Content: Pedidos Disponibles -->
+  @if (tabActiva === 'disponibles') {
+    <app-pedidos-disponibles 
+      (pedidoAceptado)="onPedidoAceptado($event)">
+    </app-pedidos-disponibles>
+  }
+
+  <!-- Tab Content: Mis Pedidos (Asignados) -->
+  @if (tabActiva === 'asignados') {
+    <section class="space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+          <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2 class="titulo-seccion border-0 mb-0">
+          Tus pedidos pendientes a entregar
+        </h2>
+      </div>
+
+      @if (isLoading) {
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Cargando pedidos...</p>
+        </div>
+      } @else {
+        @if (pedidosPendientes && pedidosPendientes.length > 0) {
+          <!-- Lista de Pedidos -->
+          <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (pedido of pedidosPendientes; track pedido.id) {
+              <li class="fade-in">
+                <app-pedido-card-component 
+                  [isRepartidor]="true"
+                  [pedido]="pedido"
+                  (marcarRecibido)="marcarRecibido($event)"
+                  (verDetalles)="verDetalle($event)"
+                  class="block h-full">
+                </app-pedido-card-component>
+              </li>
+            }
+          </ul>
+
+          <!-- Paginador -->
+          <div class="flex justify-center mt-8">
+            <mat-paginator
+              [length]="length"
+              [pageSize]="sizePedidos"
+              [pageIndex]="pagePedidos"
+              (page)="onPageChangePedidosEnCamino($event)"
+              class="bg-white rounded-xl shadow-md">
+            </mat-paginator>
+          </div>
+        } @else {
+          <!-- Empty State -->
+          <div class="empty-state">
+            <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="empty-title">
+              ¡Todo al día!
+            </h3>
+            <p class="empty-description">
+              No hay pedidos pendientes en este momento
+            </p>
+          </div>
+        }
       }
-    }
-  </section>
+    </section>
+  }
 </div>

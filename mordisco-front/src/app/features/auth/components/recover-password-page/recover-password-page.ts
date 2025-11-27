@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { environment } from '../../../../../environments/environment';
+import { NotificationService } from '../../../../core/services/notification-service';
 
 @Component({
   selector: 'app-recover-password-page',
@@ -17,7 +17,7 @@ export class RecoverPasswordPage implements OnInit {
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   protected validationService = inject(FormValidationService);
 
   protected recoverForm!: FormGroup;
@@ -46,23 +46,18 @@ export class RecoverPasswordPage implements OnInit {
       this.recoverForm.value
     ).subscribe({
       next: () => {
-        this.snackBar.open(
-          '✅ Si el email existe, recibirás un link de recuperación',
-          'Cerrar',
-          { duration: 5000 }
+        this.notificationService.success(
+          '✅ Si el email existe, recibirás un link de recuperación'
         );
-        this.router.navigate(['/login']);
       },
       error: () => {
-        this.snackBar.open(
-          'Si el email existe, recibirás un link de recuperación',
-          'Cerrar',
-          { duration: 5000 }
+        this.notificationService.success(
+          'Si el email existe, recibirás un link de recuperación'
         );
-        this.isSubmitting.set(false);
       },
       complete: () => {
         this.isSubmitting.set(false);
+        this.router.navigate(['/login']);
       }
     });
   }

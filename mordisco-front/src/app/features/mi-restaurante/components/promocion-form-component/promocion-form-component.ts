@@ -4,14 +4,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { PromocionService } from '../../../../shared/services/promocion/promocion-service';
-import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
-import { AuthService } from '../../../../shared/services/auth-service';
 import PromocionRequest from '../../../../shared/models/promocion/promocion-request';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NotificationService } from '../../../../core/services/notification-service';
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-promocion-form-component',
@@ -28,13 +28,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 })
 export class PromocionFormComponent implements OnInit {
   private promocionService = inject(PromocionService);
-  private restauranteService = inject(RestauranteService);
   private formValidationService = inject(FormValidationService)
-  private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
+  private dialog = inject(MatDialog)
 
   promocionForm!: FormGroup;
   isEditMode = false;
@@ -79,9 +78,6 @@ export class PromocionFormComponent implements OnInit {
         });
 
         this.restauranteId = p.restaurante_Id;
-      },
-      error: () => {
-        this.snackBar.open('❌ Error al cargar la promoción', 'Cerrar', { duration: 4000 });
       }
     });
   }
@@ -89,7 +85,7 @@ export class PromocionFormComponent implements OnInit {
   onSubmit(): void {
     if (!this.promocionForm.valid) {
       this.markFormGroupTouched(this.promocionForm);
-      this.snackBar.open('⚠️ Por favor completa todos los campos correctamente', 'Cerrar', { duration: 3000 });
+      this.notificationService.warning('⚠️ Por favor completa todos los campos correctamente');
       return;
     }
 
@@ -110,12 +106,10 @@ export class PromocionFormComponent implements OnInit {
       if (this.isEditMode && this.promocionId) {
         this.promocionService.put(promocionData, this.promocionId).subscribe({
           next: () => {
-            this.snackBar.open('✅ Promoción actualizada correctamente', 'Cerrar', { duration: 3000 });
+            this.notificationService.success('✅ Promoción actualizada correctamente');
             this.router.navigate(['/mi-restaurante']);
           },
-          error: (error) => {
-            console.error('Error al actualizar promoción:', error);
-            this.snackBar.open('❌ Error al actualizar la promoción', 'Cerrar', { duration: 4000 });
+          error: () => {
             this.isSubmitting = false;
           }
         });
@@ -123,12 +117,10 @@ export class PromocionFormComponent implements OnInit {
         // Crear nueva promoción
         this.promocionService.save(promocionData).subscribe({
           next: () => {
-            this.snackBar.open('✅ Promoción creada correctamente', 'Cerrar', { duration: 3000 });
+            this.notificationService.success('✅ Promoción creada correctamente');
             this.router.navigate(['/mi-restaurante']);
           },
-          error: (error) => {
-            console.error('Error al crear promoción:', error);
-            this.snackBar.open('❌ Error al crear la promoción', 'Cerrar', { duration: 4000 });
+          error: () => {
             this.isSubmitting = false;
           }
         });
@@ -157,14 +149,20 @@ export class PromocionFormComponent implements OnInit {
       fieldName
     );
   }
-
   onCancel(): void {
     if (this.promocionForm.dirty) {
-      if (confirm('¿Descartar los cambios realizados?')) {
-        this.router.navigate(['/mi-restaurante']);
-      }
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        width: '400px',
+        data: { mensaje: '¿Deseas salir sin guardar los cambios?' }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === true) {
+          this.router.navigate(['/restaurante']);
+        }
+      });
     } else {
-      this.router.navigate(['/mi-restaurante']);
+      this.router.navigate(['/restaurante']);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 
 @Component({

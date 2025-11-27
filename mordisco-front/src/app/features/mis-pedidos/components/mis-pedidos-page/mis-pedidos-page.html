@@ -43,7 +43,25 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <div class="flex items-center gap-2">
-            <mat-icon class="text-purple-600">local_shipping</mat-icon>
+            <mat-icon class="text-green-600">shopping_bag</mat-icon>
+            <span>Listo para Retirar</span>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-purple-600">inventory_2</mat-icon>
+            <span>Listo para Entregar</span>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-indigo-600">local_shipping</mat-icon>
             <span>En Camino</span>
           </div>
         </ng-template>
@@ -52,8 +70,8 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <div class="flex items-center gap-2">
-            <mat-icon class="text-green-600">check_circle</mat-icon>
-            <span>Entregados</span>
+            <mat-icon class="text-emerald-600">check_circle</mat-icon>
+            <span>Completados</span>
           </div>
         </ng-template>
       </mat-tab>
@@ -85,7 +103,7 @@
                   [pedido]="pedido"
                   (aceptarPedido)="aceptarPedido($event)"
                   (rechazarPedido)="rechazarPedido($event)"
-                  (marcarEnCamino)="marcarEnCamino($event)"
+                  (cambiarEstado)="cambiarEstado($event)"
                   class="block h-full">
                 </app-pedido-card-component>
               </li>

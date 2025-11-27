@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MatDialogTitle,
@@ -18,8 +18,8 @@ import {
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close="false"  class="!bg-red-100 !text-red-700 hover:!bg-red-800 hover:!text-white">Cancelar</button>
-    <button mat-flat-button [mat-dialog-close]="true" class="!bg-red-700 !text-white hover:!bg-red-800"> Aceptar</button>
+    <button mat-button mat-dialog-close="false"  class="bg-red-100! text-red-700! hover:bg-red-800! hover:text-white!">Cancelar</button>
+    <button mat-flat-button [mat-dialog-close]="true" class="bg-red-700! text-white! hover:bg-red-800!"> Aceptar</button>
     </mat-dialog-actions>
   `,
   standalone: true,

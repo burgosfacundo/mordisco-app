@@ -1,8 +1,8 @@
 import { Component, inject, OnInit } from "@angular/core";
+import { MatDialog } from '@angular/material/dialog';
 import { RestauranteService } from "../../../../shared/services/restaurante/restaurante-service";
 import { AuthService } from "../../../../shared/services/auth-service";
 import { ActivatedRoute, Router } from "@angular/router";
-import { MatSnackBar } from "@angular/material/snack-bar";
 import RestauranteUpdate from "../../../../shared/models/restaurante/restaurante-update";
 import RestauranteRequest from "../../../../shared/models/restaurante/restaurante-request";
 import { FormValidationService } from "../../../../shared/services/form-validation-service";
@@ -10,6 +10,8 @@ import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { NotificationService } from "../../../../core/services/notification-service";
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
   selector: 'app-restaurante-form-component',
@@ -29,7 +31,8 @@ export class RestauranteFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
+  private dialog = inject(MatDialog);
 
   restauranteForm!: FormGroup;
   isEditMode = false;
@@ -86,8 +89,7 @@ export class RestauranteFormComponent implements OnInit {
           this.imagenId = r.logo.id
       },
       error: () => {
-        this.snackBar.open('❌ Error al cargar el restaurante', 'Cerrar', { duration: 4000 });
-        this.router.navigate(['/mi-restaurante']);
+        this.router.navigate(['/restaurante']);
       }
     });
   }
@@ -95,12 +97,11 @@ export class RestauranteFormComponent implements OnInit {
   onSubmit(): void {
     if (this.restauranteForm.invalid) {
       this.markFormGroupTouched(this.restauranteForm);
-      this.snackBar.open('⚠️ Por favor completa todos los campos correctamente', 'Cerrar', { duration: 3000 });
+      this.notificationService.warning('⚠️ Por favor completa todos los campos correctamente');
       return;
     }
 
     if (!this.userId) {
-      this.snackBar.open('❌ No se pudo identificar el usuario', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -121,11 +122,8 @@ export class RestauranteFormComponent implements OnInit {
 
       this.restauranteService.put(restauranteData).subscribe({
         next: () => {
-          this.snackBar.open('✅ Restaurante actualizado correctamente', 'Cerrar', { duration: 3000 });
+          this.notificationService.success('✅ Restaurante actualizado correctamente');
           this.router.navigate(['/']);
-        },
-        error: () => {
-          this.snackBar.open('❌ Error al actualizar el restaurante', 'Cerrar', { duration: 4000 });
         },
         complete: () => {
           this.isSubmitting = false;
@@ -153,11 +151,8 @@ export class RestauranteFormComponent implements OnInit {
 
       this.restauranteService.save(restauranteData).subscribe({
         next: () => {
-          this.snackBar.open('✅ Restaurante creado correctamente', 'Cerrar', { duration: 3000 });
+          this.notificationService.success('✅ Restaurante creado correctamente');
           this.router.navigate(['/']);
-        },
-        error: () => {
-          this.snackBar.open('❌ Error al crear el restaurante', 'Cerrar', { duration: 4000 });
         },
         complete: () => {
           this.isSubmitting = false;
@@ -183,11 +178,18 @@ export class RestauranteFormComponent implements OnInit {
 
   onCancel(): void {
     if (this.restauranteForm.dirty) {
-      if (confirm('¿Descartar los cambios realizados?')) {
-        this.router.navigate(['/mi-restaurante']);
-      }
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        width: '400px',
+        data: { mensaje: '¿Descartar los cambios realizados?' }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === true) {
+          this.router.navigate(['/restaurante']);
+        }
+      });
     } else {
-      this.router.navigate(['/mi-restaurante']);
+      this.router.navigate(['/restaurante']);
     }
   }
 }

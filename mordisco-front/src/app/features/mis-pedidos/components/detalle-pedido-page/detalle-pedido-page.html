@@ -68,7 +68,7 @@
           </div>
         </div>
       </div>
-      @if (isUsuario === 'ROLE_CLIENTE' && pedido.estado === estadoPedidoEnum.RECIBIDO) {
+      @if (isUsuario === 'ROLE_CLIENTE' && pedido.estado === estadoPedidoEnum.COMPLETADO) {
         <article class="bg-white rounded-xl shadow-md overflow-hidden 
                         transition-all duration-300 hover:shadow-xl
                         flex flex-col h-full p-6">
@@ -83,7 +83,7 @@
                 [class.w-full]="pedido.tipoEntrega !== tipoEntregaEnum.DELIVERY"
                 [class.max-w-md]="pedido.tipoEntrega !== tipoEntregaEnum.DELIVERY"> 
               @if(!calificacionPedido){
-                <div class="flex flex-col items-center justify-center gap-3 p-4 bg-gradient-to-br from-red-50 to-white border-2 border-red-100 rounded-xl w-full">
+                <div class="flex flex-col items-center justify-center gap-3 p-4 bg-linear-to-br from-red-50 to-white border-2 border-red-100 rounded-xl w-full">
                   <div class="text-center mb-2">
                     <h3 class="text-lg font-semibold text-gray-800 mb-1">¿Cómo estuvo tu pedido?</h3>
                     <p class="text-sm text-gray-600">Ayúdanos a mejorar</p>
@@ -99,13 +99,19 @@
                   </button>
                 </div>
               }@else {
-                <div class="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-green-50 to-white border-2 border-green-100 rounded-xl w-full">
+                <div class="flex flex-col items-center justify-center p-4 bg-linear-to-br from-green-50 to-white border-2 border-green-100 rounded-xl w-full">
                   <span class="text-base font-semibold text-gray-800 block mb-2">Pedido calificado</span>
                   <p class="text-xs text-gray-600 mb-3">¡Gracias por tu opinión!</p>
                   <div class="w-full max-w-md">
-                    <app-calificacion-component
-                      [calificacion]="calificacionPedido">
-                    </app-calificacion-component>
+                    @defer (on viewport) {
+                      <app-calificacion-component
+                        [calificacion]="calificacionPedido">
+                      </app-calificacion-component>
+                    } @placeholder {
+                      <div class="flex items-center justify-center p-4">
+                        <div class="loading-spinner"></div>
+                      </div>
+                    }
                   </div>
                   <button (click)="eliminarCalificacionPedido(calificacionPedido.id)" class="btn-ghost flex-1 text-red-600 hover:bg-red-50 mt-3">Eliminar calificacion</button>
                 </div>
@@ -116,7 +122,7 @@
             @if(pedido.tipoEntrega === tipoEntregaEnum.DELIVERY){
               <div class="flex-1 min-w-1/2 flex">
                 @if(!calificacionRepartidor){
-                  <div class="flex flex-col items-center justify-center gap-3 p-4 bg-gradient-to-br from-red-50 to-white border-2 border-red-100 rounded-xl w-full">
+                  <div class="flex flex-col items-center justify-center gap-3 p-4 bg-linear-to-br from-red-50 to-white border-2 border-red-100 rounded-xl w-full">
                     <div class="text-center mb-2">
                       <h3 class="text-lg font-semibold text-gray-800 mb-1">¿Cómo fue el servicio?</h3>
                       <p class="text-sm text-gray-600">Califica al repartidor</p>
@@ -132,13 +138,19 @@
                     </button>
                   </div>
                 }@else {
-                  <div class="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-green-50 to-white border-2 border-green-100 rounded-xl w-full">
+                  <div class="flex flex-col items-center justify-center p-4 bg-linear-to-br from-green-50 to-white border-2 border-green-100 rounded-xl w-full">
                     <span class="text-base font-semibold text-gray-800 block mb-2">Repartidor calificado</span>
                     <p class="text-xs text-gray-600 mb-3">¡Gracias por tu feedback!</p>
                     <div class="w-full max-w-md">
-                      <app-calificacion-component
-                        [calificacion]="calificacionRepartidor">
-                      </app-calificacion-component>
+                      @defer (on viewport) {
+                        <app-calificacion-component
+                          [calificacion]="calificacionRepartidor">
+                        </app-calificacion-component>
+                      } @placeholder {
+                        <div class="flex items-center justify-center p-4">
+                          <div class="loading-spinner"></div>
+                        </div>
+                      }
                     </div>
                     <button (click)="eliminarCalificacionRepartidor(calificacionRepartidor.id)" class="btn-ghost flex-1 text-red-600 hover:bg-red-50 mt-3">Eliminar calificacion</button>
                   </div>
@@ -254,7 +266,7 @@
                   transition-all duration-200">
             Rechazar Pedido
           </button>
-        } @else if (pedido.estado === 'EN_PROCESO') {
+        } @else if (pedido.estado === estadoPedidoEnum.EN_PREPARACION) {
           <button 
             (click)="marcarEnCamino()"
             class="w-full py-2.5 rounded-lg

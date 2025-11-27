@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, output, input } from '@angular/core';
+import { Component, output, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import PromocionResponse from '../../models/promocion/promocion-response';

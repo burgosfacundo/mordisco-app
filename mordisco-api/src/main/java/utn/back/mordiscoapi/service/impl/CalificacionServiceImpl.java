@@ -237,8 +237,8 @@ public class CalificacionServiceImpl {
     private void validarCalificacionPedido(Pedido pedido, Usuario cliente)
             throws BadRequestException {
 
-        // Verificar que el pedido esté en estado RECIBIDO
-        if (pedido.getEstado() != EstadoPedido.RECIBIDO) {
+        // Verificar que el pedido esté en estado COMPLETADO
+        if (pedido.getEstado() != EstadoPedido.COMPLETADO) {
             throw new BadRequestException(
                     "Solo puedes calificar pedidos que ya fueron recibidos"
             );
@@ -258,8 +258,8 @@ public class CalificacionServiceImpl {
     private void validarCalificacionRepartidor(Pedido pedido, Usuario cliente)
             throws BadRequestException {
 
-        // Verificar que el pedido esté en estado RECIBIDO
-        if (pedido.getEstado() != EstadoPedido.RECIBIDO) {
+        // Verificar que el pedido esté en estado COMPLETADO
+        if (pedido.getEstado() != EstadoPedido.COMPLETADO) {
             throw new BadRequestException(
                     "Solo puedes calificar el repartidor de pedidos ya recibidos"
             );

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -12,13 +12,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../shared/services/auth-service';
 import { Ciudad } from '../../../shared/models/ciudad/ciudad';
 import { CiudadService } from '../../services/ciudad/ciudad-service';
 import { NavbarConfig, NavbarMenuItem } from './navbar-models';
 import { NavBarConfigFactory } from './navbar-config';
-import { CarritoFlotanteComponent } from "../carrito-flotante-component/carrito-flotante-component";
 import { NotificacionesDropdownComponent } from "../notificaciones-dropdown/notificaciones-dropdown";
+import { ConfirmDialogComponent } from '../../store/confirm-dialog-component';
 
 @Component({
   selector: 'app-navbar',
@@ -44,6 +45,7 @@ export class NavbarComponent implements OnInit {
   private authService = inject(AuthService);
   private ciudadService = inject(CiudadService);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
   ciudades = signal<Ciudad[]>([]);
   searchTerm = '';
   showMobileMenu = signal(false);
@@ -171,9 +173,16 @@ export class NavbarComponent implements OnInit {
   }
 
   logout(): void {
-    if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-      this.authService.logout();
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro que deseas cerrar sesión?' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.authService.logout();
+      }
+    });
   }
 
   goToLogin(): void {

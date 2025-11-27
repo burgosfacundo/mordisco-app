@@ -4,10 +4,12 @@ import { Footer } from "./shared/components/footer/footer";
 import { AuthService } from './shared/services/auth-service';
 import { NavbarComponent } from './shared/components/navbar/navbar';
 import { NotificacionService } from './shared/services/notificacion/notificacion-service';
+import { ToastContainerComponent } from './shared/components/toast-container/toast-container-component';
+import { ConfirmationDialogComponent } from './shared/components/confirmation-dialog/confirmation-dialog-component';
  
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, NavbarComponent],
+  imports: [RouterOutlet, Footer, NavbarComponent, ToastContainerComponent, ConfirmationDialogComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

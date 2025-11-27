@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionRequestDTO;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionResponseDTO;
@@ -31,7 +32,7 @@ public class HorarioController {
             @Valid @Positive @PathVariable Long idRestaurante,
             @RequestBody @Valid HorarioAtencionRequestDTO dto
     )
-            throws NotFoundException{
+            throws NotFoundException, BadRequestException {
         Long createdId=horarioService.save(idRestaurante, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdId);
     }
@@ -50,7 +51,7 @@ public class HorarioController {
     public ResponseEntity<Void> update(
             @Valid @Positive @PathVariable Long idHorario,
             @Valid @RequestBody HorarioAtencionRequestDTO dto
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         horarioService.update(idHorario,dto);
         return ResponseEntity.ok().build();
     }

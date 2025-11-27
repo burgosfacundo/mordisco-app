@@ -1,9 +1,9 @@
-import { Component, inject, input, OnInit, output, signal, SimpleChanges } from '@angular/core';
+import { Component, inject, input, OnInit, output, signal } from '@angular/core';
+import { NotificationService } from '../../../core/services/notification-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfiguracionSistemaService } from '../../../shared/services/configuracionSistema/configuracion-sistema-service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormValidationService } from '../../../shared/services/form-validation-service';
-import ConfiguracionSistemaResponseDTO from '../../../shared/models/configuracion/ConfiguracionSistemaResponseDTO';
+import ConfiguracionSistemaResponseDTO from '../../../shared/models/configuracion/configuracion-sistema-response-dto';
 import { Router } from '@angular/router';
 
 @Component({
@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 export class ConfiguracionFormComponent implements OnInit{
   private fb = inject(FormBuilder);
   private csService = inject(ConfiguracionSistemaService);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   protected validationService = inject(FormValidationService);
   private router = inject(Router)
 
@@ -59,8 +59,9 @@ export class ConfiguracionFormComponent implements OnInit{
           porcentajeGananciasRepartidor: data.porcentajeGananciasRepartidor,
           modoMantenimiento :  data.modoMantenimiento,
           mensajeMantenimiento : data.mensajeMantenimiento,
-        })},error:() => {
-          this.snackBar.open('❌ Ocurrió un error al cargar los datos del perfil','',{duration: 3000})
+        })
+      },
+      error:() => {
           this.router.navigate(['/'])
         }
     })
@@ -75,13 +76,11 @@ export class ConfiguracionFormComponent implements OnInit{
     this.isSubmitting.set(true);
     this.csService.actualizarConfiguracion(this.configForm.value).subscribe({
       next: () => {
-        this.snackBar.open('✅ Configuracion actualizada correctamente', 'Cerrar', { duration: 3000 });
+        this.notificationService.success('✅ Configuracion actualizada correctamente');
         this.router.navigate(['admin/configuracion'])
       },
-      error: (error) => {
-        console.error('Error:', error);
-        this.snackBar.open('❌ Error al actualizar la configuracion', 'Cerrar', { duration: 4000 });
-
+      error: () => {
+        this.isSubmitting.set(false);
       }
      });
     }
