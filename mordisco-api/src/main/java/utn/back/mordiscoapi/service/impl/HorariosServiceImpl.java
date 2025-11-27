@@ -14,6 +14,8 @@ import utn.back.mordiscoapi.repository.HorarioRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
 import utn.back.mordiscoapi.service.interf.IHorarioService;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,14 +34,10 @@ public class HorariosServiceImpl implements IHorarioService {
     }
 
     @Override
-    public Page<HorarioAtencionResponseDTO> findAllByIdRestaurante(int page,int size,Long idRestaurante) throws NotFoundException {
+    public List<HorarioAtencionResponseDTO> findAllByIdRestaurante(Long idRestaurante) throws NotFoundException {
         if(!restauranteRepository.existsById(idRestaurante)) throw new NotFoundException("Restaurante no encontrado");
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        var horarios = repository.findAllByRestauranteId(idRestaurante,pageable);
-
-        return horarios.map(HorarioAtencionMapper::toDTO);
+        var horarios = repository.findAllByRestauranteId(idRestaurante);
+        return horarios.stream().map(HorarioAtencionMapper::toDTO).toList();
     }
 
     @Override

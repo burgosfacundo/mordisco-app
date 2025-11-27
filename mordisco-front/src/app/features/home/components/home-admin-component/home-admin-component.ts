@@ -22,9 +22,9 @@ export class HomeAdminComponent implements OnInit {
   private pedidoService = inject(PedidoService);
   private usuarioService = inject(UserService);
 
-  protected restaurantes? : RestauranteForCard[];
-  protected pedidos? : PedidoResponse[];
-  protected usuarios? : UserCard[];
+  protected restaurantes : RestauranteForCard[] = [];
+  protected pedidos : PedidoResponse[] = [];
+  protected usuarios : UserCard[] = [];
 
   sizeUsuarios : number = 5;
   pageUsuarios : number = 0;

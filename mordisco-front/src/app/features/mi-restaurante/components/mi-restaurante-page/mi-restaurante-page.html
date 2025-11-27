@@ -143,17 +143,6 @@
             </li>
           }
         </ul>
-
-        <!-- Paginador -->
-        <div class="flex justify-center mt-8">
-          <mat-paginator
-            [length]="lengthHorario"
-            [pageSize]="sizeHorario"
-            [pageIndex]="pageHorario"
-            (page)="onPageChangeHorario($event)"
-            class="bg-white rounded-xl shadow-md">
-          </mat-paginator>
-        </div>
       } @else {
         <div class="empty-state">
           <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">

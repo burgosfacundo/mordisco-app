@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PedidoService } from '../../../shared/services/pedido/pedido-service';
 import { AuthService } from '../../../shared/services/auth-service';
@@ -24,6 +24,8 @@ export class EntregasPage {
   private repartidorService = inject(RepartidorService);
   private dialog = inject(MatDialog);
   pedidos?: PedidoResponse[];
+  adminMode = input<boolean>(false)
+  admin_idUser = input<number>()
   
   sizePedidos : number = 5;
   pagePedidos : number = 0;
@@ -36,15 +38,20 @@ export class EntregasPage {
   }
 
   private loadPedidos(): void {
-    const user = this.authService.currentUser();
-    
-    if (!user?.userId) {
+    let userId : number | undefined
+    if(!this.adminMode()){
+      userId= this.authService.currentUser()?.userId
+    }else{
+      userId=this.admin_idUser()
+    }
+
+    if (!userId) {
       this._snackBar.open('❌ No se encontró información del usuario', 'Cerrar' , { duration: 3000 });
       this.authService.logout();
       return;
     }
 
-    this.repartidorService.getAllPedidosRepartidor(user.userId,this.pagePedidos,this.sizePedidos).subscribe({
+    this.repartidorService.getAllPedidosRepartidor(userId!,this.pagePedidos,this.sizePedidos).subscribe({
         next: (data) => {
           this.pedidos = data.content;
           this.length = data.totalElements;

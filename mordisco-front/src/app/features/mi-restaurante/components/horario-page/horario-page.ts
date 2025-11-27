@@ -11,7 +11,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-horario-page',
-  imports: [HorarioCardComponent, MatPaginator],
+  imports: [HorarioCardComponent],
   templateUrl: './horario-page.html',
 })
 export class HorarioPage implements OnInit{
@@ -25,10 +25,6 @@ export class HorarioPage implements OnInit{
   arrHorarios? : HorarioAtencionResponse[]
   idCurrUser? : number | undefined
   restauranteLeido? : RestauranteResponse 
-  
-  sizeHorarios : number = 5;
-  pageHorarios: number = 0;
-  lengthHorarios : number = 5;
 
   isLoading = true
 
@@ -43,11 +39,9 @@ export class HorarioPage implements OnInit{
   }
   
   listarHorarios(id : number){
-    this.hService.getAllByRestauranteId(id,this.pageHorarios,this.sizeHorarios).subscribe({
-      next:(data) =>{ this.arrHorarios=data.content,
-        this.lengthHorarios = data.totalElements;
-        this.isLoading = false;
-      },error:(e)=> {
+    this.hService.getAllByRestauranteId(id).subscribe({
+      next:(data) => this.arrHorarios=data
+      ,error:(e)=> {
         this._snackBar.open('❌ Error al cargar los horarios','Cerrar' , { duration: 3000 });
         this.router.navigate(['/'])
       }
@@ -65,14 +59,6 @@ export class HorarioPage implements OnInit{
         this.aus.logout()
       }
       })
-    }
-  }
-
-  onPageChangeHorarios(event: PageEvent): void {
-    this.pageHorarios = event.pageIndex
-    this.sizeHorarios = event.pageSize;
-    if (this.idCurrUser){
-      this.encontrarRestaurante(this.idCurrUser);
     }
   }
 

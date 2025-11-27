@@ -192,4 +192,38 @@ public class CalificacionController {
         calificacionService.eliminarCalificacionRepartidor(calificacionId);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(
+            summary = "Obtener calificaciones de pedidos de un cliente",
+            description = """
+            Retorna todas las calificaciones de pedidos que hizo un cliente.
+            Útil para mostrar listar las calificaciones de un mismo cliente.
+        """
+    )
+    @GetMapping("/cliente/pedido/{clienteId}")
+    public ResponseEntity<Page<CalificacionPedidoResponseDTO>> getCalificacionesPedidosCliente(
+            @PathVariable Long clienteId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(
+                calificacionService.getCalificacionesPedidosCliente(clienteId, page, size)
+        );
+    }
+
+    @Operation(
+            summary = "Obtener calificaciones de repartidores de un cliente",
+            description = """
+            Retorna todas las calificaciones de repartidores que hizo un cliente.
+            Útil para mostrar listar las calificaciones de un mismo cliente.
+        """
+    )
+    @GetMapping("/cliente/repartidor/{clienteId}")
+    public ResponseEntity<Page<CalificacionRepartidorResponseDTO>> getCalificacionesRepartidorCliente(
+            @PathVariable Long clienteId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(
+                calificacionService.getCalificacionesRepartidoresCliente(clienteId, page, size)
+        );
+    }
 }

@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import utn.back.mordiscoapi.model.entity.CalificacionPedido;
 import utn.back.mordiscoapi.model.entity.CalificacionRepartidor;
+import utn.back.mordiscoapi.model.entity.Pedido;
 
 import java.util.List;
 import java.util.Optional;
@@ -79,6 +81,11 @@ public interface CalificacionRepartidorRepository extends JpaRepository<Califica
             Long usuarioId,
             Pageable pageable
     );
+
+    @Query(
+            value = "SELECT * FROM calificaciones_repartidor cr WHERE cr.usuario_id = :usuarioId",
+            nativeQuery = true)
+    Page<CalificacionRepartidor> findCalificacionesRealizadasPorCliente(@Param("usuarioId") Long id, Pageable pageable);
 
     @Query("""
         SELECT cr.repartidor,

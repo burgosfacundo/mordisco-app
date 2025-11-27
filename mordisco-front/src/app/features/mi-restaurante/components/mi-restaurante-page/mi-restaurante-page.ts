@@ -28,9 +28,9 @@ import CalificacionPedidoResponseDTO from '../../../../shared/models/calificacio
     PromocionCardComponent,
     CalificacionComponent,
     HorarioRestauranteComponent,
-    MatPaginator,
-    RestauranteFormComponent
-  ],
+    RestauranteFormComponent,
+    MatPaginator
+],
   templateUrl: './mi-restaurante-page.html'
 })
 export class MiRestaurantePageComponent implements OnInit {
@@ -56,11 +56,6 @@ export class MiRestaurantePageComponent implements OnInit {
   sizeCalificacion: number = 5;
   pageCalificacion: number = 0;
   lengthCalificacion: number = 0;
-
-  // Paginación Horarios
-  sizeHorario: number = 5;
-  pageHorario: number = 0;
-  lengthHorario: number = 0;
 
   isLoadingRestaurante = true;
 
@@ -130,13 +125,10 @@ export class MiRestaurantePageComponent implements OnInit {
     if (!idRestaurante) return;
 
     this.horarioService.getAllByRestauranteId(
-      idRestaurante,
-      this.pageHorario,
-      this.sizeHorario
+      idRestaurante
     ).subscribe({
       next: (response) => {
-        this.horariosDeAtencion = response.content;
-        this.lengthHorario = response.totalElements;
+        this.horariosDeAtencion = response
       }
     });
   }
@@ -167,12 +159,6 @@ export class MiRestaurantePageComponent implements OnInit {
         this.snackBar.open('❌ Error al eliminar la promoción', 'Cerrar', { duration: 4000 });
       }
     });
-  }
-
-  onPageChangeHorario(event: PageEvent): void {
-    this.pageHorario = event.pageIndex;
-    this.sizeHorario = event.pageSize;
-    this.cargarHorarios();
   }
 
   onPageChangePromocion(event: PageEvent): void {

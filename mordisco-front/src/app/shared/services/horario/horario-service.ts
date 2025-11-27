@@ -18,9 +18,8 @@ export class HorarioService {
         return this.http.post<string>(`${environment.apiUrl}/restaurantes/horarios/${idRestaurante}`,dto)
     }
 
-    getAllByRestauranteId(id : number,page : number, size : number) : Observable<PaginationResponse<HorarioAtencionResponse>>{
-        const params = new HttpParams().set('page',page).set('size',size);
-        return this.http.get<PaginationResponse<HorarioAtencionResponse>>(`${environment.apiUrl}/restaurantes/horarios/${id}`,{params})
+    getAllByRestauranteId(id : number) : Observable<HorarioAtencionResponse[]>{
+        return this.http.get<HorarioAtencionResponse[]>(`${environment.apiUrl}/restaurantes/horarios/${id}`)
     }
 
     update(id : number, dto : HorarioAtencionRequest) : Observable<string>{

@@ -2,6 +2,8 @@ import { Component, inject, input, Input } from '@angular/core';
 import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
 import HorarioAtencion from '../../models/horario/horario-atencion-request';
 import { Router } from '@angular/router';
+import { HorarioService } from '../../services/horario/horario-service';
+import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 
 
 @Component({
@@ -11,6 +13,8 @@ import { Router } from '@angular/router';
 })
 export class RestauranteCardComponent {
   restaurante = input<RestauranteForCard>()
+  listaHorarios : HorarioAtencionResponse [] = []
+  private haService = inject(HorarioService)
   private router : Router = inject(Router)
 
   getHorarios(): string {
@@ -27,10 +31,21 @@ export class RestauranteCardComponent {
     return this.getHorarios() === 'Cerrado' ? false : true
   }
 
+  getHorariosByRestaurante(){
+    if(this.restaurante()?.id){
+      this.haService.getAllByRestauranteId(this.restaurante()?.id!).subscribe({
+      next : (data) => this.listaHorarios=data,
+      error : (e)=>{
+        console.log("No se ha podido listar los horarios", e)
+      }
+      })
+    }
+  }
+
   private getHorarioDeHoy(): HorarioAtencion | undefined {
     const dias = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     const dia = dias[new Date().getDay()];
-    return this.restaurante()?.horariosDeAtencion.find(h => h.dia === dia);
+    return this.listaHorarios.find(h => h.dia === dia);
   }
 
   private nowInMinutes(): number {

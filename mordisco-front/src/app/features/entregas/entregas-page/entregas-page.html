@@ -1,11 +1,13 @@
-<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8 mt-20">
-  
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
+  @if(!adminMode()){
   <!-- Header -->
-  <div class="text-center space-y-2">
+  <div class="text-center space-y-2  mt-20">
     <h1 class="titulo-hero">Mis pedidos entregados</h1>
     <p class="text-gray-600 text-lg">Historial completo de tus pedidos entregados</p>
   </div>
-
+  }@else {
+      <p class="titulo-seccion">Historial completo de los pedidos que se asignó y entregó el repartidor</p>
+  }
   <!-- Contenido -->
   <div class="mt-8">
     @if (isLoading) {

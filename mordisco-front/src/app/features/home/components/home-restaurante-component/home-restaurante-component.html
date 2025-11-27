@@ -21,7 +21,9 @@
   </div>
 
 
-  <!-- Sección Pedidos Pendientes -->
+  <!-- Sección Pedidos Pendientes   -->
+
+
   <section class="space-y-6">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
@@ -42,7 +44,8 @@
       </div>
     } @else {
       @if (pedidosPendientes && pedidosPendientes.length > 0) {
-        <!-- Lista de Pedidos -->
+        <!-- Lista de Pedidos   -->
+
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           @for (pedido of pedidosPendientes; track pedido.id) {
             <li class="fade-in">
@@ -58,7 +61,8 @@
           }
         </ul>
 
-        <!-- Paginador -->
+        <!-- Paginador  -->
+
         <div class="flex justify-center mt-8">
           <mat-paginator
             [length]="length"
@@ -69,7 +73,8 @@
           </mat-paginator>
         </div>
       } @else {
-        <!-- Empty State -->
+        <!-- Empty State  -->
+
         <div class="empty-state">
           <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 

@@ -31,18 +31,7 @@
                                 </div>    
                             </li>
                         }
-                    </ul>
-                    
-                    <!-- Paginador -->
-                    <div class="flex justify-center mt-8">
-                        <mat-paginator
-                            [length]="lengthHorarios"
-                            [pageSize]="sizeHorarios"
-                            [pageIndex]="pageHorarios"
-                            (page)="onPageChangeHorarios($event)"
-                            class="bg-white rounded-xl shadow-md">
-                        </mat-paginator>
-                    </div>    
+                    </ul> 
                 }@else{
                     <!-- Empty State -->
                     <div class="empty-state">

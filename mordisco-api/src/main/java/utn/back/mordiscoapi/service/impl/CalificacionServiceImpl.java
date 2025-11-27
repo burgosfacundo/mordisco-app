@@ -280,4 +280,22 @@ public class CalificacionServiceImpl {
             throw new BadRequestException("Ya calificaste al repartidor de este pedido");
         }
     }
+
+    @Transactional(readOnly = true)
+    public Page<CalificacionPedidoResponseDTO> getCalificacionesPedidosCliente(
+            Long clienteId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return calificacionPedidoRepository.findCalificacionesRealizadasPorCliente(clienteId, pageable)
+                .map(CalificacionMapper::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CalificacionRepartidorResponseDTO> getCalificacionesRepartidoresCliente(
+            Long clienteId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return calificacionRepartidorRepository.findCalificacionesRealizadasPorCliente(clienteId, pageable)
+                .map(CalificacionMapper::toDTO);
+    }
 }

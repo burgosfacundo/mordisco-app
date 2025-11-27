@@ -15,6 +15,8 @@ import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionRequestDTO;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionResponseDTO;
 import utn.back.mordiscoapi.service.interf.IHorarioService;
 
+import java.util.List;
+
 @Tag(name = "Promociones", description = "Operaciones relacionadas con las promociones de los restaurantes")
 @RestController
 @RequestMapping("/api/restaurantes/horarios")
@@ -35,11 +37,10 @@ public class HorarioController {
     }
 
     @GetMapping("/{idRestaurante}")
-    public ResponseEntity<Page<HorarioAtencionResponseDTO>> getAllByIdRestaurante(
-            @RequestParam @Valid int page, @RequestParam @Valid @Positive int size,
+    public ResponseEntity<List<HorarioAtencionResponseDTO>> getAllByIdRestaurante(
             @Valid @Positive @PathVariable Long idRestaurante
     ) throws NotFoundException {
-        return ResponseEntity.ok().body(horarioService.findAllByIdRestaurante(page,size,idRestaurante));
+        return ResponseEntity.ok().body(horarioService.findAllByIdRestaurante(idRestaurante).stream().toList());
     }
 
 

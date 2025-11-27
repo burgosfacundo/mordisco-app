@@ -31,6 +31,7 @@ import { CalificacionFormPage } from './features/calificacion/calificacion-form-
 import { EntregasPage } from './features/entregas/entregas-page/entregas-page';
 import { ConfiguracionFormPage } from './features/configuracion-sistema/configuracion-form-page/configuracion-form-page';
 import { ConfiguracionPage } from './features/configuracion-sistema/configuracion-page/configuracion-page';
+import { DetalleUsuarioPage } from './features/admin/detalle-usuario-page/detalle-usuario-page';
 
 export const routes: Routes = [
   // ==========================================
@@ -157,7 +158,8 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard(['ROLE_ADMIN'])],
     children: [
       {path : 'configuracion', component : ConfiguracionPage},
-      {path : 'configuracion/edit', component :ConfiguracionFormPage}
+      {path : 'configuracion/edit', component :ConfiguracionFormPage},
+      {path : 'detalle-usuario/:idRol/:idUser', component : DetalleUsuarioPage},
     ]
   },
 

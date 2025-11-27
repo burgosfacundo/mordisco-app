@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -32,6 +32,8 @@ export class MisPedidosClientePage implements OnInit {
 
   pedidos = signal<PedidoResponse[]>([])
   isLoading = signal(true)
+  adminMode = input<boolean>(false)
+  admin_idUser = input<number>()
 
   // Paginación
   page = 0
@@ -46,7 +48,12 @@ export class MisPedidosClientePage implements OnInit {
   }
 
   private cargarPedidos(): void {
-    const userId = this.authService.currentUser()?.userId
+    let userId : number | undefined
+    if(!this.adminMode()){
+      userId= this.authService.currentUser()?.userId
+    }else{
+      userId=this.admin_idUser()
+    }
 
     if (!userId) {
       this.snackBar.open('Error: Usuario no autenticado', 'Cerrar', { duration: 3000 })

@@ -1,5 +1,5 @@
-import { Component, input, Input } from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { Component, inject, input, Input } from '@angular/core';
+import { Router, RouterLink } from "@angular/router";
 import UserCard from '../../models/user/user-card';
 import UserPedido from '../../models/user/user-pedido';
 
@@ -10,10 +10,15 @@ import UserPedido from '../../models/user/user-pedido';
 })
 export class UsuarioCardComponent {
   usuario = input<UserCard | UserPedido>();
+  private router = inject(Router)
 
   getInitials(): string {
     const first = this.usuario()?.nombre.charAt(0) || '';
     const last = this.usuario()?.apellido.charAt(0) || '';
     return (first + last).toUpperCase() || 'U';
+  }
+
+  verDetalles(){
+    this.router.navigate(['/admin/detalle-usuario/', this.usuario()?.rol, this.usuario()?.id])
   }
 }

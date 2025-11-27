@@ -58,4 +58,14 @@ export class CalificacionService {
         return this.http.delete<void>(`${environment.apiUrl}/calificaciones/repartidor/delete/${id}`)
     }
 
+    getCalificacionesPedidosCliente(page : number, size : number, clienteId : number) : Observable<PaginationResponse<CalificacionPedidoResponseDTO>>{
+        const params = new HttpParams().set('page', page).set('size', size)
+        return this.http.get<PaginationResponse<CalificacionPedidoResponseDTO>>(`${environment.apiUrl}/calificaciones/cliente/pedido/${clienteId}`, {params})
+    }
+
+    getCalificacionesRepartidorCliente(page:number, size:number, clienteId:number) : Observable<PaginationResponse<CalificacionRepartidorResponseDTO>>{
+        const params = new HttpParams().set('page', page).set('size', size)
+        return this.http.get<PaginationResponse<CalificacionRepartidorResponseDTO>>(`${environment.apiUrl}/calificaciones/cliente/repartidor/${clienteId}`, {params})
+    }
+
 }
