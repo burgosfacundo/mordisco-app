@@ -1,0 +1,43 @@
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
+  <!-- Header -->
+  <div class="text-center space-y-2  mt-20">
+    <h1 class="titulo-hero">Pedidos del sistema</h1>
+    <p class="text-gray-600 text-lg">Listado de pedidos de todos los restaurantes</p>
+  </div>
+
+    @if (isLoadingPedidos) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando pedidos...</p>
+      </div>
+    } @else {
+      @if (pedidos && pedidos.length > 0) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (pedido of pedidos; track pedido.id) {
+              <app-pedido-card-component
+                [pedido]="pedido"
+                class="block h-full">
+              </app-pedido-card-component>
+          }
+        </div>
+
+        <!-- Paginador -->
+<div class="flex justify-center mt-8">
+          <mat-paginator
+            [length]="lengthPedidos"
+            [pageSize]="sizePedidos"
+            [pageIndex]="pagePedidos"
+            (page)="onPageChangePedidos($event)"
+            class="bg-white rounded-xl shadow-md">
+          </mat-paginator>
+        </div>
+      } @else {
+  <div class="empty-state">
+          <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+          <h3 class="empty-title">No hay pedidos registrados</h3>
+        </div>
+      }
+    }

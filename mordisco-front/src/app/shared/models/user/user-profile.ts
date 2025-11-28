@@ -1,5 +1,5 @@
 export default interface UserProfile{
-    id? : number,
+    id : number,
     nombre : string,
     apellido : string,
     telefono : string,

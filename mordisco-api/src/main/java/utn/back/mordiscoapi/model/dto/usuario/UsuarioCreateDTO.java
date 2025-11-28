@@ -35,4 +35,5 @@ public record UsuarioCreateDTO(
         @NotNull(message = "El rol del usuario es obligatorio")
         Long rolId
 ) {
+
 }

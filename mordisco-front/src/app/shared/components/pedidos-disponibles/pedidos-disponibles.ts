@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, OnDestroy, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, OnDestroy, OnInit, output, Output, signal } from '@angular/core';
 import { interval, startWith, Subscription, switchMap, catchError, of } from 'rxjs';
 import PedidoResponse from '../../models/pedido/pedido-response';
 import { PedidoService } from '../../services/pedido/pedido-service';
@@ -34,6 +34,8 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
   private refreshSubscription?: Subscription;
 
   @Output() pedidoAceptado = new EventEmitter<number>();
+  verDetalles = output<number>();
+
 
   ngOnInit(): void {
     this.obtenerUbicacionYCargarPedidos();
@@ -203,6 +205,12 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
         // El error ya se maneja en el interceptor
       }
     });
+  }
+  
+  onVerDetalles(pedido: PedidoConDistancia): void {
+    if (pedido.id) {
+      this.verDetalles.emit(pedido.id);
+    }
   }
 
   /**

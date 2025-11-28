@@ -10,6 +10,7 @@ import { ICalificacionBase } from '../../models/calificacion/calificacion-base';
 })
 export class CalificacionComponent{
   calificacion = input<ICalificacionBase>();
+  repartidorFlag = input<boolean>(false)
 
   calificacionPromedio1Dec(): number {
     const prom = this.calificacion()?.puntajePromedio

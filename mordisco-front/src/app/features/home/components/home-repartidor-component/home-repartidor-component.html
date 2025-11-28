@@ -79,7 +79,8 @@
   <!-- Tab Content: Pedidos Disponibles -->
   @if (tabActiva === 'disponibles') {
     <app-pedidos-disponibles 
-      (pedidoAceptado)="onPedidoAceptado($event)">
+      (pedidoAceptado)="onPedidoAceptado($event)"
+      (verDetalles)="onVerDetalle($event)">
     </app-pedidos-disponibles>
   }
 
@@ -113,7 +114,7 @@
                   [isRepartidor]="true"
                   [pedido]="pedido"
                   (marcarRecibido)="marcarRecibido($event)"
-                  (verDetalles)="verDetalle($event)"
+                  (verDetalles)="onVerDetalle($event)"
                   class="block h-full">
                 </app-pedido-card-component>
               </li>

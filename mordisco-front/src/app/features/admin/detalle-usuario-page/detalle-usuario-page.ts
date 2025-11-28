@@ -13,22 +13,25 @@ import CalificacionRepartidorResponseDTO from '../../../shared/models/calificaci
 import { CalificacionCardAdmin } from "../../../shared/components/calificacion-card-admin/calificacion-card-admin";
 import RestauranteResponse from '../../../shared/models/restaurante/restaurante-response';
 import { RestauranteService } from '../../../shared/services/restaurante/restaurante-service';
+import { PromptService } from '../../../core/services/confirmation-prompt-service';
+import { ToastService } from '../../../core/services/toast-service';
 
 @Component({
   selector: 'app-detalle-usuario-page',
-  imports: [MisPedidosClientePage, EntregasPage, MatIcon, MatPaginator, CalificacionCardAdmin],
+  imports: [MisPedidosClientePage, EntregasPage, MatIcon, MatPaginator, CalificacionCardAdmin, EntregasPage],
   templateUrl: './detalle-usuario-page.html',
 })
 export class DetalleUsuarioPage {
 
-  private _snackBar = inject(MatSnackBar);
   private uService = inject(UserService);
   private rService = inject (RestauranteService)
   private cService = inject(CalificacionService);
+  private toastService = inject(ToastService)
+  private promptService = inject(PromptService)  
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  protected user? : UserProfile
+  protected user! : UserProfile
   protected rol? : string | null
   protected restaurante? : RestauranteResponse
   calificacionesPedidos?: CalificacionPedidoResponseDTO[];
@@ -65,9 +68,10 @@ export class DetalleUsuarioPage {
 
         if(this.user.id){
           this.setFlag();
-          this.buscarRestaurante()
           this.cargarCalificacionesPedidos(this.rol!);
           this.cargarCalificacionesRepartidor(this.rol!);
+          if(this.rol === 'ROLE_RESTAURANTE'){
+            this.buscarRestaurante()}
         }
       },
       error: () => {
@@ -139,6 +143,20 @@ export class DetalleUsuarioPage {
       next:(r)=> {this.restaurante= r
         this.cargarCalificacionesPedidos(this.rol!);
       }})
+  }
+
+  bloquearCuenta(){
+    this.promptService.show({
+      title: 'Bloquear Cuenta',
+      message: 'Indica el motivo del bloqueo',
+      placeholder: 'Ej: Muchas quejas sobre incoscistencias',
+      required: true,
+      confirmText: 'Bloquear Cuenta',
+      type: 'danger'
+    }).subscribe(result => {
+      if (!result.confirmed) return;
+        //Bloquear cuenta y si es restaurante desactivarlo
+    });
   }
 
   volver(): void {

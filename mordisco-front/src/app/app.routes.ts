@@ -32,6 +32,10 @@ import { EntregasPage } from './features/entregas/entregas-page/entregas-page';
 import { ConfiguracionFormPage } from './features/configuracion-sistema/configuracion-form-page/configuracion-form-page';
 import { ConfiguracionPage } from './features/configuracion-sistema/configuracion-page/configuracion-page';
 import { DetalleUsuarioPage } from './features/admin/detalle-usuario-page/detalle-usuario-page';
+import { CalificacionPage } from './features/calificacion/calificacion-page/calificacion-page';
+import { UsuariosPage } from './features/admin/usuarios-page/usuarios-page';
+import { PedidosAdminPage } from './features/admin/pedidos-admin-page/pedidos-admin-page';
+import { RestauranteAdminPage } from './features/admin/restaurante-admin-page/restaurante-admin-page';
 
 export const routes: Routes = [
   // ==========================================
@@ -146,7 +150,8 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard(['ROLE_REPARTIDOR'])],
     children: [
       { path : 'pedidos/historial', component : EntregasPage},
-      { path : 'pedidos/detalle/:id', component: DetallePedidoPage}
+      { path : 'pedidos/detalle/:id', component: DetallePedidoPage},
+      { path : 'calificaciones', component : CalificacionPage}
     ]
   },
 
@@ -159,6 +164,10 @@ export const routes: Routes = [
     children: [
       {path : 'configuracion', component : ConfiguracionPage},
       {path : 'configuracion/edit', component :ConfiguracionFormPage},
+      {path : 'pedidos/detalle/:id', component: DetallePedidoPage },
+      {path : 'usuarios', component: UsuariosPage},
+      {path : 'pedidos', component: PedidosAdminPage},
+      {path : 'restaurantes', component: RestauranteAdminPage},
       {path : 'detalle-usuario/:idRol/:idUser', component : DetalleUsuarioPage},
     ]
   },

@@ -241,12 +241,18 @@
       </div>
 
       <!-- Footer con botón de acción -->
-      <div class="px-6 pb-6 pt-2">
+      <div class="px-6 pb-6 pt-2 space-y-2">
         <button
           (click)="onAceptarPedido(pedido)"
           class="w-full py-3 rounded-lg bg-linear-to-r from-primary-500 to-primary-600 text-white font-bold text-base hover:from-primary-600 hover:to-primary-700 active:scale-95 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
         >
           Aceptar Pedido
+        </button>
+        <button
+          (click)="onVerDetalles(pedido)"
+          class="w-full py-3 rounded-lg bg-linear-to-r from-primary-500 to-primary-600 text-white font-bold text-base hover:from-primary-600 hover:to-primary-700 active:scale-95 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+        >
+          Ver Detalles
         </button>
       </div>
     </article>

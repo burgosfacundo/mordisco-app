@@ -7,6 +7,8 @@ export interface ConfirmationConfig {
   confirmText?: string;
   cancelText?: string;
   type?: 'danger' | 'warning' | 'info';
+  showCancelButton?: boolean;
+
 }
 
 export interface ConfirmationResult {
@@ -45,8 +47,8 @@ export class ConfirmationService {
       ...config,
       confirmText: config.confirmText || 'Confirmar',
       cancelText: config.cancelText || 'Cancelar',
-      type: config.type || 'warning'
-    });
+      type: config.type || 'warning',
+      showCancelButton: config.showCancelButton ?? true    });
     
     this.currentResult = result;
     this.showDialog.set(true);

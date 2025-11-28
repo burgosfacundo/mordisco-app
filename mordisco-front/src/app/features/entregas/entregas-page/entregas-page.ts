@@ -3,13 +3,12 @@ import { ToastService } from '../../../core/services/toast-service';
 import { PedidoService } from '../../../shared/services/pedido/pedido-service';
 import { AuthService } from '../../../shared/services/auth-service';
 import { RepartidorService } from '../../../shared/services/repartidor/repartidor-service';
-import { MatDialog } from '@angular/material/dialog';
 import PedidoResponse from '../../../shared/models/pedido/pedido-response';
-import { ConfirmDialogComponent } from '../../../shared/store/confirm-dialog-component';
 import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { PedidoCardComponent } from "../../../shared/components/pedido-card-component/pedido-card-component";
 import { MatIcon } from "@angular/material/icon";
 import { Router } from '@angular/router';
+import { ConfirmationService } from '../../../core/services/confirmation-service';
 
 @Component({
   selector: 'app-entregas-page',
@@ -22,7 +21,7 @@ export class EntregasPage {
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
   private repartidorService = inject(RepartidorService);
-  private dialog = inject(MatDialog);
+  private confirmationService = inject(ConfirmationService);
   pedidos?: PedidoResponse[];
   adminMode = input<boolean>(false)
   admin_idUser = input<number>()
@@ -61,27 +60,25 @@ export class EntregasPage {
     });
   }
 
-  marcarRecibido(pedidoID : number) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '300px',
-      data: { mensaje: '¿Estás seguro de que querés aceptar este pedido?' }
-    });
+  marcarRecibido(pedidoId: number): void {
+    this.confirmationService.confirm({
+      title: 'Marcar como entregado',
+      message: '¿Estás seguro que este pedido fue recibido por el cliente? Esta acción no se puede deshacer.',
+      confirmText: 'Rechazar',
+      type: 'danger'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado === true) {
-        this.guardarAceptacion(pedidoID);
-      }
+      this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
+        next: () => {
+          this.toastService.success('✅ Pedido marcado como "Completado"');
+          this.loadPedidos();
+        }
+      });
     });
   }
 
-  guardarAceptacion(pedidoId : number) {
-    this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
-          next: () => {
-            this.toastService.success('✅ Pedido marcado como "Recibido"');
-            this.loadPedidos();
-          }
-    });
-  }
+
 
   verDetalle(pedidoId: number): void {
     this.router.navigate(['/repartidor/pedidos/detalle', pedidoId])

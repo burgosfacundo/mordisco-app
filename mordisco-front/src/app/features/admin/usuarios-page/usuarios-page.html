@@ -1,0 +1,43 @@
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
+  <!-- Header -->
+  <div class="text-center space-y-2  mt-20">
+    <h1 class="titulo-hero">Usuarios del sistema</h1>
+    <p class="text-gray-600 text-lg">Listado de clientes, restaurantes, repartidores y administradores</p>
+  </div>
+
+    @if (isLoadingUsuarios) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando usuarios...</p>
+      </div>
+    } @else {
+      @if (usuarios && usuarios.length > 0) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (usuario of usuarios; track usuario.id) {
+              <app-usuario-card-component 
+                [usuario]="usuario"
+                class="block h-full">
+              </app-usuario-card-component>
+          }
+        </div>
+
+        <!-- Paginador -->
+        <div class="flex justify-center mt-8">
+          <mat-paginator
+            [length]="lengthUsuarios"
+            [pageSize]="sizeUsuarios"
+            [pageIndex]="pageUsuarios"
+            (page)="onPageChangeUsuarios($event)"
+            class="bg-white rounded-xl shadow-md">
+          </mat-paginator>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <h3 class="empty-title">No hay usuarios registrados</h3>
+        </div>
+      }
+    }

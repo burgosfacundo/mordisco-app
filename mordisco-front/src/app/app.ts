@@ -6,10 +6,11 @@ import { NavbarComponent } from './shared/components/navbar/navbar';
 import { NotificacionService } from './shared/services/notificacion/notificacion-service';
 import { ToastContainerComponent } from './shared/components/toast-container/toast-container-component';
 import { ConfirmationDialogComponent } from './shared/components/confirmation-dialog/confirmation-dialog-component';
+import { PromptDialogComponent } from "./shared/components/confirmation-dialog/confirmation-prompt-component/prompt-dialog-component";
  
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, NavbarComponent, ToastContainerComponent, ConfirmationDialogComponent],
+  imports: [RouterOutlet, Footer, NavbarComponent, ToastContainerComponent, ConfirmationDialogComponent, PromptDialogComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

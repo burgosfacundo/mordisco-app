@@ -32,11 +32,13 @@
           </div>
 
           <div class="dialog-footer">
+            @if(currentConfig()?.showCancelButton){
             <button 
               class="btn-cancel"
               (click)="confirmationService.cancelAction()">
               {{ currentConfig()?.cancelText }}
             </button>
+           } 
             <button 
               class="btn-confirm"
               [class]="'btn-confirm-' + currentConfig()?.type"

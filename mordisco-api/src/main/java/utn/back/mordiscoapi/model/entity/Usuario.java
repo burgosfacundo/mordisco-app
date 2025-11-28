@@ -48,6 +48,9 @@ public class Usuario implements UserDetails {
     @Column
     private Double longitudActual;
 
+    @Column
+    private Boolean activo;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Direccion> direcciones;
 

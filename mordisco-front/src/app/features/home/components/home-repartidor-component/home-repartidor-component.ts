@@ -13,6 +13,7 @@ import { ToastService } from '../../../../core/services/toast-service';
 import { PedidosDisponiblesComponent } from '../../../../shared/components/pedidos-disponibles/pedidos-disponibles';
 import { GananciasRepartidorComponent } from '../../../../shared/components/ganancias-repartidor/ganancias-repartidor';
 import { CommonModule } from '@angular/common';
+import { ConfirmationService } from '../../../../core/services/confirmation-service';
 
 @Component({
   selector: 'app-home-repartidor-component',
@@ -24,7 +25,7 @@ export class HomeRepartidorComponent {
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
   private repartidorService = inject(RepartidorService);
-  private dialog = inject(MatDialog);
+  private confirmationService = inject(ConfirmationService);
   private router = inject(Router)
 
   // Tab activa
@@ -41,6 +42,12 @@ export class HomeRepartidorComponent {
   restaurante?: RestauranteResponse;
 
   ngOnInit(): void {
+        /*
+    if(true){
+      this.cuentaDesactivada();
+      return;
+    }
+    */
     this.loadPedidosEnCamino();
   }
 
@@ -82,29 +89,26 @@ export class HomeRepartidorComponent {
     });
   }
 
-  marcarRecibido(pedidoID : number) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '300px',
-      data: { mensaje: '¿Estás seguro de que querés aceptar este pedido?' }
-    });
+  marcarRecibido(pedidoId: number): void {
+    this.confirmationService.confirm({
+      title: 'Marcar como entregado',
+      message: '¿Estás seguro que este pedido fue recibido por el cliente? Esta acción no se puede deshacer.',
+      confirmText: 'Entregado',
+      type: 'warning'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado === true) {
-        this.guardarAceptacion(pedidoID);
-      }
-    });
-  }
-
-  guardarAceptacion(pedidoId : number) {
-    this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
-          next: () => {
-            this.toastService.success('✅ Pedido marcado como "Recibido"');
-            this.loadPedidosEnCamino();
-          }
+      this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
+        next: () => {
+          this.toastService.success('✅ Pedido marcado como "Completado"');
+          this.loadPedidosEnCamino();
+        }
+      });
     });
   }
 
-  verDetalle(pedidoId: number): void {
+
+  onVerDetalle(pedidoId: number): void {
     this.router.navigate(['/repartidor/pedidos/detalle', pedidoId])
   }
 
@@ -113,4 +117,16 @@ export class HomeRepartidorComponent {
     this.sizePedidos = event.pageSize;
     this.loadPedidosEnCamino();
   }
+
+  cuentaDesactivada(){
+    this.confirmationService.confirm({
+      title: 'Su cuenta esta bloqueada',
+      message: 'Motivo: tal. Para ser desbloqueado envia un mail a mordisco@gmail.com',
+      confirmText: 'Ok',
+      type: 'danger',
+      showCancelButton : false
+    }).subscribe((confirmed) => {
+      if (confirmed) this.authService.logout(); 
+    });
+  } 
 }

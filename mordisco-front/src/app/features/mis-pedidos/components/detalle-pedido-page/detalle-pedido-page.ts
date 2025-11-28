@@ -146,7 +146,7 @@ export class DetallePedidoPage implements OnInit {
     });
   }
   volver(): void {
-    this.router.navigate(['/restaurante/pedidos']);
+    this.router.navigate(['/cliente/pedidos']);
   }
 
     /**

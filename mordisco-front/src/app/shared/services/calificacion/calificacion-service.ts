@@ -26,7 +26,7 @@ export class CalificacionService {
 
     getCalificacionesRestaurante(id : number, page : number, size : number) : Observable<PaginationResponse<CalificacionPedidoResponseDTO>>{
         const params = new HttpParams().set('page', page).set('size', size)
-        return this.http.get<PaginationResponse<CalificacionPedidoResponseDTO>>(`${environment.apiUrl}/calificaciones/restaurante/${id}`)
+        return this.http.get<PaginationResponse<CalificacionPedidoResponseDTO>>(`${environment.apiUrl}/calificaciones/restaurante/${id}`, {params})
     }
 
     getEstadisticasRestaurante(id: number) : Observable<EstadisticasRestauranteDTO>{
@@ -43,7 +43,7 @@ export class CalificacionService {
 
     getCalificacionesRepartidor(id : number, page : number, size : number) : Observable<PaginationResponse<CalificacionRepartidorResponseDTO>>{
         const params = new HttpParams().set('page', page).set('size', size)
-        return this.http.get<PaginationResponse<CalificacionRepartidorResponseDTO>>(`${environment.apiUrl}/calificaciones/repartidor/${id}`)
+        return this.http.get<PaginationResponse<CalificacionRepartidorResponseDTO>>(`${environment.apiUrl}/calificaciones/repartidor/${id}`, {params})
     }
 
     getCalificacionRepartidor(id : number) : Observable<CalificacionRepartidorResponseDTO>{

@@ -18,7 +18,10 @@ public record UsuarioResponseDTO(
         String email,
         @Schema(description = "Rol del usuario")
         RolDTO rol,
+        @Schema(description = "Activo del usuario")
+        Boolean activo,
         @Schema(description = "Direcciones del usuario")
         List<DireccionResponseDTO> direcciones
+
 ) {
 }

@@ -20,10 +20,6 @@ export class HomeAdminComponent implements OnInit {
   private pedidoService = inject(PedidoService);
   private usuarioService = inject(UserService);
 
-  protected restaurantes : RestauranteForCard[] = [];
-  protected pedidos : PedidoResponse[] = [];
-  protected usuarios : UserCard[] = [];
-
   sizeUsuarios : number = 5;
   pageUsuarios : number = 0;
   lengthUsuarios : number = 5;
@@ -56,7 +52,6 @@ export class HomeAdminComponent implements OnInit {
     
     this.restauranteService.getAll(this.pageRestaurantes,this.sizeRestaurantes).subscribe({
       next: (data) => {
-        this.restaurantes = data.content;
         this.lengthRestaurantes = data.totalElements
         this.isLoadingRestaurantes = false;
       },
@@ -70,7 +65,6 @@ export class HomeAdminComponent implements OnInit {
   loadPedidos(): void {
     this.pedidoService.getAll(this.pagePedidos,this.sizePedidos).subscribe({
       next: (data) => {
-        this.pedidos = data.content;
         this.lengthPedidos = data.totalElements
         this.isLoadingPedidos = false;
       },
@@ -83,10 +77,7 @@ export class HomeAdminComponent implements OnInit {
 
   loadUsuarios(): void {
     this.usuarioService.getAll(this.pageUsuarios,this.sizeUsuarios).subscribe({
-      next: (data) => {
-        console.log(data.content);
-        
-        this.usuarios = data.content;
+      next: (data) => {        
         this.lengthUsuarios = data.totalElements
         this.isLoadingUsuarios = false;
       },
@@ -96,22 +87,5 @@ export class HomeAdminComponent implements OnInit {
     });
   }
 
-  onPageChangePedidos(event: PageEvent): void {
-    this.pagePedidos = event.pageIndex
-    this.sizePedidos = event.pageSize;
-    this.loadPedidos();
-  }
 
-    onPageChangeRestaurantes(event: PageEvent): void {
-    this.pageRestaurantes = event.pageIndex
-    this.sizeRestaurantes = event.pageSize;
-    this.loadRestaurantes();
-  }
-
-
-    onPageChangeUsuarios(event: PageEvent): void {
-    this.pageUsuarios = event.pageIndex
-    this.sizeUsuarios = event.pageSize;
-    this.loadUsuarios();
-  }
 }

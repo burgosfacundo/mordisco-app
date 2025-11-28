@@ -11,6 +11,8 @@ import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
+import { PromptService } from '../../../../core/services/confirmation-prompt-service';
+import { PromptDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-prompt-component/prompt-dialog-component';
 
 @Component({
   selector: 'app-mis-pedidos-cliente-page',
@@ -20,7 +22,7 @@ import { ConfirmationService } from '../../../../core/services/confirmation-serv
     MatPaginatorModule,
     MatTabsModule,
     MatIconModule,
-    DetallePedidoComponent
+    DetallePedidoComponent,
 ],
   templateUrl: './mis-pedidos-cliente-page.html',
   styleUrl: './mis-pedidos-cliente-page.css'
@@ -29,7 +31,7 @@ export class MisPedidosClientePage implements OnInit {
   private pedidoService = inject(PedidoService)
   private authService = inject(AuthService)
   private toastService = inject(ToastService)
-  private confirmationService = inject(ConfirmationService)
+  private promptService = inject(PromptService)
   private router = inject(Router)
 
   pedidos = signal<PedidoResponse[]>([])
@@ -112,20 +114,25 @@ export class MisPedidosClientePage implements OnInit {
   }
 
   verDetalle(pedidoId: number): void {
-    this.router.navigate(['/cliente/pedidos/detalle', pedidoId])
+    if(this.adminMode()){
+      this.router.navigate(['/admin/pedidos/detalle', pedidoId])
+    }else{
+      this.router.navigate(['/cliente/pedidos/detalle', pedidoId])
+    }
   }
 
   cancelarPedido(pedidoId: number): void {
-    this.confirmationService.confirm({
+    this.promptService.show({
       title: 'Cancelar Pedido',
-      message: '¿Estás seguro de cancelar este pedido?',
-      confirmText: 'Sí, cancelar',
-      cancelText: 'No, mantener',
+      message: 'Indica el motivo de la cancelación',
+      placeholder: 'Ej: Cliente solicitó cancelación',
+      required: true,
+      confirmText: 'Cancelar pedido',
       type: 'danger'
-    }).subscribe(confirmed => {
-      if (!confirmed) return;
+    }).subscribe(result => {
+      if (!result.confirmed) return;
 
-      this.pedidoService.cancel(pedidoId).subscribe({
+      this.pedidoService.cancel(pedidoId, result.value).subscribe({
         next: () => {
           this.toastService.success('✅ Pedido cancelado');
           this.cargarPedidos();

@@ -4,6 +4,8 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import RestauranteForCard from '../../../../shared/models/restaurante/restaurante-for-card';
 import { CarritoFlotanteComponent } from "../../../../shared/components/carrito-flotante-component/carrito-flotante-component";
+import { ConfirmationService } from '../../../../core/services/confirmation-service';
+import { AuthService } from '../../../../shared/services/auth-service';
 
 @Component({
   selector: 'app-home-cliente-component',
@@ -14,6 +16,9 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   private eventListeners: (() => void)[] = [];
   private restauranteService = inject(RestauranteService);
   private originalRestaurantes?: RestauranteForCard[];
+  private confirmationService = inject(ConfirmationService);
+  private authService = inject(AuthService)
+
   restaurantes?: RestauranteForCard[];
   restaurantesPromociones?: RestauranteForCard[];
   ciudadSeleccionada?: string = 'Mar del Plata';
@@ -31,6 +36,12 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   isLoadingPromocion = true;
 
   ngOnInit(): void {
+    /*
+    if(true){
+      this.cuentaDesactivada();
+      return;
+    }
+    */
     this.setupEventListeners();
     this.loadRestaurantesData('Mar del Plata');
     this.loadRestaurantesPromocionesData('Mar del Plata');
@@ -116,5 +127,17 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
     if (this.ciudadSeleccionada){
       this.loadRestaurantesPromocionesData(this.ciudadSeleccionada);
     }
+  }
+
+  cuentaDesactivada(){
+    this.confirmationService.confirm({
+      title: 'Su cuenta esta bloqueada',
+      message: 'Motivo: tal. Para ser desbloqueado envia un mail a mordisco@gmail.com',
+      confirmText: 'Ok',
+      type: 'danger',
+      showCancelButton : false
+    }).subscribe((confirmed) => {
+      if (confirmed) this.authService.logout(); 
+    });
   }
 }
