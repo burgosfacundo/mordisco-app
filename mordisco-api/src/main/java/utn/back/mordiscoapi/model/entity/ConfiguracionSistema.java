@@ -71,19 +71,22 @@ public class ConfiguracionSistema {
             this.tiempoMaximoEntrega = 45; // 45 minutos
         }
         if (this.costoBaseDelivery == null) {
-            this.costoBaseDelivery = BigDecimal.valueOf(200.0); // $200
+            this.costoBaseDelivery = BigDecimal.valueOf(2000.0); // $2000
         }
         if (this.costoPorKilometro == null) {
-            this.costoPorKilometro = BigDecimal.valueOf(50.0); // $50/km
+            this.costoPorKilometro = BigDecimal.valueOf(500.0); // $500/km
         }
         if (this.montoMinimoPedido == null) {
-            this.montoMinimoPedido = BigDecimal.valueOf(500.0); // $500
+            this.montoMinimoPedido = BigDecimal.valueOf(5000.0); // $5000
         }
         if (this.porcentajeGananciasRepartidor == null) {
             this.porcentajeGananciasRepartidor = BigDecimal.valueOf(80.0); // 80%
         }
         if (this.modoMantenimiento == null) {
             this.modoMantenimiento = false;
+        }
+        if (this.fechaActualizacion == null) {
+            this.fechaActualizacion = LocalDateTime.now();
         }
     }
 

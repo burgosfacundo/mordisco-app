@@ -46,7 +46,7 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
     @Query(value =
             "SELECT p.* FROM pedidos p " +
                     "INNER JOIN direcciones d ON p.direccion_id = d.id " +
-                    "WHERE p.estado = 'EN_CAMINO' " +
+                    "WHERE p.estado = 'LISTO_PARA_ENTREGAR' " +
                     "AND p.tipo_entrega = 'DELIVERY' " +
                     "AND p.repartidor_id IS NULL " +
                     "AND d.latitud IS NOT NULL " +

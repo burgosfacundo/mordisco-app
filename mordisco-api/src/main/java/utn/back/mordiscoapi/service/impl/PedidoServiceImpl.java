@@ -76,6 +76,16 @@ public class PedidoServiceImpl implements IPedidoService {
         BigDecimal total = calcularTotalYValidarProductos(pedido);
         pedido.setTotal(total);
 
+        // Validar monto mínimo del pedido
+        BigDecimal montoMinimo = configuracionService.getMontoMinimoPedido();
+        if (total.compareTo(montoMinimo) < 0) {
+            throw new BadRequestException(
+                    String.format("El monto mínimo del pedido es $%.2f. Tu pedido es de $%.2f",
+                            montoMinimo, total)
+            );
+        }
+
+
         validarYAsignarDireccion(pedido, dto, restaurante, cliente);
 
         // Calcular costo de delivery si es DELIVERY
@@ -287,9 +297,6 @@ public class PedidoServiceImpl implements IPedidoService {
             case LISTO_PARA_RETIRAR ->
                     notificacionService.notificarPedidoListoParaRetirar(pedido);
 
-            case LISTO_PARA_ENTREGAR ->
-                    notificacionService.notificarRepartidoresCercanos(pedido);
-
             case EN_CAMINO ->
                     notificacionService.notificarPedidoEnCamino(pedido);
 
@@ -496,8 +503,14 @@ public class PedidoServiceImpl implements IPedidoService {
         // Asignar repartidor
         pedido.setRepartidor(repartidor);
         pedido.setFechaAceptacionRepartidor(LocalDateTime.now());
+        
+        // Cambiar estado a EN_CAMINO cuando el repartidor acepta
+        pedido.setEstado(EstadoPedido.EN_CAMINO);
 
         pedidoRepository.save(pedido);
+        
+        log.info("🚚 Repartidor #{} asignado al pedido #{}. Estado: EN_CAMINO", 
+                repartidorId, pedidoId);
     }
 
     @Transactional

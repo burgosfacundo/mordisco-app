@@ -192,19 +192,6 @@ public class NotificacionService {
         };
     }
 
-    public void notificarRepartidoresCercanos(Pedido pedido) {
-        String topic = "/topic/repartidor/" + pedido.getRepartidor().getId();
-
-        NotificacionDTO notif = new NotificacionDTO(
-                TipoNotificacion.CAMBIO_ESTADO_PEDIDO,
-                "¡Pedido #" + pedido.getId() + " está disponible para asignarse!",
-                pedido.getId(),
-                pedido.getEstado().toString()
-        );
-
-        messagingTemplate.convertAndSend(topic, notif);
-    }
-
     public void notificarPedidoEnCamino(Pedido pedido) {
         String topic = "/topic/cliente/" + pedido.getCliente().getId();
 

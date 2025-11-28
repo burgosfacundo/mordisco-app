@@ -4,6 +4,11 @@
 -- 1) roles
 INSERT INTO `roles` VALUES (1,'ROLE_ADMIN'),(2,'ROLE_CLIENTE'),(3,'ROLE_RESTAURANTE'),(4,'ROLE_REPARTIDOR');
 
+-- 2) configuracion_sistema
+INSERT INTO configuracion_sistema (id, comision_plataforma, costo_base_delivery, costo_por_kilometro, modo_mantenimiento, monto_minimo_pedido, porcentaje_ganancias_repartidor, radio_maximo_entrega, tiempo_maximo_entrega,fecha_actualizacion)
+VALUES (1, 15.0, 2000.0, 500.0, false, 5000.0, 80.0, 10.0, 45,'2025-11-28 08:28:49.000000');
+
+
 INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (1,'Pérez','admin@mordisco.com','Admin','$2a$10$q.w4chhllSxhfEk.pSwX.OPunLp1cVyC.uJ1ddf8cOJDRtpqaPX/i','1111111111',1,NULL,NULL);
 INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (2,'Alvarez','cliente1@mordisco.com','Juan','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333331',2,NULL,NULL);
 INSERT INTO usuarios (`id`,`apellido`,`email`,`nombre`,`password`,`telefono`,`rol_id`,`latitud_actual`,`longitud_actual`) VALUES (3,'Benítez','cliente2@mordisco.com','Carla','$2a$10$6w3FGu7sjm0K9AKWLGgzGOmMs3a.9Tiqmp68QdQtCjNUVrWhSDBN6','3333333332',2,NULL,NULL);

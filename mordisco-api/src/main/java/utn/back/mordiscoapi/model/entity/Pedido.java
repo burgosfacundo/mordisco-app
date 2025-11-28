@@ -82,7 +82,7 @@ public class Pedido {
     }
 
     public boolean puedeSerAceptadoPorRepartidor() {
-        return EstadoPedido.EN_CAMINO.equals(this.estado) && this.repartidor == null;
+        return EstadoPedido.LISTO_PARA_ENTREGAR.equals(this.estado) && this.repartidor == null;
     }
 
     public boolean puedeSerCalificado() {
