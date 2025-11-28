@@ -36,7 +36,7 @@
                   <p class="font-semibold text-gray-900">Delivery</p>
                   <p class="text-sm text-gray-600">Recibe tu pedido en tu domicilio</p>
                   <p class="text-xs text-primary-600 font-semibold mt-1">
-                    + ${{ COSTO_ENVIO | number:'1.2-2' }} de envío
+                    + ${{ resumenConEnvio().costoEnvio | number:'1.2-2' }} de envío
                   </p>
                 </div>
               </div>
@@ -240,6 +240,19 @@
               <span class="font-semibold">${{ resumenConEnvio().subtotal | number:'1.2-2' }}</span>
             </div>
             
+            <!-- Advertencia de monto mínimo -->
+            @if (montoMinimoPedido() > 0 && resumenConEnvio().subtotal < montoMinimoPedido()) {
+              <div class="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
+                <div class="flex items-start gap-2">
+                  <mat-icon class="text-yellow-600 text-base">warning</mat-icon>
+                  <p class="text-xs text-yellow-800">
+                    El monto mínimo del pedido es <strong>${{ montoMinimoPedido() | number:'1.2-2' }}</strong>. 
+                    Te faltan <strong>${{ (montoMinimoPedido() - resumenConEnvio().subtotal) | number:'1.2-2' }}</strong> para continuar.
+                  </p>
+                </div>
+              </div>
+            }
+            
             <!-- Mostrar envío SOLO si es DELIVERY -->
             @if (cobraEnvio()) {
               <div class="flex items-center justify-between text-gray-700">
@@ -268,7 +281,7 @@
           <div class="space-y-3 pt-4">
             <button 
               type="submit"
-              [disabled]="checkoutForm.invalid || isProcessing()"
+              [disabled]="checkoutForm.invalid || isProcessing() || (montoMinimoPedido() > 0 && resumenConEnvio().subtotal < montoMinimoPedido())"
               class="w-full btn-primary">
               @if (isProcessing()) {
                 <span class="inline-flex items-center gap-2">

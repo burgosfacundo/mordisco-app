@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
 import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
 import HorarioAtencion from '../../models/horario/horario-atencion-request';
 import { Router } from '@angular/router';
@@ -11,11 +11,15 @@ import HorarioAtencionResponse from '../../models/horario/horario-atencion-respo
   imports: [],
   templateUrl: './restaurante-card-component.html'
 })
-export class RestauranteCardComponent {
+export class RestauranteCardComponent implements OnInit {
   restaurante = input<RestauranteForCard>()
   listaHorarios : HorarioAtencionResponse [] = []
   private haService = inject(HorarioService)
   private router : Router = inject(Router)
+
+  ngOnInit(): void {
+    this.getHorariosByRestaurante();
+  }
 
   getHorarios(): string {
     const h = this.getHorarioDeHoy();

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,6 +13,9 @@ import { CarritoService } from '../../../../shared/services/carrito/carrito-serv
 import { MetodoPago } from '../../../../shared/models/enums/metodo-pago';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
 import { ToastService } from '../../../../core/services/toast-service';
+import { GeolocationService } from '../../../../shared/services/geolocation/geolocation-service';
+import { ConfiguracionSistemaService } from '../../../../shared/services/configuracionSistema/configuracion-sistema-service';
+import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 
 @Component({
   selector: 'app-checkout-page',
@@ -35,19 +38,23 @@ export class CheckoutPage implements OnInit {
   private pedidoService = inject(PedidoService);
   private direccionService = inject(DireccionService);
   private authService = inject(AuthService);
+  private geolocationService = inject(GeolocationService);
+  private configuracionService = inject(ConfiguracionSistemaService);
+  private restauranteService = inject(RestauranteService);
 
   checkoutForm!: FormGroup;
   direcciones = signal<DireccionResponse[]>([]);
   isLoading = signal(false);
   isProcessing = signal(false);
+  costoDeliveryCalculado = signal<number>(0);
+  direccionSeleccionadaId = signal<number | null>(null);
+  montoMinimoPedido = signal<number>(0);
 
   // Signal para el tipo de entrega actual
   tipoEntregaActual = signal<TipoEntrega>(TipoEntrega.DELIVERY);
 
   // Computed del carrito
   items = this.carritoService.items;
-  
-  readonly COSTO_ENVIO = 2000;
 
   // Computed para saber si debe cobrar envío
   cobraEnvio = computed(() => 
@@ -61,7 +68,7 @@ export class CheckoutPage implements OnInit {
       sum + (item.precio * item.cantidad), 0
     );
     
-    const costoEnvio = this.cobraEnvio() ? this.COSTO_ENVIO : 0;
+    const costoEnvio = this.cobraEnvio() ? this.costoDeliveryCalculado() : 0;
     const total = subtotal + costoEnvio;
 
     return {
@@ -72,12 +79,30 @@ export class CheckoutPage implements OnInit {
     };
   });
 
+  constructor() {
+    // Effect para recalcular costo cuando cambia la dirección
+    effect(() => {
+      const direccionId = this.direccionSeleccionadaId();
+      const tipoEntrega = this.tipoEntregaActual();
+      
+      if (tipoEntrega === TipoEntrega.DELIVERY && direccionId) {
+        this.calcularCostoDelivery(direccionId);
+      }
+    });
+  }
+
   ngOnInit(): void {
     if (!this.carritoService.tieneItems()) {
       this.toastService.success('El carrito está vacío');
       this.router.navigate(['/cliente/carrito']);
       return;
     }
+
+    // Cargar monto mínimo del pedido
+    this.configuracionService.getMontoMinimo().subscribe({
+      next: (monto) => this.montoMinimoPedido.set(monto),
+      error: () => this.montoMinimoPedido.set(0)
+    });
 
     this.initializeForm();
     this.cargarDirecciones();
@@ -87,7 +112,7 @@ export class CheckoutPage implements OnInit {
     this.checkoutForm = this.fb.group({
       tipoEntrega: [TipoEntrega.DELIVERY, Validators.required],
       direccionId: [null, Validators.required],
-      metodoPago: [MetodoPago.MERCADO_PAGO, Validators.required],
+      metodoPago: [null, Validators.required],
       comentarios: ['']
     });
 
@@ -106,9 +131,15 @@ export class CheckoutPage implements OnInit {
       } else {
         direccionControl?.clearValidators();
         direccionControl?.setValue(null);
+        this.costoDeliveryCalculado.set(0);
       }
       
       direccionControl?.updateValueAndValidity();
+    });
+
+    // Escuchar cambios en la dirección seleccionada
+    this.checkoutForm.get('direccionId')?.valueChanges.subscribe(direccionId => {
+      this.direccionSeleccionadaId.set(direccionId);
     });
   }
 
@@ -207,6 +238,53 @@ export class CheckoutPage implements OnInit {
   agregarDireccion(): void {
     this.router.navigate(['/cliente/my-address'], {
       queryParams: { returnUrl: '/checkout' }
+    });
+  }
+
+  private calcularCostoDelivery(direccionId: number): void {
+    const restauranteId = this.resumenConEnvio().restauranteId;
+    
+    if (!restauranteId) {
+      this.costoDeliveryCalculado.set(0);
+      return;
+    }
+
+    // Obtener dirección seleccionada
+    const direccion = this.direcciones().find(d => d.id === direccionId);
+    
+    if (!direccion || !direccion.latitud || !direccion.longitud) {
+      this.costoDeliveryCalculado.set(0);
+      return;
+    }
+
+    // Obtener datos completos del restaurante
+    this.restauranteService.findById(restauranteId).subscribe({
+      next: (restaurante) => {
+        if (!restaurante.direccion?.latitud || !restaurante.direccion?.longitud) {
+          this.costoDeliveryCalculado.set(0);
+          return;
+        }
+
+        // Calcular distancia
+        const distanciaKm = this.geolocationService.calcularDistancia(
+          { latitud: restaurante.direccion.latitud, longitud: restaurante.direccion.longitud },
+          { latitud: direccion.latitud, longitud: direccion.longitud }
+        );
+
+        // Obtener costo de delivery del backend
+        this.configuracionService.calcularCostoDelivery(distanciaKm).subscribe({
+          next: (costo) => {
+            this.costoDeliveryCalculado.set(costo);
+          },
+          error: () => {
+            // Fallback: usar costo base
+            this.costoDeliveryCalculado.set(2000);
+          }
+        });
+      },
+      error: () => {
+        this.costoDeliveryCalculado.set(0);
+      }
     });
   }
 

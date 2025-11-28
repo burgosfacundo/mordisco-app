@@ -5,7 +5,6 @@ import { CarritoResumen } from '../../models/carrito/carrito-resumen';
 @Injectable({ providedIn: 'root' })
 export class CarritoService {
   private readonly STORAGE_KEY = 'mordisco_carrito'
-  private readonly COSTO_ENVIO_BASE = 2000;
   
   // Estado reactivo
   private _items = signal<ItemCarrito[]>([])
@@ -22,12 +21,8 @@ export class CarritoService {
     this._items().reduce((sum, item) => sum + (item.precio * item.cantidad), 0)
   )
   
-  costoEnvio = computed(() => 
-    this._items().length > 0 ? this.COSTO_ENVIO_BASE : 0
-  )
-  
   total = computed(() => 
-    this.subtotal() + this.costoEnvio()
+    this.subtotal()
   )
   
   restauranteActual = computed(() => {
@@ -45,7 +40,7 @@ export class CarritoService {
   resumen = computed((): CarritoResumen => ({
     items: this._items(),
     subtotal: this.subtotal(),
-    costoEnvio: this.costoEnvio(),
+    costoEnvio: 0,
     total: this.total(),
     cantidadItems: this.cantidadTotal(),
     restauranteId: this.restauranteActual()?.id ?? null,
