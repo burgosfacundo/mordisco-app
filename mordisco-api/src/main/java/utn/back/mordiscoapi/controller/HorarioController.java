@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,7 +40,7 @@ public class HorarioController {
     public ResponseEntity<List<HorarioAtencionResponseDTO>> getAllByIdRestaurante(
             @Valid @Positive @PathVariable Long idRestaurante
     ) throws NotFoundException {
-        return ResponseEntity.ok().body(horarioService.findAllByIdRestaurante(idRestaurante).stream().toList());
+        return ResponseEntity.ok().body(horarioService.findAllByIdRestaurante(idRestaurante));
     }
 
 

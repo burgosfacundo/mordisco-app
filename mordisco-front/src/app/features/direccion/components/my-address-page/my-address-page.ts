@@ -5,7 +5,7 @@ import { DireccionFormComponent } from '../direccion-form-component/direccion-fo
 import { DireccionCardComponent } from '../direccion-card-component/direccion-card-component';
 import { DireccionService } from '../../services/direccion-service';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
@@ -20,7 +20,7 @@ import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-
 })
 export class MyAddressPage implements OnInit {
   private direccionService = inject(DireccionService);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
   @ViewChild('direccionForm') direccionFormComponent?: DireccionFormComponent;
@@ -76,7 +76,7 @@ export class MyAddressPage implements OnInit {
 
       this.direccionService.delete(id).subscribe({
         next: () => {
-          this.notificationService.success('✅ Dirección eliminada correctamente');
+          this.toastService.success('✅ Dirección eliminada correctamente');
           
           if (this.direccionParaEditar()?.id === id) {
             this.handleCancelEdit();

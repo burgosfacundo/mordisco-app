@@ -9,7 +9,7 @@ import RestauranteResponse from '../../../../shared/models/restaurante/restauran
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { Router } from '@angular/router';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
 
 @Component({
@@ -19,7 +19,7 @@ import { ConfirmationService } from '../../../../core/services/confirmation-serv
   templateUrl: './home-restaurante-component.html'
 })
 export class HomeRestauranteComponent implements OnInit {
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private confirmationService = inject(ConfirmationService);
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
@@ -86,7 +86,7 @@ export class HomeRestauranteComponent implements OnInit {
 
       this.pedidoService.changeState(pedidoId, EstadoPedido.EN_PREPARACION).subscribe({
         next: () => {
-          this.notificationService.success('✅ Pedido aceptado');
+          this.toastService.success('✅ Pedido aceptado');
           this.loadRestauranteData();
         }
       });
@@ -105,7 +105,7 @@ export class HomeRestauranteComponent implements OnInit {
 
       this.pedidoService.cancel(pedidoId).subscribe({
         next: () => {
-          this.notificationService.success('✅ Pedido cancelado');
+          this.toastService.success('✅ Pedido cancelado');
           this.loadRestauranteData();
         }
       });
@@ -126,7 +126,7 @@ export class HomeRestauranteComponent implements OnInit {
 
       this.pedidoService.changeState(event.pedidoId, event.nuevoEstado).subscribe({
         next: () => {
-          this.notificationService.success(`✅ Estado actualizado a "${estadoLabel}"`);
+          this.toastService.success(`✅ Estado actualizado a "${estadoLabel}"`);
           this.loadRestauranteData();
         }
       });

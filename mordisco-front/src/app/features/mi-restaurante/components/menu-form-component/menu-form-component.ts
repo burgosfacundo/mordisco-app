@@ -5,7 +5,7 @@ import { MenuService } from '../../../../shared/services/menu/menu-service';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-menu-form',
@@ -16,7 +16,7 @@ import { NotificationService } from '../../../../core/services/notification-serv
 export class MenuFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private menuService = inject(MenuService);
   private authService = inject(AuthService);
   private restauranteService = inject(RestauranteService);
@@ -74,7 +74,7 @@ export class MenuFormComponent implements OnInit {
 
     this.menuService.save(this.restauranteId, nombreMenu).subscribe({
       next: () => {
-        this.notificationService.success('✅ Menú creado exitosamente');
+        this.toastService.success('✅ Menú creado exitosamente');
         this.router.navigate(['/restaurante']);
       },
       error: () => {

@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { environment } from '../../../../../environments/environment';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-recover-password-page',
@@ -17,7 +17,7 @@ export class RecoverPasswordPage implements OnInit {
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
   private router = inject(Router);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   protected validationService = inject(FormValidationService);
 
   protected recoverForm!: FormGroup;
@@ -46,18 +46,22 @@ export class RecoverPasswordPage implements OnInit {
       this.recoverForm.value
     ).subscribe({
       next: () => {
-        this.notificationService.success(
-          '✅ Si el email existe, recibirás un link de recuperación'
-        );
-      },
-      error: () => {
-        this.notificationService.success(
+        this.toastService.success(
           'Si el email existe, recibirás un link de recuperación'
         );
-      },
-      complete: () => {
         this.isSubmitting.set(false);
-        this.router.navigate(['/login']);
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: () => {
+        this.toastService.success(
+          'Si el email existe, recibirás un link de recuperación'
+        );
+        this.isSubmitting.set(false);
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
       }
     });
   }

@@ -11,7 +11,7 @@ import { ProductoService } from '../../../../shared/services/productos/producto-
 import { MenuFormComponent } from "../menu-form-component/menu-form-component";
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Router, RouterLink } from '@angular/router';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
@@ -23,7 +23,7 @@ import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-
 export class MiMenuPage implements OnInit {
   private aus = inject(AuthService);
   private router = inject(Router);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
   private mService = inject(MenuService);
   private rService = inject(RestauranteService);
@@ -56,7 +56,7 @@ export class MiMenuPage implements OnInit {
     this.rService.getByUsuario(userId).subscribe({
       next: (restaurante) => {
         if (!restaurante) {
-          this.notificationService.warning('⚠️ Primero debes crear tu restaurante');
+          this.toastService.warning('⚠️ Primero debes crear tu restaurante');
           this.router.navigate(['/restaurante']);
           return;
         }
@@ -67,7 +67,7 @@ export class MiMenuPage implements OnInit {
         this.verificarMenu(restaurante.id);
       },
       error: () => {
-        this.notificationService.warning('⚠️ Primero debes crear tu restaurante');
+        this.toastService.warning('⚠️ Primero debes crear tu restaurante');
         this.router.navigate(['/restaurante']);
         this.isLoading = false;
       }
@@ -152,7 +152,7 @@ export class MiMenuPage implements OnInit {
   private eliminarProducto(id: number): void {
     this.pService.delete(id).subscribe({
       next: () => {
-        this.notificationService.success('✅ Producto eliminado');
+        this.toastService.success('✅ Producto eliminado');
         this.cargarProductos();
       }
     });

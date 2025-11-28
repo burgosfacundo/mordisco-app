@@ -9,7 +9,7 @@ import HorarioAtencionResponse from '../../../../shared/models/horario/horario-a
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import HorarioAtencionRequest from '../../../../shared/models/horario/horario-atencion-request';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-horario-form-component',
@@ -19,7 +19,7 @@ import { NotificationService } from '../../../../core/services/notification-serv
 export class HorarioFormComponent implements OnInit{
 
   private fb : FormBuilder = inject(FormBuilder)
-  private notificationService = inject(NotificationService)
+  private toastService = inject(ToastService)
   private validationService : FormValidationService = inject(FormValidationService)
   private aus : AuthService = inject(AuthService)
   private rService : RestauranteService = inject(RestauranteService)
@@ -110,7 +110,7 @@ export class HorarioFormComponent implements OnInit{
         this.hService.update(this.formHorarioAtencion.value.id,horarioParaBackend).subscribe({
           next:()=>{
             this.hService.clearHorarioToEdit()
-            this.notificationService.success("✅ Horario editado correctamente")
+            this.toastService.success("✅ Horario editado correctamente")
             this.router.navigate(['/restaurante/horarios'])
           },error:()=> { 
             this.hService.clearHorarioToEdit()
@@ -127,7 +127,7 @@ export class HorarioFormComponent implements OnInit{
         if(this.restaurante){
           this.hService.save(horarioParaBackend, this.restaurante?.id).subscribe({
             next:()=>{
-              this.notificationService.success("✅ Horario creado correctamente")
+              this.toastService.success("✅ Horario creado correctamente")
               this.router.navigate(['/restaurante/horarios'])
             },
             error:()=>{

@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { environment } from '../../../../../environments/environment';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
     selector: 'app-reset-password-page',
@@ -18,7 +18,7 @@ export class ResetPasswordPage implements OnInit {
     private http = inject(HttpClient);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
-    private notificationService = inject(NotificationService);
+    private toastService = inject(ToastService);
     protected validationService = inject(FormValidationService);
     protected resetForm!: FormGroup;
     isSubmitting = signal(false);
@@ -73,7 +73,7 @@ export class ResetPasswordPage implements OnInit {
 
         this.http.post<string>(`${environment.apiUrl}/usuarios/reset-password`,payload).subscribe({
             next: () => {
-                this.notificationService.success('✅ Contraseña restablecida correctamente');
+                this.toastService.success('Contraseña restablecida correctamente');
             },
             complete: () => {
                 this.isSubmitting.set(false);

@@ -9,17 +9,18 @@ import { PedidoCardComponent } from "../../../../shared/components/pedido-card-c
 import { MatDialog} from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 import { Router } from '@angular/router';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { PedidosDisponiblesComponent } from '../../../../shared/components/pedidos-disponibles/pedidos-disponibles';
+import { GananciasRepartidorComponent } from '../../../../shared/components/ganancias-repartidor/ganancias-repartidor';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home-repartidor-component',
-  imports: [PedidoCardComponent, MatPaginator, PedidosDisponiblesComponent, CommonModule],
+  imports: [PedidoCardComponent, MatPaginator, PedidosDisponiblesComponent, GananciasRepartidorComponent, CommonModule],
   templateUrl: './home-repartidor-component.html',
 })
 export class HomeRepartidorComponent {
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
   private repartidorService = inject(RepartidorService);
@@ -27,7 +28,7 @@ export class HomeRepartidorComponent {
   private router = inject(Router)
 
   // Tab activa
-  tabActiva: 'disponibles' | 'asignados' = 'disponibles';
+  tabActiva: 'disponibles' | 'asignados' | 'ganancias' = 'disponibles';
 
   pedidosPendientes?: PedidoResponse[];
 
@@ -46,7 +47,7 @@ export class HomeRepartidorComponent {
   /**
    * Cambia entre tabs
    */
-  cambiarTab(tab: 'disponibles' | 'asignados'): void {
+  cambiarTab(tab: 'disponibles' | 'asignados' | 'ganancias'): void {
     this.tabActiva = tab;
     if (tab === 'asignados') {
       this.loadPedidosEnCamino();
@@ -97,7 +98,7 @@ export class HomeRepartidorComponent {
   guardarAceptacion(pedidoId : number) {
     this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
           next: () => {
-            this.notificationService.success('✅ Pedido marcado como "Recibido"');
+            this.toastService.success('✅ Pedido marcado como "Recibido"');
             this.loadPedidosEnCamino();
           }
     });

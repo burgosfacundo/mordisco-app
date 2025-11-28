@@ -3,16 +3,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../registro/services/user-service';
 import UserProfile from '../../../shared/models/user/user-profile';
-import PedidoResponse from '../../../shared/models/pedido/pedido-response';
 import { MisPedidosClientePage } from '../../mis-pedidos/components/mis-pedidos-cliente-page/mis-pedidos-cliente-page';
 import { MatIcon } from "@angular/material/icon";
 import { EntregasPage } from '../../entregas/entregas-page/entregas-page';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import CalificacionPedidoResponseDTO from '../../../shared/models/calificacion/calificacion-pedido-response-dto';
-import { CalificacionComponent } from '../../../shared/components/calificacion-component/calificacion-component';
 import { CalificacionService } from '../../../shared/services/calificacion/calificacion-service';
 import CalificacionRepartidorResponseDTO from '../../../shared/models/calificacion/calificacion-repartidor-response-dto';
-import { ICalificacionBase } from '../../../shared/models/calificacion/ICalificacionBase';
 import { CalificacionCardAdmin } from "../../../shared/components/calificacion-card-admin/calificacion-card-admin";
 import RestauranteResponse from '../../../shared/models/restaurante/restaurante-response';
 import { RestauranteService } from '../../../shared/services/restaurante/restaurante-service';
@@ -57,7 +54,6 @@ export class DetalleUsuarioPage {
     this.rol = this.route.snapshot.paramMap.get('idRol');
     
     if (!id) {
-      this._snackBar.open('❌ ID de pedido no válido', 'Cerrar', { duration: 3000 });
       this.router.navigate(['/restaurante/pedidos']);
       return;
     }
@@ -74,9 +70,7 @@ export class DetalleUsuarioPage {
           this.cargarCalificacionesRepartidor(this.rol!);
         }
       },
-      error: (error) => {
-        console.error('Error al cargar usuario:', error);
-        this._snackBar.open('❌ Error al cargar el usuario', 'Cerrar', { duration: 3000 });
+      error: () => {
         this.isLoading = false;
         this.router.navigate(['/']);
       }
@@ -92,16 +86,13 @@ export class DetalleUsuarioPage {
       next: (response) => {
         this.calificacionesPedidos = response.content;
         this.lengthCalificacionPedidos = response.totalElements;
-        console.log("Printea las calificaciones ", response.content)
-      },error: (e)=> console.log(e)
+      }
     });      
     }else if(rol === 'ROLE_CLIENTE'){
       this.cService.getCalificacionesPedidosCliente(this.pageCalificacionRepartidores,this.sizeCalificacionRepartidores,this.user?.id!).subscribe({
         next:(response)=>{
           this.calificacionesPedidos = response.content;
           this.lengthCalificacionPedidos = response.totalElements;
-          console.log("CALIFICACIONES PPPPP",this.calificacionesPedidos)
-
         }
       })
     }
@@ -113,9 +104,7 @@ export class DetalleUsuarioPage {
       next: (response) => {
         this.calificacionesRepartidores = response.content;
         this.lengthCalificacionRepartidores = response.totalElements;
-                  console.log("CALIFICACIONES RRRRR",this.calificacionesRepartidores)
-
-      }});
+    }});
     }else if(rol === 'ROLE_CLIENTE'){
       this.cService.getCalificacionesRepartidorCliente(this.pageCalificacionRepartidores,this.sizeCalificacionRepartidores, this.user?.id!).subscribe({
           next:(response)=>{

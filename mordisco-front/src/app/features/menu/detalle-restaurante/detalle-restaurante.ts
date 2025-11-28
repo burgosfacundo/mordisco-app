@@ -11,7 +11,7 @@ import RestauranteResponse from '../../../shared/models/restaurante/restaurante-
 import MenuResponse from '../../../shared/models/menu/menu-response';
 import ProductoResponse from '../../../shared/models/producto/producto-response';
 import { ProductoCardWithAdd } from '../../../shared/components/producto-card-with-add/producto-card-with-add';
-import { NotificationService } from '../../../core/services/notification-service';
+import { ToastService } from '../../../core/services/toast-service';
 
 @Component({
   selector: 'app-restaurante-detalle-page',
@@ -27,7 +27,7 @@ import { NotificationService } from '../../../core/services/notification-service
 export class RestauranteDetallePage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private restauranteService = inject(RestauranteService);
   private menuService = inject(MenuService);
   private productoService = inject(ProductoService);
@@ -42,7 +42,7 @@ export class RestauranteDetallePage implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     
     if (!id) {
-      this.notificationService.success('ID de restaurante inválido');
+      this.toastService.success('ID de restaurante inválido');
       this.router.navigate(['/home']);
       return;
     }
@@ -105,9 +105,9 @@ export class RestauranteDetallePage implements OnInit {
         disponible: producto.disponible
       });
 
-      this.notificationService.success(`✅ ${producto.nombre} agregado al carrito`);
+      this.toastService.success(`✅ ${producto.nombre} agregado al carrito`);
     } catch (error: any) {
-      this.notificationService.error(error.message);
+      this.toastService.error(error.message);
     }
   }
 

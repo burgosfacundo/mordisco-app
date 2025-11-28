@@ -3,7 +3,7 @@ import { AuthService } from '../../../../shared/services/auth-service';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-edit-password-component',
@@ -12,7 +12,7 @@ import { NotificationService } from '../../../../core/services/notification-serv
 })
 export class EditPasswordComponent implements OnInit {
   private fb : FormBuilder = inject(FormBuilder)
-  private notificationService = inject(NotificationService)
+  private toastService = inject(ToastService)
   private router : Router = inject(Router)
   private authService : AuthService = inject(AuthService)
   private validationService : FormValidationService = inject(FormValidationService)
@@ -38,13 +38,13 @@ export class EditPasswordComponent implements OnInit {
     // Validación del lado del cliente
     if (password !== confirmarPasswordNueva) {
       this.isSubmitting.set(false)
-      this.notificationService.error('❌ Las contraseñas nuevas no coinciden');
+      this.toastService.error('❌ Las contraseñas nuevas no coinciden');
       return;
     }
 
     this.authService.updatePassword({currentPassword : passwordActual, newPassword : password}).subscribe({
       next: () => {
-        this.notificationService.success('✅ Contraseña actualizada correctamente');
+        this.toastService.success('✅ Contraseña actualizada correctamente');
         this.router.navigate(['/profile']);
       },
       error: () => {

@@ -13,7 +13,7 @@ export interface ToastNotification {
 }
 
 @Injectable({ providedIn: 'root' })
-export class NotificationService {
+export class ToastService {
   private notifications = signal<ToastNotification[]>([]);
   private idCounter = 0;
 

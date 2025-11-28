@@ -1,5 +1,5 @@
 import { Component, inject, input, OnInit, output, signal } from '@angular/core';
-import { NotificationService } from '../../../core/services/notification-service';
+import { ToastService } from '../../../core/services/toast-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfiguracionSistemaService } from '../../../shared/services/configuracionSistema/configuracion-sistema-service';
 import { FormValidationService } from '../../../shared/services/form-validation-service';
@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 export class ConfiguracionFormComponent implements OnInit{
   private fb = inject(FormBuilder);
   private csService = inject(ConfiguracionSistemaService);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   protected validationService = inject(FormValidationService);
   private router = inject(Router)
 
@@ -76,7 +76,7 @@ export class ConfiguracionFormComponent implements OnInit{
     this.isSubmitting.set(true);
     this.csService.actualizarConfiguracion(this.configForm.value).subscribe({
       next: () => {
-        this.notificationService.success('✅ Configuracion actualizada correctamente');
+        this.toastService.success('✅ Configuracion actualizada correctamente');
         this.router.navigate(['admin/configuracion'])
       },
       error: () => {

@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { HorarioService } from '../../../../shared/services/horario/horario-service';
 import HorarioAtencionResponse from '../../../../shared/models/horario/horario-atencion-response';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
@@ -20,7 +20,7 @@ export class HorarioPage implements OnInit{
   private aus : AuthService = inject(AuthService)
   private rService : RestauranteService = inject(RestauranteService)
   private router : Router = inject(Router)
-  private notificationService = inject(NotificationService)
+  private toastService = inject(ToastService)
   private dialog = inject(MatDialog)
   private hService : HorarioService= inject(HorarioService)
 
@@ -98,7 +98,7 @@ export class HorarioPage implements OnInit{
 
     this.hService.delete(id).subscribe({
       next :() => {
-        this.notificationService.success('Horario eliminado correctamente')
+        this.toastService.success('Horario eliminado correctamente')
         if(this.restauranteLeido?.id){
           this.listarHorarios(this.restauranteLeido?.id)
         }

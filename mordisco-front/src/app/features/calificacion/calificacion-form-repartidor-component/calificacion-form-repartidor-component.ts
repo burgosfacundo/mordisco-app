@@ -4,7 +4,7 @@ import { CalificacionService } from '../../../shared/services/calificacion/calif
 import { FormValidationService } from '../../../shared/services/form-validation-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import CalificacionRepartidorRequestDTO from '../../../shared/models/calificacion/calificacion-repartidor-request-dto';
-import { NotificationService } from '../../../core/services/notification-service';
+import { ToastService } from '../../../core/services/toast-service';
 
 @Component({
   selector: 'app-calificacion-form-repartidor-component',
@@ -14,7 +14,7 @@ import { NotificationService } from '../../../core/services/notification-service
 export class CalificacionFormRepartidorComponent {
 
   private router = inject(Router)
-  private notificationService = inject(NotificationService)
+  private toastService = inject(ToastService)
   private cService = inject(CalificacionService)
   private validationService = inject(FormValidationService)
   private fb = inject(FormBuilder)
@@ -58,7 +58,7 @@ export class CalificacionFormRepartidorComponent {
   
     this.cService.calificarRepartidor(calificacionRequest).subscribe({
       next : () => {
-        this.notificationService.success('✅ Calificacion registrada correctamente')
+        this.toastService.success('✅ Calificacion registrada correctamente')
         this.router.navigate(['cliente/pedidos/detalle',idPed])
       },
       error:() => {

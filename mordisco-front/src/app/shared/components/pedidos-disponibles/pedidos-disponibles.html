@@ -77,7 +77,7 @@
     >
       <!-- Header con ID y Badge urgente -->
       <div
-        class="bg-gradient-to-r from-primary-50 to-primary-100 px-6 py-4 border-b border-primary-200"
+        class="bg-linear-to-r from-primary-50 to-primary-100 px-6 py-4 border-b border-primary-200"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -202,7 +202,7 @@
               />
             </svg>
             <p class="text-xs text-gray-600 font-semibold">Tiempo</p>
-            <!--  <p class="text-lg font-bold text-purple-700">{{ pedido.tiempoEstimado }} min</p>-->
+            <p class="text-lg font-bold text-purple-700">~30 min</p>
           </div>
 
           <!-- Pago -->
@@ -221,7 +221,9 @@
               />
             </svg>
             <p class="text-xs text-gray-600 font-semibold">Ganarás</p>
-            <p class="text-lg font-bold text-green-700">${{ pedido.total }}</p>
+            <p class="text-lg font-bold text-green-700">
+              ${{ pedido.costoDelivery ? (pedido.costoDelivery * 0.8).toFixed(2) : ((pedido.total * 0.2) * 0.8).toFixed(2) }}
+            </p>
           </div>
         </div>
 
@@ -242,7 +244,7 @@
       <div class="px-6 pb-6 pt-2">
         <button
           (click)="onAceptarPedido(pedido)"
-          class="w-full py-3 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold text-base hover:from-primary-600 hover:to-primary-700 active:scale-95 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+          class="w-full py-3 rounded-lg bg-linear-to-r from-primary-500 to-primary-600 text-white font-bold text-base hover:from-primary-600 hover:to-primary-700 active:scale-95 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
         >
           Aceptar Pedido
         </button>

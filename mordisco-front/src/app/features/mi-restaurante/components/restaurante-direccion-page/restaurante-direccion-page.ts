@@ -5,9 +5,9 @@ import { DireccionFormComponent } from '../../../direccion/components/direccion-
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { AuthService } from '../../../../shared/services/auth-service';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
-import { NotificationService } from '../../../../core/services/notification-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 import { MatDialog } from '@angular/material/dialog';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-restaurante-direccion-page',
@@ -23,7 +23,7 @@ export class RestauranteDireccionPage implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private dialog = inject(MatDialog);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
 
   @ViewChild('direccionForm') direccionFormComponent?: DireccionFormComponent;
 
@@ -54,7 +54,7 @@ export class RestauranteDireccionPage implements OnInit {
   }
 
   handleSaved(): void {
-    this.notificationService.success('✅ Dirección del restaurante guardada correctamente');
+    this.toastService.success('✅ Dirección del restaurante guardada correctamente');
     this.router.navigate(['/restaurante']);
   }
 

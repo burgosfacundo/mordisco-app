@@ -1,5 +1,5 @@
 import { Component, inject, input } from '@angular/core';
-import { NotificationService } from '../../../core/services/notification-service';
+import { ToastService } from '../../../core/services/toast-service';
 import { PedidoService } from '../../../shared/services/pedido/pedido-service';
 import { AuthService } from '../../../shared/services/auth-service';
 import { RepartidorService } from '../../../shared/services/repartidor/repartidor-service';
@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
   templateUrl: './entregas-page.html',
 })
 export class EntregasPage {
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private router = inject(Router)
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
@@ -77,7 +77,7 @@ export class EntregasPage {
   guardarAceptacion(pedidoId : number) {
     this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
           next: () => {
-            this.notificationService.success('✅ Pedido marcado como "Recibido"');
+            this.toastService.success('✅ Pedido marcado como "Recibido"');
             this.loadPedidos();
           }
     });

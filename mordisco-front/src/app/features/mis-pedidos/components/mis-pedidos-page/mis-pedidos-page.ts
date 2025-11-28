@@ -12,7 +12,7 @@ import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-mis-pedidos-page',
@@ -33,7 +33,7 @@ export class MisPedidosPage implements OnInit {
   private auS = inject(AuthService);
   private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
 
   arrPedidos?: PedidoResponse[];
   restaurante?: RestauranteResponse;
@@ -142,7 +142,7 @@ export class MisPedidosPage implements OnInit {
 
       this.pService.changeState(pedidoId, EstadoPedido.EN_PREPARACION).subscribe({
         next: () => {
-          this.notificationService.success('✅ Pedido aceptado');
+          this.toastService.success('✅ Pedido aceptado');
           this.cargarPedidos();
         }
       });
@@ -160,7 +160,7 @@ export class MisPedidosPage implements OnInit {
 
       this.pService.cancel(pedidoId).subscribe({
         next: () => {
-          this.notificationService.success('✅ Pedido rechazado');
+          this.toastService.success('✅ Pedido rechazado');
           this.cargarPedidos();
         }
       });
@@ -180,7 +180,7 @@ export class MisPedidosPage implements OnInit {
 
       this.pService.changeState(event.pedidoId, event.nuevoEstado).subscribe({
         next: () => {
-          this.notificationService.success(`✅ Estado actualizado a "${estadoLabel}"`);
+          this.toastService.success(`✅ Estado actualizado a "${estadoLabel}"`);
           this.cargarPedidos();
         }
       });

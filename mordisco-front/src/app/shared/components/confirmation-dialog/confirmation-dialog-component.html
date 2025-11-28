@@ -1,9 +1,9 @@
-@if (confirmationService.getDialogState()) {
+@if (isDialogOpen()) {
       <div class="dialog-overlay" [@fadeIn] (click)="confirmationService.cancelAction()">
         <div class="dialog-container" [@slideIn] (click)="$event.stopPropagation()">
-          <div class="dialog-header" [class]="'dialog-header-' + currentConfig?.type">
+          <div class="dialog-header" [class]="'dialog-header-' + currentConfig()?.type">
             <div class="dialog-icon">
-              @switch (currentConfig?.type) {
+              @switch (currentConfig()?.type) {
                 @case ('danger') {
                   <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -24,24 +24,24 @@
                 }
               }
             </div>
-            <h3 class="dialog-title">{{ currentConfig?.title }}</h3>
+            <h3 class="dialog-title">{{ currentConfig()?.title }}</h3>
           </div>
 
           <div class="dialog-body">
-            <p class="dialog-message">{{ currentConfig?.message }}</p>
+            <p class="dialog-message">{{ currentConfig()?.message }}</p>
           </div>
 
           <div class="dialog-footer">
             <button 
               class="btn-cancel"
               (click)="confirmationService.cancelAction()">
-              {{ currentConfig?.cancelText }}
+              {{ currentConfig()?.cancelText }}
             </button>
             <button 
               class="btn-confirm"
-              [class]="'btn-confirm-' + currentConfig?.type"
+              [class]="'btn-confirm-' + currentConfig()?.type"
               (click)="confirmationService.confirmAction()">
-              {{ currentConfig?.confirmText }}
+              {{ currentConfig()?.confirmText }}
             </button>
           </div>
         </div>

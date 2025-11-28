@@ -17,7 +17,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import CalificacionPedidoResponseDTO from '../../../../shared/models/calificacion/calificacion-pedido-response-dto';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
@@ -41,7 +41,7 @@ export class MiRestaurantePageComponent implements OnInit {
   private horarioService = inject(HorarioService);
   private promocionService = inject(PromocionService);
   private calificacionService = inject(CalificacionService);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
 
@@ -157,7 +157,7 @@ export class MiRestaurantePageComponent implements OnInit {
 
       this.promocionService.delete(this.restaurante!.id, promocionId).subscribe({
         next: () => {
-          this.notificationService.success('✅ Promoción eliminada correctamente');
+          this.toastService.success('✅ Promoción eliminada correctamente');
           this.cargarPromociones();
         }
       });

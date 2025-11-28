@@ -10,7 +10,7 @@ import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
-import { NotificationService } from "../../../../core/services/notification-service";
+import { ToastService } from "../../../../core/services/toast-service";
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
@@ -31,7 +31,7 @@ export class RestauranteFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
   restauranteForm!: FormGroup;
@@ -97,7 +97,7 @@ export class RestauranteFormComponent implements OnInit {
   onSubmit(): void {
     if (this.restauranteForm.invalid) {
       this.markFormGroupTouched(this.restauranteForm);
-      this.notificationService.warning('⚠️ Por favor completa todos los campos correctamente');
+      this.toastService.warning('⚠️ Por favor completa todos los campos correctamente');
       return;
     }
 
@@ -122,7 +122,7 @@ export class RestauranteFormComponent implements OnInit {
 
       this.restauranteService.put(restauranteData).subscribe({
         next: () => {
-          this.notificationService.success('✅ Restaurante actualizado correctamente');
+          this.toastService.success('✅ Restaurante actualizado correctamente');
           this.router.navigate(['/']);
         },
         complete: () => {
@@ -151,7 +151,7 @@ export class RestauranteFormComponent implements OnInit {
 
       this.restauranteService.save(restauranteData).subscribe({
         next: () => {
-          this.notificationService.success('✅ Restaurante creado correctamente');
+          this.toastService.success('✅ Restaurante creado correctamente');
           this.router.navigate(['/']);
         },
         complete: () => {

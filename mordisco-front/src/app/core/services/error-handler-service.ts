@@ -145,21 +145,59 @@ export class ErrorHandlerService {
    * Extrae mensaje de error del backend si existe
    */
   private extractBackendMessage(error: HttpErrorResponse): string | null {
-    if (error.error) {
-      // Intentar diferentes formatos de respuesta del backend
-      if (typeof error.error === 'string') {
+    if (!error.error) {
+      return null;
+    }
+
+    // Si error.error es un string, intentar parsearlo como JSON
+    if (typeof error.error === 'string') {
+      try {
+        const parsed = JSON.parse(error.error);
+        return this.extractMessageFromObject(parsed);
+      } catch {
+        // Si no es JSON válido, retornar el string tal cual
         return error.error;
       }
-      if (error.error.message) {
-        return error.error.message;
-      }
-      if (error.error.error) {
-        return error.error.error;
-      }
-      if (error.error.mensaje) {
-        return error.error.mensaje;
-      }
     }
+
+    // Si error.error es un objeto, extraer el mensaje
+    if (typeof error.error === 'object') {
+      return this.extractMessageFromObject(error.error);
+    }
+
+    return null;
+  }
+
+  /**
+   * Extrae el mensaje de un objeto de error
+   * Maneja diferentes formatos del backend:
+   * - { message: "..." }
+   * - { error: "..." }
+   * - { fieldName: "mensaje de validación" } (ej: { password: "La contraseña debe..." })
+   */
+  private extractMessageFromObject(obj: any): string | null {
+    if (!obj) {
+      return null;
+    }
+
+    // Priorizar campos estándar
+    if (obj.message) {
+      return obj.message;
+    }
+    if (obj.error) {
+      return obj.error;
+    }
+    if (obj.mensaje) {
+      return obj.mensaje;
+    }
+
+    // Si no tiene campos estándar, extraer el primer valor del objeto
+    // Esto maneja casos de validación de DTO: { password: "mensaje", email: "mensaje" }
+    const values = Object.values(obj);
+    if (values.length > 0 && typeof values[0] === 'string') {
+      return values[0];
+    }
+
     return null;
   }
 

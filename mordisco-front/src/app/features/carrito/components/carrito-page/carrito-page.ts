@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { CarritoService } from '../../../../shared/services/carrito/carrito-service';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
@@ -15,7 +15,7 @@ import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-
 })
 export class CarritoPage {
   private router = inject(Router)
-  private notificationService = inject(NotificationService)
+  private toastService = inject(ToastService)
   private dialog = inject(MatDialog)
   protected carritoService = inject(CarritoService)
 
@@ -56,7 +56,7 @@ export class CarritoPage {
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
         this.carritoService.eliminarProducto(productoId)
-        this.notificationService.success('Producto eliminado del carrito')
+        this.toastService.success('Producto eliminado del carrito')
       }
     });
   }
@@ -70,7 +70,7 @@ export class CarritoPage {
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
         this.carritoService.vaciarCarrito()
-        this.notificationService.success('Carrito vaciado')
+        this.toastService.success('Carrito vaciado')
         this.router.navigate(['/home'])
       }
     });
@@ -85,7 +85,7 @@ export class CarritoPage {
     const validacion = this.carritoService.validarDisponibilidad()
     
     if (!validacion.valido) {
-      this.notificationService.error(
+      this.toastService.error(
         `Los siguientes productos no están disponibles: ${validacion.productosNoDisponibles.join(', ')}`
       )
       return

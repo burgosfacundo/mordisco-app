@@ -41,7 +41,6 @@ public class RestauranteServiceImpl implements IRestauranteService {
     @Override
     public void save(RestauranteCreateDTO restauranteCreateDTO) {
         Restaurante restaurante = RestauranteMapper.toEntity(restauranteCreateDTO);
-        restaurante.setActivo(false);
         var d = restaurante.getDireccion();
 
         geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())

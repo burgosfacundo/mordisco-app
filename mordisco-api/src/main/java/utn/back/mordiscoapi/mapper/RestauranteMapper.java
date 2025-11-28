@@ -42,6 +42,7 @@ public class RestauranteMapper {
 
         return Restaurante.builder()
                 .razonSocial(Sanitize.trimToNull(dto.razonSocial()))
+                .activo(dto.activo())
                 .imagen(imagen)
                 .usuario(usuario)
                 .direccion(direccion)

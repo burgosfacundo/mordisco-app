@@ -12,7 +12,7 @@ import { CrearPedidoRequest } from '../../../../shared/models/pedido/crear-pedid
 import { CarritoService } from '../../../../shared/services/carrito/carrito-service';
 import { MetodoPago } from '../../../../shared/models/enums/metodo-pago';
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-checkout-page',
@@ -30,7 +30,7 @@ import { NotificationService } from '../../../../core/services/notification-serv
 export class CheckoutPage implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private carritoService = inject(CarritoService);
   private pedidoService = inject(PedidoService);
   private direccionService = inject(DireccionService);
@@ -74,7 +74,7 @@ export class CheckoutPage implements OnInit {
 
   ngOnInit(): void {
     if (!this.carritoService.tieneItems()) {
-      this.notificationService.success('El carrito está vacío');
+      this.toastService.success('El carrito está vacío');
       this.router.navigate(['/cliente/carrito']);
       return;
     }
@@ -143,9 +143,9 @@ export class CheckoutPage implements OnInit {
       this.checkoutForm.markAllAsTouched();
       
       if (this.tipoEntregaActual() === TipoEntrega.DELIVERY && !this.checkoutForm.get('direccionId')?.value) {
-        this.notificationService.error('Por favor selecciona una dirección de entrega');
+        this.toastService.error('Por favor selecciona una dirección de entrega');
       } else {
-        this.notificationService.error('Por favor completa todos los campos requeridos')
+        this.toastService.error('Por favor completa todos los campos requeridos')
       }
       return;
     }
@@ -162,7 +162,7 @@ export class CheckoutPage implements OnInit {
     }
 
     if (!resumen.restauranteId) {
-      this.notificationService.error('Error al procesar el pedido');
+      this.toastService.error('Error al procesar el pedido');
       this.isProcessing.set(false);
       return;
     }
@@ -184,14 +184,14 @@ export class CheckoutPage implements OnInit {
     this.pedidoService.crearPedido(request).subscribe({
       next: (response) => {
         if (formValue.metodoPago === MetodoPago.MERCADO_PAGO && response.initPoint) {
-          this.notificationService.success('Redirigiendo a Mercado Pago...');
+          this.toastService.success('Redirigiendo a Mercado Pago...');
  
           this.carritoService.vaciarCarrito();
           const urlPago = response.sandboxInitPoint || response.initPoint;
           window.location.href = urlPago;
           
         } else if (formValue.metodoPago === MetodoPago.EFECTIVO) {
-          this.notificationService.success('✅ Pedido confirmado - Pago en efectivo al recibir');
+          this.toastService.success('✅ Pedido confirmado - Pago en efectivo al recibir');
           this.carritoService.vaciarCarrito();
           this.router.navigate(['/cliente/pedidos']);
         }

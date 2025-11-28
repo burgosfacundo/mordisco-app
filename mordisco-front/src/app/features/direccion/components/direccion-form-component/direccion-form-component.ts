@@ -5,7 +5,7 @@ import { DireccionService } from '../../services/direccion-service';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import DireccionRequest from '../../../../shared/models/direccion/direccion-request';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-direccion-form-component',
@@ -16,7 +16,7 @@ import { NotificationService } from '../../../../core/services/notification-serv
 export class DireccionFormComponent implements OnInit , OnChanges{
   private fb = inject(FormBuilder);
   private direccionService = inject(DireccionService);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   protected validationService = inject(FormValidationService);
 
   direccion = input<DireccionResponse>();
@@ -90,7 +90,7 @@ export class DireccionFormComponent implements OnInit , OnChanges{
       // Modo edición
       this.direccionService.update(dir.id, direccionData).subscribe({
         next: () => {
-          this.notificationService.success('✅ Dirección actualizada correctamente');
+          this.toastService.success('✅ Dirección actualizada correctamente');
           this.resetForm();
           this.onSaved.emit();
         },
@@ -102,7 +102,7 @@ export class DireccionFormComponent implements OnInit , OnChanges{
       // Modo creación
       this.direccionService.save(direccionData).subscribe({
         next: () => {
-          this.notificationService.success('✅ Dirección guardada correctamente');
+          this.toastService.success('✅ Dirección guardada correctamente');
           this.resetForm();
           this.onSaved.emit();
         },

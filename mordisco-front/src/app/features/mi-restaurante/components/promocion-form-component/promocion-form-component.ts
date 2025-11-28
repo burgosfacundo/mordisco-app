@@ -9,7 +9,7 @@ import PromocionRequest from '../../../../shared/models/promocion/promocion-requ
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -32,7 +32,7 @@ export class PromocionFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog)
 
   promocionForm!: FormGroup;
@@ -85,7 +85,7 @@ export class PromocionFormComponent implements OnInit {
   onSubmit(): void {
     if (!this.promocionForm.valid) {
       this.markFormGroupTouched(this.promocionForm);
-      this.notificationService.warning('⚠️ Por favor completa todos los campos correctamente');
+      this.toastService.warning('⚠️ Por favor completa todos los campos correctamente');
       return;
     }
 
@@ -106,7 +106,7 @@ export class PromocionFormComponent implements OnInit {
       if (this.isEditMode && this.promocionId) {
         this.promocionService.put(promocionData, this.promocionId).subscribe({
           next: () => {
-            this.notificationService.success('✅ Promoción actualizada correctamente');
+            this.toastService.success('✅ Promoción actualizada correctamente');
             this.router.navigate(['/mi-restaurante']);
           },
           error: () => {
@@ -117,7 +117,7 @@ export class PromocionFormComponent implements OnInit {
         // Crear nueva promoción
         this.promocionService.save(promocionData).subscribe({
           next: () => {
-            this.notificationService.success('✅ Promoción creada correctamente');
+            this.toastService.success('✅ Promoción creada correctamente');
             this.router.navigate(['/mi-restaurante']);
           },
           error: () => {

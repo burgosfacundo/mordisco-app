@@ -19,9 +19,11 @@ import utn.back.mordiscoapi.repository.*;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 import utn.back.mordiscoapi.service.MercadoPagoService;
 import utn.back.mordiscoapi.service.NotificacionService;
+import utn.back.mordiscoapi.service.interf.IGananciaRepartidorService;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -41,6 +43,7 @@ public class PedidoServiceImpl implements IPedidoService {
     private final NotificacionService notificacionService;
     private final ConfiguracionSistemaServiceImpl configuracionService;
     private final AuthUtils authUtils;
+    private final IGananciaRepartidorService gananciaRepartidorService;
 
     /**
      * Guarda un pedido y gestiona el pago
@@ -74,6 +77,25 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setTotal(total);
 
         validarYAsignarDireccion(pedido, dto, restaurante, cliente);
+
+        // Calcular costo de delivery si es DELIVERY
+        if (pedido.getTipoEntrega() == TipoEntrega.DELIVERY && pedido.getDireccionEntrega() != null) {
+            // Calcular distancia entre restaurante y dirección de entrega
+            BigDecimal distanciaKm = calcularDistancia(
+                    restaurante.getDireccion().getLatitud(),
+                    restaurante.getDireccion().getLongitud(),
+                    pedido.getDireccionEntrega().getLatitud(),
+                    pedido.getDireccionEntrega().getLongitud()
+            );
+            pedido.setDistanciaKm(distanciaKm);
+
+            // Calcular costo de delivery basado en la distancia
+            BigDecimal costoDelivery = configuracionService.calcularCostoDelivery(distanciaKm);
+            pedido.setCostoDelivery(costoDelivery);
+
+            log.info("📍 Pedido #{} - Distancia: {} km, Costo delivery: ${}",
+                    pedido.getId(), distanciaKm, costoDelivery);
+        }
 
         if (pedido.getDireccionEntrega() != null) {
             pedido.setDireccionSnapshot(pedido.getDireccionEntrega().toSnapshot());
@@ -202,7 +224,7 @@ public class PedidoServiceImpl implements IPedidoService {
         pedidoRepository.save(pedido);
 
         // Notificar según el nuevo estado
-        // notificarCambioEstado(pedido, nuevoEstado);
+        notificarCambioEstado(pedido, nuevoEstado);
     }
 
     /**
@@ -259,8 +281,6 @@ public class PedidoServiceImpl implements IPedidoService {
         }
     }
 
-    /**
-     * Notifica según el nuevo estado y tipo de entrega
 
     private void notificarCambioEstado(Pedido pedido, EstadoPedido nuevoEstado) {
         switch (nuevoEstado) {
@@ -282,7 +302,7 @@ public class PedidoServiceImpl implements IPedidoService {
             default ->
                     notificacionService.notificarCambioEstadoACliente(pedido);
         }
-    }*/
+    }
 
 
     /**
@@ -507,9 +527,17 @@ public class PedidoServiceImpl implements IPedidoService {
 
         pedidoRepository.save(pedido);
 
+        // Registrar ganancia del repartidor
+        try {
+            gananciaRepartidorService.registrarGanancia(pedido);
+        } catch (NotFoundException e) {
+            log.error("Error al registrar ganancia del repartidor: {}", e.getMessage());
+        }
+
+        log.info("✅ Pedido #{} marcado como entregado por repartidor #{}",
+                pedidoId, repartidorId);
 
         // TODO: Notificar al cliente
-        // TODO: Calcular ganancia del repartidor
     }
 
     @Override
@@ -550,6 +578,32 @@ public class PedidoServiceImpl implements IPedidoService {
         }
 
         return PedidoMapper.toDTO(pedido);
+    }
+
+    /**
+     * Calcula la distancia entre dos puntos geográficos usando la fórmula de Haversine
+     * @param lat1 Latitud del punto 1
+     * @param lon1 Longitud del punto 1
+     * @param lat2 Latitud del punto 2
+     * @param lon2 Longitud del punto 2
+     * @return Distancia en kilómetros
+     */
+    private BigDecimal calcularDistancia(Double lat1, Double lon1, Double lat2, Double lon2) {
+        final int RADIO_TIERRA_KM = 6371;
+
+        double lat1Rad = Math.toRadians(lat1);
+        double lat2Rad = Math.toRadians(lat2);
+        double deltaLat = Math.toRadians(lat2 - lat1);
+        double deltaLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                        Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distancia = RADIO_TIERRA_KM * c;
+
+        return BigDecimal.valueOf(distancia).setScale(2, RoundingMode.HALF_UP);
     }
 }
 

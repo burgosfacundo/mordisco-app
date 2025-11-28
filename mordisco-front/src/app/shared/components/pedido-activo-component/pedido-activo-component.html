@@ -38,13 +38,13 @@
         <!-- Información del pedido -->
         <div>
           <h1 class="text-3xl font-bold text-gray-900 font-display">
-            Pedido #{{ pedido?.id }}
+            Pedido #{{ pedido.id }}
           </h1>
           <div class="flex items-center gap-2 mt-2 text-gray-600">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span class="text-sm">{{ formatearFecha(pedido?.fechaHora || '') }}</span>
+            <span class="text-sm">{{ formatearFecha(pedido.fechaHora || '') }}</span>
           </div>
         </div>
 
@@ -52,13 +52,13 @@
         <div class="flex flex-col items-start sm:items-end gap-2">
           <span 
             class="px-4 py-2 rounded-full text-sm font-semibold"
-            [class]="obtenerClaseEstado(pedido?.estado )"
+            [class]="obtenerClaseEstado(pedido.estado )"
           >
-            {{ obtenerTextoEstado(pedido?.estado) }}
+            {{ obtenerTextoEstado(pedido.estado) }}
           </span>
           <span class="text-xs text-gray-500">
-            {{ obtenerEmojiTipoEntrega(pedido?.tipoEntrega) }} 
-            {{ obtenerTextoTipoEntrega(pedido?.tipoEntrega) }}
+            {{ obtenerEmojiTipoEntrega(pedido.tipoEntrega) }} 
+            {{ obtenerTextoTipoEntrega(pedido.tipoEntrega) }}
           </span>
         </div>
       </div>
@@ -77,14 +77,14 @@
       
       <div class="flex items-center gap-4">
         <img 
-          [src]="pedido?.restaurante?.logo?.url" 
-          [alt]="pedido?.restaurante?.razonSocial"
+          [src]="pedido.restaurante.logo.url" 
+          [alt]="pedido.restaurante.razonSocial"
           class="w-16 h-16 rounded-lg object-cover"
         />
         <div>
-          <h3 class="font-semibold text-lg">{{ pedido?.restaurante?.razonSocial }}</h3>
+          <h3 class="font-semibold text-lg">{{ pedido.restaurante.razonSocial }}</h3>
           <p class="text-sm text-gray-600">
-            ⭐ {{ pedido?.restaurante?.estrellas }} estrellas
+            ⭐ {{ pedido.restaurante.estrellas }} estrellas
           </p>
         </div>
       </div>
@@ -104,15 +104,15 @@
       <div class="space-y-2">
         <p class="text-gray-800">
           <span class="font-semibold">Nombre:</span> 
-          {{ pedido?.cliente?.nombre }} {{ pedido?.cliente?.apellido }}
+          {{ pedido.cliente.nombre }} {{ pedido.cliente.apellido }}
         </p>
         <p class="text-gray-800">
           <span class="font-semibold">Email:</span> 
-          {{ pedido?.cliente?.email }}
+          {{ pedido.cliente.email }}
         </p>
         <p class="text-gray-800">
           <span class="font-semibold">Teléfono:</span> 
-          {{ pedido?.cliente?.telefono }}
+          {{ pedido.cliente.telefono }}
         </p>
       </div>
     </div>
@@ -132,10 +132,10 @@
       
       <div class="space-y-2">
         <p class="text-gray-800 font-semibold text-lg">
-          {{ formatearDireccion(pedido?.direccionEntrega) }}
+          {{ formatearDireccion(pedido.direccionEntrega) }}
         </p>
         <p class="text-sm text-gray-600">
-          CP: {{ pedido?.direccionEntrega?.codigoPostal }} - {{ pedido?.direccionEntrega?.ciudad }}
+          CP: {{ pedido.direccionEntrega.codigoPostal }} - {{ pedido.direccionEntrega.ciudad }}
         </p>
         
         <!-- Referencias (si existen) -->
@@ -143,7 +143,7 @@
              @if (pedido.direccionEntrega.referencias) {
           <p class="text-sm text-yellow-800">
             <span class="font-semibold">📌 Referencias:</span> 
-            {{ pedido?.direccionEntrega?.referencias }}
+            {{ pedido.direccionEntrega.referencias }}
           </p>
         }
         </div>
@@ -164,8 +164,8 @@
       
       <!-- Lista de productos -->
       <div class="space-y-3">
+        @for (producto of pedido.productos; track producto.id) {
         <div 
-          *ngFor="let producto of pedido.productos; trackBy: trackByProductoId"
           class="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
         >
           <div class="flex-1">
@@ -178,6 +178,7 @@
             {{ formatearPrecio(calcularSubtotal(producto.cantidad, producto.precioUnitario)) }}
           </p>
         </div>
+        }
       </div>
 
       <!-- Total -->
@@ -190,7 +191,7 @@
             TOTAL
           </span>
           <span class="text-2xl font-bold text-primary-500">
-            {{ formatearPrecio(pedido?.total) }}
+            {{ formatearPrecio(pedido.total) }}
           </span>
         </div>
       </div>
@@ -340,8 +341,8 @@
 
       <!-- Lista de motivos -->
       <div class="space-y-2">
+        @for (motivo of MOTIVOS_CANCELACION; track motivo) {
         <label 
-          *ngFor="let motivo of MOTIVOS_CANCELACION"
           class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary-500 transition-colors"
           [class.border-primary-500]="motivoCancelacion === motivo"
           [class.bg-primary-50]="motivoCancelacion === motivo"
@@ -350,19 +351,20 @@
             type="radio"
             name="motivo"
             [value]="motivo"
-            (ngModel)="motivoCancelacion"
+            [(ngModel)]="motivoCancelacion"
             (change)="onMotivoChange()"
             class="w-4 h-4 text-primary-500 focus:ring-primary-500"
           />
           <span class="text-gray-700 font-medium">{{ motivo }}</span>
         </label>
+        }
       </div>
 
       <!-- Campo de texto para "Otro motivo" -->
       <div  class="fade-in">
         @if (mostrarCampoOtroMotivo) {
         <textarea
-          (ngModel)="otroMotivo"
+          [(ngModel)]="otroMotivo"
           placeholder="Describe el motivo de cancelación..."
           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none resize-none"
           rows="3"

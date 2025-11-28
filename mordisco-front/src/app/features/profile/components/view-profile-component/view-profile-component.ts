@@ -4,8 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { UserService } from '../../../registro/services/user-service';
 import UserProfile from '../../../../shared/models/user/user-profile';
 import { AuthService } from '../../../../shared/services/auth-service';
-import { NotificationService } from '../../../../core/services/notification-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-view-profile',
@@ -16,7 +16,7 @@ export class ViewProfileComponent {
   private authService = inject(AuthService)
   private userService : UserService = inject(UserService)
   private router : Router = inject(Router)
-  private notificationService = inject(NotificationService)
+  private toastService = inject(ToastService)
   private dialog = inject(MatDialog)
   usuario? : UserProfile
 
@@ -46,7 +46,7 @@ export class ViewProfileComponent {
   eliminarCuenta(): void {
     this.userService.deleteMe().subscribe({
       next: () => {
-        this.notificationService.success('Cuenta eliminada correctamente');
+        this.toastService.success('Cuenta eliminada correctamente');
         this.authService.logout();
       }
     });

@@ -1,5 +1,5 @@
 <div class="toast-container">
-  @for (notification of notificationService.getNotifications(); track notification.id) {
+  @for (notification of toastService.getNotifications(); track notification.id) {
   <div class="toast toast-{{ notification.severity }}" (click)="dismiss(notification.id)">
     <div class="toast-icon">
       @switch (notification.severity) { @case ('success') {

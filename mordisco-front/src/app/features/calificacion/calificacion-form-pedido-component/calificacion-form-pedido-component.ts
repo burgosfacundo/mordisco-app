@@ -3,7 +3,7 @@ import { Router } from '@angular/router';import { CalificacionService } from '..
 import { FormValidationService } from '../../../shared/services/form-validation-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import CalificacionPedidoRequestDTO from '../../../shared/models/calificacion/calificacion-pedido-request-dto';
-import { NotificationService } from '../../../core/services/notification-service';
+import { ToastService } from '../../../core/services/toast-service';
 
 @Component({
   selector: 'app-calificacion-form-pedido-component',
@@ -14,7 +14,7 @@ export class CalificacionFormPedidoComponent implements OnInit{
   private router = inject(Router)
   private cService = inject(CalificacionService)
   private validationService = inject(FormValidationService)
-  private notificationService = inject(NotificationService)
+  private toastService = inject(ToastService)
   private fb = inject(FormBuilder)
   formCalificacionPedido! : FormGroup
   pedido = input<number|null>()
@@ -57,7 +57,7 @@ export class CalificacionFormPedidoComponent implements OnInit{
   
     this.cService.calificarPedido(calificacionRequest).subscribe({
       next : () => {
-        this.notificationService.success('✅ Calificacion registrada correctamente')
+        this.toastService.success('✅ Calificacion registrada correctamente')
         this.router.navigate(['cliente/pedidos/detalle',idPed])
       },
       error:() => {

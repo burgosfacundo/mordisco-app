@@ -4,7 +4,7 @@ import UserRegister from '../../model/user-register';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-user-form',
@@ -16,7 +16,7 @@ export class UserFormComponent implements OnInit{
   private service : UserService = inject(UserService)
   private validationService = inject(FormValidationService)
   private fb : FormBuilder = inject(FormBuilder)
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
 
   userForm! : FormGroup
 
@@ -48,9 +48,12 @@ export class UserFormComponent implements OnInit{
 
     this.service.post(user).subscribe({
       next : () => {
-        this.notificationService.success('✅ Usuario registrado correctamente')
+        this.toastService.success('Usuario registrado correctamente')
         this.router.navigate(['/login']);
-      }
+      },
+      error : () => {
+        this.isSubmitting.set(false);
+      },
     })
   }
 

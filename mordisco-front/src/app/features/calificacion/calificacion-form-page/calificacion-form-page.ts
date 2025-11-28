@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CalificacionFormRepartidorComponent } from '../calificacion-form-repartidor-component/calificacion-form-repartidor-component';
 import { CalificacionFormPedidoComponent } from '../calificacion-form-pedido-component/calificacion-form-pedido-component';
-import { NotificationService } from '../../../core/services/notification-service';
 
 @Component({
   selector: 'app-calificacion-form-page',
@@ -12,7 +11,6 @@ import { NotificationService } from '../../../core/services/notification-service
 export class CalificacionFormPage implements OnInit{
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private notificationService = inject(NotificationService);
   public pedidoId?: number;
   tipoCalificacion : string| null = null
   

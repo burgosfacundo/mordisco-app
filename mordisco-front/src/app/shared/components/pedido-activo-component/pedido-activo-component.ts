@@ -1,20 +1,25 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input, Input } from '@angular/core';
 import PedidoResponse from '../../models/pedido/pedido-response';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import DireccionResponse from '../../models/direccion/direccion-response';
 import { EstadoPedido } from '../../models/enums/estado-pedido';
 import { TipoEntrega } from '../../models/enums/tipo-entrega';
 import { PedidoService } from '../../services/pedido/pedido-service';
+import { ToastService } from '../../../core/services/toast-service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-pedido-activo-component',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './pedido-activo-component.html',
   styleUrl: './pedido-activo-component.css'
 })
 export class PedidoActivoComponent {
-  @Input() pedidoId?: number; // Si viene como input desde otro componente
+  pedidoId? = input<number>();
+  private route = inject(ActivatedRoute);
+  private pedidoService = inject(PedidoService);
+  private toastService = inject(ToastService);
+
   
   pedido: PedidoResponse | null = null;
   isLoading = false;
@@ -51,15 +56,6 @@ export class PedidoActivoComponent {
     'Otro motivo'
   ];
 
-  // ============================================
-  // CONSTRUCTOR E INYECCIÓN DE DEPENDENCIAS
-  // ============================================
-  
-  constructor(
-    private route: ActivatedRoute,
-    private pedidoService: PedidoService,
-    private snackBar: MatSnackBar
-  ) {}
 
   // ============================================
   // CICLO DE VIDA - INICIALIZACIÓN
@@ -68,7 +64,7 @@ export class PedidoActivoComponent {
   ngOnInit(): void {
     // Obtener ID del pedido desde la ruta o desde el @Input
     const idFromRoute = this.route.snapshot.paramMap.get('id');
-    const pedidoIdToLoad = this.pedidoId || (idFromRoute ? +idFromRoute : null);
+    const pedidoIdToLoad = this.pedidoId?.() || (idFromRoute ? +idFromRoute : null);
 
     if (pedidoIdToLoad) {
       this.cargarPedido(pedidoIdToLoad);
@@ -92,13 +88,9 @@ export class PedidoActivoComponent {
       next: (pedido) => {
         this.pedido = pedido;
         this.isLoading = false;
-        console.log('Pedido cargado:', pedido);
       },
-      error: (err) => {
-        this.error = 'Error al cargar el pedido. Por favor, intenta nuevamente.';
+      error: () => {
         this.isLoading = false;
-        console.error('Error al cargar pedido:', err);
-        this.mostrarNotificacion('Error al cargar el pedido', 'error');
       }
     });
   }
@@ -124,8 +116,6 @@ export class PedidoActivoComponent {
 
     const telefono = this.pedido.cliente.telefono.replace(/[^\d+]/g, '');
     window.location.href = `tel:${telefono}`;
-    
-    console.log('Llamando al cliente:', telefono);
   }
 
   /**
@@ -133,7 +123,7 @@ export class PedidoActivoComponent {
    */
   abrirEnGoogleMaps(): void {
     if (!this.pedido?.direccionEntrega) {
-      this.mostrarNotificacion('No hay dirección de entrega disponible', 'info');
+      this.toastService.info('No hay dirección de entrega disponible');
       return;
     }
 
@@ -155,13 +145,13 @@ export class PedidoActivoComponent {
     if (!this.pedido) return;
 
     // Validar que el pedido esté en un estado válido para entrega
-    if (this.pedido.estado === EstadoPedido.RECIBIDO) {
-      this.mostrarNotificacion('Este pedido ya fue entregado', 'info');
+    if (this.pedido.estado === EstadoPedido.COMPLETADO) {
+      this.toastService.info('Este pedido ya fue entregado');
       return;
     }
 
     if (this.pedido.estado === EstadoPedido.CANCELADO) {
-      this.mostrarNotificacion('No se puede entregar un pedido cancelado', 'error');
+      this.toastService.error('No se puede entregar un pedido cancelado');
       return;
     }
 
@@ -184,18 +174,14 @@ export class PedidoActivoComponent {
     this.isProcessingEntrega = true;
 
     this.pedidoService.marcarComoEntregado(this.pedido.id).subscribe({
-      next: (pedidoActualizado) => {
-        this.pedido = pedidoActualizado;
+      next: () => {
         this.isProcessingEntrega = false;
         this.showModalEntregado = false;
         
-        this.mostrarNotificacion('✅ Pedido marcado como entregado exitosamente', 'success');
-        console.log('Pedido entregado:', pedidoActualizado);
+        this.toastService.success('✅ Pedido marcado como entregado exitosamente');
       },
-      error: (err) => {
+      error: () => {
         this.isProcessingEntrega = false;
-        this.mostrarNotificacion('Error al marcar como entregado. Intenta nuevamente.', 'error');
-        console.error('Error al marcar como entregado:', err);
       }
     });
   }
@@ -211,13 +197,13 @@ export class PedidoActivoComponent {
     if (!this.pedido) return;
 
     // Validar que el pedido se pueda cancelar
-    if (this.pedido.estado === EstadoPedido.RECIBIDO) {
-      this.mostrarNotificacion('No se puede cancelar un pedido ya entregado', 'error');
+    if (this.pedido.estado === EstadoPedido.COMPLETADO) {
+      this.toastService.error('No se puede cancelar un pedido ya entregado');
       return;
     }
 
     if (this.pedido.estado === EstadoPedido.CANCELADO) {
-      this.mostrarNotificacion('Este pedido ya está cancelado', 'info');
+      this.toastService.info('Este pedido ya está cancelado');
       return;
     }
 
@@ -256,7 +242,7 @@ export class PedidoActivoComponent {
       : this.motivoCancelacion;
 
     if (!motivoFinal) {
-      this.mostrarNotificacion('Por favor selecciona un motivo de cancelación', 'error');
+      this.toastService.error('Por favor selecciona un motivo de cancelación');
       return;
     }
 
@@ -268,13 +254,11 @@ export class PedidoActivoComponent {
         this.isProcessingCancelacion = false;
         this.cerrarModalCancelado();
         
-        this.mostrarNotificacion(`❌ Pedido cancelado: ${motivoFinal}`, 'success');
+        this.toastService.success(`Pedido cancelado: ${motivoFinal}`);
         console.log('Pedido cancelado:', pedidoActualizado, 'Motivo:', motivoFinal);
       },
-      error: (err) => {
+      error: () => {
         this.isProcessingCancelacion = false;
-        this.mostrarNotificacion('Error al cancelar el pedido. Intenta nuevamente.', 'error');
-        console.error('Error al cancelar pedido:', err);
       }
     });
   }
@@ -371,11 +355,12 @@ obtenerClaseEstado(estado?: EstadoPedido | null): string {
   
   const clases: Record<EstadoPedido, string> = {
     [EstadoPedido.PENDIENTE]: 'bg-yellow-100 text-yellow-700',
-    [EstadoPedido.EN_PROCESO]: 'bg-blue-100 text-blue-700',
-    [EstadoPedido.EN_CAMINO]: 'bg-purple-100 text-purple-700',
-    [EstadoPedido.RECIBIDO]: 'bg-green-100 text-green-700',
-    [EstadoPedido.CANCELADO]: 'bg-red-100 text-red-700',
-    [EstadoPedido.LISTO_PARA_RETIRAR]: 'bg-indigo-100 text-indigo-700'
+    [EstadoPedido.EN_PREPARACION]: 'bg-blue-100 text-blue-700',
+    [EstadoPedido.LISTO_PARA_RETIRAR]: 'bg-green-100 text-green-700',
+    [EstadoPedido.LISTO_PARA_ENTREGAR]: 'bg-purple-100 text-purple-700',
+    [EstadoPedido.EN_CAMINO]: 'bg-indigo-100 text-indigo-700',
+    [EstadoPedido.COMPLETADO]: 'bg-emerald-100 text-emerald-700',
+    [EstadoPedido.CANCELADO]: 'bg-red-100 text-red-700'
   };
   
   return clases[estado] || 'bg-gray-100 text-gray-700';
@@ -395,24 +380,6 @@ obtenerClaseEstado(estado?: EstadoPedido | null): string {
   }
 
   // ============================================
-  // NOTIFICACIONES
-  // ============================================
-  
-  /**
-   * Muestra un snackbar con un mensaje
-   */
-  private mostrarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'info' = 'info'): void {
-    const panelClass = `snackbar-${tipo}`;
-    
-    this.snackBar.open(mensaje, 'Cerrar', {
-      duration: 4000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-      panelClass: [panelClass]
-    });
-  }
-
-  // ============================================
   // UTILIDADES
   // ============================================
   
@@ -421,10 +388,5 @@ obtenerClaseEstado(estado?: EstadoPedido | null): string {
    */
   calcularSubtotal(cantidad: number, precioUnitario: number): number {
     return cantidad * precioUnitario;
-  }
-
-
-  trackByProductoId(index: number, producto: any): number {
-    return producto.id;
   }
 }

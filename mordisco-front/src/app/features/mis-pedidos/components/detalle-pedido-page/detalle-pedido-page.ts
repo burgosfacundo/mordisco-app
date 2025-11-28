@@ -13,7 +13,7 @@ import { CalificacionService } from '../../../../shared/services/calificacion/ca
 import CalificacionPedidoResponseDTO from '../../../../shared/models/calificacion/calificacion-pedido-response-dto';
 import CalificacionRepartidorResponseDTO from '../../../../shared/models/calificacion/calificacion-repartidor-response-dto';
 import { CalificacionComponent } from '../../../../shared/components/calificacion-component/calificacion-component';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
@@ -32,7 +32,7 @@ import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-
 export class DetallePedidoPage implements OnInit {
   private authService = inject(AuthService);
   private cService = inject(CalificacionService)
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private pedidoService = inject(PedidoService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -101,7 +101,7 @@ export class DetallePedidoPage implements OnInit {
 
       this.pedidoService.changeState(this.pedido.id, EstadoPedido.EN_PREPARACION).subscribe({
         next: () => {
-          this.notificationService.success('✅ Pedido aceptado');
+          this.toastService.success('✅ Pedido aceptado');
           this.loadPedido();
         }
       });
@@ -120,7 +120,7 @@ export class DetallePedidoPage implements OnInit {
 
       this.pedidoService.cancel(this.pedido.id).subscribe({
         next: () => {
-          this.notificationService.success('✅ Pedido cancelado');
+          this.toastService.success('✅ Pedido cancelado');
           this.loadPedido();
         }
       });
@@ -139,7 +139,7 @@ export class DetallePedidoPage implements OnInit {
 
       this.pedidoService.changeState(this.pedido.id, EstadoPedido.EN_CAMINO).subscribe({
         next: () => {
-          this.notificationService.success('✅ Pedido marcado como "En Camino"');
+          this.toastService.success('✅ Pedido marcado como "En Camino"');
           this.loadPedido();
         }
       });
@@ -192,7 +192,7 @@ export class DetallePedidoPage implements OnInit {
 
       this.cService.eliminarCalificacionRepartidor(id).subscribe({
         next: () => {
-          this.notificationService.success('✅ Calificacion eliminada correctamente');
+          this.toastService.success('✅ Calificacion eliminada correctamente');
           this.loadPedido();
         }
       });
@@ -210,7 +210,7 @@ export class DetallePedidoPage implements OnInit {
 
       this.cService.eliminarCalificacionPedido(id).subscribe({
         next: () => {
-          this.notificationService.success('✅ Calificacion eliminada correctamente');
+          this.toastService.success('✅ Calificacion eliminada correctamente');
           this.reloadComponent();
         }
       });

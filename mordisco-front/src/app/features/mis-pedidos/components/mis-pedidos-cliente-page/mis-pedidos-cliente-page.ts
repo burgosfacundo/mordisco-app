@@ -9,7 +9,7 @@ import { AuthService } from '../../../../shared/services/auth-service';
 import { DetallePedidoComponent } from '../../../mis-pedidos/components/detalle-pedido-component/detalle-pedido-component';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
 
 @Component({
@@ -28,7 +28,7 @@ import { ConfirmationService } from '../../../../core/services/confirmation-serv
 export class MisPedidosClientePage implements OnInit {
   private pedidoService = inject(PedidoService)
   private authService = inject(AuthService)
-  private notificationService = inject(NotificationService)
+  private toastService = inject(ToastService)
   private confirmationService = inject(ConfirmationService)
   private router = inject(Router)
 
@@ -127,7 +127,7 @@ export class MisPedidosClientePage implements OnInit {
 
       this.pedidoService.cancel(pedidoId).subscribe({
         next: () => {
-          this.notificationService.success('✅ Pedido cancelado');
+          this.toastService.success('✅ Pedido cancelado');
           this.cargarPedidos();
         }
       });

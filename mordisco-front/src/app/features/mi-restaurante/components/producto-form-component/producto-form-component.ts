@@ -7,7 +7,7 @@ import ProductoRequest from '../../../../shared/models/producto/producto-request
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
@@ -23,7 +23,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
   private productoService = inject(ProductoService);
   private formValidationService = inject(FormValidationService);
   private fb = inject(FormBuilder);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
   protected productoForm!: FormGroup;
@@ -80,7 +80,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
           this.router.navigate(['/restaurante/menu']);
         }
       }else {
-        this.notificationService.warning('⚠️ Ruta inválida');
+        this.toastService.warning('⚠️ Ruta inválida');
         this.router.navigate(['/restaurante/menu']);
       }
     });
@@ -122,7 +122,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (this.productoForm.invalid) {
       this.productoForm.markAllAsTouched();
-      this.notificationService.warning('⚠️ Por favor completa todos los campos correctamente');
+      this.toastService.warning('⚠️ Por favor completa todos los campos correctamente');
       return;
     }
 
@@ -154,7 +154,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
 
     this.productoService.post(request).subscribe({
       next: () => {
-        this.notificationService.success('✅ Producto creado exitosamente');
+        this.toastService.success('✅ Producto creado exitosamente');
         this.router.navigate(['/restaurante/menu']);
       },
       error: () => {
@@ -180,7 +180,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
 
     this.productoService.update(update, this.productoId!).subscribe({
       next: () => {
-        this.notificationService.success('✅ Producto actualizado exitosamente');
+        this.toastService.success('✅ Producto actualizado exitosamente');
         this.router.navigate(['/restaurante/menu']);
       },
       error: () => {

@@ -3,7 +3,7 @@ import { UserService } from '../../../registro/services/user-service';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NotificationService } from '../../../../core/services/notification-service';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-edit-profile-form-component',
@@ -13,7 +13,7 @@ import { NotificationService } from '../../../../core/services/notification-serv
 export class EditProfileFormComponent {
   private fb = inject(FormBuilder);
   private validationService : FormValidationService = inject(FormValidationService)
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
   private userService = inject(UserService)
 
@@ -63,7 +63,7 @@ export class EditProfileFormComponent {
 
     this.userService.updateMe(this.editarPerfil.value).subscribe({
       next: () => {
-        this.notificationService.success('✅ Perfil actualizado correctamente')
+        this.toastService.success('✅ Perfil actualizado correctamente')
         this.router.navigate(['/profile'])
       }
     });

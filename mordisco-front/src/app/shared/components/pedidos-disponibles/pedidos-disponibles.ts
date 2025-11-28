@@ -5,8 +5,8 @@ import PedidoResponse from '../../models/pedido/pedido-response';
 import { PedidoService } from '../../services/pedido/pedido-service';
 import { GeolocationService } from '../../services/geolocation/geolocation-service';
 import { Ubicacion } from '../../models/ubicacion/ubicacion.model';
-import { NotificationService } from '../../../core/services/notification-service';
 import { ConfirmationService } from '../../../core/services/confirmation-service';
+import { ToastService } from '../../../core/services/toast-service';
 
 interface PedidoConDistancia extends PedidoResponse {
   distanciaKm?: number;
@@ -22,7 +22,7 @@ interface PedidoConDistancia extends PedidoResponse {
 export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
   private pedidoService = inject(PedidoService);
   private geolocationService = inject(GeolocationService);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
   private confirmationService = inject(ConfirmationService);
 
   pedidosDisponibles = signal<PedidoConDistancia[]>([]);
@@ -50,7 +50,7 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
     if (!this.geolocationService.soportaGeolocation()) {
       this.errorUbicacion.set('Tu navegador no soporta geolocalización');
       this.isLoading.set(false);
-      this.notificationService.error('Tu navegador no soporta geolocalización');
+      this.toastService.error('Tu navegador no soporta geolocalización');
       return;
     }
 
@@ -63,7 +63,7 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.errorUbicacion.set(error.message);
         this.isLoading.set(false);
-        this.notificationService.error(error.message);
+        this.toastService.error(error.message);
       }
     });
   }
@@ -81,7 +81,7 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
         switchMap(() => this.cargarPedidosDisponibles(ubicacion)),
         catchError(error => {
           console.error('Error al cargar pedidos:', error);
-          this.notificationService.error('Error al cargar pedidos disponibles');
+          this.toastService.error('Error al cargar pedidos disponibles');
           return of({ content: [], totalElements: 0 });
         })
       )
@@ -156,7 +156,7 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
         this.pedidosDisponibles.set(pedidosConDistancia);
         this.lastUpdate.set(new Date());
         this.isLoading.set(false);
-        this.notificationService.success('Pedidos actualizados');
+        this.toastService.success('Pedidos actualizados');
       },
       error: (error) => {
         console.error('Error al recargar pedidos:', error);
@@ -170,12 +170,12 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
    */
   onAceptarPedido(pedido: PedidoConDistancia): void {
     const distanciaInfo = pedido.distanciaFormateada 
-      ? `Distancia: ${pedido.distanciaFormateada}`
+      ? `\n\nDistancia: ${pedido.distanciaFormateada}`
       : '';
 
     this.confirmationService.confirm({
       title: 'Aceptar Pedido',
-      message: `¿Deseas aceptar el pedido #${pedido.id}?${distanciaInfo ? '\n\n' + distanciaInfo : ''}`,
+      message: `¿Deseas aceptar el pedido #${pedido.id}?${distanciaInfo}`,
       type: 'info'
     }).subscribe(confirmed => {
       if (confirmed) {
@@ -190,7 +190,7 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
   private aceptarPedido(pedidoId: number): void {
     this.pedidoService.aceptarPedido(pedidoId).subscribe({
       next: () => {
-        this.notificationService.success(`✅ Pedido #${pedidoId} aceptado exitosamente`);
+        this.toastService.success(`Pedido #${pedidoId} aceptado exitosamente`);
         
         // Emitir evento para que el componente padre actualice
         this.pedidoAceptado.emit(pedidoId);
