@@ -97,7 +97,7 @@
       </div>
     }
 
-    @if (isRepartidor()) {
+    @if (isRepartidor() || isRestaurante()) {
       <div class="flex items-start gap-3">
         <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
           <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -136,14 +136,16 @@
       </div>
     </div>
 
+    @if (isRestaurante()) {
     <div class="mt-4 pt-4 border-t border-gray-200">
       <div class="flex items-center justify-between">
         <span class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total</span>
         <span class="text-2xl font-bold text-primary-600">
-          ${{ pedido()?.total | number:'1.2-2' }}
+          ${{ pedido()?.subtotalProductos | number:'1.2-2' }}
         </span>
       </div>
     </div>
+    }
   </div>
 
   <!-- Footer con botones de acción -->

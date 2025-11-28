@@ -25,10 +25,16 @@ public record PedidoResponseDTO(
     EstadoPedido estado,
     @Schema(description = "Fecha y hora del pedido", example = "2023-10-01T12:00:00")
     LocalDateTime fechaHora,
-    @Schema(description = "Total del pedido", example = "150.00")
+    @Schema(description = "Total del pedido (incluye delivery si aplica)", example = "150.00")
     BigDecimal total,
     @Schema(description = "Dirección de entrega del pedido")
     DireccionResponseDTO direccionEntrega,
-    String direccionSnapshot
+    String direccionSnapshot,
+    @Schema(description = "Costo del delivery", example = "300.00")
+    BigDecimal costoDelivery,
+    @Schema(description = "Distancia en kilómetros", example = "5.5")
+    BigDecimal distanciaKm,
+    @Schema(description = "Subtotal solo productos (sin delivery)", example = "120.00")
+    BigDecimal subtotalProductos
 ) {
 }

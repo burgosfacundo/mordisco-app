@@ -14,8 +14,10 @@ export default interface PedidoResponse{
     tipoEntrega : TipoEntrega,
     estado : EstadoPedido,
     fechaHora : string,
-    total : number,
-    costoDelivery? : number,
-    direccionEntrega? : DireccionResponse,
-    direccionSnapshot? : string
+    total: number,
+    direccionEntrega?: DireccionResponse,
+    direccionSnapshot?: string,
+    costoDelivery?: number,
+    distanciaKm?: number,
+    subtotalProductos?: number
 }

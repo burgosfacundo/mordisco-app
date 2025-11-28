@@ -111,25 +111,47 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
 
   /**
    * Calcula las distancias y ordena los pedidos
+   * Distancia TOTAL = (Repartidor → Restaurante) + (Restaurante → Dirección Entrega)
    */
   private calcularDistancias(pedidos: PedidoResponse[], ubicacionActual: Ubicacion): PedidoConDistancia[] {
     const pedidosConDistancia: PedidoConDistancia[] = pedidos.map(pedido => {
-      if (pedido.direccionEntrega?.latitud && pedido.direccionEntrega?.longitud) {
-        const distanciaKm = this.geolocationService.calcularDistancia(
+      let distanciaTotal = 0;
+
+      // Validar que tengamos todas las coordenadas necesarias
+      const tieneCoordRestaurante = pedido.restaurante?.direccion?.latitud && pedido.restaurante?.direccion?.longitud;
+      const tieneCoordEntrega = pedido.direccionEntrega?.latitud && pedido.direccionEntrega?.longitud;
+
+      if (tieneCoordRestaurante && tieneCoordEntrega) {
+        // Distancia 1: Repartidor → Restaurante
+        const distanciaAlRestaurante = this.geolocationService.calcularDistancia(
           ubicacionActual,
           {
-            latitud: pedido.direccionEntrega.latitud,
-            longitud: pedido.direccionEntrega.longitud
+            latitud: pedido.restaurante!.direccion!.latitud,
+            longitud: pedido.restaurante!.direccion!.longitud
           }
         );
-        
-        return {
-          ...pedido,
-          distanciaKm,
-          distanciaFormateada: this.geolocationService.formatearDistancia(distanciaKm)
-        };
+
+        // Distancia 2: Restaurante → Dirección de Entrega
+        const distanciaEntrega = this.geolocationService.calcularDistancia(
+          {
+            latitud: pedido.restaurante!.direccion!.latitud,
+            longitud: pedido.restaurante!.direccion!.longitud
+          },
+          {
+            latitud: pedido.direccionEntrega!.latitud!,
+            longitud: pedido.direccionEntrega!.longitud!
+          }
+        );
+
+        // Distancia TOTAL del recorrido
+        distanciaTotal = distanciaAlRestaurante + distanciaEntrega;
       }
-      return pedido;
+
+      return {
+        ...pedido,
+        distanciaKm: distanciaTotal,
+        distanciaFormateada: this.geolocationService.formatearDistancia(distanciaTotal)
+      };
     });
 
     // Ordenar por distancia (más cercanos primero)

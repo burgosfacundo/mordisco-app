@@ -103,8 +103,19 @@ public class PedidoServiceImpl implements IPedidoService {
             BigDecimal costoDelivery = configuracionService.calcularCostoDelivery(distanciaKm);
             pedido.setCostoDelivery(costoDelivery);
 
-            log.info("📍 Pedido #{} - Distancia: {} km, Costo delivery: ${}",
-                    pedido.getId(), distanciaKm, costoDelivery);
+            // Guardar el subtotal de productos (sin delivery) para el restaurante
+            pedido.setSubtotalProductos(total);
+
+            // Actualizar el total para incluir el costo de delivery (para el cliente)
+            // Total = Subtotal productos + Costo delivery
+            pedido.setTotal(total.add(costoDelivery));
+
+            log.info("📍 Pedido #{} - Distancia: {} km, Costo delivery: ${}, Total con envío: ${}",
+                    pedido.getId(), distanciaKm, costoDelivery, pedido.getTotal());
+        } else {
+            // Para RETIRO_POR_LOCAL, el total y subtotal son iguales
+            pedido.setSubtotalProductos(total);
+            log.info("🏪 Pedido #{} - Retiro por local, Total: ${}", pedido.getId(), total);
         }
 
         if (pedido.getDireccionEntrega() != null) {

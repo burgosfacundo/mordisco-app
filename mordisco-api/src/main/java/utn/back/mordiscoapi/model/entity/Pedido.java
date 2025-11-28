@@ -37,6 +37,9 @@ public class Pedido {
     private BigDecimal total;
 
     @Column
+    private BigDecimal subtotalProductos;
+
+    @Column
     private BigDecimal costoDelivery;
 
     @Column

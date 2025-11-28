@@ -42,20 +42,35 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
 
     /**
      * Encuentra pedidos disponibles para repartidores cerca de una ubicación
+     * Calcula la distancia TOTAL del recorrido:
+     * 1. Desde ubicación del repartidor hasta el RESTAURANTE (recogida)
+     * 2. Desde el RESTAURANTE hasta la DIRECCIÓN DE ENTREGA
      */
     @Query(value =
             "SELECT p.* FROM pedidos p " +
-                    "INNER JOIN direcciones d ON p.direccion_id = d.id " +
+                    "INNER JOIN restaurantes r ON p.restaurante_id = r.id " +
+                    "INNER JOIN direcciones dr ON r.direccion_id = dr.id " +
+                    "INNER JOIN direcciones de ON p.direccion_id = de.id " +
                     "WHERE p.estado = 'LISTO_PARA_ENTREGAR' " +
                     "AND p.tipo_entrega = 'DELIVERY' " +
                     "AND p.repartidor_id IS NULL " +
-                    "AND d.latitud IS NOT NULL " +
-                    "AND d.longitud IS NOT NULL " +
+                    "AND dr.latitud IS NOT NULL " +
+                    "AND dr.longitud IS NOT NULL " +
+                    "AND de.latitud IS NOT NULL " +
+                    "AND de.longitud IS NOT NULL " +
                     "AND ( " +
-                    "  6371 * acos( " +
-                    "    cos(radians(:latitud)) * cos(radians(d.latitud)) * " +
-                    "    cos(radians(d.longitud) - radians(:longitud)) + " +
-                    "    sin(radians(:latitud)) * sin(radians(d.latitud)) " +
+                    "  ( " +
+                    "    6371 * acos( " +
+                    "      cos(radians(:latitud)) * cos(radians(dr.latitud)) * " +
+                    "      cos(radians(dr.longitud) - radians(:longitud)) + " +
+                    "      sin(radians(:latitud)) * sin(radians(dr.latitud)) " +
+                    "    ) " +
+                    "  ) + ( " +
+                    "    6371 * acos( " +
+                    "      cos(radians(dr.latitud)) * cos(radians(de.latitud)) * " +
+                    "      cos(radians(de.longitud) - radians(dr.longitud)) + " +
+                    "      sin(radians(dr.latitud)) * sin(radians(de.latitud)) " +
+                    "    ) " +
                     "  ) " +
                     ") <= :radioKm " +
                     "ORDER BY p.fecha_hora DESC",

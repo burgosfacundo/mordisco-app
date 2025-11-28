@@ -68,7 +68,10 @@ public class PedidoMapper {
                 pedido.getFechaHora(),
                 pedido.getTotal(),
                 direccionEntrega,
-                pedido.getDireccionSnapshot()
+                pedido.getDireccionSnapshot(),
+                pedido.getCostoDelivery(),
+                pedido.getDistanciaKm(),
+                pedido.getSubtotalProductos()
                 );
     }
 }

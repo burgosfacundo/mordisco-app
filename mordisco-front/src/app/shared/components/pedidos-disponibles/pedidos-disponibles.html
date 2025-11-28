@@ -84,12 +84,6 @@
             <p class="text-xs text-primary-600 uppercase tracking-wide font-semibold">Pedido</p>
             <p class="text-2xl font-bold text-gray-900">#{{ pedido.id }}</p>
           </div>
-          <!-- @if (pedido.tiempoEstimado <= 15) {
-                <span class="px-3 py-1 rounded-full text-xs font-bold
-                             bg-red-100 text-red-700 animate-pulse">
-                  ¡Urgente!
-                </span>
-              }-->
         </div>
       </div>
 
@@ -162,8 +156,8 @@
         </div>
 
         <!-- Métricas en Cards -->
-        <div class="grid grid-cols-3 gap-2 mt-2">
-          <!-- Distancia -->
+        <div class="grid grid-cols-2 gap-3 mt-2">
+          <!-- Distancia Total -->
           <div class="bg-blue-50 rounded-lg p-3 text-center">
             <svg
               class="w-5 h-5 text-blue-600 mx-auto mb-1"
@@ -178,7 +172,7 @@
                 d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
               />
             </svg>
-            <p class="text-xs text-gray-600 font-semibold">Distancia</p>
+            <p class="text-xs text-gray-600 font-semibold">Distancia Total</p>
             @if (pedido.distanciaFormateada) {
             <p class="text-lg font-bold text-blue-700">{{ pedido.distanciaFormateada }}</p>
             } @else {
@@ -186,26 +180,7 @@
             }
           </div>
 
-          <!-- Tiempo -->
-          <div class="bg-purple-50 rounded-lg p-3 text-center">
-            <svg
-              class="w-5 h-5 text-purple-600 mx-auto mb-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p class="text-xs text-gray-600 font-semibold">Tiempo</p>
-            <p class="text-lg font-bold text-purple-700">~30 min</p>
-          </div>
-
-          <!-- Pago -->
+          <!-- Ganancia -->
           <div class="bg-green-50 rounded-lg p-3 text-center">
             <svg
               class="w-5 h-5 text-green-600 mx-auto mb-1"
@@ -221,9 +196,13 @@
               />
             </svg>
             <p class="text-xs text-gray-600 font-semibold">Ganarás</p>
+            @if (pedido.costoDelivery) {
             <p class="text-lg font-bold text-green-700">
-              ${{ pedido.costoDelivery ? (pedido.costoDelivery * 0.8).toFixed(2) : ((pedido.total * 0.2) * 0.8).toFixed(2) }}
+              ${{ (pedido.costoDelivery * 0.8) | number:'1.2-2' }}
             </p>
+            } @else {
+            <p class="text-xs text-gray-400">N/D</p>
+            }
           </div>
         </div>
 

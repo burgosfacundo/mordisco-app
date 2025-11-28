@@ -44,11 +44,24 @@
           </div>
         }
 
-        <!-- Total -->
+        <!-- Total / Subtotal según rol -->
         <div class="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
           <div class="space-y-2">
-            <p class="text-green-600 text-sm font-semibold uppercase tracking-wide">Total</p>
-            <p class="text-2xl font-bold text-green-900">${{ pedido.total | number:'1.2-2' }}</p>
+            @if (isUsuario === 'ROLE_RESTAURANTE') {
+              <p class="text-green-600 text-sm font-semibold uppercase tracking-wide">Recibirás</p>
+              <p class="text-2xl font-bold text-green-900">
+                ${{ (pedido.subtotalProductos || pedido.total) | number:'1.2-2' }}
+              </p>
+              <p class="text-xs text-gray-600">Solo productos</p>
+            } @else {
+              <p class="text-green-600 text-sm font-semibold uppercase tracking-wide">Total Pagado</p>
+              <p class="text-2xl font-bold text-green-900">${{ pedido.total | number:'1.2-2' }}</p>
+              @if (pedido.tipoEntrega === tipoEntregaEnum.DELIVERY && pedido.costoDelivery) {
+                <p class="text-xs text-gray-600">
+                  Incluye envío: ${{ pedido.costoDelivery | number:'1.2-2' }}
+                </p>
+              }
+            }
           </div>
         </div>
       </div>
