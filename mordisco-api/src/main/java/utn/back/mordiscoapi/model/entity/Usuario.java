@@ -48,8 +48,14 @@ public class Usuario implements UserDetails {
     @Column
     private Double longitudActual;
 
+    @Column(nullable = false)
+    private Boolean bajaLogica = false;
+
+    @Column(length = 500)
+    private String motivoBaja;
+
     @Column
-    private Boolean activo;
+    private java.time.LocalDateTime fechaBaja;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Direccion> direcciones;
@@ -141,7 +147,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !bajaLogica;
     }
 
     public void addDireccion(Direccion d) {

@@ -18,10 +18,13 @@ public record UsuarioResponseDTO(
         String email,
         @Schema(description = "Rol del usuario")
         RolDTO rol,
-        @Schema(description = "Activo del usuario")
-        Boolean activo,
         @Schema(description = "Direcciones del usuario")
-        List<DireccionResponseDTO> direcciones
-
+        List<DireccionResponseDTO> direcciones,
+        @Schema(description = "Indica si el usuario está dado de baja", example = "false")
+        Boolean bajaLogica,
+        @Schema(description = "Motivo de la baja lógica", example = "Violación de términos de servicio")
+        String motivoBaja,
+        @Schema(description = "Fecha de la baja lógica")
+        java.time.LocalDateTime fechaBaja
 ) {
 }

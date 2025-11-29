@@ -314,5 +314,53 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
 
         log.info("✅ Contraseña restablecida para: {}", email);
     }
+
+    /**
+     * Da de baja lógicamente a un usuario
+     * Si el usuario tiene rol RESTAURANTE, también desactiva el restaurante
+     */
+    @Transactional
+    @Override
+    public void darDeBaja(Long usuarioId, String motivo) throws NotFoundException {
+        Usuario usuario = repository.findById(usuarioId)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        usuario.setBajaLogica(true);
+        usuario.setMotivoBaja(motivo);
+        usuario.setFechaBaja(java.time.LocalDateTime.now());
+
+        // Si el usuario tiene rol RESTAURANTE, desactivar el restaurante
+        if (usuario.getRol() != null && "ROLE_RESTAURANTE".equals(usuario.getRol().getNombre())) {
+            if (usuario.getRestaurante() != null) {
+                usuario.getRestaurante().setActivo(false);
+            }
+        }
+
+        repository.save(usuario);
+    }
+
+    /**
+     * Reactiva un usuario dado de baja
+     * Si el usuario tiene rol RESTAURANTE, también activa el restaurante
+     */
+    @Transactional
+    @Override
+    public void reactivar(Long usuarioId) throws NotFoundException {
+        Usuario usuario = repository.findById(usuarioId)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        usuario.setBajaLogica(false);
+        usuario.setMotivoBaja(null);
+        usuario.setFechaBaja(null);
+
+        // Si el usuario tiene rol RESTAURANTE, activar el restaurante
+        if (usuario.getRol() != null && "ROLE_RESTAURANTE".equals(usuario.getRol().getNombre())) {
+            if (usuario.getRestaurante() != null) {
+                usuario.getRestaurante().setActivo(true);
+            }
+        }
+
+        repository.save(usuario);
+    }
 }
 

@@ -288,6 +288,23 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Maneja la excepción de cuenta desactivada.
+     *
+     * @param ex la excepción de cuenta desactivada
+     * @return una respuesta con el mensaje de error y estado HTTP 403
+     */
+    @ExceptionHandler(AccountDeactivatedException.class)
+    public ResponseEntity<ErrorResponse> handleAccountDeactivated(AccountDeactivatedException ex) {
+        log.warn("Intento de login con cuenta desactivada: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(
+                        HttpStatus.FORBIDDEN.value(),
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    /**
      * Maneja la excepción personalizada NotFoundException.
      *
      * @return una respuesta con el mensaje de error y estado HTTP 404

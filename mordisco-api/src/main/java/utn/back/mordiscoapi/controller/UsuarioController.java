@@ -312,4 +312,58 @@ public class UsuarioController {
             throws NotFoundException {
         return ResponseEntity.ok(service.findByRolId(page,size,id));
     }
+
+    /**
+     * Da de baja lógicamente a un usuario
+     * Solo accesible por administradores
+     */
+    @Operation(
+            summary = "Dar de baja un usuario",
+            description = """
+            Da de baja lógicamente a un usuario especificando un motivo.
+            Si el usuario tiene rol RESTAURANTE, también desactiva el restaurante asociado.
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario dado de baja exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/baja")
+    public ResponseEntity<Void> darDeBaja(
+            @PathVariable Long id,
+            @RequestBody @Valid BajaLogicaRequestDTO dto)
+            throws NotFoundException {
+        service.darDeBaja(id, dto.motivo());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Reactiva un usuario dado de baja
+     * Solo accesible por administradores
+     */
+    @Operation(
+            summary = "Reactivar un usuario",
+            description = """
+            Reactiva un usuario que fue dado de baja lógicamente.
+            Si el usuario tiene rol RESTAURANTE, también activa el restaurante asociado.
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario reactivado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/reactivar")
+    public ResponseEntity<Void> reactivar(@PathVariable Long id) throws NotFoundException {
+        service.reactivar(id);
+        return ResponseEntity.ok().build();
+    }
 }

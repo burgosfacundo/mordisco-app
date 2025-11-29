@@ -5,4 +5,6 @@ public record AuthResponse(
         Long userId,
         String email,
         String role,
-        Long expiresIn) {}
+        Long expiresIn,
+        Boolean bajaLogica,
+        String motivoBaja) {}
