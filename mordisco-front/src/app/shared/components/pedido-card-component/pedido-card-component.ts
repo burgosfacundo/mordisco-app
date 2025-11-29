@@ -18,14 +18,15 @@ import { TipoEntrega } from '../../models/enums/tipo-entrega';
 })
 export class PedidoCardComponent {
   pedido = input<PedidoResponse>();
-  isRestaurante = input<boolean>(false);
-  isRepartidor = input<boolean>(false);
+  isUsuario = input<string>();
   
   aceptarPedido = output<number>();
   rechazarPedido = output<number>();
   cambiarEstado = output<{ pedidoId: number, nuevoEstado: EstadoPedido }>();
   marcarRecibido = output<number>();
   verDetalles = output<number>();
+  cancelar = output<number>()
+  deshacerCancelacion = output<number>()
 
   // Exponer enums para el template
   EstadoPedido = EstadoPedido;
@@ -104,9 +105,21 @@ export class PedidoCardComponent {
     }
   }
 
+  onCancelar(): void {
+    if (this.pedido()?.id) {
+      this.cancelar.emit(this.pedido()!.id);
+    }
+  }
+
+  onDeshacerCancelacion(){
+    if (this.pedido()?.id) {
+      this.deshacerCancelacion.emit(this.pedido()!.id);
+    }
+  }
+
   mostrarBotonAvanzar(): boolean {
     const pedido = this.pedido();
-    if (!pedido || !this.isRestaurante()) return false;
+    if (!pedido || this.isUsuario() !== 'ROLE_RESTAURANTE') return false;
     
     const estado = pedido.estado as EstadoPedido;
     return estado === EstadoPedido.EN_PREPARACION;

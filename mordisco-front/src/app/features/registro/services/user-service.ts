@@ -8,6 +8,7 @@ import UserCard from '../../../shared/models/user/user-card';
 import PaginationResponse from '../../../shared/models/pagination/pagination-response';
 import UserRegister from '../model/user-register';
 import PedidoResponse from '../../../shared/models/pedido/pedido-response';
+import BajaLogisticaDTO from '../../../shared/models/BajaLogisticaRequestDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -57,4 +58,15 @@ export class UserService {
     const params = new HttpParams().set('page', page).set('size', size);  
     return this.http.get<PaginationResponse<UserCard>>(`${environment.apiUrl}/rol/${idRol}`, {params})
   }
+
+  darDeBaja(dto : BajaLogisticaDTO, idUsuario : number){
+    console.log("ID:", idUsuario)
+    console.log("dto:", dto)
+    return this.http.post<void>(`${environment.apiUrl}/usuarios/${idUsuario}/baja`, dto)
+  }
+
+  reactivar(idUsuario : number){
+    return this.http.post<void>(`${environment.apiUrl}/usuarios/${idUsuario}/reactivar`, null)
+  }
+
 }

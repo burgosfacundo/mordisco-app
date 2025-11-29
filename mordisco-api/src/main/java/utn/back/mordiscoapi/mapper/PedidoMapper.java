@@ -71,7 +71,11 @@ public class PedidoMapper {
                 pedido.getDireccionSnapshot(),
                 pedido.getCostoDelivery(),
                 pedido.getDistanciaKm(),
-                pedido.getSubtotalProductos()
+                pedido.getSubtotalProductos(),
+                pedido.getBajaLogica(),
+                pedido.getMotivoBaja(),
+                pedido.getFechaBaja(),
+                pedido.getEstadoAntesDeCancelado()
                 );
     }
 }

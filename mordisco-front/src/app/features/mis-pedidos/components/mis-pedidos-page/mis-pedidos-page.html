@@ -99,7 +99,7 @@
             @for (pedido of arrPedidos; track pedido.id) {
               <li class="fade-in">
                 <app-pedido-card-component 
-                  [isRestaurante]="true"
+                  [isUsuario]="'ROLE_RESTAURANTE'"
                   [pedido]="pedido"
                   (aceptarPedido)="aceptarPedido($event)"
                   (rechazarPedido)="rechazarPedido($event)"

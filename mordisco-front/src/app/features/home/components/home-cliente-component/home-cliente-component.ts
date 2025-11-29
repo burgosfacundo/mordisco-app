@@ -36,12 +36,6 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   isLoadingPromocion = true;
 
   ngOnInit(): void {
-    /*
-    if(true){
-      this.cuentaDesactivada();
-      return;
-    }
-    */
     this.setupEventListeners();
     this.loadRestaurantesData('Mar del Plata');
     this.loadRestaurantesPromocionesData('Mar del Plata');

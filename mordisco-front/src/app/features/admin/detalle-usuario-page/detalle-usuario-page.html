@@ -3,10 +3,10 @@
   <!-- Hero Title-->
   <div class="text-center space-y-2">
     <h1 class="titulo-hero">
-      {{user?.nombre}}  {{user?.apellido}}
+      {{user.nombre}}  {{user.apellido}}
     </h1>
     <p class="text-gray-600 text-lg">
-      Información del usuario #{{ user?.id }}
+      Información del usuario #{{ user.id }}
     </p>
   </div>
 
@@ -55,14 +55,26 @@
             {{ rol?.replace('ROLE_', '') }}
           </span>
         </div>
-        <button 
-          class="mt-auto w-full py-2.5 rounded-lg
-          bg-red-700 text-white font-semibold text-sm
-          hover:bg-red-900 active:scale-95
-          transition-all duration-200
-          focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"             
-          (click)="bloquearCuenta()"> Bloquear cuenta
-        </button>  
+        @if(user.bajaLogica){
+          <button 
+            class="mt-auto w-full py-2.5 rounded-lg
+            bg-red-700 text-white font-semibold text-sm
+            hover:bg-red-900 active:scale-95
+            transition-all duration-200
+            focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"             
+            (click)="desbloquearCuenta()"> Desbloquear cuenta 
+          </button>           
+        }@else {
+          <button 
+            class="mt-auto w-full py-2.5 rounded-lg
+            bg-red-700 text-white font-semibold text-sm
+            hover:bg-red-900 active:scale-95
+            transition-all duration-200
+            focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"             
+            (click)="bloquearCuenta()"> Bloquear cuenta 
+          </button>  
+        }
+
       </div>
       </article>
 

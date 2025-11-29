@@ -59,7 +59,8 @@ public class UsuarioMapper {
                 usuario.getNombre(),
                 usuario.getApellido(),
                 usuario.getEmail(),
-                usuario.getRol().getNombre()
+                usuario.getRol().getNombre(),
+                usuario.getBajaLogica()
         );
     }
 

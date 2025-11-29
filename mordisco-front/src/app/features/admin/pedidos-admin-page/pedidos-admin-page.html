@@ -16,28 +16,31 @@
           @for (pedido of pedidos; track pedido.id) {
               <app-pedido-card-component
                 [pedido]="pedido"
+                [isUsuario]="'ROLE_ADMIN'"
+                (cancelar)="cancelarPedido($event)"
+                (deshacerCancelacion)="deshacerCancelacion($event)"
                 class="block h-full">
               </app-pedido-card-component>
           }
         </div>
 
         <!-- Paginador -->
-<div class="flex justify-center mt-8">
-          <mat-paginator
-            [length]="lengthPedidos"
-            [pageSize]="sizePedidos"
-            [pageIndex]="pagePedidos"
-            (page)="onPageChangePedidos($event)"
-            class="bg-white rounded-xl shadow-md">
-          </mat-paginator>
-        </div>
-      } @else {
-  <div class="empty-state">
-          <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-          </svg>
-          <h3 class="empty-title">No hay pedidos registrados</h3>
-        </div>
-      }
+      <div class="flex justify-center mt-8">
+                <mat-paginator
+                  [length]="lengthPedidos"
+                  [pageSize]="sizePedidos"
+                  [pageIndex]="pagePedidos"
+                  (page)="onPageChangePedidos($event)"
+                  class="bg-white rounded-xl shadow-md">
+                </mat-paginator>
+              </div>
+            } @else {
+        <div class="empty-state">
+                <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                <h3 class="empty-title">No hay pedidos registrados</h3>
+              </div>
+            }
     }

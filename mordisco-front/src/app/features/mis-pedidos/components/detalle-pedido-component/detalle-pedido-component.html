@@ -5,15 +5,20 @@
       <!-- Badges de estado y tipo de entrega -->
       @if(pedidoResponse()) { 
         <div class="flex items-center gap-2 flex-wrap">
-          <span [ngClass]="getEstadoClasses()" 
-                class="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
-            {{ fromatearEstado(pedidoResponse()!) }}
-          </span>
+      <span [class]="getEstadoBadgeClass()">
+        <span class="material-icons text-sm">{{ getEstadoIcon() }}</span>
+        {{ getEstadoLabel() }}
+      </span>
           <span class="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide
                        bg-white text-primary-600 shadow-md">
             {{ formatearEntrega(pedidoResponse()!) }}
           </span>
         </div>
+
+        @if(pedidoResponse()?.bajaLogica){
+          <p class="text-xs text-white uppercase tracking-wide font-semibold"> Pedido cancelado por administrador</p>
+          <p class="text-xs text-white uppercase tracking-wide ">{{pedidoResponse()?.motivoBaja}}</p>
+        }
       }
       
       <!-- Restaurante y fecha -->

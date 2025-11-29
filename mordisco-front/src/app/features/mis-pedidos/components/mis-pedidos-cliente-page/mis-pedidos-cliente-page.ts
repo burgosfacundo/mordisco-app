@@ -11,8 +11,6 @@ import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
-import { PromptService } from '../../../../core/services/confirmation-prompt-service';
-import { PromptDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-prompt-component/prompt-dialog-component';
 
 @Component({
   selector: 'app-mis-pedidos-cliente-page',
@@ -31,7 +29,7 @@ export class MisPedidosClientePage implements OnInit {
   private pedidoService = inject(PedidoService)
   private authService = inject(AuthService)
   private toastService = inject(ToastService)
-  private promptService = inject(PromptService)
+  private confirmationService = inject(ConfirmationService)
   private router = inject(Router)
 
   pedidos = signal<PedidoResponse[]>([])
@@ -121,24 +119,22 @@ export class MisPedidosClientePage implements OnInit {
     }
   }
 
-  cancelarPedido(pedidoId: number): void {
-    this.promptService.show({
+  cancelarPedido(pedidoId: number){
+    this.confirmationService.confirm({
       title: 'Cancelar Pedido',
-      message: 'Indica el motivo de la cancelación',
-      placeholder: 'Ej: Cliente solicitó cancelación',
-      required: true,
-      confirmText: 'Cancelar pedido',
-      type: 'danger'
-    }).subscribe(result => {
-      if (!result.confirmed) return;
+          message: '¿Estás seguro que queres cancelar el pedido? Esta accion no tiene como deshacerse',
+          confirmText: 'Aceptar',
+          type: 'danger'
+        }).subscribe(confirmed => {
+          if (!confirmed) return;
+          this.pedidoService.cancel(pedidoId).subscribe({
+                  next: () => {
+                    this.toastService.success('✅ Pedido cancelado');
+                    this.cargarPedidos();
+                  }
+          });
+        });
 
-      this.pedidoService.cancel(pedidoId, result.value).subscribe({
-        next: () => {
-          this.toastService.success('✅ Pedido cancelado');
-          this.cargarPedidos();
-        }
-      });
-    });
   }
   
   navegarAHome() {

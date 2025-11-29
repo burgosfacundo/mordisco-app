@@ -33,4 +33,6 @@ public interface IPedidoService {
             Double latitud, Double longitud, int page, int size);
 
     PedidoResponseDTO getPedidoActivoRepartidor(Long id) throws NotFoundException, BadRequestException;
+    void darDeBaja(Long pedidoId, String motivo) throws NotFoundException;
+    void reactivar(Long pedidoId) throws NotFoundException;
 }

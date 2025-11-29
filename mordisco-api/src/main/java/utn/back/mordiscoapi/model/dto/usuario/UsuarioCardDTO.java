@@ -12,6 +12,8 @@ public record UsuarioCardDTO(
         @Schema(description = "Email del usuario", example = "juan@gmail.com")
         String email,
         @Schema(description = "Rol del usuario")
-        String rol
-) {
+        String rol,
+        @Schema(description = "Cuenta desactivada")
+        Boolean bajaLogistica
+        ) {
 }

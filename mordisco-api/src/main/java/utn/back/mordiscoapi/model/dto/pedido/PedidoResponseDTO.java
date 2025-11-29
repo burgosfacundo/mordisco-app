@@ -35,6 +35,14 @@ public record PedidoResponseDTO(
     @Schema(description = "Distancia en kilómetros", example = "5.5")
     BigDecimal distanciaKm,
     @Schema(description = "Subtotal solo productos (sin delivery)", example = "120.00")
-    BigDecimal subtotalProductos
+    BigDecimal subtotalProductos,
+    @Schema(description = "Indica si el pedido está dado de baja", example = "false")
+    Boolean bajaLogica,
+    @Schema(description = "Motivo de la baja lógica", example = "Violación de términos de servicio")
+    String motivoBaja,
+    @Schema(description = "Fecha de la baja lógica")
+    java.time.LocalDateTime fechaBaja,
+    @Schema(description = "Estado del pedido antes de ser cancelado por admin", example = "EN_PROCESO")
+    EstadoPedido estadoAntesDeCancelado
 ) {
 }

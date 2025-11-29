@@ -60,11 +60,6 @@ public class AuthController {
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) throws NotFoundException, AccountDeactivatedException {
 
-        // Autenticar
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.email(), request.password()));
-
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
         Usuario usuario = (Usuario) userDetails;
 
@@ -74,6 +69,11 @@ public class AuthController {
                     usuario.getMotivoBaja() != null ? usuario.getMotivoBaja() : "Cuenta desactivada"
             );
         }
+
+        // Autenticar
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.email(), request.password()));
 
         // Generar access token (15 min)
         String accessToken = jwtUtil.generateAccessToken(userDetails);

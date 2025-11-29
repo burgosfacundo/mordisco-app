@@ -21,7 +21,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           @for (pedido of pedidos; track pedido.id) {
               <app-pedido-card-component
-                [isRepartidor]="true"
+                [isUsuario]='"ROLE_REPARTIDOR"'
                 [pedido]="pedido"
                 (marcarRecibido)="marcarRecibido($event)"
                 (verDetalles)="verDetalle($event)"

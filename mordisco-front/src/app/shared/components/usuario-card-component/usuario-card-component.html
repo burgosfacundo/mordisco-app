@@ -2,26 +2,50 @@
                 transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                 flex flex-col h-full">
   <!-- Header con Avatar -->
-  <div class="bg-linear-to-r from-blue-500 to-blue-600 p-6">
-    <div class="flex items-center gap-4">
+   @if(usuario()?.bajaLogica){ 
+    <div class="bg-linear-to-r from-red-900 to-red-800 p-6">
+      <div class="flex items-center gap-4">
       <!-- Avatar con iniciales -->
-      <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center
+        <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center
+                  text-red-800 font-bold text-xl shadow-lg">
+        BLOCK
+      </div>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-white font-bold text-lg truncate">
+            {{ usuario()?.nombre }} {{ usuario()?.apellido }}
+          </h3>
+          <p class="text-white text-sm truncate">
+            {{ usuario()?.email }}
+          </p>
+          <p class="text-white text-sm truncate">
+            {{ usuario()?.telefono }} 
+          </p>
+        </div>
+      </div>
+    </div>
+  }@else {
+    <div class="bg-linear-to-r from-blue-500 to-blue-600 p-6">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center
                   text-blue-600 font-bold text-xl shadow-lg">
         {{ getInitials() }}
       </div>
-      <div class="flex-1 min-w-0">
-        <h3 class="text-white font-bold text-lg truncate">
-          {{ usuario()?.nombre }} {{ usuario()?.apellido }}
-        </h3>
-        <p class="text-white text-sm truncate">
-          {{ usuario()?.email }}
-        </p>
-        <p class="text-white text-sm truncate">
-          {{ usuario()?.telefono }} hola
-        </p>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-white font-bold text-lg truncate">
+            {{ usuario()?.nombre }} {{ usuario()?.apellido }}
+          </h3>
+          <p class="text-white text-sm truncate">
+            {{ usuario()?.email }}
+          </p>
+          <p class="text-white text-sm truncate">
+            {{ usuario()?.telefono }} 
+          </p>
+        </div>
       </div>
     </div>
-  </div>
+       }
+      
+      
 
     @if (usuario()?.rol) {
         <div class="p-6 flex-1 flex flex-col">

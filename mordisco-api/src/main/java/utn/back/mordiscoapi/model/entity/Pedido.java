@@ -45,6 +45,20 @@ public class Pedido {
     @Column
     private BigDecimal distanciaKm;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean bajaLogica = false;
+
+    @Column(length = 500)
+    private String motivoBaja;
+
+    @Column
+    private java.time.LocalDateTime fechaBaja;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private EstadoPedido estadoAntesDeCancelado;
+
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario cliente;

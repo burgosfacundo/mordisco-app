@@ -629,5 +629,41 @@ public class PedidoServiceImpl implements IPedidoService {
 
         return BigDecimal.valueOf(distancia).setScale(2, RoundingMode.HALF_UP);
     }
+
+    /**
+     * Cancelar pedido con motivo obligatorio
+     */
+    @Transactional
+    @Override
+    public void darDeBaja(Long pedidoId, String motivo) throws NotFoundException {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
+
+        pedido.setEstadoAntesDeCancelado(pedido.getEstado());
+        pedido.setEstado(EstadoPedido.CANCELADO);
+        pedido.setBajaLogica(true);
+        pedido.setMotivoBaja(motivo);
+        pedido.setFechaBaja(java.time.LocalDateTime.now());
+
+        pedidoRepository.save(pedido);
+    }
+
+    /**
+     * Anula cancelacion a un pedido con motivo
+     */
+    @Transactional
+    @Override
+    public void reactivar(Long pedidoId) throws NotFoundException {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
+
+        pedido.setEstado(pedido.getEstadoAntesDeCancelado());
+        pedido.setEstadoAntesDeCancelado(null);
+        pedido.setBajaLogica(false);
+        pedido.setMotivoBaja(null);
+        pedido.setFechaBaja(null);
+
+        pedidoRepository.save(pedido);
+    }
 }
 

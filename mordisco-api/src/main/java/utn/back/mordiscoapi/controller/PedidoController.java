@@ -19,6 +19,7 @@ import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
+import utn.back.mordiscoapi.model.dto.usuario.BajaLogicaRequestDTO;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
 
@@ -362,6 +363,58 @@ public class PedidoController {
         PedidoResponseDTO pedido = pedidoService.getPedidoActivoRepartidor(repartidor.getId());
 
         return ResponseEntity.ok(pedido);
+    }
+
+    /**
+     * Cancela un pedido con motivo obligatorio
+     * Solo accesible por administradores
+     */
+    @Operation(
+            summary = "Cancela un pedido con motivo obligatorio",
+            description = """
+            Cancela un pedido especificando un motivo.
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido cancelado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Pedido no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/baja")
+    public ResponseEntity<Void> darDeBaja(
+            @PathVariable Long id,
+            @RequestBody @Valid BajaLogicaRequestDTO dto)
+            throws NotFoundException {
+        pedidoService.darDeBaja(id, dto.motivo());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Anula cancelacion de un pedido con motivo obligatorio
+     * Solo accesible por administradores
+     */
+    @Operation(
+            summary = "Anula cancelacion de un pedido",
+            description = """
+            Anula cancelacion de un pedido si fue cancelado por un administrador.
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido activo exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Pedido no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/reactivar")
+    public ResponseEntity<Void> reactivar(@PathVariable Long id) throws NotFoundException {
+        pedidoService.reactivar(id);
+        return ResponseEntity.ok().build();
     }
 }
 

@@ -19,5 +19,8 @@ export default interface PedidoResponse{
     direccionSnapshot?: string,
     costoDelivery?: number,
     distanciaKm?: number,
-    subtotalProductos?: number
+    subtotalProductos?: number,
+    bajaLogica? : boolean,
+    motivoBaja? : string,
+    fechaBaja? : string
 }

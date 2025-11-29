@@ -37,12 +37,6 @@ export class HomeRestauranteComponent implements OnInit {
   restaurante?: RestauranteResponse;
 
   ngOnInit(): void {
-        /*
-    if(true){
-      this.cuentaDesactivada();
-      return;
-    }
-    */
     this.loadRestauranteData();
   }
 
@@ -53,7 +47,7 @@ export class HomeRestauranteComponent implements OnInit {
       this.authService.logout();
       return;
     }
-
+    
     this.restauranteService.getByUsuario(user.userId).subscribe({
       next: (r) => {
         this.restaurante = r
@@ -146,15 +140,5 @@ export class HomeRestauranteComponent implements OnInit {
     this.loadRestauranteData();
   }
 
-  cuentaDesactivada(){
-    this.confirmationService.confirm({
-      title: 'Su cuenta esta bloqueada',
-      message: 'Motivo: tal. Para ser desbloqueado envia un mail a mordisco@gmail.com',
-      confirmText: 'Ok',
-      type: 'danger',
-      showCancelButton : false
-    }).subscribe((confirmed) => {
-      if (confirmed) this.authService.logout(); 
-    });
-  }
+
 }

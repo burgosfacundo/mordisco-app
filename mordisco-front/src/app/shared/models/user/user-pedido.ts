@@ -5,5 +5,7 @@ export default interface UserPedido{
     apellido : string,
     email : string,
     telefono : string,
-    rol? : string
+    rol? : string,
+    bajaLogica : boolean,
+
 }

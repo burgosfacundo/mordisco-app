@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../registro/services/user-service';
 import UserProfile from '../../../shared/models/user/user-profile';
@@ -14,6 +13,8 @@ import { CalificacionCardAdmin } from "../../../shared/components/calificacion-c
 import RestauranteResponse from '../../../shared/models/restaurante/restaurante-response';
 import { RestauranteService } from '../../../shared/services/restaurante/restaurante-service';
 import { PromptService } from '../../../core/services/confirmation-prompt-service';
+import BajaLogisticaDTO from '../../../shared/models/BajaLogisticaRequestDTO';
+import { ConfirmationService } from '../../../core/services/confirmation-service';
 import { ToastService } from '../../../core/services/toast-service';
 
 @Component({
@@ -26,8 +27,9 @@ export class DetalleUsuarioPage {
   private uService = inject(UserService);
   private rService = inject (RestauranteService)
   private cService = inject(CalificacionService);
-  private toastService = inject(ToastService)
   private promptService = inject(PromptService)  
+  private confirmationService = inject(ConfirmationService)
+  private toastService = inject (ToastService)
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -65,7 +67,6 @@ export class DetalleUsuarioPage {
       next: (data) => {
         this.user = data;
         this.isLoading = false
-
         if(this.user.id){
           this.setFlag();
           this.cargarCalificacionesPedidos(this.rol!);
@@ -155,8 +156,42 @@ export class DetalleUsuarioPage {
       type: 'danger'
     }).subscribe(result => {
       if (!result.confirmed) return;
-        //Bloquear cuenta y si es restaurante desactivarlo
+      const blDTO : BajaLogisticaDTO = {
+        motivo : result.value ?? ""
+      }
+      
+      this.uService.darDeBaja(blDTO,this.user.id).subscribe({
+        next:()=> {
+          this.toastService.success('✅ Usuario bloqueado');
+          this.loadUsuario()},
+        error:()=> {
+          console.log("No se ha podido bloquear la cuenta"),
+          this.toastService.success(' No se ha podido bloquear al usuario');
+        }
+      })
     });
+  }
+
+  desbloquearCuenta(){
+    this.confirmationService.confirm({
+      title: 'Desbloquear cuenta',
+          message: '¿Estás seguro de desbloquear esta cuenta?',
+          confirmText: 'Aceptar',
+          type: 'danger'
+        }).subscribe(confirmed => {
+          if (!confirmed) return;
+    
+          this.uService.reactivar(this.user.id).subscribe({
+            next: () => {
+              this.toastService.success('✅ Usuario desbloqueado');
+              this.loadUsuario();
+            },error:()=>{
+              console.log("No se ha podido desbloquear la cuenta"),
+              this.toastService.success(' No se ha podido desbloquear al usuario');
+            }
+          });
+        });
+
   }
 
   volver(): void {

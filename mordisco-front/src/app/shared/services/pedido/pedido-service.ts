@@ -7,6 +7,7 @@ import { EstadoPedido } from '../../models/enums/estado-pedido';
 import PedidoResponse from '../../models/pedido/pedido-response';
 import { CrearPedidoRequest } from '../../models/pedido/crear-pedido-request';
 import { MercadoPagoPreferenceResponse } from '../../models/pago/mercado-pago-preference-response';
+import BajaLogisticaDTO from '../../models/BajaLogisticaRequestDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -78,5 +79,13 @@ export class PedidoService {
       `${environment.apiUrl}/pedidos/${pedidoId}/aceptar-repartidor`,
       {}
     );
+  }
+
+  darDeBaja(dto : BajaLogisticaDTO, idPedido : number){
+    return this.http.post<PedidoResponse>(`${environment.apiUrl}/pedidos/${idPedido}/baja`, dto)
+  }
+  
+  reactivar(idPedido : number){
+    return this.http.post<void>(`${environment.apiUrl}/pedidos/${idPedido}/reactivar`, null)
   }
 }

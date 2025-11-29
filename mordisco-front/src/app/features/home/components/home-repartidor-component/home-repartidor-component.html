@@ -111,7 +111,7 @@
             @for (pedido of pedidosPendientes; track pedido.id) {
               <li class="fade-in">
                 <app-pedido-card-component 
-                  [isRepartidor]="true"
+                  [isUsuario]="'ROLE_REPARTIDOR'"
                   [pedido]="pedido"
                   (marcarRecibido)="marcarRecibido($event)"
                   (verDetalles)="onVerDetalle($event)"

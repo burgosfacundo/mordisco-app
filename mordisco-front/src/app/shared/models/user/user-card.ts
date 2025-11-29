@@ -5,5 +5,6 @@ export default interface UserCard{
     apellido : string,
     email : string,
     telefono? : string,
-    rol: string
+    rol: string,
+    bajaLogica : boolean,
 }

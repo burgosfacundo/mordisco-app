@@ -1,10 +1,16 @@
 import { Component,input,output } from '@angular/core';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
-import { EstadoPedido, ESTADO_PEDIDO_LABELS, ESTADO_PEDIDO_COLORS } from '../../../../shared/models/enums/estado-pedido';
+
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from "@angular/material/icon";
-
+import { 
+  EstadoPedido, 
+  ESTADO_PEDIDO_LABELS, 
+  ESTADO_PEDIDO_COLORS, 
+  ESTADO_PEDIDO_ICONS,
+  getSiguienteEstado
+} from '../../../../shared/models/enums/estado-pedido';
 @Component({
   selector: 'app-detalle-pedido-component',
   imports: [CommonModule, MatIcon],
@@ -27,10 +33,26 @@ export class DetallePedidoComponent {
     return colorClasses.replace('bg-', 'bg-').replace('-100', '-500').replace('text-', 'text-').replace('-700', '-white');
   }
 
-  fromatearEstado(pedidoResponse : PedidoResponse){
-    const estado = pedidoResponse.estado as EstadoPedido;
-    return ESTADO_PEDIDO_LABELS[estado] || String(pedidoResponse.estado);
+  getEstadoBadgeClass(): string {
+    const estado = this.pedidoResponse()?.estado as EstadoPedido;
+    if (!estado) return 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-gray-100 text-gray-700';
+    
+    const baseClasses = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide';
+    const colorClasses = ESTADO_PEDIDO_COLORS[estado] || 'bg-gray-100 text-gray-700';
+    
+    return `${baseClasses} ${colorClasses}`;
   }
+
+  getEstadoLabel(): string {
+    const estado = this.pedidoResponse()?.estado as EstadoPedido;
+    return estado ? ESTADO_PEDIDO_LABELS[estado] : 'Desconocido';
+  }
+
+  getEstadoIcon(): string {
+    const estado = this.pedidoResponse()?.estado as EstadoPedido;
+    return estado ? ESTADO_PEDIDO_ICONS[estado] : 'help_outline';
+  }
+
   formatearEntrega(pedidoResponse : PedidoResponse){
     if(pedidoResponse.tipoEntrega === TipoEntrega.DELIVERY){
       return 'Delivery'

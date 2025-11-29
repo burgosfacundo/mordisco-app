@@ -44,8 +44,7 @@ export class LoginForm implements OnInit {
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
         this.toastService.success('Inicio de sesión exitoso');
-        this.isSubmitting.set(false);
-        
+        this.isSubmitting.set(false);        
         setTimeout(() => {
           this.router.navigate(['/']);
         }, 100);
@@ -62,4 +61,6 @@ export class LoginForm implements OnInit {
       fieldName
     );
   }
+  
+
 }
