@@ -311,4 +311,124 @@ WHERE
             @Param("fechaFin") LocalDateTime fechaFin,
             Pageable pageable
     );
+
+    /**
+     * Cuenta el total de pedidos completados en la plataforma
+     * @return Total de pedidos completados
+     */
+    @Query("SELECT COUNT(p) FROM Pedido p WHERE p.estado = 'COMPLETADO'")
+    Integer countTotalPedidosCompletados();
+
+    /**
+     * Calcula los ingresos totales de la plataforma (subtotal de productos)
+     * @return Ingresos totales
+     */
+    @Query("SELECT COALESCE(SUM(p.subtotalProductos), 0) FROM Pedido p WHERE p.estado = 'COMPLETADO'")
+    java.math.BigDecimal calcularIngresosTotalesPlataforma();
+
+    /**
+     * Encuentra los métodos de pago más usados con estadísticas
+     * @return Lista de métodos de pago con cantidad y porcentaje
+     */
+    @Query(value = """
+            SELECT 
+                pago.metodo_pago,
+                COUNT(*) as cantidad,
+                (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM pedidos WHERE estado = 'COMPLETADO')) as porcentaje
+            FROM pedidos p
+            JOIN pagos pago ON p.id = pago.pedido_id
+            WHERE p.estado = 'COMPLETADO'
+            GROUP BY pago.metodo_pago
+            ORDER BY cantidad DESC
+            """, nativeQuery = true)
+    java.util.List<Object[]> findMetodosPagoMasUsados();
+
+    /**
+     * Calcula el tiempo promedio de preparación de un restaurante
+     * @param restauranteId ID del restaurante
+     * @return Tiempo promedio en minutos
+     */
+    @Query("""
+            SELECT AVG(TIMESTAMPDIFF(MINUTE, p.fechaHora, 
+                CASE 
+                    WHEN p.tipoEntrega = 'DELIVERY' THEN p.fechaAceptacionRepartidor
+                    ELSE p.fechaEntrega
+                END))
+            FROM Pedido p
+            WHERE p.restaurante.id = :restauranteId
+            AND p.estado = 'COMPLETADO'
+            AND (
+                (p.tipoEntrega = 'DELIVERY' AND p.fechaAceptacionRepartidor IS NOT NULL)
+                OR (p.tipoEntrega = 'RETIRO_POR_LOCAL' AND p.fechaEntrega IS NOT NULL)
+            )
+            """)
+    Double calcularTiempoPromedioPreparacion(@Param("restauranteId") Long restauranteId);
+
+    /**
+     * Calcula el tiempo promedio de entrega de un repartidor
+     * @param repartidorId ID del repartidor
+     * @return Tiempo promedio en minutos
+     */
+    @Query("""
+            SELECT AVG(TIMESTAMPDIFF(MINUTE, p.fechaAceptacionRepartidor, p.fechaEntrega))
+            FROM Pedido p
+            WHERE p.repartidor.id = :repartidorId
+            AND p.estado = 'COMPLETADO'
+            AND p.fechaAceptacionRepartidor IS NOT NULL
+            AND p.fechaEntrega IS NOT NULL
+            """)
+    Double calcularTiempoPromedioEntregaRepartidor(@Param("repartidorId") Long repartidorId);
+
+    /**
+     * Encuentra pedidos por día (últimos 30 días)
+     * @param repartidorId ID del repartidor
+     * @return Lista de pedidos por día
+     */
+    @Query(value = """
+            SELECT DATE(p.fecha_hora) as periodo,
+                   COUNT(*) as cantidad
+            FROM pedidos p
+            WHERE p.repartidor_id = :repartidorId
+            AND p.estado = 'COMPLETADO'
+            AND p.fecha_hora >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
+            GROUP BY DATE(p.fecha_hora)
+            ORDER BY periodo
+            """, nativeQuery = true)
+    java.util.List<Object[]> findPedidosPorDiaRepartidor(@Param("repartidorId") Long repartidorId);
+
+    /**
+     * Encuentra pedidos por semana (últimas 12 semanas)
+     * @param repartidorId ID del repartidor
+     * @return Lista de pedidos por semana
+     */
+    @Query(value = """
+            SELECT CONCAT(YEAR(p.fecha_hora), '-W', LPAD(WEEK(p.fecha_hora, 1), 2, '0')) as periodo,
+                   COUNT(*) as cantidad
+            FROM pedidos p
+            WHERE p.repartidor_id = :repartidorId
+            AND p.estado = 'COMPLETADO'
+            AND p.fecha_hora >= DATE_SUB(CURRENT_DATE, INTERVAL 12 WEEK)
+            GROUP BY YEAR(p.fecha_hora), WEEK(p.fecha_hora, 1)
+            ORDER BY periodo
+            """, nativeQuery = true)
+    java.util.List<Object[]> findPedidosPorSemanaRepartidor(@Param("repartidorId") Long repartidorId);
+
+    /**
+     * Encuentra pedidos por mes (últimos 12 meses)
+     * @param repartidorId ID del repartidor
+     * @return Lista de pedidos por mes
+     */
+    @Query(value = """
+            SELECT DATE_FORMAT(p.fecha_hora, '%Y-%m') as periodo,
+                   COUNT(*) as cantidad
+            FROM pedidos p
+            WHERE p.repartidor_id = :repartidorId
+            AND p.estado = 'COMPLETADO'
+            AND p.fecha_hora >= DATE_SUB(CURRENT_DATE, INTERVAL 12 MONTH)
+            GROUP BY DATE_FORMAT(p.fecha_hora, '%Y-%m')
+            ORDER BY periodo
+            """, nativeQuery = true)
+    java.util.List<Object[]> findPedidosPorMesRepartidor(@Param("repartidorId") Long repartidorId);
+    
 }
+

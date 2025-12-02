@@ -48,6 +48,31 @@ public class DireccionServiceImpl implements IDireccionService {
         Usuario u = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("Usuario no autenticado"));
 
+        // Validar que no exista una dirección duplicada
+        boolean existeDuplicada = direccionRepository.findAllByUsuarioId(u.getId())
+                .stream()
+                .anyMatch(d ->
+                        d.getCalle().equalsIgnoreCase(dto.calle()) &&
+                        d.getNumero().equals(dto.numero()) &&
+                        java.util.Objects.equals(d.getPiso(), dto.piso()) &&
+                        java.util.Objects.equals(d.getDepto(), dto.depto()) &&
+                        d.getCiudad().equalsIgnoreCase(dto.ciudad()) &&
+                        d.getCodigoPostal().equals(dto.codigoPostal())
+                );
+
+        if (existeDuplicada) {
+            StringBuilder mensaje = new StringBuilder("Ya tienes una dirección registrada en ");
+            mensaje.append(dto.calle()).append(" ").append(dto.numero());
+            if (dto.piso() != null && !dto.piso().isEmpty()) {
+                mensaje.append(", Piso ").append(dto.piso());
+                if (dto.depto() != null && !dto.depto().isEmpty()) {
+                    mensaje.append(" ").append(dto.depto());
+                }
+            }
+            mensaje.append(", ").append(dto.ciudad());
+            throw new BadRequestException(mensaje.toString());
+        }
+
         Direccion d = DireccionMapper.fromCreateDTO(dto);
         d.setUsuario(u);
 
@@ -79,6 +104,32 @@ public class DireccionServiceImpl implements IDireccionService {
 
         if (!d.getUsuario().getId().equals(usuario.getId())) {
             throw new BadRequestException("No tienes permiso para modificar esta dirección");
+        }
+
+        // Validar que no exista una dirección duplicada (excluyendo la actual)
+        boolean existeDuplicada = direccionRepository.findAllByUsuarioId(usuario.getId())
+                .stream()
+                .filter(dir -> !dir.getId().equals(id)) // Excluir la dirección actual
+                .anyMatch(dir ->
+                        dir.getCalle().equalsIgnoreCase(dto.calle()) &&
+                        dir.getNumero().equals(dto.numero()) &&
+                        java.util.Objects.equals(dir.getPiso(), dto.piso()) &&
+                        java.util.Objects.equals(dir.getDepto(), dto.depto()) &&
+                        dir.getCiudad().equalsIgnoreCase(dto.ciudad()) &&
+                        dir.getCodigoPostal().equals(dto.codigoPostal())
+                );
+
+        if (existeDuplicada) {
+            StringBuilder mensaje = new StringBuilder("Ya tienes otra dirección registrada en ");
+            mensaje.append(dto.calle()).append(" ").append(dto.numero());
+            if (dto.piso() != null && !dto.piso().isEmpty()) {
+                mensaje.append(", Piso ").append(dto.piso());
+                if (dto.depto() != null && !dto.depto().isEmpty()) {
+                    mensaje.append(" ").append(dto.depto());
+                }
+            }
+            mensaje.append(", ").append(dto.ciudad());
+            throw new BadRequestException(mensaje.toString());
         }
 
         geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())

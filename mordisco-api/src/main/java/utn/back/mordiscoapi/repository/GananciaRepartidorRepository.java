@@ -65,4 +65,20 @@ public interface GananciaRepartidorRepository extends JpaRepository<GananciaRepa
      */
     @Query("SELECT g FROM GananciaRepartidor g WHERE g.pedido.id = :pedidoId")
     GananciaRepartidor findByPedidoId(@Param("pedidoId") Long pedidoId);
+
+    /**
+     * Calcula ganancias por mes (últimos 12 meses)
+     * @param repartidorId ID del repartidor
+     * @return Lista de ganancias por mes
+     */
+    @Query(value = """
+            SELECT DATE_FORMAT(g.fecha_registro, '%Y-%m') as periodo,
+                   COALESCE(SUM(g.ganancia_repartidor), 0) as ganancias
+            FROM ganancias_repartidor g
+            WHERE g.repartidor_id = :repartidorId
+            AND g.fecha_registro >= DATE_SUB(CURRENT_DATE, INTERVAL 12 MONTH)
+            GROUP BY DATE_FORMAT(g.fecha_registro, '%Y-%m')
+            ORDER BY periodo
+            """, nativeQuery = true)
+    java.util.List<Object[]> calcularGananciasPorMes(@Param("repartidorId") Long repartidorId);
 }

@@ -3,6 +3,7 @@ package utn.back.mordiscoapi.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,9 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.enums.*;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.event.order.*;
+import utn.back.mordiscoapi.event.payment.PagoAprobadoEvent;
+import utn.back.mordiscoapi.event.payment.PagoRechazadoEvent;
 import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
@@ -26,6 +30,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -45,6 +51,7 @@ public class PedidoServiceImpl implements IPedidoService {
     private final ConfiguracionSistemaServiceImpl configuracionService;
     private final AuthUtils authUtils;
     private final IGananciaRepartidorService gananciaRepartidorService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Guarda un pedido y gestiona el pago
@@ -140,8 +147,8 @@ public class PedidoServiceImpl implements IPedidoService {
             return preference;
 
         } else if (dto.metodoPago() == MetodoPago.EFECTIVO) {
-            // Para efectivo, notificar directamente al restaurante
-            notificacionService.notificarNuevoPedidoARestaurante(pedido);
+            // Para efectivo, publicar evento de nuevo pedido
+            eventPublisher.publishEvent(new PedidoCreatedEvent(pedido));
 
             // Retornar response sin preference (para que el front sepa que es efectivo)
             return new MercadoPagoPreferenceResponse(null, null, null,
@@ -306,20 +313,35 @@ public class PedidoServiceImpl implements IPedidoService {
 
     private void notificarCambioEstado(Pedido pedido, EstadoPedido nuevoEstado) {
         switch (nuevoEstado) {
-            case LISTO_PARA_RETIRAR ->
-                    notificacionService.notificarPedidoListoParaRetirar(pedido);
+            case LISTO_PARA_RETIRAR -> {
+                // Publicar evento de pedido listo para retirar
+                eventPublisher.publishEvent(new PedidoEstadoChangedEvent(pedido, pedido.getEstado()));
+            }
 
-            case EN_CAMINO ->
-                    notificacionService.notificarPedidoEnCamino(pedido);
+            case LISTO_PARA_ENTREGAR -> {
+                // Publicar evento para notificar a repartidores
+                eventPublisher.publishEvent(new PedidoListoParaEntregarEvent(pedido));
+            }
 
-            case COMPLETADO ->
-                    notificacionService.notificarPedidoCompletado(pedido);
+            case EN_CAMINO -> {
+                // Publicar evento de pedido en camino
+                eventPublisher.publishEvent(new PedidoEnCaminoEvent(pedido));
+            }
 
-            case CANCELADO ->
-                    notificacionService.notificarPedidoCancelado(pedido);
+            case COMPLETADO -> {
+                // Publicar evento de pedido completado
+                eventPublisher.publishEvent(new PedidoCompletadoEvent(pedido));
+            }
 
-            default ->
-                    notificacionService.notificarCambioEstadoACliente(pedido);
+            case CANCELADO -> {
+                // Publicar evento de pedido cancelado
+                eventPublisher.publishEvent(new PedidoCanceladoEvent(pedido, "Cancelado por el sistema"));
+            }
+
+            default -> {
+                // Para otros estados, publicar evento genérico de cambio de estado
+                eventPublisher.publishEvent(new PedidoEstadoChangedEvent(pedido, pedido.getEstado()));
+            }
         }
     }
 
@@ -363,7 +385,7 @@ public class PedidoServiceImpl implements IPedidoService {
      * @param idRestaurante el ID del Restaurante a buscar sus pedidos.
      * @param estado el EstadoPedido por el que hay que filtrar.
      * @throws NotFoundException si el Restaurante no se encuentra.
-     *      * @throws BadRequestException si el estado del pedido no es válido.
+     * @throws BadRequestException si el estado del pedido no es válido.
      */
     @Override
     public Page<PedidoResponseDTO> findAllByRestaurante_IdAndEstado(int pageNo,int pageSize,Long idRestaurante, EstadoPedido estado) throws NotFoundException {
@@ -395,7 +417,8 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setEstado(EstadoPedido.CANCELADO);
         pedidoRepository.save(pedido);
 
-        notificacionService.notificarCambioEstadoACliente(pedido);
+        // Publicar evento de pedido cancelado
+        eventPublisher.publishEvent(new PedidoCanceladoEvent(pedido, "Cancelado por el usuario"));
 
         log.info("❌ Pedido #{} cancelado", id);
     }
@@ -403,6 +426,27 @@ public class PedidoServiceImpl implements IPedidoService {
 
     private BigDecimal calcularTotalYValidarProductos(Pedido pedido) throws NotFoundException, BadRequestException {
         BigDecimal total = BigDecimal.ZERO;
+
+        // Validar que todos los productos pertenezcan al mismo restaurante
+        for (ProductoPedido item : pedido.getItems()) {
+            Producto producto = productoRepository.findById(item.getProducto().getId())
+                    .orElseThrow(() -> new NotFoundException(
+                            "El producto con ID " + item.getProducto().getId() + " no existe"
+                    ));
+
+            // Validar que el producto pertenezca al restaurante del pedido
+            if (!producto.getRestaurante().getId().equals(pedido.getRestaurante().getId())) {
+                throw new BadRequestException(
+                        String.format(
+                                "No se pueden agregar productos de diferentes restaurantes. " +
+                                "El producto '%s' pertenece a '%s', pero el pedido es de '%s'.",
+                                producto.getNombre(),
+                                producto.getRestaurante().getRazonSocial(),
+                                pedido.getRestaurante().getRazonSocial()
+                        )
+                );
+            }
+        }
 
         for (ProductoPedido item : pedido.getItems()) {
             item.setPedido(pedido);
@@ -459,6 +503,45 @@ public class PedidoServiceImpl implements IPedidoService {
                         "No se puede realizar delivery a otra ciudad. " +
                                 "Restaurante: " + restaurante.getDireccion().getCiudad() +
                                 ", Dirección: " + direccion.getCiudad()
+                );
+            }
+
+            // Validar que ambas direcciones tengan coordenadas
+            if (direccion.getLatitud() == null || direccion.getLongitud() == null) {
+                throw new BadRequestException(
+                        "La dirección de entrega no tiene coordenadas válidas. " +
+                        "Por favor, actualiza la dirección o selecciona otra."
+                );
+            }
+
+            if (restaurante.getDireccion().getLatitud() == null ||
+                restaurante.getDireccion().getLongitud() == null) {
+                throw new BadRequestException(
+                        "El restaurante no tiene coordenadas configuradas. " +
+                        "Por favor, contacta al soporte."
+                );
+            }
+
+            // Calcular distancia entre restaurante y dirección de entrega
+            BigDecimal distanciaKm = calcularDistancia(
+                    restaurante.getDireccion().getLatitud(),
+                    restaurante.getDireccion().getLongitud(),
+                    direccion.getLatitud(),
+                    direccion.getLongitud()
+            );
+
+            // Obtener radio máximo de entrega desde configuración
+            BigDecimal radioMaximo = configuracionService.getRadioMaximoEntrega();
+
+            // Validar que la distancia no exceda el radio máximo
+            if (distanciaKm.compareTo(radioMaximo) > 0) {
+                throw new BadRequestException(
+                        String.format(
+                                "La dirección está demasiado lejos del restaurante. " +
+                                "Distancia: %.2f km. Máximo permitido: %.2f km.",
+                                distanciaKm.doubleValue(),
+                                radioMaximo.doubleValue()
+                        )
                 );
             }
 

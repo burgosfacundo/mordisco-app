@@ -146,7 +146,8 @@ public class RestauranteController {
      * @param nombre Nombre del restaurante a filtrar.
      * @return Respuesta HTTP con una lista de DTO de restaurantes.
      */
-    @Operation(summary = "Listar restaurantes por nombre",description = "Lista los restaurantes según su nombre")
+    @Operation(summary = "Listar restaurantes por nombre",
+            description = "Busca restaurantes activos por nombre en toda la base de datos (búsqueda global, no filtrada por ciudad)")
     @ApiResponses (value = {
             @ApiResponse(responseCode = "200",description = "Restaurantes listados exitosamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
@@ -275,6 +276,91 @@ public class RestauranteController {
 
         return ResponseEntity.ok(
                 restauranteService.filtrarRestaurantes(page, size, search, activo)
+        );
+    }
+
+    /**
+     * Busca restaurantes dentro de un radio desde una ubicación específica.
+     * Los resultados se ordenan automáticamente: primero restaurantes abiertos, luego por distancia.
+     *
+     * @param latitud Latitud del punto de referencia
+     * @param longitud Longitud del punto de referencia
+     * @param radioKm Radio de búsqueda en kilómetros (por defecto 40km)
+     * @param searchTerm Término de búsqueda opcional para filtrar por nombre
+     * @param page Número de página (por defecto 0)
+     * @param size Tamaño de página (por defecto 10)
+     * @return Página de restaurantes dentro del radio, ordenados por estado abierto y distancia
+     */
+    @Operation(
+            summary = "Buscar restaurantes por ubicación",
+            description = "Busca restaurantes activos dentro de un radio específico desde una ubicación. " +
+                    "Los resultados se ordenan automáticamente mostrando primero los restaurantes abiertos, " +
+                    "y luego por distancia (más cercanos primero). Soporta búsqueda opcional por nombre."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Restaurantes encontrados exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Parámetros inválidos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/ubicacion")
+    public ResponseEntity<Page<RestauranteResponseCardDTO>> findByLocation(
+            @RequestParam Double latitud,
+            @RequestParam Double longitud,
+            @RequestParam(defaultValue = "40.0") Double radioKm,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        return ResponseEntity.ok(
+                restauranteService.findByLocationWithinRadius(
+                        latitud, 
+                        longitud, 
+                        radioKm, 
+                        searchTerm, 
+                        page, 
+                        size
+                )
+        );
+    }
+
+    /**
+     * Busca restaurantes con promociones activas dentro de un radio desde una ubicación específica.
+     * Los resultados se ordenan automáticamente: primero restaurantes abiertos, luego por distancia.
+     *
+     * @param latitud Latitud del punto de referencia
+     * @param longitud Longitud del punto de referencia
+     * @param radioKm Radio de búsqueda en kilómetros (por defecto 40km)
+     * @param page Número de página (por defecto 0)
+     * @param size Tamaño de página (por defecto 10)
+     * @return Página de restaurantes con promociones dentro del radio, ordenados por estado abierto y distancia
+     */
+    @Operation(
+            summary = "Buscar restaurantes con promociones por ubicación",
+            description = "Busca restaurantes activos con promociones vigentes dentro de un radio específico desde una ubicación. " +
+                    "Los resultados se ordenan automáticamente mostrando primero los restaurantes abiertos, " +
+                    "y luego por distancia (más cercanos primero)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Restaurantes con promociones encontrados exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Parámetros inválidos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/ubicacion/promociones")
+    public ResponseEntity<Page<RestauranteResponseCardDTO>> findWithPromocionByLocation(
+            @RequestParam Double latitud,
+            @RequestParam Double longitud,
+            @RequestParam(defaultValue = "40.0") Double radioKm,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        return ResponseEntity.ok(
+                restauranteService.findWithPromocionByLocationWithinRadius(
+                        latitud, 
+                        longitud, 
+                        radioKm, 
+                        page, 
+                        size
+                )
         );
     }
 }
