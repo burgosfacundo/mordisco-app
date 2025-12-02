@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, ViewChild, viewChild } from '@angular/core';
 import { ToastService } from '../../../core/services/toast-service';
 import { PedidoService } from '../../../shared/services/pedido/pedido-service';
 import { AuthService } from '../../../shared/services/auth-service';
@@ -9,10 +9,14 @@ import { PedidoCardComponent } from "../../../shared/components/pedido-card-comp
 import { MatIcon } from "@angular/material/icon";
 import { Router } from '@angular/router';
 import { ConfirmationService } from '../../../core/services/confirmation-service';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { BarraBuscadoraComponent } from '../../../shared/components/barra-buscadora-component/barra-buscadora-component';
 
 @Component({
   selector: 'app-entregas-page',
-  imports: [MatPaginator, PedidoCardComponent, MatIcon],
+  imports: [MatPaginator, PedidoCardComponent, MatIcon, FormsModule, BarraBuscadoraComponent],
   templateUrl: './entregas-page.html',
 })
 export class EntregasPage {
@@ -25,6 +29,14 @@ export class EntregasPage {
   pedidos?: PedidoResponse[];
   adminMode = input<boolean>(false)
   admin_idUser = input<number>()
+  private searchSubject = new Subject<string>();
+  @ViewChild(BarraBuscadoraComponent) barraBuscadora!: BarraBuscadoraComponent;
+
+  filtroEstado: string = '';
+  filtroFechaInicio: string = '';
+  filtroFechaFin: string = '';
+  searchValue: string = '';
+  idUser? : number
   
   sizePedidos : number = 5;
   pagePedidos : number = 0;
@@ -34,22 +46,28 @@ export class EntregasPage {
 
   ngOnInit(): void {
     this.loadPedidos();
+    this.searchSubject.pipe(
+      debounceTime(500), // Espera 500ms después de que el usuario deje de escribir
+      distinctUntilChanged() // Solo emite si el valor cambió
+    ).subscribe(() => {
+      this.pagePedidos = 0; // Resetear a la primera página
+      this.buscar();
+    });     
   }
 
   private loadPedidos(): void {
-    let userId : number | undefined
     if(!this.adminMode()){
-      userId= this.authService.currentUser()?.userId
+      this.idUser= this.authService.currentUser()?.userId
     }else{
-      userId=this.admin_idUser()
+      this.idUser=this.admin_idUser()
     }
 
-    if (!userId) {
+    if (!this.idUser) {
       this.authService.logout();
       return;
     }
 
-    this.repartidorService.getAllPedidosRepartidor(userId!,this.pagePedidos,this.sizePedidos).subscribe({
+    this.repartidorService.getAllPedidosRepartidor(this.idUser!,this.pagePedidos,this.sizePedidos).subscribe({
         next: (data) => {
           this.pedidos = data.content;
           this.length = data.totalElements;
@@ -87,8 +105,76 @@ export class EntregasPage {
   onPageChangePedidos(event: PageEvent): void {
     this.pagePedidos = event.pageIndex
     this.sizePedidos = event.pageSize;
+    if (this.searchValue.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.buscar();
+    } else {
+      this.loadPedidos();
+    }  
+  }
+
+ aplicarFiltros(): void {
+    this.pagePedidos = 0;
+    this.buscar();
+  }
+
+  private tieneFiltrosAplicados(): boolean {
+    return this.filtroEstado !== '' ||
+           this.filtroFechaInicio !== '' ||
+           this.filtroFechaFin !== '';
+  }
+
+  buscar() {
+    // Convertir fechas de tipo date a LocalDateTime con hora 00:00:00
+    const fechaInicioFormatted = this.filtroFechaInicio 
+      ? `${this.filtroFechaInicio}T00:00:00` 
+      : '';
+    
+    const fechaFinFormatted = this.filtroFechaFin 
+      ? `${this.filtroFechaFin}T23:59:59` 
+      : '';
+
+    this.pedidoService.filtrarPedidosRepartidor(
+      this.idUser!,
+      this.searchValue,
+      this.filtroEstado,
+      fechaInicioFormatted,
+      fechaFinFormatted,
+      this.pagePedidos, 
+      this.sizePedidos
+    ).subscribe(resp => {
+      this.pedidos = resp.content;
+      this.length = resp.totalElements;
+    });
+  }  
+
+  onClearFilters(): void {
+    this.searchValue = '';
+    this.filtroEstado = '';
+    this.filtroFechaInicio = '';
+    this.filtroFechaFin = '';
+    this.pagePedidos = 0;
+    
+    // Limpiar la barra buscadora visualmente
+    if (this.barraBuscadora) {
+      this.barraBuscadora.onSearchClear();
+    }
+    
     this.loadPedidos();
   }
+
+ onSearchChanged(text: string) {
+    this.searchValue = text;
+    
+    // Si hay texto o hay filtros aplicados, buscar
+    if (text.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.searchSubject.next(text);
+    } else if (text.trim() === '' && !this.tieneFiltrosAplicados()) {
+      // Si borraron todo y no hay filtros, cargar todos
+      this.pagePedidos = 0;
+      this.loadPedidos();
+    }
+  }
+
   navegarAHome() {
     this.router.navigate(['/home'])
   }

@@ -48,4 +48,28 @@ export class RestauranteService {
   delete(id : number) : Observable<string>{
     return this.http.delete<string>(`${environment.apiUrl}/restaurantes/delete/${id}`)
   }
+
+
+  filtrarRestaurantes(
+    search: string,
+    activo: string,
+    page: number,
+    size: number
+  ): Observable<PaginationResponse<RestauranteForCard>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (search && search.trim() !== '') {
+      params = params.set('search', search.trim());
+    }
+    if (activo && activo !== '') {
+      params = params.set('activo', activo);
+    }
+
+    return this.http.get<PaginationResponse<RestauranteForCard>>(
+      `${environment.apiUrl}/restaurantes/buscar`, 
+      { params }
+    );
+  }  
 }

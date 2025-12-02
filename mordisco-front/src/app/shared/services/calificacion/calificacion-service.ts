@@ -68,4 +68,33 @@ export class CalificacionService {
         return this.http.get<PaginationResponse<CalificacionRepartidorResponseDTO>>(`${environment.apiUrl}/calificaciones/cliente/repartidor/${clienteId}`, {params})
     }
 
+
+    filtrarCalificacion(
+        search: string,
+        estrellas: string,
+        fechaInicio: string,
+        fechaFin: string,
+        page: number,
+        size: number
+    ): Observable<PaginationResponse<CalificacionPedidoResponseDTO>> {
+
+        let params = new HttpParams()
+        .set('page', page.toString())
+        .set('size', size.toString());
+
+        if (search && search.trim() !== '') {
+        params = params.set('search', search.trim());
+        }
+        if (estrellas && estrellas !== '') {
+        params = params.set('estrellas', estrellas);
+        }
+        if (fechaInicio && fechaInicio !== '') {
+        params = params.set('fechaInicio', fechaInicio);
+        }
+        if (fechaFin && fechaFin !== '') {
+        params = params.set('fechaFin', fechaFin);
+        }
+        return this.http.get<PaginationResponse<CalificacionPedidoResponseDTO>>(`${environment.apiUrl}/calificaciones/buscar`, { params });
+    }    
+
 }

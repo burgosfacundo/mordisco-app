@@ -11,6 +11,9 @@ import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.model.entity.Pedido;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido,Long> {
@@ -80,6 +83,232 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
             @Param("latitud") Double latitud,
             @Param("longitud") Double longitud,
             @Param("radioKm") Double radioKm,
+            Pageable pageable
+    );
+
+    @Query(value = """
+    SELECT p.*
+    FROM pedidos p
+    INNER JOIN usuarios u ON p.usuario_id = u.id
+    INNER JOIN restaurantes r ON p.restaurante_id = r.id
+    LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+    WHERE 
+        -- FILTRO ESTADO
+        (:estado IS NULL OR :estado = '' OR p.estado = :estado)
+
+        -- FILTRO TIPO ENTREGA
+        AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
+
+        -- FILTRO FECHA INICIO
+        AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+
+        -- FILTRO FECHA FIN
+        AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+
+        -- BUSCADOR TEXTO LIBRE
+        AND (
+                :search IS NULL OR :search = '' 
+                OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+                OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(CONCAT(rep.nombre, ' ', rep.apellido)) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+    """,
+            countQuery = """
+    SELECT COUNT(*)
+    FROM pedidos p
+    INNER JOIN usuarios u ON p.usuario_id = u.id
+    INNER JOIN restaurantes r ON p.restaurante_id = r.id
+    LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+    WHERE 
+        (:estado IS NULL OR :estado = '' OR p.estado = :estado)
+        AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
+        AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+        AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+        AND (
+                :search IS NULL OR :search = '' 
+                OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+                OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(CONCAT(rep.nombre, ' ', rep.apellido)) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+    """,
+            nativeQuery = true)
+    Page<Pedido> filtrarPedidos(
+            @Param("search") String search,
+            @Param("estado") String estado,
+            @Param("tipoEntrega") String tipoEntrega,
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin,
+            Pageable pageable
+    );@Query(value = """
+
+SELECT p.*
+FROM pedidos p
+INNER JOIN usuarios u ON p.usuario_id = u.id
+INNER JOIN restaurantes r ON p.restaurante_id = r.id
+LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+WHERE 
+    p.restaurante_id = :restauranteId
+    AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
+    AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
+    AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+    AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+    AND (
+        :search IS NULL OR :search = '' 
+        OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+        OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(CONCAT(rep.nombre, ' ', rep.apellido)) LIKE LOWER(CONCAT('%', :search, '%'))
+    )
+""",
+            countQuery = """
+SELECT COUNT(*)
+FROM pedidos p
+INNER JOIN usuarios u ON p.usuario_id = u.id
+INNER JOIN restaurantes r ON p.restaurante_id = r.id
+LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+WHERE 
+    p.restaurante_id = :restauranteId
+    AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
+    AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
+    AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+    AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+    AND (
+        :search IS NULL OR :search = '' 
+        OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+        OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(CONCAT(rep.nombre, ' ', rep.apellido)) LIKE LOWER(CONCAT('%', :search, '%'))
+    )
+""",
+            nativeQuery = true)
+    Page<Pedido> filtrarPedidosRestaurante(
+                    @Param("restauranteId") Long restauranteId,
+                    @Param("search") String search,
+                    @Param("estado") String estado,
+                    @Param("tipoEntrega") String tipoEntrega,
+                    @Param("fechaInicio") LocalDateTime fechaInicio,
+                    @Param("fechaFin") LocalDateTime fechaFin,
+                    Pageable pageable
+            );
+
+    // Para CLIENTE - solo ve sus propios pedidos
+    @Query(value = """
+    SELECT p.*
+    FROM pedidos p
+    INNER JOIN usuarios u ON p.usuario_id = u.id
+    INNER JOIN restaurantes r ON p.restaurante_id = r.id
+    LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+    WHERE 
+        p.usuario_id = :clienteId
+        AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
+        AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+        AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)   
+        AND (
+            :search IS NULL OR :search = '' 
+            OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+            OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+    """,
+            countQuery = """
+    SELECT COUNT(*)
+    FROM pedidos p
+    INNER JOIN usuarios u ON p.usuario_id = u.id
+    INNER JOIN restaurantes r ON p.restaurante_id = r.id
+    LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+    WHERE 
+        p.usuario_id = :clienteId
+        AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
+        AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+        AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)   
+        AND (
+            :search IS NULL OR :search = '' 
+            OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+            OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+    """,
+            nativeQuery = true)
+    Page<Pedido> filtrarPedidosCliente(
+            @Param("clienteId") Long clienteId,
+            @Param("estado") String estado,
+            @Param("search") String search,
+            @Param("tipoEntrega") String tipoEntrega,
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin,
+            Pageable pageable
+    );
+
+    // Para REPARTIDOR - solo ve sus propios pedidos
+    @Query(value = """
+    SELECT p.*
+    FROM pedidos p
+    INNER JOIN usuarios u ON p.usuario_id = u.id
+    INNER JOIN restaurantes r ON p.restaurante_id = r.id
+    LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+    WHERE 
+        p.repartidor_id = :repartidorId
+        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
+        AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+        AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+        AND (
+            :search IS NULL OR :search = '' 
+            OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+            OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+    """,
+            countQuery = """
+    SELECT COUNT(*)
+    FROM pedidos p
+    INNER JOIN usuarios u ON p.usuario_id = u.id
+    INNER JOIN restaurantes r ON p.restaurante_id = r.id
+    LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+    WHERE 
+        p.repartidor_id = :repartidorId
+        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
+        AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+        AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+        AND (
+            :search IS NULL OR :search = '' 
+            OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+            OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+    """,
+            nativeQuery = true)
+    Page<Pedido> filtrarPedidosRepartidores(
+            @Param("repartidorId") Long repartidorId,
+            @Param("search") String search,
+            @Param("estado") String estado,
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin,
             Pageable pageable
     );
 }

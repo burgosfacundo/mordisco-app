@@ -35,7 +35,6 @@ export class CalificacionPage implements OnInit{
   cargarCalificaciones(){
       this.cService.getCalificacionesRepartidor(this.idUsuario,this.page, this.size).subscribe({
       next: (response) => {
-        console.log("Holaaa2",response)
         this.calificaciones = response.content;
         this.totalElements = response.totalElements;},
       error:(e)=> console.log("Errorrrr", e)

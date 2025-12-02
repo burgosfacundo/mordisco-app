@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, inject, input, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -11,6 +11,10 @@ import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
+import { BarraBuscadoraComponent } from '../../../../shared/components/barra-buscadora-component/barra-buscadora-component';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-mis-pedidos-cliente-page',
@@ -21,6 +25,8 @@ import { ConfirmationService } from '../../../../core/services/confirmation-serv
     MatTabsModule,
     MatIconModule,
     DetallePedidoComponent,
+    BarraBuscadoraComponent,
+    FormsModule
 ],
   templateUrl: './mis-pedidos-cliente-page.html',
   styleUrl: './mis-pedidos-cliente-page.css'
@@ -32,10 +38,19 @@ export class MisPedidosClientePage implements OnInit {
   private confirmationService = inject(ConfirmationService)
   private router = inject(Router)
 
+  private searchSubject = new Subject<string>();
+  @ViewChild(BarraBuscadoraComponent) barraBuscadora!: BarraBuscadoraComponent;
+
+  filtroTipoEntrega: string = '';
+  filtroFechaInicio: string = '';
+  filtroFechaFin: string = '';
+  searchValue: string = '';
+
   pedidos = signal<PedidoResponse[]>([])
   isLoading = signal(true)
   adminMode = input<boolean>(false)
   admin_idUser = input<number>()
+  idUsuario? : number
 
   // Paginación
   page = 0
@@ -47,17 +62,23 @@ export class MisPedidosClientePage implements OnInit {
 
   ngOnInit(): void {
     this.cargarPedidos()
+     this.searchSubject.pipe(
+          debounceTime(500), // Espera 500ms después de que el usuario deje de escribir
+          distinctUntilChanged() // Solo emite si el valor cambió
+        ).subscribe(() => {
+          this.page = 0; // Resetear a la primera página
+          this.buscar();
+        }); 
   }
 
   private cargarPedidos(): void {
-    let userId : number | undefined
     if(!this.adminMode()){
-      userId= this.authService.currentUser()?.userId
+      this.idUsuario= this.authService.currentUser()?.userId
     }else{
-      userId=this.admin_idUser()
+      this.idUsuario=this.admin_idUser()
     }
 
-    if (!userId) {
+    if (!this.idUsuario) {
       this.router.navigate(['/login'])
       return
     }
@@ -65,7 +86,7 @@ export class MisPedidosClientePage implements OnInit {
     this.isLoading.set(true)
 
     if (this.estadoActual === 'TODOS') {
-      this.pedidoService.getAllByCliente(userId, this.page, this.size).subscribe({
+      this.pedidoService.getAllByCliente(this.idUsuario, this.page, this.size).subscribe({
         next: (response) => {
           this.pedidos.set(response.content)
           this.totalElements = response.totalElements
@@ -76,7 +97,7 @@ export class MisPedidosClientePage implements OnInit {
         }
       });
     } else {
-      this.pedidoService.getAllByClienteYEstado(userId, this.estadoActual, this.page, this.size).subscribe({
+      this.pedidoService.getAllByClienteYEstado(this.idUsuario, this.estadoActual, this.page, this.size).subscribe({
         next: (response) => {
           this.pedidos.set(response.content)
           this.totalElements = response.totalElements
@@ -102,13 +123,23 @@ export class MisPedidosClientePage implements OnInit {
 
     this.estadoActual = estados[index]
     this.page = 0
-    this.cargarPedidos()
+
+    if (this.searchValue.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.buscar();
+    } else {
+      this.cargarPedidos();
+    } 
   }
 
-  onPageChange(event: PageEvent): void {
-    this.page = event.pageIndex
-    this.size = event.pageSize
-    this.cargarPedidos()
+  onPageChangePedidos(event: PageEvent): void {
+    this.page = event.pageIndex;
+    this.size = event.pageSize;
+
+    if (this.searchValue.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.buscar();
+    } else {
+      this.cargarPedidos();
+    }
   }
 
   verDetalle(pedidoId: number): void {
@@ -136,7 +167,78 @@ export class MisPedidosClientePage implements OnInit {
         });
 
   }
+   aplicarFiltros(): void {
+    this.page = 0;
+    this.buscar();
+  }
+
+  private tieneFiltrosAplicados(): boolean {
+    return this.filtroTipoEntrega !== '' ||
+           this.filtroFechaInicio !== '' ||
+           this.filtroFechaFin !== '';
+  }
+
+  buscar() {
+      if (!this.idUsuario) return; // ← Agregar validación
+
+    // Convertir fechas de tipo date a LocalDateTime con hora 00:00:00
+    const fechaInicioFormatted = this.filtroFechaInicio 
+      ? `${this.filtroFechaInicio}T00:00:00` 
+      : '';
+    
+    const fechaFinFormatted = this.filtroFechaFin 
+      ? `${this.filtroFechaFin}T23:59:59` 
+      : '';
+    const estadoParaBuscar = this.estadoActual === 'TODOS' 
+      ? '' 
+      : this.estadoActual;  
   
+
+      this.pedidoService.filtrarPedidosClientes(
+      this.idUsuario!,
+      this.searchValue,
+      estadoParaBuscar,
+      this.filtroTipoEntrega,
+      fechaInicioFormatted,
+      fechaFinFormatted,
+      this.page, 
+      this.size
+    ).subscribe(resp => {
+      this.pedidos.set(resp.content)
+      this.totalElements = resp.totalElements;
+    });
+  }
+
+
+ onSearchChanged(text: string) {
+    this.searchValue = text;
+    
+    // Si hay texto o hay filtros aplicados, buscar
+    if (text.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.searchSubject.next(text);
+    } else if (text.trim() === '' && !this.tieneFiltrosAplicados()) {
+      // Si borraron todo y no hay filtros, cargar todos
+      this.page = 0;
+      this.cargarPedidos();
+    }
+  }
+
+
+  onClearFilters(): void {
+    this.searchValue = '';
+    this.filtroTipoEntrega = '';
+    this.filtroFechaInicio = '';
+    this.filtroFechaFin = '';
+    this.page = 0;
+    
+    // Limpiar la barra buscadora visualmente
+    if (this.barraBuscadora) {
+      this.barraBuscadora.onSearchClear();
+    }
+    
+    this.cargarPedidos();
+  }
+
   navegarAHome() {
     this.router.navigate(['/home'])
   }

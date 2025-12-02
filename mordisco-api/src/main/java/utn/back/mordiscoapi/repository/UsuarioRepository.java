@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.model.entity.Pedido;
 import utn.back.mordiscoapi.model.entity.Usuario;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -50,4 +51,51 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByEmail(@NotBlank(message = "El email es obligatorio") @Email(message = "Formato de email inválido") String email);
 
     boolean existsByTelefono(@NotBlank(message = "El teléfono es obligatorio") @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Formato de teléfono inválido") String telefono);
+
+
+
+    @Query(value = """
+SELECT u.*
+FROM usuarios u 
+INNER JOIN roles r ON u.rol_id = r.id
+WHERE 
+    -- FILTRO BAJA LOGICA (BIT -> Boolean)
+    (:bajaLogica IS NULL OR u.baja_logica = :bajaLogica)
+
+    -- FILTRO ROL
+    AND (:rol IS NULL OR :rol = '' OR r.nombre = :rol)
+
+    -- BUSCADOR TEXTO LIBRE
+    AND (
+        :search IS NULL OR :search = '' 
+        OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR CAST(u.id AS CHAR) LIKE CONCAT('%', :search, '%')
+        OR CAST(u.telefono AS CHAR) LIKE CONCAT('%', :search, '%')
+    )
+""",
+            countQuery = """
+SELECT COUNT(*)
+FROM usuarios u 
+INNER JOIN roles r ON u.rol_id = r.id
+WHERE 
+    (:bajaLogica IS NULL OR u.baja_logica = :bajaLogica)
+    AND (:rol IS NULL OR :rol = '' OR r.nombre = :rol)
+    AND (
+        :search IS NULL OR :search = '' 
+        OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR CAST(u.id AS CHAR) LIKE CONCAT('%', :search, '%')
+        OR LOWER(u.telefono) LIKE CONCAT('%', :search, '%')
+    )
+""",
+            nativeQuery = true)
+    Page<Usuario> filtrarUsuario(
+            @Param("search") String search,
+            @Param("bajaLogica") Boolean bajaLogica,
+            @Param("rol") String rol,
+            Pageable pageable
+    );
 }

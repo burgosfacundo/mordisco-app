@@ -6,10 +6,11 @@ import RestauranteForCard from '../../../../shared/models/restaurante/restaurant
 import { CarritoFlotanteComponent } from "../../../../shared/components/carrito-flotante-component/carrito-flotante-component";
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
 import { AuthService } from '../../../../shared/services/auth-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home-cliente-component',
-  imports: [RestauranteCardComponent, MatPaginator, RestauranteCardComponent, CarritoFlotanteComponent],
+  imports: [MatPaginator, CarritoFlotanteComponent, RestauranteCardComponent],
   templateUrl: './home-cliente-component.html'
 })
 export class HomeClienteComponent  implements OnInit , OnDestroy{
@@ -18,6 +19,7 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   private originalRestaurantes?: RestauranteForCard[];
   private confirmationService = inject(ConfirmationService);
   private authService = inject(AuthService)
+  private router = inject(Router)
 
   restaurantes?: RestauranteForCard[];
   restaurantesPromociones?: RestauranteForCard[];
@@ -133,5 +135,9 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
     }).subscribe((confirmed) => {
       if (confirmed) this.authService.logout(); 
     });
+  }
+
+  verMenu(id : number){
+    this.router.navigate(['/cliente/restaurante', id])
   }
 }

@@ -14,6 +14,6 @@ public record UsuarioCardDTO(
         @Schema(description = "Rol del usuario")
         String rol,
         @Schema(description = "Cuenta desactivada")
-        Boolean bajaLogistica
+        Boolean bajaLogica
         ) {
 }

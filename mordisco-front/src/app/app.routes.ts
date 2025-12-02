@@ -36,6 +36,7 @@ import { CalificacionPage } from './features/calificacion/calificacion-page/cali
 import { UsuariosPage } from './features/admin/usuarios-page/usuarios-page';
 import { PedidosAdminPage } from './features/admin/pedidos-admin-page/pedidos-admin-page';
 import { RestauranteAdminPage } from './features/admin/restaurante-admin-page/restaurante-admin-page';
+import { CalificacionesRestaurante } from './features/admin/calificaciones-restaurante/calificaciones-restaurante';
 
 export const routes: Routes = [
   // ==========================================
@@ -166,9 +167,11 @@ export const routes: Routes = [
       {path : 'configuracion/edit', component :ConfiguracionFormPage},
       {path : 'pedidos/detalle/:id', component: DetallePedidoPage },
       {path : 'usuarios', component: UsuariosPage},
+      {path : 'detalle-usuario/:idRol/:idUser', component : DetalleUsuarioPage},
       {path : 'pedidos', component: PedidosAdminPage},
       {path : 'restaurantes', component: RestauranteAdminPage},
-      {path : 'detalle-usuario/:idRol/:idUser', component : DetalleUsuarioPage},
+      {path : 'restaurante/:id', component: RestauranteDetallePage },
+      {path : 'restaurante/calificaciones/:id', component: CalificacionesRestaurante}
     ]
   },
 

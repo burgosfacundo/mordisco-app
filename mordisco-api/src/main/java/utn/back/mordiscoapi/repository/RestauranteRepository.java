@@ -111,4 +111,51 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             @Param("restauranteId") Long restauranteId,
             Pageable pageable
     );
+
+    @Query(value = """
+    SELECT r.*
+    FROM restaurantes r
+    LEFT JOIN direcciones d ON r.direccion_id = d.id
+    LEFT JOIN menus m ON r.menu_id = m.id
+    WHERE 
+        -- FILTRO ACTIVO (BIT -> Boolean)
+        (:activo IS NULL OR r.activo = :activo)
+        
+        -- BUSCADOR TEXTO LIBRE
+        AND (
+            :search IS NULL OR :search = '' 
+            OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR CAST(r.id AS CHAR) LIKE CONCAT('%', :search, '%')
+            OR LOWER(d.calle) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(d.ciudad) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(d.codigo_postal) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(d.numero) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(m.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+    ORDER BY r.razon_social ASC
+    """,
+            countQuery = """
+    SELECT COUNT(*)
+    FROM restaurantes r
+    LEFT JOIN direcciones d ON r.direccion_id = d.id
+    LEFT JOIN menus m ON r.menu_id = m.id
+    WHERE 
+        (:activo IS NULL OR r.activo = :activo)
+        AND (
+            :search IS NULL OR :search = '' 
+            OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR CAST(r.id AS CHAR) LIKE CONCAT('%', :search, '%')
+            OR LOWER(d.calle) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(d.ciudad) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(d.codigo_postal) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(d.numero) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(m.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+    """,
+            nativeQuery = true)
+    Page<Restaurante> filtrarRestaurantes(
+            @Param("search") String search,
+            @Param("activo") Boolean activo,
+            Pageable pageable
+    );
 }

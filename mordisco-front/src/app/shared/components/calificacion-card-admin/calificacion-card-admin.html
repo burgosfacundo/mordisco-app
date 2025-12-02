@@ -66,7 +66,7 @@
   <div class="p-6 flex-1 flex flex-col space-y-4">
     <!-- Nombre del cliente -->
     @if(clienteFlag()){ <div class="text-base text-gray-800"> Para: {{ ped?.restaurante?.razonSocial }} ({{ped?.restaurante?.id}})</div> }
-    @else{ <div class="text-base font-semibold text-gray-800"> {{ calificacionR()?.clienteNombre }} </div> }
+    @else{<div class="text-base font-semibold text-gray-800"> {{ calificacionP()?.clienteNombre }} </div> }
 
     <!-- Comentario -->
     @if (calificacionP()?.comentario) {

@@ -24,6 +24,7 @@
               <div  class="cursor-pointer">
                 <app-restaurante-card-component 
                   [restaurante]="restaurante"
+                  (menuVer)="verMenu($event)"
                   class="block">
                 </app-restaurante-card-component>
               </div>
@@ -78,6 +79,7 @@
               <span class="badge-promocion">¡PROMO!</span>
               <app-restaurante-card-component 
                 [restaurante]="restaurante"
+                (menuVer)="verMenu($event)"
                 class="block">
               </app-restaurante-card-component>
             </li>

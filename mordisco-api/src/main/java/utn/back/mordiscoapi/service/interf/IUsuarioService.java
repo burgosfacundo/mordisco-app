@@ -1,6 +1,8 @@
 package utn.back.mordiscoapi.service.interf;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
@@ -26,4 +28,5 @@ public interface IUsuarioService {
     void updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;
     void darDeBaja(Long usuarioId, String motivo) throws NotFoundException;
     void reactivar(Long usuarioId) throws NotFoundException;
+    Page<UsuarioCardDTO> filtrarUsuarios (int pageNo, int pageSize, String search, String bajaLogica, String rol) throws NotFoundException;
 }

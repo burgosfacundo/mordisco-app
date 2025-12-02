@@ -253,5 +253,29 @@ public class RestauranteController {
         restauranteService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(
+            summary = "Buscar restaurantes con filtros",
+            description = """
+            Busca restaurantes por texto libre y estado de actividad.
+            **Búsqueda por:** razón social, ID, dirección (calle, ciudad, código postal, número), menús (nombre)
+            **Rol necesario: Público (sin autenticación)**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Restaurantes encontrados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<RestauranteResponseDTO>> filtrarRestaurantes(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String activo,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        return ResponseEntity.ok(
+                restauranteService.filtrarRestaurantes(page, size, search, activo)
+        );
+    }
 }
 

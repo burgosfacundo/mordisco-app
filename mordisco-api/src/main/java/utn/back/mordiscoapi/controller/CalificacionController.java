@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.calificaciones.*;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.service.impl.CalificacionServiceImpl;
 
 
@@ -225,5 +226,28 @@ public class CalificacionController {
         return ResponseEntity.ok(
                 calificacionService.getCalificacionesRepartidoresCliente(clienteId, page, size)
         );
+    }
+
+    @Operation(
+            summary = "Busca entre los pedidos por alguna palabra clave especifica",
+            description = """
+            Busca por palabra clave coincidencias en los pedidos.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos con coincidencias encontradas"),
+            @ApiResponse(responseCode = "404", description = "Pedidos sin coincidencias"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<CalificacionPedidoResponseDTO>> searchCalificaciones(@RequestParam(required = false) String search,
+                                                                 @RequestParam(required = false) String estrellas,
+                                                                 @RequestParam(required = false) String fechaInicio,
+                                                                 @RequestParam(required = false) String fechaFin,
+                                                                 @RequestParam int page,
+                                                                 @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(calificacionService.filtrarCalificaciones(page,size,estrellas, fechaInicio, fechaFin,search));
     }
 }

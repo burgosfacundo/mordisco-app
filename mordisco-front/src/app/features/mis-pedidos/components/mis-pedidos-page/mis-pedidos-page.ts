@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -13,6 +13,10 @@ import RestauranteResponse from '../../../../shared/models/restaurante/restauran
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
 import { ToastService } from '../../../../core/services/toast-service';
+import { BarraBuscadoraComponent } from '../../../../shared/components/barra-buscadora-component/barra-buscadora-component';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-mis-pedidos-page',
@@ -22,7 +26,9 @@ import { ToastService } from '../../../../core/services/toast-service';
     PedidoCardComponent,
     MatPaginatorModule,
     MatTabsModule,
-    MatIconModule
+    MatIconModule,
+    BarraBuscadoraComponent,
+    FormsModule
   ],
   templateUrl: './mis-pedidos-page.html',
   styleUrl: './mis-pedidos-page.css'
@@ -35,6 +41,14 @@ export class MisPedidosPage implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private toastService = inject(ToastService);
 
+  private searchSubject = new Subject<string>();
+  @ViewChild(BarraBuscadoraComponent) barraBuscadora!: BarraBuscadoraComponent;
+
+  filtroTipoEntrega: string = '';
+  filtroFechaInicio: string = '';
+  filtroFechaFin: string = '';
+  searchValue: string = '';
+  idUsuario? : number
   arrPedidos?: PedidoResponse[];
   restaurante?: RestauranteResponse;
 
@@ -48,17 +62,24 @@ export class MisPedidosPage implements OnInit {
 
   ngOnInit(): void {
     this.cargarRestaurante();
+    this.searchSubject.pipe(
+      debounceTime(500), // Espera 500ms después de que el usuario deje de escribir
+      distinctUntilChanged() // Solo emite si el valor cambió
+    ).subscribe(() => {
+        this.pagePedidos = 0; // Resetear a la primera página
+        this.buscar();
+    });  
   }
 
   private cargarRestaurante(): void {
-    const userId = this.auS.getCurrentUser()?.userId;
+    this.idUsuario = this.auS.getCurrentUser()?.userId;
 
-    if (!userId) {
+    if (!this.idUsuario) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.rService.getByUsuario(userId).subscribe({
+    this.rService.getByUsuario(this.idUsuario).subscribe({
       next: (data) => {
         this.restaurante = data;
         this.cargarPedidos();
@@ -122,13 +143,22 @@ export class MisPedidosPage implements OnInit {
 
     this.estadoActual = estados[index];
     this.pagePedidos = 0;
-    this.cargarPedidos();
+
+    if (this.searchValue.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.buscar();
+    } else {
+      this.cargarPedidos();
+    }  
   }
 
   onPageChangePedidos(event: PageEvent): void {
     this.pagePedidos = event.pageIndex;
     this.sizePedidos = event.pageSize;
-    this.cargarPedidos();
+    if (this.searchValue.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.buscar();
+    } else {
+      this.cargarPedidos();
+    }
   }
 
   aceptarPedido(pedidoId: number): void {
@@ -186,4 +216,73 @@ export class MisPedidosPage implements OnInit {
       });
     });
   }
+
+  onSearchChanged(text: string) {
+    this.searchValue = text;
+    
+    // Si hay texto o hay filtros aplicados, buscar
+    if (text.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.searchSubject.next(text);
+    } else if (text.trim() === '' && !this.tieneFiltrosAplicados()) {
+      // Si borraron todo y no hay filtros, cargar todos
+      this.pagePedidos = 0;
+      this.cargarPedidos();
+    }
+  } 
+ 
+  private tieneFiltrosAplicados(): boolean {
+    return this.filtroTipoEntrega !== '' ||
+           this.filtroFechaInicio !== '' ||
+           this.filtroFechaFin !== '';
+  }  
+
+  onClearFilters(): void {
+    this.searchValue = '';
+    this.filtroTipoEntrega = '';
+    this.filtroFechaInicio = '';
+    this.filtroFechaFin = '';
+    this.pagePedidos = 0;
+    
+    // Limpiar la barra buscadora visualmente
+    if (this.barraBuscadora) {
+      this.barraBuscadora.onSearchClear();
+    }
+    
+    this.cargarPedidos();
+  }  
+
+  buscar() {
+    // Convertir fechas de tipo date a LocalDateTime con hora 00:00:00
+    const fechaInicioFormatted = this.filtroFechaInicio 
+      ? `${this.filtroFechaInicio}T00:00:00` 
+      : '';
+    
+    const fechaFinFormatted = this.filtroFechaFin 
+      ? `${this.filtroFechaFin}T23:59:59` 
+      : '';
+    
+    const estadoParaBuscar = this.estadoActual === 'TODOS' 
+      ? '' 
+      : this.estadoActual;  
+
+    this.pService.filtrarPedidosRestaurante(
+      this.restaurante?.id!,
+      this.searchValue,
+      estadoParaBuscar,
+      this.filtroTipoEntrega,
+      fechaInicioFormatted,
+      fechaFinFormatted,
+      this.pagePedidos, 
+      this.sizePedidos
+    ).subscribe(resp => {
+      this.arrPedidos = resp.content;
+      this.lengthPedidos = resp.totalElements;
+    });
+  }
+
+
+  aplicarFiltros(): void {
+    this.pagePedidos = 0;
+    this.buscar();
+  }  
 }

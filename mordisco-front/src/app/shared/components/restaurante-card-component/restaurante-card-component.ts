@@ -1,13 +1,13 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import { Component, inject, input, OnInit, output } from '@angular/core';
 import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
 import HorarioAtencion from '../../models/horario/horario-atencion-request';
-import { Router } from '@angular/router';
 import { HorarioService } from '../../services/horario/horario-service';
 import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 
 
 @Component({
   selector: 'app-restaurante-card-component',
+
   imports: [],
   templateUrl: './restaurante-card-component.html'
 })
@@ -15,7 +15,9 @@ export class RestauranteCardComponent implements OnInit {
   restaurante = input<RestauranteForCard>()
   listaHorarios : HorarioAtencionResponse [] = []
   private haService = inject(HorarioService)
-  private router : Router = inject(Router)
+  menuVer = output<number>();
+  verCalificaciones = output<number>()
+  adminMode = input<boolean>(false)
 
   ngOnInit(): void {
     this.getHorariosByRestaurante();
@@ -80,7 +82,15 @@ export class RestauranteCardComponent implements OnInit {
     return `${h.padStart(2, '0')}:${(m ?? '00').padStart(2, '0')}`;
   }
 
-  verMenu(r : RestauranteForCard){
-    this.router.navigate(['/cliente/restaurante', r.id])
+  verMenu(){
+    if (this.restaurante()?.id) {
+      this.menuVer.emit(this.restaurante()!.id);
+    }
+  }
+
+  verCalif(){
+    if (this.restaurante()?.id && this.adminMode()) {
+      this.verCalificaciones.emit(this.restaurante()!.id);
+    }    
   }
 }

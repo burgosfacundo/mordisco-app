@@ -23,6 +23,10 @@ import utn.back.mordiscoapi.model.dto.usuario.BajaLogicaRequestDTO;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 
 @Tag(name = "Pedidos", description = "Operaciones relacionadas con los pedidos de los restaurantes")
 @RestController
@@ -416,5 +420,123 @@ public class PedidoController {
         pedidoService.reactivar(id);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Busca entre los pedidos por alguna palabra clave especifica
+     */
+    @Operation(
+            summary = "Busca entre los pedidos por alguna palabra clave especifica",
+            description = """
+            Busca por palabra clave coincidencias en los pedidos.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos con coincidencias encontradas"),
+            @ApiResponse(responseCode = "404", description = "Pedidos sin coincidencias"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<PedidoResponseDTO>> searchPedidos(@RequestParam(required = false) String search,
+                                                                 @RequestParam(required = false) String estado,
+                                                                 @RequestParam(required = false) String tipoEntrega,
+                                                                 @RequestParam(required = false) String fechaInicio,
+                                                                 @RequestParam(required = false) String fechaFin,
+                                                                 @RequestParam int page,
+                                                                 @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.filtrarPedidos(page,size,estado,tipoEntrega, fechaInicio, fechaFin,search));
+    }
+
+    /**
+     * Busca entre los pedidos por restaurante ID alguna palabra clave especifica
+     */
+    @Operation(
+            summary = "Busca entre los pedidos por alguna palabra clave especifica",
+            description = """
+            Busca por palabra clave coincidencias en los pedidos.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos con coincidencias encontradas"),
+            @ApiResponse(responseCode = "404", description = "Pedidos sin coincidencias"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE')")
+    @GetMapping("/buscar-by-restaurante/{idRest}")
+    public ResponseEntity<Page<PedidoResponseDTO>> searchPedidosRestaurante(
+            @PathVariable Long idRest,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) String tipoEntrega,
+            @RequestParam(required = false) String fechaInicio,
+            @RequestParam(required = false) String fechaFin,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+
+        return ResponseEntity.ok(
+                pedidoService.filtrarPedidosRestaurantes(
+                        page, size, idRest, estado, tipoEntrega, fechaInicio, fechaFin, search
+                )
+        );
+    }
+    /**
+     * Busca entre los pedidos por alguna palabra clave especifica
+     */
+    @Operation(
+            summary = "Busca entre los pedidos por alguna palabra clave especifica",
+            description = """
+            Busca por palabra clave coincidencias en los pedidos.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos con coincidencias encontradas"),
+            @ApiResponse(responseCode = "404", description = "Pedidos sin coincidencias"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('CLIENTE')")
+    @GetMapping("/buscar-by-cliente/{idCli}")
+    public ResponseEntity<Page<PedidoResponseDTO>> searchPedidosCliente(@PathVariable Long idCli,
+                                                                 @RequestParam(required = false) String search,
+                                                                 @RequestParam(required = false) String estado,
+                                                                 @RequestParam(required = false) String tipoEntrega,
+                                                                 @RequestParam(required = false) String fechaInicio,
+                                                                 @RequestParam(required = false) String fechaFin,
+                                                                 @RequestParam int page,
+                                                                 @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.filtrarPedidosCliente(page,size,idCli,estado,tipoEntrega, fechaInicio, fechaFin,search));
+    }
+    /**
+     * Busca entre los pedidos por alguna palabra clave especifica
+     */
+    @Operation(
+            summary = "Busca entre los pedidos por alguna palabra clave especifica",
+            description = """
+            Busca por palabra clave coincidencias en los pedidos.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos con coincidencias encontradas"),
+            @ApiResponse(responseCode = "404", description = "Pedidos sin coincidencias"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @GetMapping("/buscar-by-repartidor/{idRep}")
+    public ResponseEntity<Page<PedidoResponseDTO>> searchPedidosRepartidor(@PathVariable Long idRep,
+                                                                 @RequestParam(required = false) String search,
+                                                                 @RequestParam(required = false) String estado,
+                                                                 @RequestParam(required = false) String fechaInicio,
+                                                                 @RequestParam(required = false) String fechaFin,
+                                                                 @RequestParam int page,
+                                                                 @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.filtrarPedidosRepartidor(page,size,idRep,estado, fechaInicio, fechaFin,search));
+    }
+
+
+
+
 }
 

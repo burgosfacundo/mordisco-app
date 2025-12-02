@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -361,6 +362,29 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         }
 
         repository.save(usuario);
+    }
+
+    @Override
+    public Page<UsuarioCardDTO> filtrarUsuarios(
+            int pageNo, int pageSize,
+            String search,
+            String bajaLogica,
+            String rol) {
+
+        // Convertir String a Boolean para bajaLogica
+        Boolean bajaLogicaBoolean = null;
+        if (bajaLogica != null && !bajaLogica.isBlank()) {
+            bajaLogicaBoolean = bajaLogica.equals("1"); // "1" = true (bloqueado), "0" = false (activo)
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return repository.filtrarUsuario(
+                search,
+                bajaLogicaBoolean,
+                rol,
+                pageable
+        ).map(UsuarioMapper::toUsuarioCardDTO);
     }
 }
 

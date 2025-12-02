@@ -221,4 +221,25 @@ public class RestauranteServiceImpl implements IRestauranteService {
         return restauranteRepository.findPedidosActivosByRestaurante(restauranteId, pageable)
                 .map(PedidoMapper::toDTO);
     }
+
+    @Override
+    public Page<RestauranteResponseDTO> filtrarRestaurantes(
+            int pageNo, int pageSize,
+            String search,
+            String activo) {
+
+        // Convertir String a Boolean para activo
+        Boolean activoBoolean = null;
+        if (activo != null && !activo.isBlank()) {
+            activoBoolean = activo.equals("1"); // "1" = true (activo), "0" = false (inactivo)
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return restauranteRepository.filtrarRestaurantes(
+                search,
+                activoBoolean,
+                pageable
+        ).map(RestauranteMapper::toDTO);
+    }
 }

@@ -32,4 +32,11 @@ public interface IRestauranteService {
 
     Page<PedidoResponseDTO> getPedidosActivos(Long restauranteId, int page, int size)
             throws NotFoundException;
+
+    Page<RestauranteResponseDTO> filtrarRestaurantes(
+            int pageNo,
+            int pageSize,
+            String search,
+            String activo
+    );
 }

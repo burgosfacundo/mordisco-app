@@ -24,6 +24,7 @@ import utn.back.mordiscoapi.service.interf.IPedidoService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -664,6 +665,95 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setFechaBaja(null);
 
         pedidoRepository.save(pedido);
+    }
+
+    /**
+     * Busca los pedidos por filtro especifico
+     */
+    public Page<PedidoResponseDTO> filtrarPedidos(int pageNo,int pageSize,String estado, String tipoEntrega, String fechaInicio, String fechaFin, String variable){
+        LocalDateTime ini = (fechaInicio == null || fechaInicio.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaInicio);
+
+        LocalDateTime fin = (fechaFin == null || fechaFin.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaFin);
+        Pageable pageable = PageRequest.of(pageNo,pageSize);
+        return pedidoRepository.filtrarPedidos(variable,estado,tipoEntrega, ini, fin, pageable).map(PedidoMapper::toDTO);
+    }
+    /**
+     * Busca los pedidos de un restaurante por filtro especifico
+     */
+    @Override
+    public Page<PedidoResponseDTO> filtrarPedidosRestaurantes(
+            int pageNo, int pageSize,
+            Long id,
+            String estado,
+            String tipoEntrega,
+            String fechaInicio,
+            String fechaFin,
+            String variable) throws NotFoundException {
+
+        LocalDateTime ini = (fechaInicio == null || fechaInicio.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaInicio);
+
+        LocalDateTime fin = (fechaFin == null || fechaFin.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaFin);
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return pedidoRepository.filtrarPedidosRestaurante(
+                id, variable, estado, tipoEntrega, ini, fin, pageable
+        ).map(PedidoMapper::toDTO);
+    }
+    /*
+     * Busca los pedidos de un cliente por filtro especifico
+     */
+    @Override
+    public Page<PedidoResponseDTO> filtrarPedidosCliente(
+            int pageNo, int pageSize,
+            Long id,
+            String estado,
+            String tipoEntrega,
+            String fechaInicio,
+            String fechaFin,
+            String variable) throws NotFoundException {
+
+        LocalDateTime ini = (fechaInicio == null || fechaInicio.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaInicio);
+
+        LocalDateTime fin = (fechaFin == null || fechaFin.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaFin);
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return pedidoRepository.filtrarPedidosCliente(
+                id,          // clienteId
+                estado,      // estado
+                variable,    // search
+                tipoEntrega, // tipoEntrega
+                ini,         // fechaInicio
+                fin,         // fechaFin
+                pageable     // pageable
+        ).map(PedidoMapper::toDTO);
+    }
+    /**
+     * Busca los pedidos de un repartidor por filtro especifico
+     */
+    @Override
+    public Page<PedidoResponseDTO> filtrarPedidosRepartidor(int pageNo, int pageSize, Long id, String estado, String fechaInicio, String fechaFin, String variable) throws NotFoundException {
+        LocalDateTime ini = (fechaInicio == null || fechaInicio.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaInicio);
+
+        LocalDateTime fin = (fechaFin == null || fechaFin.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaFin);
+        Pageable pageable = PageRequest.of(pageNo,pageSize);
+        return pedidoRepository.filtrarPedidosRepartidores(id,variable,estado, ini, fin, pageable).map(PedidoMapper::toDTO);
     }
 }
 

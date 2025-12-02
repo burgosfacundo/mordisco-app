@@ -69,4 +69,30 @@ export class UserService {
     return this.http.post<void>(`${environment.apiUrl}/usuarios/${idUsuario}/reactivar`, null)
   }
 
+  filtrarUsuarios(
+    search: string,
+    bajaLogica: string,
+    rol: string,
+    page: number,
+    size: number
+  ): Observable<PaginationResponse<UserCard>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (search && search.trim() !== '') {
+      params = params.set('search', search.trim());
+    }
+    if (bajaLogica && bajaLogica !== '') {
+      params = params.set('bajaLogica', bajaLogica);
+    }
+    if (rol && rol !== '') {
+      params = params.set('rol', rol);
+    }
+
+    return this.http.get<PaginationResponse<UserCard>>(
+      `${environment.apiUrl}/usuarios/buscar`, 
+      { params }
+    );
+  }
 }

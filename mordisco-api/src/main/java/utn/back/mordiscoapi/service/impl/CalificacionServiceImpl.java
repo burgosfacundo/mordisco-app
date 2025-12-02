@@ -11,10 +11,14 @@ import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.mapper.CalificacionMapper;
+import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.model.dto.calificaciones.*;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.repository.*;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -297,5 +301,20 @@ public class CalificacionServiceImpl {
         Pageable pageable = PageRequest.of(page, size);
         return calificacionRepartidorRepository.findCalificacionesRealizadasPorCliente(clienteId, pageable)
                 .map(CalificacionMapper::toDTO);
+    }
+
+    /**
+     * Busca los pedidos por filtro especifico
+     */
+    public Page<CalificacionPedidoResponseDTO> filtrarCalificaciones(int pageNo, int pageSize, String estrellas, String fechaInicio, String fechaFin, String variable){
+        LocalDateTime ini = (fechaInicio == null || fechaInicio.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaInicio);
+
+        LocalDateTime fin = (fechaFin == null || fechaFin.isBlank())
+                ? null
+                : LocalDateTime.parse(fechaFin);
+        Pageable pageable = PageRequest.of(pageNo,pageSize);
+        return calificacionPedidoRepository.filtrarCalificaciones(variable,estrellas, ini, fin, pageable).map(CalificacionMapper::toDTO);
     }
 }

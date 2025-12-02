@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.mapper.UsuarioMapper;
 import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
 import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
@@ -366,4 +369,33 @@ public class UsuarioController {
         service.reactivar(id);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(
+            summary = "Buscar usuarios con filtro",
+            description = """
+            
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario reactivado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<UsuarioCardDTO>> filtrarUsuarios(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String bajaLogica,
+            @RequestParam(required = false) String rol,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+
+        return ResponseEntity.ok(
+                service.filtrarUsuarios(page, size, search, bajaLogica, rol)
+        );
+    }
+
+
 }

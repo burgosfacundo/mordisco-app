@@ -88,4 +88,135 @@ export class PedidoService {
   reactivar(idPedido : number){
     return this.http.post<void>(`${environment.apiUrl}/pedidos/${idPedido}/reactivar`, null)
   }
+
+  filtrarPedidos(
+    search: string,
+    estado: string,
+    tipoEntrega: string,
+    fechaInicio: string,
+    fechaFin: string,
+    page: number,
+    size: number
+  ): Observable<PaginationResponse<PedidoResponse>> {
+
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (search && search.trim() !== '') {
+      params = params.set('search', search.trim());
+    }
+    if (estado && estado !== '') {
+      params = params.set('estado', estado);
+    }
+    if (tipoEntrega && tipoEntrega !== '') {
+      params = params.set('tipoEntrega', tipoEntrega);
+    }
+    if (fechaInicio && fechaInicio !== '') {
+      params = params.set('fechaInicio', fechaInicio);
+    }
+    if (fechaFin && fechaFin !== '') {
+      params = params.set('fechaFin', fechaFin);
+    }
+    return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/buscar`, { params });
+  }
+
+filtrarPedidosRestaurante(
+  id: number,
+  search: string,
+  estado: string,
+  tipoEntrega: string,
+  fechaInicio: string,
+  fechaFin: string,
+  page: number,
+  size: number
+): Observable<PaginationResponse<PedidoResponse>> {
+  let params = new HttpParams()
+    .set('page', page.toString())
+    .set('size', size.toString());
+
+  if (search && search.trim() !== '') {
+    params = params.set('search', search.trim());
+  }
+  if (estado && estado !== '') {
+    params = params.set('estado', estado);
+  }
+  if (tipoEntrega && tipoEntrega !== '') {
+    params = params.set('tipoEntrega', tipoEntrega);
+  }
+  if (fechaInicio && fechaInicio !== '') {
+    params = params.set('fechaInicio', fechaInicio);
+  }
+  if (fechaFin && fechaFin !== '') {
+    params = params.set('fechaFin', fechaFin);
+  }
+  
+  return this.http.get<PaginationResponse<PedidoResponse>>(
+    `${environment.apiUrl}/pedidos/buscar-by-restaurante/${id}`, 
+    { params }
+  );
+}
+
+  filtrarPedidosClientes(
+    id : number,
+    search: string,
+    estado: string,
+    tipoEntrega: string,
+    fechaInicio: string,
+    fechaFin: string,
+    page: number,
+    size: number
+  ): Observable<PaginationResponse<PedidoResponse>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (search && search.trim() !== '') {
+      params = params.set('search', search.trim());
+    }
+    if (estado && estado !== '') {
+      params = params.set('estado', estado);
+    }    
+    if (tipoEntrega && tipoEntrega !== '') {
+      params = params.set('tipoEntrega', tipoEntrega);
+    }
+    if (fechaInicio && fechaInicio !== '') {
+      params = params.set('fechaInicio', fechaInicio);
+    }
+    if (fechaFin && fechaFin !== '') {
+      params = params.set('fechaFin', fechaFin);
+    }
+    return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/buscar-by-cliente/${id}`, { params });
+  }
+
+  filtrarPedidosRepartidor(
+    id : number,
+    search: string,
+    estado: string,
+    fechaInicio: string,
+    fechaFin: string,
+    page: number,
+    size: number
+  ): Observable<PaginationResponse<PedidoResponse>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (search && search.trim() !== '') {
+      params = params.set('search', search.trim());
+    }
+    if (estado && estado !== '') {
+      params = params.set('estado', estado);
+    }
+    if (fechaInicio && fechaInicio !== '') {
+      params = params.set('fechaInicio', fechaInicio);
+    }
+    if (fechaFin && fechaFin !== '') {
+      params = params.set('fechaFin', fechaFin);
+    }
+    return this.http.get<PaginationResponse<PedidoResponse>>(`${environment.apiUrl}/pedidos/buscar-by-repartidor/${id}`, { params });
+  }  
+
+
+
 }
