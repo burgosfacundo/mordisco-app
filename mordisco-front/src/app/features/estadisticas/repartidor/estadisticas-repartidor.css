@@ -1,0 +1,137 @@
+.estadisticas-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.page-title mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* Summary Cards */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card mat-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.card-icon.earnings {
+  color: #ff9800;
+}
+
+.card-icon.time {
+  color: #2196f3;
+}
+
+.card-icon.deliveries {
+  color: #4caf50;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.stat-subtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Chart Cards */
+.chart-card {
+  margin-bottom: 24px;
+}
+
+.chart-card mat-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: #5e35b1;
+}
+
+.chart-container-large {
+  padding: 20px;
+  min-height: 300px;
+}
+
+/* Tabs */
+mat-tab-group {
+  margin-top: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .estadisticas-container {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-number {
+    font-size: 26px;
+  }
+
+  .chart-container-large {
+    padding: 10px;
+    min-height: 250px;
+  }
+}

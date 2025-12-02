@@ -1,0 +1,112 @@
+<div class="estadisticas-container">
+  <h1 class="page-title">
+    <mat-icon>analytics</mat-icon>
+    Estadísticas del Repartidor
+  </h1>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <p>Cargando estadísticas...</p>
+    </div>
+  } @else if (estadisticas(); as stats) {
+    <!-- Cards de resumen -->
+    <div class="summary-cards">
+      <!-- Ganancias Totales -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon class="card-icon earnings">attach_money</mat-icon>
+          <mat-card-title>Ganancias Totales</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-number">{{ formatCurrency(stats.gananciasTotales) }}</div>
+          <div class="stat-subtitle">Entregas completadas</div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Tiempo Promedio de Entrega -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon class="card-icon time">schedule</mat-icon>
+          <mat-card-title>Tiempo Promedio</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-number">{{ formatTime(stats.tiempoPromedioEntrega) }}</div>
+          <div class="stat-subtitle">Tiempo de entrega</div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Total de Entregas -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon class="card-icon deliveries">delivery_dining</mat-icon>
+          <mat-card-title>Total Entregas</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-number">{{ getTotalEntregas(stats) }}</div>
+          <div class="stat-subtitle">Últimos 12 meses</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Gráfico de Ganancias por Período -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-icon class="section-icon">trending_up</mat-icon>
+        <mat-card-title>Ganancias por Período (Últimos 12 Meses)</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container-large">
+          <canvas baseChart
+                  [data]="lineChartData"
+                  [options]="lineChartOptions"
+                  type="line">
+          </canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Gráficos de Pedidos por Período con Tabs -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-icon class="section-icon">bar_chart</mat-icon>
+        <mat-card-title>Pedidos por Período</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-tab-group>
+          <!-- Tab: Por Día -->
+          <mat-tab label="Por Día (Últimos 30 días)">
+            <div class="chart-container-large">
+              <canvas baseChart
+                      [data]="barChartDataDia"
+                      [options]="barChartOptions"
+                      type="bar">
+              </canvas>
+            </div>
+          </mat-tab>
+
+          <!-- Tab: Por Semana -->
+          <mat-tab label="Por Semana (Últimas 12 semanas)">
+            <div class="chart-container-large">
+              <canvas baseChart
+                      [data]="barChartDataSemana"
+                      [options]="barChartOptions"
+                      type="bar">
+              </canvas>
+            </div>
+          </mat-tab>
+
+          <!-- Tab: Por Mes -->
+          <mat-tab label="Por Mes (Últimos 12 meses)">
+            <div class="chart-container-large">
+              <canvas baseChart
+                      [data]="barChartDataMes"
+                      [options]="barChartOptions"
+                      type="bar">
+              </canvas>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
