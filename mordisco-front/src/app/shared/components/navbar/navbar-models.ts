@@ -8,7 +8,6 @@ export interface NavbarMenuItem {
 
 export interface NavbarConfig {
   showSearch: boolean;
-  showCitySelector: boolean;
   showProfileMenu: boolean;
   showLoginButton: boolean;
   profileMenuItems: NavbarMenuItem[];

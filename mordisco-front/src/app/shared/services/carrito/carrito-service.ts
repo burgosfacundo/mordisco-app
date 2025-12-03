@@ -61,8 +61,9 @@ export class CarritoService {
     // Validar que sea del mismo restaurante
     if (items.length > 0 && items[0].restauranteId !== item.restauranteId) {
       throw new Error(
-        `Solo puedes agregar productos de ${items[0].restauranteNombre}. ` +
-        `Vacía el carrito primero para pedir de otro restaurante.`
+        `🏪 Solo puedes pedir de un restaurante a la vez.\n\n` +
+        `Tu carrito tiene productos de "${items[0].restauranteNombre}".\n` +
+        `Vacía el carrito para pedir de "${item.restauranteNombre}".`
       )
     }
     

@@ -1,8 +1,12 @@
 package utn.back.mordiscoapi.service;
 
 import com.mercadopago.resources.payment.Payment;
+import org.springframework.context.ApplicationEventPublisher;
 import utn.back.mordiscoapi.enums.EstadoPago;
 import utn.back.mordiscoapi.enums.EstadoPedido;
+import utn.back.mordiscoapi.event.order.PedidoCreatedEvent;
+import utn.back.mordiscoapi.event.payment.PagoAprobadoEvent;
+import utn.back.mordiscoapi.event.payment.PagoRechazadoEvent;
 import utn.back.mordiscoapi.model.dto.pago.PagoResponse;
 import utn.back.mordiscoapi.model.dto.pago.WebhookMercadoPagoRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +27,7 @@ public class PagoService {
     private final PedidoRepository pedidoRepository;
     private final MercadoPagoService mercadoPagoService;
     private final NotificacionService notificacionService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Procesa el webhook de Mercado Pago
@@ -84,21 +89,19 @@ public class PagoService {
                 pedido.setEstado(EstadoPedido.EN_PREPARACION);
                 pedidoRepository.save(pedido);
 
-                // Notificar al restaurante
-                notificacionService.notificarNuevoPedidoARestaurante(pedido);
+                // Publicar eventos
+                eventPublisher.publishEvent(new PedidoCreatedEvent(pedido)); // Notificar al restaurante
+                eventPublisher.publishEvent(new PagoAprobadoEvent(pedido)); // Notificar al cliente
 
-                // Notificar al cliente
-                notificacionService.notificarPagoAprobado(pedido);
-
-                log.info("✅ Pedido #{} confirmado y notificaciones enviadas", pedidoId);
+                log.info("✅ Pedido #{} confirmado y eventos publicados", pedidoId);
 
             } else if (nuevoEstadoPago == EstadoPago.RECHAZADO) {
                 // Pago rechazado -> Pedido CANCELADO
                 pedido.setEstado(EstadoPedido.CANCELADO);
                 pedidoRepository.save(pedido);
 
-                // Notificar al cliente
-                notificacionService.notificarPagoRechazado(pedido);
+                // Publicar evento de pago rechazado
+                eventPublisher.publishEvent(new PagoRechazadoEvent(pedido, "Pago rechazado por Mercado Pago"));
 
                 log.info("❌ Pedido #{} cancelado por pago rechazado", pedidoId);
             }

@@ -53,7 +53,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByTelefono(@NotBlank(message = "El teléfono es obligatorio") @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Formato de teléfono inválido") String telefono);
 
 
-
     @Query(value = """
 SELECT u.*
 FROM usuarios u 
@@ -102,4 +101,30 @@ WHERE
             @Param("rol") String rol,
             Pageable pageable
     );
+
+    /**
+     * Cuenta usuarios por rol
+     * @param rolId ID del rol
+     * @return Cantidad de usuarios con ese rol
+     */
+    @Query("SELECT COUNT(u) FROM Usuario u WHERE u.rol.id = :rolId")
+    Integer countByRolId(@Param("rolId") Long rolId);
+
+    /**
+     * Encuentra los repartidores más activos
+     * @return Lista de repartidores con más entregas
+     */
+    @Query(value = """
+            SELECT u.id, u.nombre, u.apellido,
+                   COUNT(p.id) as entregas_realizadas,
+                   COALESCE(SUM(gr.monto), 0) as ganancia_generada
+            FROM usuarios u
+            LEFT JOIN pedidos p ON p.repartidor_id = u.id AND p.estado = 'COMPLETADO'
+            LEFT JOIN ganancias_repartidor gr ON gr.repartidor_id = u.id
+            WHERE u.rol_id = (SELECT id FROM roles WHERE nombre = 'REPARTIDOR')
+            GROUP BY u.id, u.nombre, u.apellido
+            ORDER BY entregas_realizadas DESC
+            LIMIT 10
+            """, nativeQuery = true)
+    List<Object[]> findRepartidoresMasActivos();
 }

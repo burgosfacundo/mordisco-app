@@ -49,7 +49,7 @@ public class Usuario implements UserDetails {
     private Double longitudActual;
 
     @Column(nullable = false)
-    private Boolean bajaLogica = false;
+    private Boolean bajaLogica;
 
     @Column(length = 500)
     private String motivoBaja;

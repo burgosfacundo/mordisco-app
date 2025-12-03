@@ -3,6 +3,7 @@ package utn.back.mordiscoapi.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,9 @@ import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.config.AppProperties;
+import utn.back.mordiscoapi.event.auth.CuentaBloqueadaEvent;
+import utn.back.mordiscoapi.event.auth.PasswordChangedEvent;
+import utn.back.mordiscoapi.event.auth.PasswordResetRequestedEvent;
 import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.mapper.UsuarioMapper;
 import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
@@ -43,6 +47,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     private final AuthUtils authUtils;
     private final AppProperties appProperties;
     private final IEmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
     final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
@@ -55,7 +60,9 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         if (!rolRepository.existsById(dto.rolId())){
             throw new NotFoundException("Rol no encontrado");
         }
-        repository.save(UsuarioMapper.toUsuario(dto));
+        var user = UsuarioMapper.toUsuario(dto);
+        user.setBajaLogica(false);
+        repository.save(user);
     }
 
     /**
@@ -222,8 +229,12 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         }
 
         usuario.setPassword(passwordEncoder.encode(dto.newPassword()));
+        repository.save(usuario);
+        
+        // Publicar evento de cambio de contraseña
         String loginLink = appProperties.getFrontendUrl() + "/login";
-        emailService.sendPasswordChangeAlertEmail(usuario.getEmail(), usuario.getNombre(), loginLink);
+        eventPublisher.publishEvent(new PasswordChangedEvent(
+                usuario.getId(), usuario.getEmail(), usuario.getNombre(), loginLink));
     }
 
     /**
@@ -268,14 +279,11 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         // Construir URL de recuperación
         String resetUrl = appProperties.getFrontendUrl() + "/reset-password?token=" + recoveryToken;
 
-        // Enviar email
-        emailService.sendPasswordResetEmail(
-                usuario.getEmail(),
-                usuario.getNombre(),
-                resetUrl
-        );
+        // Publicar evento de solicitud de reset de contraseña
+        eventPublisher.publishEvent(new PasswordResetRequestedEvent(
+                usuario.getId(), usuario.getEmail(), usuario.getNombre(), resetUrl));
 
-        log.info("📧 Email de recuperación enviado a: {}", usuario.getEmail());
+        log.info("📧 Evento de recuperación publicado para: {}", usuario.getEmail());
     }
 
     /**
@@ -300,18 +308,10 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         usuario.setPassword(passwordEncoder.encode(dto.newPassword()));
         repository.save(usuario);
 
-        // Enviar email de confirmación
-        try {
-            String loginLink = appProperties.getFrontendUrl() + "/login";
-
-            emailService.sendPasswordChangeAlertEmail(
-                    usuario.getEmail(),
-                    usuario.getNombre(),
-                    loginLink
-            );
-        } catch (Exception e) {
-            log.warn("No se pudo enviar email de confirmación: {}", e.getMessage());
-        }
+        // Publicar evento de cambio de contraseña
+        String loginLink = appProperties.getFrontendUrl() + "/login";
+        eventPublisher.publishEvent(new PasswordChangedEvent(
+                usuario.getId(), usuario.getEmail(), usuario.getNombre(), loginLink));
 
         log.info("✅ Contraseña restablecida para: {}", email);
     }
@@ -338,6 +338,10 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         }
 
         repository.save(usuario);
+        
+        // Publicar evento de cuenta bloqueada
+        eventPublisher.publishEvent(new CuentaBloqueadaEvent(
+                usuario.getId(), usuario.getEmail(), usuario.getNombre(), motivo));
     }
 
     /**

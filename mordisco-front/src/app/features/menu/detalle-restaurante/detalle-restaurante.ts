@@ -107,7 +107,8 @@ export class RestauranteDetallePage implements OnInit {
 
       this.toastService.success(`✅ ${producto.nombre} agregado al carrito`);
     } catch (error: any) {
-      this.toastService.error(error.message);
+      // Mostrar mensaje de advertencia con mejor UX
+      this.toastService.warning(error.message || 'No se pudo agregar el producto al carrito');
     }
   }
 

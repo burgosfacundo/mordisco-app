@@ -1,0 +1,142 @@
+<div class="estadisticas-container">
+  <h1 class="page-title">
+    <mat-icon>analytics</mat-icon>
+    Estadísticas de la Plataforma
+  </h1>
+
+  @if (isLoading()) {
+  <div class="loading-container">
+    <p>Cargando estadísticas...</p>
+  </div>
+  } @else if (estadisticas(); as stats) {
+  <!-- Cards de resumen -->
+  <div class="summary-cards">
+    <!-- Total Usuarios -->
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-icon class="card-icon users">people</mat-icon>
+        <mat-card-title>Total Usuarios</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-number">{{ stats.usuariosTotales.total }}</div>
+        <div class="stat-details">
+          <div class="detail-item">
+            <span class="detail-label">Clientes:</span>
+            <span class="detail-value">{{ stats.usuariosTotales.clientes }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Restaurantes:</span>
+            <span class="detail-value">{{ stats.usuariosTotales.restaurantes }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Repartidores:</span>
+            <span class="detail-value">{{ stats.usuariosTotales.repartidores }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Total Pedidos -->
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-icon class="card-icon orders">shopping_cart</mat-icon>
+        <mat-card-title>Total Pedidos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-number">{{ stats.totalPedidos }}</div>
+        <div class="stat-subtitle">Pedidos completados</div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Ingresos Totales -->
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-icon class="card-icon revenue">attach_money</mat-icon>
+        <mat-card-title>Ingresos Totales</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-number">{{ formatCurrency(stats.ingresosTotalesPlataforma) }}</div>
+        <div class="stat-subtitle">Ingresos de la plataforma</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Gráfico de Métodos de Pago -->
+  <mat-card class="chart-card">
+    <mat-card-header>
+      <mat-icon class="section-icon">payment</mat-icon>
+      <mat-card-title>Métodos de Pago Más Usados</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="chart-container">
+        <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" type="pie"> </canvas>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tablas de Top 10 -->
+  <div class="tables-row">
+    <!-- Top Restaurantes -->
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-icon class="section-icon">restaurant</mat-icon>
+        <mat-card-title>Top 10 Restaurantes Más Activos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="stats.restaurantesMasActivos" class="stats-table">
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef>Restaurante</th>
+            <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="pedidos">
+            <th mat-header-cell *matHeaderCellDef>Pedidos</th>
+            <td mat-cell *matCellDef="let element">{{ element.pedidosCompletados }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="ingresos">
+            <th mat-header-cell *matHeaderCellDef>Ingresos</th>
+            <td mat-cell *matCellDef="let element">
+              {{ formatCurrency(element.ingresoGenerado) }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="restaurantesColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: restaurantesColumns"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Top Repartidores -->
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-icon class="section-icon">delivery_dining</mat-icon>
+        <mat-card-title>Top 10 Repartidores Más Activos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="stats.repartidoresMasActivos" class="stats-table">
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef>Repartidor</th>
+            <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="entregas">
+            <th mat-header-cell *matHeaderCellDef>Entregas</th>
+            <td mat-cell *matCellDef="let element">{{ element.entregasRealizadas }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="ganancias">
+            <th mat-header-cell *matHeaderCellDef>Ganancias</th>
+            <td mat-cell *matCellDef="let element">
+              {{ formatCurrency(element.gananciaGenerada) }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="repartidoresColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: repartidoresColumns"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  }
+</div>

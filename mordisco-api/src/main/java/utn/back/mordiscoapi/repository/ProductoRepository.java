@@ -31,4 +31,25 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
             @Param("productoId") Long productoId,
             Pageable pageable
     );
+
+    /**
+     * Encuentra los productos más vendidos de un restaurante
+     * @param restauranteId ID del restaurante
+     * @return Lista de productos más vendidos
+     */
+    @Query(value = """
+            SELECT pr.id, pr.nombre,
+                   SUM(pp.cantidad) as cantidad_vendida,
+                   SUM(pp.precio_unitario * pp.cantidad) as ingreso_generado
+            FROM productos pr
+            JOIN productos_pedido pp ON pp.producto_id = pr.id
+            JOIN pedidos p ON pp.pedido_id = p.id
+            WHERE pr.restaurante_id = :restauranteId
+            AND p.estado = 'COMPLETADO'
+            GROUP BY pr.id, pr.nombre
+            ORDER BY cantidad_vendida DESC
+            LIMIT 10
+            """, nativeQuery = true)
+    java.util.List<Object[]> findProductosMasVendidos(@Param("restauranteId") Long restauranteId);
 }
+

@@ -241,5 +241,69 @@ public class RestauranteServiceImpl implements IRestauranteService {
                 activoBoolean,
                 pageable
         ).map(RestauranteMapper::toDTO);
+
+    /**
+     * Busca restaurantes dentro de un radio desde una ubicación específica
+     *
+     * @param latitud Latitud del punto de referencia
+     * @param longitud Longitud del punto de referencia
+     * @param radioKm Radio de búsqueda en kilómetros
+     * @param searchTerm Término de búsqueda opcional (null o vacío para todos)
+     * @param pageNo Número de página
+     * @param pageSize Tamaño de página
+     * @return Página de restaurantes ordenados por estado abierto y distancia
+     */
+    @Override
+    public Page<RestauranteResponseCardDTO> findByLocationWithinRadius(
+            Double latitud,
+            Double longitud,
+            Double radioKm,
+            String searchTerm,
+            int pageNo,
+            int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        
+        // Si no hay término de búsqueda, buscar todos (%)
+        String search = (searchTerm == null || searchTerm.trim().isEmpty()) 
+                ? "%" 
+                : "%" + searchTerm.trim() + "%";
+        
+        return restauranteRepository.findByLocationWithinRadius(
+                latitud, 
+                longitud, 
+                radioKm, 
+                search, 
+                pageable
+        ).map(RestauranteMapper::toCardDTO);
+    }
+
+    /**
+     * Busca restaurantes con promociones activas dentro de un radio desde una ubicación específica
+     *
+     * @param latitud Latitud del punto de referencia
+     * @param longitud Longitud del punto de referencia
+     * @param radioKm Radio de búsqueda en kilómetros
+     * @param pageNo Número de página
+     * @param pageSize Tamaño de página
+     * @return Página de restaurantes con promociones ordenados por estado abierto y distancia
+     */
+    @Override
+    public Page<RestauranteResponseCardDTO> findWithPromocionByLocationWithinRadius(
+            Double latitud,
+            Double longitud,
+            Double radioKm,
+            int pageNo,
+            int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        
+        return restauranteRepository.findWithPromocionByLocationWithinRadius(
+                latitud, 
+                longitud, 
+                radioKm, 
+                pageable
+        ).map(RestauranteMapper::toCardDTO);
+
     }
 }

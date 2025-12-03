@@ -24,7 +24,6 @@ export class NavBarConfigFactory {
   private static getPublicConfig(): NavbarConfig {
     return {
       showSearch: true,
-      showCitySelector: true,
       showProfileMenu: false,
       showLoginButton: true,
       profileMenuItems: []
@@ -35,7 +34,6 @@ export class NavBarConfigFactory {
     if(home){
       return {
         showSearch: true,
-        showCitySelector: true,
         showProfileMenu: true,
         showLoginButton: false,
         profileMenuItems: [
@@ -43,14 +41,12 @@ export class NavBarConfigFactory {
           { label: 'Mis Direcciones', icon: 'home',route: '/cliente/my-address'},
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Pedidos', icon: 'receipt_long', route: '/cliente/pedidos' },
-          { label: 'Necesitas ayuda? Llama a +54 9 223 555 7894', icon: 'support_agent' },
           { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
         ]
       }
     } else {
       return {
         showSearch: false,
-        showCitySelector: false,
         showProfileMenu: true,
         showLoginButton: false,
         profileMenuItems: [
@@ -58,7 +54,6 @@ export class NavBarConfigFactory {
           { label: 'Mis Direcciones', icon: 'home',route: '/cliente/my-address'},
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Pedidos', icon: 'receipt_long', route: '/cliente/pedidos' },
-          { label: 'Necesitas ayuda? Llama a +54 9 223 555 7894', icon: 'support_agent' },
           { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
         ]
       }
@@ -68,7 +63,6 @@ export class NavBarConfigFactory {
   private static getRestauranteConfig(): NavbarConfig {
     return {
       showSearch: false,
-      showCitySelector: false,
       showProfileMenu: true,
       showLoginButton: false,
       profileMenuItems: [
@@ -77,7 +71,7 @@ export class NavBarConfigFactory {
         { label: 'Mi Restaurante', icon: 'restaurant', route: '/restaurante' },
         { label: 'Menú', icon: 'menu_book', route: '/restaurante/menu' },
         { label: 'Pedidos', icon: 'receipt_long', route: '/restaurante/pedidos' },
-        { label: 'Necesitas ayuda? Llama a +54 9 223 555 7894', icon: 'support_agent' },
+        { label: 'Estadísticas', icon: 'analytics', route: '/restaurante/estadisticas/:id' },
         { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
       ]
     }
@@ -86,7 +80,6 @@ export class NavBarConfigFactory {
   private static getAdminConfig(): NavbarConfig {
     return {
       showSearch: false,
-      showCitySelector: false,
       showProfileMenu: true,
       showLoginButton: false,
       profileMenuItems: [
@@ -106,7 +99,6 @@ export class NavBarConfigFactory {
     if(home){
       return {
         showSearch: false,
-        showCitySelector: false,
         showProfileMenu: true,
         showLoginButton: false,
         profileMenuItems: [
@@ -114,14 +106,13 @@ export class NavBarConfigFactory {
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Calificaciones', icon: 'delivery_dining', route: '/repartidor/calificaciones' },
           { label: 'Historial', icon: 'history', route: '/repartidor/pedidos/historial' },
-          { label: 'Necesitas ayuda? Llama a +54 9 223 555 7894', icon: 'support_agent' },
+          { label: 'Estadísticas', icon: 'analytics', route: '/repartidor/estadisticas/:id' },
           { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
         ]
       }
     } else {
       return {
         showSearch: false,
-        showCitySelector: false,
         showProfileMenu: true,
         showLoginButton: false,
         profileMenuItems: [
@@ -129,7 +120,7 @@ export class NavBarConfigFactory {
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Calificaciones', icon: 'delivery_dining', route: '/repartidor/calificaciones' },
           { label: 'Historial', icon: 'history', route: '/repartidor/historial' },
-          { label: 'Necesitas ayuda? Llama a +54 9 223 555 7894', icon: 'support_agent' },
+          { label: 'Estadísticas', icon: 'analytics', route: '/repartidor/estadisticas/:id' },
           { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
         ]
       };

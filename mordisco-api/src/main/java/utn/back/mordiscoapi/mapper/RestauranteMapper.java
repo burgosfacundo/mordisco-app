@@ -76,6 +76,10 @@ public class RestauranteMapper {
      */
     public static RestauranteResponseCardDTO toCardDTO(Restaurante r){
         var imagen = ImagenMapper.toDTO(r.getImagen());
+        var direccion = r.getDireccion();
+        
+        // Determinar si el restaurante está abierto en este momento
+        boolean estaAbierto = isRestauranteAbierto(r);
 
         return new RestauranteResponseCardDTO(
                 r.getId(),
@@ -83,8 +87,33 @@ public class RestauranteMapper {
                 r.getActivo(),
                 imagen,
                 r.getHorariosAtencion().stream().map(HorarioAtencionMapper::toDTO).toList(),
-                r.getPromedioCalificaciones()
+                r.getPromedioCalificaciones(),
+                direccion != null ? direccion.getLatitud() : null,
+                direccion != null ? direccion.getLongitud() : null,
+                estaAbierto
         );
+    }
+
+    /**
+     * Determina si un restaurante está abierto en este momento
+     * @param r la entidad de restaurante
+     * @return true si el restaurante está abierto, false en caso contrario
+     */
+    private static boolean isRestauranteAbierto(Restaurante r) {
+        if (r.getHorariosAtencion() == null || r.getHorariosAtencion().isEmpty()) {
+            return false;
+        }
+
+        var now = java.time.LocalDateTime.now();
+        var currentDay = now.getDayOfWeek();
+        var currentTime = now.toLocalTime();
+
+        return r.getHorariosAtencion().stream()
+                .anyMatch(horario -> 
+                    horario.getDia().equals(currentDay) &&
+                    !currentTime.isBefore(horario.getHoraApertura()) &&
+                    !currentTime.isAfter(horario.getHoraCierre())
+                );
     }
 
 

@@ -37,6 +37,9 @@ import { UsuariosPage } from './features/admin/usuarios-page/usuarios-page';
 import { PedidosAdminPage } from './features/admin/pedidos-admin-page/pedidos-admin-page';
 import { RestauranteAdminPage } from './features/admin/restaurante-admin-page/restaurante-admin-page';
 import { CalificacionesRestaurante } from './features/admin/calificaciones-restaurante/calificaciones-restaurante';
+import { EstadisticasRestauranteComponent } from './features/estadisticas/restaurante/estadisticas-restaurante';
+import { EstadisticasRepartidorComponent } from './features/estadisticas/repartidor/estadisticas-repartidor';
+import { EstadisticasAdminComponent } from './features/estadisticas/admin/estadisticas-admin';
 
 export const routes: Routes = [
   // ==========================================
@@ -112,7 +115,8 @@ export const routes: Routes = [
       { path: 'promociones/nueva/:idRestaurante', component: PromocionFormComponent },
       { path: 'promociones/editar/:id', component: PromocionFormComponent },
       { path: 'pedidos', component: MisPedidosPage },
-      { path: 'pedidos/detalle/:id', component: DetallePedidoPage }
+      { path: 'pedidos/detalle/:id', component: DetallePedidoPage },
+      { path: 'estadisticas/:id', component: EstadisticasRestauranteComponent}
     ]
   },
 
@@ -124,20 +128,14 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard(['ROLE_CLIENTE'])],
     children: [
       { path: 'my-address',component: MyAddressPage },
-      // Ver restaurante y menú
       { path: 'restaurante/:id', component: RestauranteDetallePage },
-      // Carrito y checkout
       { path: 'carrito', component: CarritoPage },
       { path: 'checkout', component: CheckoutPage },
       { path: 'calificar/:var/:id', component : CalificacionFormPage},
       { path: 'calificar/:var/:id', component : CalificacionFormPage},
-
-      // Confirmaciones de pago
       { path: 'pedidos/pago-exitoso', component: PagoExitosoPage },
       { path: 'pedidos/pago-fallido', component: PagoFallidoPage },
       { path: 'pedidos/pago-pendiente', component: PagoExitosoPage },
-      
-      // Mis pedidos
       { path: 'pedidos', component: MisPedidosClientePage },
       { path: 'pedidos/detalle/:id', component: DetallePedidoPage }
     ]
@@ -152,7 +150,8 @@ export const routes: Routes = [
     children: [
       { path : 'pedidos/historial', component : EntregasPage},
       { path : 'pedidos/detalle/:id', component: DetallePedidoPage},
-      { path : 'calificaciones', component : CalificacionPage}
+      { path : 'calificaciones', component : CalificacionPage},
+      { path: 'estadisticas/:id', component: EstadisticasRepartidorComponent }
     ]
   },
 
@@ -171,7 +170,8 @@ export const routes: Routes = [
       {path : 'pedidos', component: PedidosAdminPage},
       {path : 'restaurantes', component: RestauranteAdminPage},
       {path : 'restaurante/:id', component: RestauranteDetallePage },
-      {path : 'restaurante/calificaciones/:id', component: CalificacionesRestaurante}
+      {path : 'restaurante/calificaciones/:id', component: CalificacionesRestaurante},
+      {path : 'estadisticas', component : EstadisticasAdminComponent }
     ]
   },
 

@@ -47,28 +47,6 @@
       </div>
     }
 
-    <!-- Selector de Ciudad -->
-    @if (config().showCitySelector) {
-      <div class="navbar-city hidden lg:block">
-        <mat-form-field appearance="outline" class="w-full ">
-          <mat-icon matPrefix class="text-white">location_on</mat-icon>
-          <mat-select 
-            [value]="ciudadSeleccionada()"
-            (selectionChange)="onCiudadChange($event.value)"
-            class="text-white ">
-            @for (ciudad of ciudades(); track ciudad.id) {
-              <mat-option [value]="ciudad">
-                {{ ciudad.nombre }}
-                @if (ciudad.provincia) {
-                  <span class="text-gray-500 text-sm ml-1">({{ ciudad.provincia }})</span>
-                }
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      </div>
-    }
-
     <!-- Spacer -->
     <div class="flex-1"></div>
 
@@ -141,7 +119,7 @@
     }
 
     <!-- Botón de menú móvil (hamburger) -->
-    @if (config().showSearch || config().showCitySelector) {
+    @if (config().showSearch) {
       <button 
         (click)="toggleMobileMenu()"
         class="lg:hidden p-2 rounded-lg text-white hover:bg-white/20 transition-colors">
@@ -185,41 +163,6 @@
                 </svg>
               </button>
             }
-          </div>
-        }
-
-        <!-- Selector de ciudad móvil -->
-        @if (config().showCitySelector) {
-          <div class="relative">
-            <select 
-              [value]="ciudadSeleccionada()"
-              (change)="onCiudadChangeMobile($event)"
-              class="w-full pl-10 pr-10 py-2.5 rounded-lg
-                     bg-white text-gray-900
-                     focus:outline-none focus:ring-2 focus:ring-white/50
-                     appearance-none">
-              @for (ciudad of ciudades(); track ciudad.id) {
-                <option [value]="ciudad.id">
-                  {{ ciudad.nombre }}
-                  @if (ciudad.provincia) {
-                    ({{ ciudad.provincia }})
-                  }
-                </option>
-              }
-            </select>
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
           </div>
         }
       </div>
