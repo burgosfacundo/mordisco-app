@@ -68,6 +68,8 @@ WHERE
     -- BUSCADOR TEXTO LIBRE
     AND (
         :search IS NULL OR :search = '' 
+        OR LOWER(CONCAT(u.nombre, ' ', u.apellido)) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(CONCAT(u.apellido, ' ', u.nombre)) LIKE LOWER(CONCAT('%', :search, '%'))        
         OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -83,7 +85,9 @@ WHERE
     (:bajaLogica IS NULL OR u.baja_logica = :bajaLogica)
     AND (:rol IS NULL OR :rol = '' OR r.nombre = :rol)
     AND (
-        :search IS NULL OR :search = '' 
+        :search IS NULL OR :search = ''
+        OR LOWER(CONCAT(u.nombre, ' ', u.apellido)) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(CONCAT(u.apellido, ' ', u.nombre)) LIKE LOWER(CONCAT('%', :search, '%'))         
         OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))

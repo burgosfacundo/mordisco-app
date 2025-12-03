@@ -20,7 +20,7 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   private confirmationService = inject(ConfirmationService);
   private authService = inject(AuthService)
   private router = inject(Router)
-
+  isOpen=false;
   restaurantes?: RestauranteForCard[];
   restaurantesPromociones?: RestauranteForCard[];
   ciudadSeleccionada?: string = 'Mar del Plata';

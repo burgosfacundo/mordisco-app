@@ -182,39 +182,37 @@ export class DetallePedidoPage implements OnInit {
   }
 
   eliminarCalificacionRepartidor(id: number): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
-      data: { mensaje: '¿Estás seguro de eliminar esta calificación?' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result !== true) return;
-
-      this.cService.eliminarCalificacionRepartidor(id).subscribe({
-        next: () => {
-          this.toastService.success('✅ Calificacion eliminada correctamente');
-          this.loadPedido();
-        }
-      });
-    });
+    this.confirmationService.confirm({
+      title: 'Eliminar calificacion al repartidor',
+          message: '¿Estás seguro que queres eliminar la calificacion al repartidor? Esta accion no tiene como deshacerse',
+ 
+          type: 'danger'
+        }).subscribe(confirmed => {
+          if (!confirmed) return;
+          this.pedidoService.cancel(this.pedido?.id!).subscribe({
+                  next: () => {
+                    this.toastService.success('✅ Pedido cancelado');
+                    this.loadPedido();
+                  }
+          });
+        });
   }
   
   eliminarCalificacionPedido(id: number): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
-      data: { mensaje: '¿Estás seguro de eliminar esta calificación?' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result !== true) return;
-
-      this.cService.eliminarCalificacionPedido(id).subscribe({
-        next: () => {
-          this.toastService.success('✅ Calificacion eliminada correctamente');
-          this.reloadComponent();
-        }
-      });
-    });
+    this.confirmationService.confirm({
+      title: 'Eliminar calificacion al restaurante',
+          message: '¿Estás seguro que queres eliminar la calificacion del pedido? Esta accion no tiene como deshacerse',
+          confirmText: 'Aceptar',
+          type: 'danger'
+        }).subscribe(confirmed => {
+          if (!confirmed) return;
+          this.pedidoService.cancel(this.pedido?.id!).subscribe({
+                  next: () => {
+                    this.toastService.success('✅ Pedido cancelado');
+                    this.loadPedido();
+                  }
+          });
+        });
   }
 
   private reloadComponent(): void {
