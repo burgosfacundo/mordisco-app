@@ -110,4 +110,30 @@ export class EstadisticasAdminComponent implements OnInit {
       currency: 'ARS'
     }).format(value);
   }
+
+  // Helper methods para detectar datos vacíos
+  hasPaymentMethodsData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && stats.metodosPagoMasUsados.length > 0;
+  }
+
+  hasRestaurantsData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && stats.restaurantesMasActivos.length > 0;
+  }
+
+  hasDeliveryDriversData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && stats.repartidoresMasActivos.length > 0;
+  }
+
+  hasAnyData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && (
+      stats.totalPedidos > 0 ||
+      stats.metodosPagoMasUsados.length > 0 ||
+      stats.restaurantesMasActivos.length > 0 ||
+      stats.repartidoresMasActivos.length > 0
+    );
+  }
 }

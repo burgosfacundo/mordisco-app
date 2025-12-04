@@ -68,9 +68,17 @@
       <mat-card-title>Métodos de Pago Más Usados</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="chart-container">
-        <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" type="pie"> </canvas>
-      </div>
+      @if (hasPaymentMethodsData()) {
+        <div class="chart-container">
+          <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" type="pie"> </canvas>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">payment</mat-icon>
+          <h3>No hay datos de métodos de pago</h3>
+          <p>Aún no se han registrado pedidos completados en la plataforma.</p>
+        </div>
+      }
     </mat-card-content>
   </mat-card>
 
@@ -83,27 +91,35 @@
         <mat-card-title>Top 10 Restaurantes Más Activos</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table mat-table [dataSource]="stats.restaurantesMasActivos" class="stats-table">
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef>Restaurante</th>
-            <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
-          </ng-container>
+        @if (hasRestaurantsData()) {
+          <table mat-table [dataSource]="stats.restaurantesMasActivos" class="stats-table">
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Restaurante</th>
+              <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
+            </ng-container>
 
-          <ng-container matColumnDef="pedidos">
-            <th mat-header-cell *matHeaderCellDef>Pedidos</th>
-            <td mat-cell *matCellDef="let element">{{ element.pedidosCompletados }}</td>
-          </ng-container>
+            <ng-container matColumnDef="pedidos">
+              <th mat-header-cell *matHeaderCellDef>Pedidos</th>
+              <td mat-cell *matCellDef="let element">{{ element.pedidosCompletados }}</td>
+            </ng-container>
 
-          <ng-container matColumnDef="ingresos">
-            <th mat-header-cell *matHeaderCellDef>Ingresos</th>
-            <td mat-cell *matCellDef="let element">
-              {{ formatCurrency(element.ingresoGenerado) }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="ingresos">
+              <th mat-header-cell *matHeaderCellDef>Ingresos</th>
+              <td mat-cell *matCellDef="let element">
+                {{ formatCurrency(element.ingresoGenerado) }}
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="restaurantesColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: restaurantesColumns"></tr>
-        </table>
+            <tr mat-header-row *matHeaderRowDef="restaurantesColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: restaurantesColumns"></tr>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">restaurant</mat-icon>
+            <h3>No hay restaurantes activos</h3>
+            <p>Aún no hay restaurantes con pedidos completados.</p>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
 
@@ -114,27 +130,35 @@
         <mat-card-title>Top 10 Repartidores Más Activos</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table mat-table [dataSource]="stats.repartidoresMasActivos" class="stats-table">
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef>Repartidor</th>
-            <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
-          </ng-container>
+        @if (hasDeliveryDriversData()) {
+          <table mat-table [dataSource]="stats.repartidoresMasActivos" class="stats-table">
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Repartidor</th>
+              <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
+            </ng-container>
 
-          <ng-container matColumnDef="entregas">
-            <th mat-header-cell *matHeaderCellDef>Entregas</th>
-            <td mat-cell *matCellDef="let element">{{ element.entregasRealizadas }}</td>
-          </ng-container>
+            <ng-container matColumnDef="entregas">
+              <th mat-header-cell *matHeaderCellDef>Entregas</th>
+              <td mat-cell *matCellDef="let element">{{ element.entregasRealizadas }}</td>
+            </ng-container>
 
-          <ng-container matColumnDef="ganancias">
-            <th mat-header-cell *matHeaderCellDef>Ganancias</th>
-            <td mat-cell *matCellDef="let element">
-              {{ formatCurrency(element.gananciaGenerada) }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="ganancias">
+              <th mat-header-cell *matHeaderCellDef>Ganancias</th>
+              <td mat-cell *matCellDef="let element">
+                {{ formatCurrency(element.gananciaGenerada) }}
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="repartidoresColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: repartidoresColumns"></tr>
-        </table>
+            <tr mat-header-row *matHeaderRowDef="repartidoresColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: repartidoresColumns"></tr>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">delivery_dining</mat-icon>
+            <h3>No hay repartidores activos</h3>
+            <p>Aún no hay repartidores con entregas completadas.</p>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
   </div>

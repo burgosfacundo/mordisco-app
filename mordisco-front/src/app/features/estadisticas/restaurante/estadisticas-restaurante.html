@@ -55,13 +55,21 @@
         <mat-card-title>Ingresos por Período (Últimos 12 Meses)</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="chart-container-large">
-          <canvas baseChart
-                  [data]="lineChartData"
-                  [options]="lineChartOptions"
-                  type="line">
-          </canvas>
-        </div>
+        @if (hasIncomeData()) {
+          <div class="chart-container-large">
+            <canvas baseChart
+                    [data]="lineChartData"
+                    [options]="lineChartOptions"
+                    type="line">
+            </canvas>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">trending_up</mat-icon>
+            <h3>No hay datos de ingresos</h3>
+            <p>Aún no tienes pedidos completados para mostrar estadísticas de ingresos.</p>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
 
@@ -72,13 +80,21 @@
         <mat-card-title>Top 10 Productos Más Vendidos</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="chart-container-large">
-          <canvas baseChart
-                  [data]="barChartData"
-                  [options]="barChartOptions"
-                  type="bar">
-          </canvas>
-        </div>
+        @if (hasProductsData()) {
+          <div class="chart-container-large">
+            <canvas baseChart
+                    [data]="barChartData"
+                    [options]="barChartOptions"
+                    type="bar">
+            </canvas>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">bar_chart</mat-icon>
+            <h3>No hay productos vendidos</h3>
+            <p>Aún no tienes ventas de productos para mostrar en el gráfico.</p>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
 
@@ -89,25 +105,33 @@
         <mat-card-title>Detalle de Productos Más Vendidos</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table mat-table [dataSource]="stats.productosMasVendidos" class="stats-table">
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef>Producto</th>
-            <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
-          </ng-container>
+        @if (hasProductsData()) {
+          <table mat-table [dataSource]="stats.productosMasVendidos" class="stats-table">
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Producto</th>
+              <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
+            </ng-container>
 
-          <ng-container matColumnDef="cantidad">
-            <th mat-header-cell *matHeaderCellDef>Cantidad Vendida</th>
-            <td mat-cell *matCellDef="let element">{{ element.cantidadVendida }}</td>
-          </ng-container>
+            <ng-container matColumnDef="cantidad">
+              <th mat-header-cell *matHeaderCellDef>Cantidad Vendida</th>
+              <td mat-cell *matCellDef="let element">{{ element.cantidadVendida }}</td>
+            </ng-container>
 
-          <ng-container matColumnDef="ingresos">
-            <th mat-header-cell *matHeaderCellDef>Ingresos Generados</th>
-            <td mat-cell *matCellDef="let element">{{ formatCurrency(element.ingresoGenerado) }}</td>
-          </ng-container>
+            <ng-container matColumnDef="ingresos">
+              <th mat-header-cell *matHeaderCellDef>Ingresos Generados</th>
+              <td mat-cell *matCellDef="let element">{{ formatCurrency(element.ingresoGenerado) }}</td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="productosColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: productosColumns;"></tr>
-        </table>
+            <tr mat-header-row *matHeaderRowDef="productosColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: productosColumns;"></tr>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">shopping_basket</mat-icon>
+            <h3>No hay productos para mostrar</h3>
+            <p>Aún no tienes ventas de productos registradas.</p>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
   }

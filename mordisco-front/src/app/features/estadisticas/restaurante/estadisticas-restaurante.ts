@@ -157,4 +157,24 @@ export class EstadisticasRestauranteComponent implements OnInit {
     const mins = Math.round(minutes % 60);
     return `${hours}h ${mins}min`;
   }
+
+  // Helper methods para detectar datos vacíos
+  hasIncomeData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && stats.ingresosPorPeriodo.length > 0;
+  }
+
+  hasProductsData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && stats.productosMasVendidos.length > 0;
+  }
+
+  hasAnyData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && (
+      stats.ingresosTotales > 0 ||
+      stats.ingresosPorPeriodo.length > 0 ||
+      stats.productosMasVendidos.length > 0
+    );
+  }
 }

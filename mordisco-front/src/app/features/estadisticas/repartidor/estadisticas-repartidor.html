@@ -55,13 +55,21 @@
         <mat-card-title>Ganancias por Período (Últimos 12 Meses)</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="chart-container-large">
-          <canvas baseChart
-                  [data]="lineChartData"
-                  [options]="lineChartOptions"
-                  type="line">
-          </canvas>
-        </div>
+        @if (hasEarningsData()) {
+          <div class="chart-container-large">
+            <canvas baseChart
+                    [data]="lineChartData"
+                    [options]="lineChartOptions"
+                    type="line">
+            </canvas>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">trending_up</mat-icon>
+            <h3>No hay datos de ganancias</h3>
+            <p>Aún no tienes entregas completadas para mostrar estadísticas de ganancias.</p>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
 
@@ -72,40 +80,72 @@
         <mat-card-title>Pedidos por Período</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <mat-tab-group>
-          <!-- Tab: Por Día -->
-          <mat-tab label="Por Día (Últimos 30 días)">
-            <div class="chart-container-large">
-              <canvas baseChart
-                      [data]="barChartDataDia"
-                      [options]="barChartOptions"
-                      type="bar">
-              </canvas>
-            </div>
-          </mat-tab>
+        @if (hasAnyOrdersData()) {
+          <mat-tab-group>
+            <!-- Tab: Por Día -->
+            <mat-tab label="Por Día (Últimos 30 días)">
+              @if (hasOrdersByDayData()) {
+                <div class="chart-container-large">
+                  <canvas baseChart
+                          [data]="barChartDataDia"
+                          [options]="barChartOptions"
+                          type="bar">
+                  </canvas>
+                </div>
+              } @else {
+                <div class="empty-state">
+                  <mat-icon class="empty-icon">calendar_today</mat-icon>
+                  <h3>No hay datos por día</h3>
+                  <p>Aún no tienes entregas en los últimos 30 días.</p>
+                </div>
+              }
+            </mat-tab>
 
-          <!-- Tab: Por Semana -->
-          <mat-tab label="Por Semana (Últimas 12 semanas)">
-            <div class="chart-container-large">
-              <canvas baseChart
-                      [data]="barChartDataSemana"
-                      [options]="barChartOptions"
-                      type="bar">
-              </canvas>
-            </div>
-          </mat-tab>
+            <!-- Tab: Por Semana -->
+            <mat-tab label="Por Semana (Últimas 12 semanas)">
+              @if (hasOrdersByWeekData()) {
+                <div class="chart-container-large">
+                  <canvas baseChart
+                          [data]="barChartDataSemana"
+                          [options]="barChartOptions"
+                          type="bar">
+                  </canvas>
+                </div>
+              } @else {
+                <div class="empty-state">
+                  <mat-icon class="empty-icon">date_range</mat-icon>
+                  <h3>No hay datos por semana</h3>
+                  <p>Aún no tienes entregas en las últimas 12 semanas.</p>
+                </div>
+              }
+            </mat-tab>
 
-          <!-- Tab: Por Mes -->
-          <mat-tab label="Por Mes (Últimos 12 meses)">
-            <div class="chart-container-large">
-              <canvas baseChart
-                      [data]="barChartDataMes"
-                      [options]="barChartOptions"
-                      type="bar">
-              </canvas>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
+            <!-- Tab: Por Mes -->
+            <mat-tab label="Por Mes (Últimos 12 meses)">
+              @if (hasOrdersByMonthData()) {
+                <div class="chart-container-large">
+                  <canvas baseChart
+                          [data]="barChartDataMes"
+                          [options]="barChartOptions"
+                          type="bar">
+                  </canvas>
+                </div>
+              } @else {
+                <div class="empty-state">
+                  <mat-icon class="empty-icon">event</mat-icon>
+                  <h3>No hay datos por mes</h3>
+                  <p>Aún no tienes entregas en los últimos 12 meses.</p>
+                </div>
+              }
+            </mat-tab>
+          </mat-tab-group>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">bar_chart</mat-icon>
+            <h3>No hay datos de pedidos</h3>
+            <p>Aún no tienes entregas completadas para mostrar estadísticas.</p>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
   }

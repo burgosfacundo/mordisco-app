@@ -209,4 +209,29 @@ export class EstadisticasRepartidorComponent implements OnInit {
   getTotalEntregas(stats: RepartidorEstadisticas): number {
     return stats.pedidosPorMes.reduce((sum, p) => sum + p.cantidad, 0);
   }
+
+  // Helper methods para detectar datos vacíos
+  hasEarningsData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && stats.gananciasPorPeriodo.length > 0;
+  }
+
+  hasOrdersByDayData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && stats.pedidosPorDia.length > 0;
+  }
+
+  hasOrdersByWeekData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && stats.pedidosPorSemana.length > 0;
+  }
+
+  hasOrdersByMonthData(): boolean {
+    const stats = this.estadisticas();
+    return stats !== null && stats.pedidosPorMes.length > 0;
+  }
+
+  hasAnyOrdersData(): boolean {
+    return this.hasOrdersByDayData() || this.hasOrdersByWeekData() || this.hasOrdersByMonthData();
+  }
 }
