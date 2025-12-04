@@ -5,14 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import utn.back.mordiscoapi.common.AppProperties;
+import utn.back.mordiscoapi.config.AppProperties;
 import utn.back.mordiscoapi.event.auth.CuentaBloqueadaEvent;
 import utn.back.mordiscoapi.event.auth.PasswordChangedEvent;
 import utn.back.mordiscoapi.event.auth.PasswordResetRequestedEvent;
-import utn.back.mordiscoapi.event.order.PedidoCanceladoEvent;
-import utn.back.mordiscoapi.event.order.PedidoCreatedEvent;
-import utn.back.mordiscoapi.event.order.PedidoEnCaminoEvent;
-import utn.back.mordiscoapi.event.order.PedidoEstadoChangedEvent;
+import utn.back.mordiscoapi.event.order.*;
+import utn.back.mordiscoapi.event.payment.PagoAprobadoEvent;
+import utn.back.mordiscoapi.event.payment.PagoRechazadoEvent;
 import utn.back.mordiscoapi.model.entity.Pedido;
 import utn.back.mordiscoapi.service.interf.IEmailService;
 
@@ -27,6 +26,9 @@ public class EmailEventListener {
     private final IEmailService emailService;
     private final AppProperties appProperties;
 
+    /**
+     * Envía email al restaurante cuando se crea un nuevo pedido
+     */
     @Async
     @EventListener
     public void handlePedidoCreated(PedidoCreatedEvent event) {
@@ -36,47 +38,79 @@ public class EmailEventListener {
         
         try {
             Pedido pedido = event.getPedido();
-            String link = appProperties.getFrontendUrl() + "/restaurante/pedidos";
+            String link = appProperties.getFrontendUrl() + "/restaurante/pedidos/" + pedido.getId();
             
             emailService.sendNuevoPedidoEmail(
-                    event.getUserEmail(),
-                    pedido.getRestaurante().getRazonSocial(),
+                    pedido.getRestaurante().getUsuario().getEmail(),
+                    pedido.getRestaurante().getUsuario().getNombre(),
                     pedido.getId(),
-                    pedido.getCliente().getNombre(),
+                    pedido.getRestaurante().getRazonSocial(),
                     link
             );
             
-            log.info("Email sent successfully for new order #{}", pedido.getId());
+            log.info("✉️ Email sent successfully for new order #{}", pedido.getId());
         } catch (Exception e) {
             log.error("Error sending email for PedidoCreatedEvent: {}", e.getMessage(), e);
         }
     }
 
+    /**
+     * Envía email al cliente cuando su pedido pasa a preparación
+     */
     @Async
     @EventListener
-    public void handlePedidoEstadoChanged(PedidoEstadoChangedEvent event) {
+    public void handlePedidoEnPreparacion(PedidoEnPreparacionEvent event) {
         if (!event.shouldSendEmail()) return;
         
-        log.info("Sending email for PedidoEstadoChangedEvent: {}", event.getEventId());
+        log.info("Sending email for PedidoEnPreparacionEvent: {}", event.getEventId());
         
         try {
             Pedido pedido = event.getPedido();
-            String link = appProperties.getFrontendUrl() + "/cliente/pedidos";
+            String link = appProperties.getFrontendUrl() + "/cliente/pedidos/" + pedido.getId();
             
-            emailService.sendCambioEstadoPedidoEmail(
-                    event.getUserEmail(),
+            emailService.sendPedidoEnPreparacionEmail(
+                    pedido.getCliente().getEmail(),
                     pedido.getCliente().getNombre(),
                     pedido.getId(),
-                    formatearEstado(event.getEstadoNuevo()),
                     link
             );
             
-            log.info("Email sent successfully for order #{} state change", pedido.getId());
+            log.info("✉️ Email sent successfully for order #{} en preparación", pedido.getId());
         } catch (Exception e) {
-            log.error("Error sending email for PedidoEstadoChangedEvent: {}", e.getMessage(), e);
+            log.error("Error sending email for PedidoEnPreparacionEvent: {}", e.getMessage(), e);
         }
     }
 
+    /**
+     * Envía email al cliente cuando su pedido está listo para retirar
+     */
+    @Async
+    @EventListener
+    public void handlePedidoListoParaRetirar(PedidoListoParaRetirarEvent event) {
+        if (!event.shouldSendEmail()) return;
+        
+        log.info("Sending email for PedidoListoParaRetirarEvent: {}", event.getEventId());
+        
+        try {
+            Pedido pedido = event.getPedido();
+            String link = appProperties.getFrontendUrl() + "/cliente/pedidos/" + pedido.getId();
+            
+            emailService.sendPedidoListoParaRetirarEmail(
+                    pedido.getCliente().getEmail(),
+                    pedido.getCliente().getNombre(),
+                    pedido.getId(),
+                    link
+            );
+            
+            log.info("✉️ Email sent successfully for order #{} listo para retirar", pedido.getId());
+        } catch (Exception e) {
+            log.error("Error sending email for PedidoListoParaRetirarEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Envía email al cliente cuando su pedido está en camino
+     */
     @Async
     @EventListener
     public void handlePedidoEnCamino(PedidoEnCaminoEvent event) {
@@ -86,45 +120,135 @@ public class EmailEventListener {
         
         try {
             Pedido pedido = event.getPedido();
-            String link = appProperties.getFrontendUrl() + "/cliente/pedidos";
+            String link = appProperties.getFrontendUrl() + "/cliente/pedidos/" + pedido.getId();
             
             emailService.sendPedidoEnCaminoEmail(
-                    event.getUserEmail(),
+                    pedido.getCliente().getEmail(),
                     pedido.getCliente().getNombre(),
                     pedido.getId(),
                     link
             );
             
-            log.info("Email sent successfully for order #{} en camino", pedido.getId());
+            log.info("✉️ Email sent successfully for order #{} en camino", pedido.getId());
         } catch (Exception e) {
             log.error("Error sending email for PedidoEnCaminoEvent: {}", e.getMessage(), e);
         }
     }
 
+    /**
+     * Envía emails al cliente Y al restaurante cuando un pedido es cancelado
+     */
     @Async
     @EventListener
     public void handlePedidoCancelado(PedidoCanceladoEvent event) {
         if (!event.shouldSendEmail()) return;
         
-        log.info("Sending email for PedidoCanceladoEvent: {}", event.getEventId());
+        log.info("Sending emails for PedidoCanceladoEvent: {}", event.getEventId());
         
         try {
             Pedido pedido = event.getPedido();
-            String link = appProperties.getFrontendUrl() + "/cliente/pedidos";
             
-            emailService.sendCambioEstadoPedidoEmail(
-                    event.getUserEmail(),
+            // Email al cliente
+            String linkCliente = appProperties.getFrontendUrl() + "/cliente/pedidos/" + pedido.getId();
+            emailService.sendPedidoCanceladoEmailCliente(
+                    pedido.getCliente().getEmail(),
                     pedido.getCliente().getNombre(),
                     pedido.getId(),
-                    "CANCELADO - " + event.getMotivo(),
-                    link
+                    event.getMotivo(),
+                    linkCliente
             );
             
-            log.info("Email sent successfully for cancelled order #{}", pedido.getId());
+            // Email al restaurante
+            String linkRestaurante = appProperties.getFrontendUrl() + "/restaurante/pedidos/" + pedido.getId();
+            emailService.sendPedidoCanceladoEmailRestaurante(
+                    pedido.getRestaurante().getUsuario().getEmail(),
+                    pedido.getRestaurante().getRazonSocial(),
+                    pedido.getId(),
+                    linkRestaurante
+            );
+            
+            log.info("✉️ Emails sent successfully for cancelled order #{}", pedido.getId());
         } catch (Exception e) {
-            log.error("Error sending email for PedidoCanceladoEvent: {}", e.getMessage(), e);
+            log.error("Error sending emails for PedidoCanceladoEvent: {}", e.getMessage(), e);
         }
     }
+
+    /**
+     * Envía emails al cliente Y al restaurante cuando un pago es aprobado
+     */
+    @Async
+    @EventListener
+    public void handlePagoAprobado(PagoAprobadoEvent event) {
+        if (!event.shouldSendEmail()) return;
+        
+        log.info("Sending emails for PagoAprobadoEvent: {}", event.getEventId());
+        
+        try {
+            Pedido pedido = event.getPedido();
+            
+            // Email al cliente
+            String linkCliente = appProperties.getFrontendUrl() + "/cliente/pedidos/" + pedido.getId();
+            emailService.sendPagoConfirmadoEmailCliente(
+                    pedido.getCliente().getEmail(),
+                    pedido.getCliente().getNombre(),
+                    pedido.getId(),
+                    linkCliente
+            );
+            
+            // Email al restaurante
+            String linkRestaurante = appProperties.getFrontendUrl() + "/restaurante/pedidos/" + pedido.getId();
+            emailService.sendPagoConfirmadoEmailRestaurante(
+                    pedido.getRestaurante().getUsuario().getEmail(),
+                    pedido.getRestaurante().getRazonSocial(),
+                    pedido.getId(),
+                    linkRestaurante
+            );
+            
+            log.info("✉️ Emails sent successfully for approved payment of order #{}", pedido.getId());
+        } catch (Exception e) {
+            log.error("Error sending emails for PagoAprobadoEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Envía emails al cliente Y al restaurante cuando un pago es rechazado
+     */
+    @Async
+    @EventListener
+    public void handlePagoRechazado(PagoRechazadoEvent event) {
+        if (!event.shouldSendEmail()) return;
+        
+        log.info("Sending emails for PagoRechazadoEvent: {}", event.getEventId());
+        
+        try {
+            Pedido pedido = event.getPedido();
+            
+            // Email al cliente
+            String linkCliente = appProperties.getFrontendUrl() + "/cliente/pedidos/" + pedido.getId();
+            emailService.sendPagoRechazadoEmailCliente(
+                    pedido.getCliente().getEmail(),
+                    pedido.getCliente().getNombre(),
+                    pedido.getId(),
+                    event.getMotivo(),
+                    linkCliente
+            );
+            
+            // Email al restaurante
+            String linkRestaurante = appProperties.getFrontendUrl() + "/restaurante/pedidos/" + pedido.getId();
+            emailService.sendPagoRechazadoEmailRestaurante(
+                    pedido.getRestaurante().getUsuario().getEmail(),
+                    pedido.getRestaurante().getRazonSocial(),
+                    pedido.getId(),
+                    linkRestaurante
+            );
+            
+            log.info("✉️ Emails sent successfully for rejected payment of order #{}", pedido.getId());
+        } catch (Exception e) {
+            log.error("Error sending emails for PagoRechazadoEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    // ========== Auth Events (sin cambios) ==========
 
     @Async
     @EventListener
@@ -174,8 +298,6 @@ public class EmailEventListener {
         log.info("Sending email for CuentaBloqueadaEvent: {}", event.getEventId());
         
         try {
-            // Aquí podrías crear un nuevo método en EmailService para cuenta bloqueada
-            // Por ahora usamos el de cambio de contraseña como template
             emailService.sendPasswordChangeAlertEmail(
                     event.getUserEmail(),
                     event.getNombre(),
@@ -186,17 +308,5 @@ public class EmailEventListener {
         } catch (Exception e) {
             log.error("Error sending account blocked email: {}", e.getMessage(), e);
         }
-    }
-
-    private String formatearEstado(utn.back.mordiscoapi.enums.EstadoPedido estado) {
-        return switch (estado) {
-            case PENDIENTE -> "Pendiente de Confirmación";
-            case EN_PROCESO -> "En Preparación";
-            case LISTO_PARA_ENTREGAR -> "Listo para Entregar";
-            case LISTO_PARA_RETIRAR -> "Listo para Retirar";
-            case EN_CAMINO -> "En Camino";
-            case COMPLETADO -> "Completado";
-            case CANCELADO -> "Cancelado";
-        };
     }
 }

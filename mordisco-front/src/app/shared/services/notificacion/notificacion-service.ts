@@ -197,12 +197,22 @@ export class NotificacionService {
     switch (tipo) {
       case TipoNotificacion.NUEVO_PEDIDO:
         return 'shopping_bag';
-      case TipoNotificacion.CAMBIO_ESTADO_PEDIDO:
+      case TipoNotificacion.PEDIDO_EN_PREPARACION:
+        return 'restaurant';
+      case TipoNotificacion.PEDIDO_LISTO_PARA_ENTREGAR:
+        return 'delivery_dining';
+      case TipoNotificacion.PEDIDO_LISTO_PARA_RETIRAR:
+        return 'shopping_basket';
+      case TipoNotificacion.PEDIDO_EN_CAMINO:
         return 'local_shipping';
-      case TipoNotificacion.PAGO_CONFIRMADO:
+      case TipoNotificacion.PEDIDO_COMPLETADO:
         return 'check_circle';
-      case TipoNotificacion.PAGO_RECHAZADO:
+      case TipoNotificacion.PEDIDO_CANCELADO:
         return 'cancel';
+      case TipoNotificacion.PAGO_CONFIRMADO:
+        return 'payment';
+      case TipoNotificacion.PAGO_RECHAZADO:
+        return 'error';
       default:
         return 'notifications';
     }
@@ -212,8 +222,18 @@ export class NotificacionService {
     switch (tipo) {
       case TipoNotificacion.NUEVO_PEDIDO:
         return 'text-green-600';
-      case TipoNotificacion.CAMBIO_ESTADO_PEDIDO:
+      case TipoNotificacion.PEDIDO_EN_PREPARACION:
+        return 'text-orange-600';
+      case TipoNotificacion.PEDIDO_LISTO_PARA_ENTREGAR:
         return 'text-blue-600';
+      case TipoNotificacion.PEDIDO_LISTO_PARA_RETIRAR:
+        return 'text-green-600';
+      case TipoNotificacion.PEDIDO_EN_CAMINO:
+        return 'text-blue-600';
+      case TipoNotificacion.PEDIDO_COMPLETADO:
+        return 'text-green-600';
+      case TipoNotificacion.PEDIDO_CANCELADO:
+        return 'text-red-600';
       case TipoNotificacion.PAGO_CONFIRMADO:
         return 'text-purple-600';
       case TipoNotificacion.PAGO_RECHAZADO:
@@ -227,8 +247,18 @@ export class NotificacionService {
     switch (tipo) {
       case TipoNotificacion.NUEVO_PEDIDO:
         return 'Nuevo Pedido';
-      case TipoNotificacion.CAMBIO_ESTADO_PEDIDO:
-        return 'Estado del Pedido';
+      case TipoNotificacion.PEDIDO_EN_PREPARACION:
+        return 'Pedido en Preparación';
+      case TipoNotificacion.PEDIDO_LISTO_PARA_ENTREGAR:
+        return 'Listo para Entregar';
+      case TipoNotificacion.PEDIDO_LISTO_PARA_RETIRAR:
+        return 'Listo para Retirar';
+      case TipoNotificacion.PEDIDO_EN_CAMINO:
+        return 'Pedido en Camino';
+      case TipoNotificacion.PEDIDO_COMPLETADO:
+        return 'Pedido Completado';
+      case TipoNotificacion.PEDIDO_CANCELADO:
+        return 'Pedido Cancelado';
       case TipoNotificacion.PAGO_CONFIRMADO:
         return 'Pago Confirmado';
       case TipoNotificacion.PAGO_RECHAZADO:
@@ -242,6 +272,18 @@ export class NotificacionService {
     switch (tipo) {
       case TipoNotificacion.NUEVO_PEDIDO:
         return { duration: 5000, panelClass: ['snackbar-success'] };
+      case TipoNotificacion.PEDIDO_EN_PREPARACION:
+        return { duration: 4000, panelClass: ['snackbar-info'] };
+      case TipoNotificacion.PEDIDO_LISTO_PARA_ENTREGAR:
+        return { duration: 5000, panelClass: ['snackbar-info'] };
+      case TipoNotificacion.PEDIDO_LISTO_PARA_RETIRAR:
+        return { duration: 5000, panelClass: ['snackbar-success'] };
+      case TipoNotificacion.PEDIDO_EN_CAMINO:
+        return { duration: 5000, panelClass: ['snackbar-info'] };
+      case TipoNotificacion.PEDIDO_COMPLETADO:
+        return { duration: 4000, panelClass: ['snackbar-success'] };
+      case TipoNotificacion.PEDIDO_CANCELADO:
+        return { duration: 6000, panelClass: ['snackbar-error'] };
       case TipoNotificacion.PAGO_CONFIRMADO:
         return { duration: 4000, panelClass: ['snackbar-success'] };
       case TipoNotificacion.PAGO_RECHAZADO:

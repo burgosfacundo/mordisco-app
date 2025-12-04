@@ -75,7 +75,7 @@ public final class EmailTemplateBuilder {
         ));
     }
 
-    public String buildNuevoPedidoEmail(String nombre, Long pedidoId, String restaurante,String link)
+    public String buildNuevoPedidoEmail(String nombre, Long pedidoId, String restaurante, String link)
             throws InternalServerErrorException {
         String template = loadTemplate("nuevo-pedido.html");
         return replacePlaceholders(template, Map.of(
@@ -86,22 +86,93 @@ public final class EmailTemplateBuilder {
         ));
     }
 
-    public String buildCambioEstadoPedidoEmail(String nombre, Long pedidoId, String nuevoEstado,String link)
+    public String buildPedidoEnPreparacionEmail(String nombre, Long pedidoId, String link)
             throws InternalServerErrorException {
-        String template = loadTemplate("cambio-estado-pedido.html");
+        String template = loadTemplate("pedido-en-preparacion.html");
         return replacePlaceholders(template, Map.of(
                 "nombre", nombre,
                 "pedidoId", String.valueOf(pedidoId),
-                "nuevoEstado", nuevoEstado,
                 "link", link
         ));
     }
 
-    public String buildPedidoEnCaminoEmail(String nombre, Long pedidoId,String link)
+    public String buildPedidoListoParaRetirarEmail(String nombre, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String template = loadTemplate("pedido-listo-retirar.html");
+        return replacePlaceholders(template, Map.of(
+                "nombre", nombre,
+                "pedidoId", String.valueOf(pedidoId),
+                "link", link
+        ));
+    }
+
+    public String buildPedidoEnCaminoEmail(String nombre, Long pedidoId, String link)
             throws InternalServerErrorException {
         String template = loadTemplate("pedido-en-camino.html");
         return replacePlaceholders(template, Map.of(
                 "nombre", nombre,
+                "pedidoId", String.valueOf(pedidoId),
+                "link", link
+        ));
+    }
+
+    public String buildPedidoCanceladoEmailCliente(String nombre, Long pedidoId, String motivo, String link)
+            throws InternalServerErrorException {
+        String template = loadTemplate("pedido-cancelado-cliente.html");
+        return replacePlaceholders(template, Map.of(
+                "nombre", nombre,
+                "pedidoId", String.valueOf(pedidoId),
+                "motivo", motivo,
+                "link", link
+        ));
+    }
+
+    public String buildPedidoCanceladoEmailRestaurante(String nombreRestaurante, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String template = loadTemplate("pedido-cancelado-restaurante.html");
+        return replacePlaceholders(template, Map.of(
+                "nombreRestaurante", nombreRestaurante,
+                "pedidoId", String.valueOf(pedidoId),
+                "link", link
+        ));
+    }
+
+    public String buildPagoConfirmadoEmailCliente(String nombre, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String template = loadTemplate("pago-confirmado-cliente.html");
+        return replacePlaceholders(template, Map.of(
+                "nombre", nombre,
+                "pedidoId", String.valueOf(pedidoId),
+                "link", link
+        ));
+    }
+
+    public String buildPagoConfirmadoEmailRestaurante(String nombreRestaurante, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String template = loadTemplate("pago-confirmado-restaurante.html");
+        return replacePlaceholders(template, Map.of(
+                "nombreRestaurante", nombreRestaurante,
+                "pedidoId", String.valueOf(pedidoId),
+                "link", link
+        ));
+    }
+
+    public String buildPagoRechazadoEmailCliente(String nombre, Long pedidoId, String motivo, String link)
+            throws InternalServerErrorException {
+        String template = loadTemplate("pago-rechazado-cliente.html");
+        return replacePlaceholders(template, Map.of(
+                "nombre", nombre,
+                "pedidoId", String.valueOf(pedidoId),
+                "motivo", motivo,
+                "link", link
+        ));
+    }
+
+    public String buildPagoRechazadoEmailRestaurante(String nombreRestaurante, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String template = loadTemplate("pago-rechazado-restaurante.html");
+        return replacePlaceholders(template, Map.of(
+                "nombreRestaurante", nombreRestaurante,
                 "pedidoId", String.valueOf(pedidoId),
                 "link", link
         ));

@@ -241,6 +241,7 @@ public class RestauranteServiceImpl implements IRestauranteService {
                 activoBoolean,
                 pageable
         ).map(RestauranteMapper::toDTO);
+    }
 
     /**
      * Busca restaurantes dentro de un radio desde una ubicación específica

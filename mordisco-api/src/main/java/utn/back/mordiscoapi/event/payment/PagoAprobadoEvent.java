@@ -20,7 +20,7 @@ public class PagoAprobadoEvent extends NotificationEvent {
 
     @Override
     public boolean shouldSendEmail() {
-        return false; // No enviar email (solo WebSocket)
+        return true; // Enviar email al cliente y restaurante
     }
 
     @Override

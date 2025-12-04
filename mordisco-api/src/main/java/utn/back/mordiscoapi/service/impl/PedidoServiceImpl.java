@@ -12,8 +12,6 @@ import utn.back.mordiscoapi.enums.*;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.event.order.*;
-import utn.back.mordiscoapi.event.payment.PagoAprobadoEvent;
-import utn.back.mordiscoapi.event.payment.PagoRechazadoEvent;
 import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
@@ -22,16 +20,12 @@ import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.repository.*;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 import utn.back.mordiscoapi.service.MercadoPagoService;
-import utn.back.mordiscoapi.service.NotificacionService;
 import utn.back.mordiscoapi.service.interf.IGananciaRepartidorService;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 
@@ -47,7 +41,6 @@ public class PedidoServiceImpl implements IPedidoService {
     private final PagoRepository pagoRepository;
 
     private final MercadoPagoService mercadoPagoService;
-    private final NotificacionService notificacionService;
     private final ConfiguracionSistemaServiceImpl configuracionService;
     private final AuthUtils authUtils;
     private final IGananciaRepartidorService gananciaRepartidorService;
@@ -313,9 +306,14 @@ public class PedidoServiceImpl implements IPedidoService {
 
     private void notificarCambioEstado(Pedido pedido, EstadoPedido nuevoEstado) {
         switch (nuevoEstado) {
+            case EN_PREPARACION -> {
+                // Publicar evento de pedido en preparación
+                eventPublisher.publishEvent(new PedidoEnPreparacionEvent(pedido));
+            }
+
             case LISTO_PARA_RETIRAR -> {
                 // Publicar evento de pedido listo para retirar
-                eventPublisher.publishEvent(new PedidoEstadoChangedEvent(pedido, pedido.getEstado()));
+                eventPublisher.publishEvent(new PedidoListoParaRetirarEvent(pedido));
             }
 
             case LISTO_PARA_ENTREGAR -> {
@@ -336,11 +334,6 @@ public class PedidoServiceImpl implements IPedidoService {
             case CANCELADO -> {
                 // Publicar evento de pedido cancelado
                 eventPublisher.publishEvent(new PedidoCanceladoEvent(pedido, "Cancelado por el sistema"));
-            }
-
-            default -> {
-                // Para otros estados, publicar evento genérico de cambio de estado
-                eventPublisher.publishEvent(new PedidoEstadoChangedEvent(pedido, pedido.getEstado()));
             }
         }
     }
@@ -385,7 +378,6 @@ public class PedidoServiceImpl implements IPedidoService {
      * @param idRestaurante el ID del Restaurante a buscar sus pedidos.
      * @param estado el EstadoPedido por el que hay que filtrar.
      * @throws NotFoundException si el Restaurante no se encuentra.
-     * @throws BadRequestException si el estado del pedido no es válido.
      */
     @Override
     public Page<PedidoResponseDTO> findAllByRestaurante_IdAndEstado(int pageNo,int pageSize,Long idRestaurante, EstadoPedido estado) throws NotFoundException {
@@ -427,27 +419,6 @@ public class PedidoServiceImpl implements IPedidoService {
     private BigDecimal calcularTotalYValidarProductos(Pedido pedido) throws NotFoundException, BadRequestException {
         BigDecimal total = BigDecimal.ZERO;
 
-        // Validar que todos los productos pertenezcan al mismo restaurante
-        for (ProductoPedido item : pedido.getItems()) {
-            Producto producto = productoRepository.findById(item.getProducto().getId())
-                    .orElseThrow(() -> new NotFoundException(
-                            "El producto con ID " + item.getProducto().getId() + " no existe"
-                    ));
-
-            // Validar que el producto pertenezca al restaurante del pedido
-            if (!producto.getRestaurante().getId().equals(pedido.getRestaurante().getId())) {
-                throw new BadRequestException(
-                        String.format(
-                                "No se pueden agregar productos de diferentes restaurantes. " +
-                                "El producto '%s' pertenece a '%s', pero el pedido es de '%s'.",
-                                producto.getNombre(),
-                                producto.getRestaurante().getRazonSocial(),
-                                pedido.getRestaurante().getRazonSocial()
-                        )
-                );
-            }
-        }
-
         for (ProductoPedido item : pedido.getItems()) {
             item.setPedido(pedido);
 
@@ -455,6 +426,19 @@ public class PedidoServiceImpl implements IPedidoService {
                     .orElseThrow(() -> new NotFoundException(
                             "El producto con ID " + item.getProducto().getId() + " no existe"
                     ));
+
+            // Validar que el producto pertenezca al restaurante del pedido
+            if (!producto.getMenu().getRestaurante().getId().equals(pedido.getRestaurante().getId())) {
+                throw new BadRequestException(
+                        String.format(
+                                "No se pueden agregar productos de diferentes restaurantes. " +
+                                "El producto '%s' pertenece a '%s', pero el pedido es de '%s'.",
+                                producto.getNombre(),
+                                producto.getMenu().getRestaurante().getRazonSocial(),
+                                pedido.getRestaurante().getRazonSocial()
+                        )
+                );
+            }
 
             // Validar que el producto esté disponible
             if (!producto.getDisponible()) {

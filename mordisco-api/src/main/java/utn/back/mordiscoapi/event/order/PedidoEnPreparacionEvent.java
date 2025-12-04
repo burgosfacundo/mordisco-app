@@ -1,32 +1,30 @@
-package utn.back.mordiscoapi.event.payment;
+package utn.back.mordiscoapi.event.order;
 
 import lombok.Getter;
 import utn.back.mordiscoapi.event.NotificationEvent;
 import utn.back.mordiscoapi.model.entity.Pedido;
 
 @Getter
-public class PagoRechazadoEvent extends NotificationEvent {
+public class PedidoEnPreparacionEvent extends NotificationEvent {
     private final Pedido pedido;
-    private final String motivo;
 
-    public PagoRechazadoEvent(Pedido pedido, String motivo) {
+    public PedidoEnPreparacionEvent(Pedido pedido) {
         super(pedido.getCliente().getId(), pedido.getCliente().getEmail());
         this.pedido = pedido;
-        this.motivo = motivo;
     }
 
     @Override
     public boolean shouldSendWebSocket() {
-        return true; // Notificar al cliente
+        return true; // Notificar al cliente por WebSocket
     }
 
     @Override
     public boolean shouldSendEmail() {
-        return true; // Enviar email al cliente y restaurante
+        return true; // Enviar email al cliente
     }
 
     @Override
     public String getEventType() {
-        return "PAGO_RECHAZADO";
+        return "PEDIDO_EN_PREPARACION";
     }
 }

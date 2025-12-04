@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Recibido</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 50px auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; padding: 30px; text-align: center; }
+        .content { padding: 30px; color: #333; }
+        .button { display: inline-block; background: #4CAF50; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+        .footer { background: #f4f4f4; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>💰 Pago Recibido</h1>
+    </div>
+    <div class="content">
+        <p>Hola <strong>${nombreRestaurante}</strong>,</p>
+        <p>Se ha confirmado el pago para el pedido <strong>#${pedidoId}</strong>.</p>
+        <p>Puedes comenzar a preparar el pedido.</p>
+        <a href="${link}" class="button">Ver Detalles del Pedido</a>
+    </div>
+    <div class="footer">
+        <p>© 2025 Mordisco. Todos los derechos reservados.</p>
+    </div>
+</div>
+</body>
+</html>

@@ -26,7 +26,6 @@ public class PagoService {
     private final PagoRepository pagoRepository;
     private final PedidoRepository pedidoRepository;
     private final MercadoPagoService mercadoPagoService;
-    private final NotificacionService notificacionService;
     private final ApplicationEventPublisher eventPublisher;
 
     /**

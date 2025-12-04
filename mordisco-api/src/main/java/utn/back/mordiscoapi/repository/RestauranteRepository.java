@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.model.entity.Pedido;
 import utn.back.mordiscoapi.model.entity.Restaurante;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -118,13 +120,12 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     FROM restaurantes r
     LEFT JOIN direcciones d ON r.direccion_id = d.id
     LEFT JOIN menus m ON r.menu_id = m.id
-    WHERE 
+    WHERE
         -- FILTRO ACTIVO (BIT -> Boolean)
         (:activo IS NULL OR r.activo = :activo)
-        
         -- BUSCADOR TEXTO LIBRE
         AND (
-            :search IS NULL OR :search = '' 
+            :search IS NULL OR :search = ''
             OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
             OR CAST(r.id AS CHAR) LIKE CONCAT('%', :search, '%')
             OR LOWER(d.calle) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -140,10 +141,10 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     FROM restaurantes r
     LEFT JOIN direcciones d ON r.direccion_id = d.id
     LEFT JOIN menus m ON r.menu_id = m.id
-    WHERE 
+    WHERE
         (:activo IS NULL OR r.activo = :activo)
         AND (
-            :search IS NULL OR :search = '' 
+            :search IS NULL OR :search = ''
             OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
             OR CAST(r.id AS CHAR) LIKE CONCAT('%', :search, '%')
             OR LOWER(d.calle) LIKE LOWER(CONCAT('%', :search, '%'))

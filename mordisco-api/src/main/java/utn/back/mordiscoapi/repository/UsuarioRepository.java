@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.model.entity.Pedido;
 import utn.back.mordiscoapi.model.entity.Usuario;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -55,9 +55,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query(value = """
 SELECT u.*
-FROM usuarios u 
+FROM usuarios u
 INNER JOIN roles r ON u.rol_id = r.id
-WHERE 
+WHERE
     -- FILTRO BAJA LOGICA (BIT -> Boolean)
     (:bajaLogica IS NULL OR u.baja_logica = :bajaLogica)
 
@@ -66,9 +66,9 @@ WHERE
 
     -- BUSCADOR TEXTO LIBRE
     AND (
-        :search IS NULL OR :search = '' 
+        :search IS NULL OR :search = ''
         OR LOWER(CONCAT(u.nombre, ' ', u.apellido)) LIKE LOWER(CONCAT('%', :search, '%'))
-        OR LOWER(CONCAT(u.apellido, ' ', u.nombre)) LIKE LOWER(CONCAT('%', :search, '%'))        
+        OR LOWER(CONCAT(u.apellido, ' ', u.nombre)) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -78,15 +78,15 @@ WHERE
 """,
             countQuery = """
 SELECT COUNT(*)
-FROM usuarios u 
+FROM usuarios u
 INNER JOIN roles r ON u.rol_id = r.id
-WHERE 
+WHERE
     (:bajaLogica IS NULL OR u.baja_logica = :bajaLogica)
     AND (:rol IS NULL OR :rol = '' OR r.nombre = :rol)
     AND (
         :search IS NULL OR :search = ''
         OR LOWER(CONCAT(u.nombre, ' ', u.apellido)) LIKE LOWER(CONCAT('%', :search, '%'))
-        OR LOWER(CONCAT(u.apellido, ' ', u.nombre)) LIKE LOWER(CONCAT('%', :search, '%'))         
+        OR LOWER(CONCAT(u.apellido, ' ', u.nombre)) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -117,7 +117,7 @@ WHERE
     @Query(value = """
             SELECT u.id, u.nombre, u.apellido,
                    COUNT(p.id) as entregas_realizadas,
-                   COALESCE(SUM(gr.monto), 0) as ganancia_generada
+                   COALESCE(SUM(gr.ganancia_repartidor), 0) as ganancia_generada
             FROM usuarios u
             LEFT JOIN pedidos p ON p.repartidor_id = u.id AND p.estado = 'COMPLETADO'
             LEFT JOIN ganancias_repartidor gr ON gr.repartidor_id = u.id
