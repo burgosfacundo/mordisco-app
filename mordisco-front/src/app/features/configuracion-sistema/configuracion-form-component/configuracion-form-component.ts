@@ -40,8 +40,8 @@ export class ConfiguracionFormComponent implements OnInit{
       costoPorKilometro: ['', [Validators.required, Validators.maxLength(10),  Validators.pattern(/^[0-9]+$/)]],
       montoMinimoPedido:['', [Validators.required, Validators.maxLength(10),  Validators.pattern(/^[0-9]+$/)]],
       porcentajeGananciasRepartidor: ['', [Validators.required, Validators.maxLength(2), Validators.pattern(/^[0-9]+$/)]],
-      modoMantenimiento : [true, [Validators.required]],
-      mensajeMantenimiento : ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      modoMantenimiento : [false],
+      mensajeMantenimiento : ['', [Validators.minLength(3), Validators.maxLength(150)]],
 
     });
   }
