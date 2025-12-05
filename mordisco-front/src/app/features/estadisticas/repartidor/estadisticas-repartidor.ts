@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -26,11 +25,9 @@ import { ToastService } from '../../../core/services/toast-service';
 export class EstadisticasRepartidorComponent implements OnInit {
   private estadisticasService = inject(EstadisticasService);
   private toastService = inject(ToastService);
-  private route = inject(ActivatedRoute);
 
   estadisticas = signal<RepartidorEstadisticas | null>(null);
   isLoading = signal(true);
-  repartidorId: number = 0;
 
   // Gráfico de líneas para ganancias por período
   lineChartData: ChartConfiguration<'line'>['data'] = {
@@ -115,15 +112,11 @@ export class EstadisticasRepartidorComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.repartidorId = Number(id);
-      this.cargarEstadisticas();
-    }
+    this.cargarEstadisticas();
   }
 
   private cargarEstadisticas(): void {
-    this.estadisticasService.getEstadisticasRepartidor(this.repartidorId).subscribe({
+    this.estadisticasService.getEstadisticasRepartidor().subscribe({
       next: (data) => {
         this.estadisticas.set(data);
         this.configurarGraficoLineas(data);
@@ -131,7 +124,6 @@ export class EstadisticasRepartidorComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error cargando estadísticas:', error);
         this.toastService.error('Error al cargar las estadísticas');
         this.isLoading.set(false);
       }

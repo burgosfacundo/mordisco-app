@@ -53,6 +53,13 @@ public class EstadisticasRepartidorServiceImpl implements IEstadisticasRepartido
         );
     }
 
+    @Override
+    public RepartidorEstadisticasDTO getEstadisticasByUsuarioId(Long usuarioId) {
+        // Para repartidores, el usuarioId es el mismo que el repartidorId
+        // No hay una entidad separada para repartidor, es directamente el usuario
+        return getEstadisticas(usuarioId);
+    }
+
     private List<GananciasPorPeriodoDTO> obtenerGananciasPorPeriodo(Long repartidorId) {
         List<Object[]> results = gananciaRepartidorRepository.calcularGananciasPorMes(repartidorId);
 

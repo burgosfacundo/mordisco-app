@@ -9,7 +9,6 @@
       <p>Cargando estadísticas...</p>
     </div>
   } @else if (estadisticas(); as stats) {
-    <!-- Cards de resumen -->
     <div class="summary-cards">
       <!-- Ingresos Totales -->
       <mat-card class="stat-card">
@@ -20,18 +19,6 @@
         <mat-card-content>
           <div class="stat-number">{{ formatCurrency(stats.ingresosTotales) }}</div>
           <div class="stat-subtitle">Pedidos completados</div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Tiempo Promedio de Preparación -->
-      <mat-card class="stat-card">
-        <mat-card-header>
-          <mat-icon class="card-icon time">schedule</mat-icon>
-          <mat-card-title>Tiempo Promedio</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="stat-number">{{ formatTime(stats.tiempoPromedioPreparacion) }}</div>
-          <div class="stat-subtitle">Tiempo de preparación</div>
         </mat-card-content>
       </mat-card>
 

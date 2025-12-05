@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
@@ -26,11 +25,9 @@ import { ToastService } from '../../../core/services/toast-service';
 export class EstadisticasRestauranteComponent implements OnInit {
   private estadisticasService = inject(EstadisticasService);
   private toastService = inject(ToastService);
-  private route = inject(ActivatedRoute);
 
   estadisticas = signal<RestauranteEstadisticas | null>(null);
   isLoading = signal(true);
-  restauranteId: number = 0;
 
   // Gráfico de líneas para ingresos por período
   lineChartData: ChartConfiguration<'line'>['data'] = {
@@ -91,16 +88,11 @@ export class EstadisticasRestauranteComponent implements OnInit {
   productosColumns = ['nombre', 'cantidad', 'ingresos'];
 
   ngOnInit(): void {
-    // Obtener ID del restaurante de la ruta
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.restauranteId = Number(id);
-      this.cargarEstadisticas();
-    }
+    this.cargarEstadisticas();
   }
 
   private cargarEstadisticas(): void {
-    this.estadisticasService.getEstadisticasRestaurante(this.restauranteId).subscribe({
+    this.estadisticasService.getEstadisticasRestaurante().subscribe({
       next: (data) => {
         this.estadisticas.set(data);
         this.configurarGraficoLineas(data);
@@ -147,15 +139,6 @@ export class EstadisticasRestauranteComponent implements OnInit {
       style: 'currency',
       currency: 'ARS'
     }).format(value);
-  }
-
-  formatTime(minutes: number): string {
-    if (minutes < 60) {
-      return `${Math.round(minutes)} min`;
-    }
-    const hours = Math.floor(minutes / 60);
-    const mins = Math.round(minutes % 60);
-    return `${hours}h ${mins}min`;
   }
 
   // Helper methods para detectar datos vacíos

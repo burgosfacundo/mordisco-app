@@ -17,11 +17,11 @@ export class EstadisticasService {
     return this.http.get<AdminEstadisticas>(`${this.apiUrl}/estadisticas/admin`);
   }
 
-  getEstadisticasRestaurante(id: number): Observable<RestauranteEstadisticas> {
-    return this.http.get<RestauranteEstadisticas>(`${this.apiUrl}/estadisticas/restaurante/${id}`);
+  getEstadisticasRestaurante(): Observable<RestauranteEstadisticas> {
+    return this.http.get<RestauranteEstadisticas>(`${this.apiUrl}/estadisticas/restaurante`);
   }
 
-  getEstadisticasRepartidor(id: number): Observable<RepartidorEstadisticas> {
-    return this.http.get<RepartidorEstadisticas>(`${this.apiUrl}/estadisticas/repartidor/${id}`);
+  getEstadisticasRepartidor(): Observable<RepartidorEstadisticas> {
+    return this.http.get<RepartidorEstadisticas>(`${this.apiUrl}/estadisticas/repartidor`);
   }
 }
