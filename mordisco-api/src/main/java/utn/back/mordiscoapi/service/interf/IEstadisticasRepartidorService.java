@@ -9,4 +9,11 @@ public interface IEstadisticasRepartidorService {
      * @return Estadísticas del repartidor
      */
     RepartidorEstadisticasDTO getEstadisticas(Long repartidorId);
+
+    /**
+     * Obtiene las estadísticas del repartidor (usuario autenticado)
+     * @param usuarioId ID del usuario
+     * @return Estadísticas del repartidor
+     */
+    RepartidorEstadisticasDTO getEstadisticasByUsuarioId(Long usuarioId);
 }

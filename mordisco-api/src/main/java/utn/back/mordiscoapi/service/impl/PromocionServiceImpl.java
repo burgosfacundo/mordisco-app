@@ -27,6 +27,7 @@ public class PromocionServiceImpl implements IPromocionService {
     // Inyección de dependencias de PromocionRepository a través del constructor de lombok @RequiredArgsConstructor
     private final PromocionRepository repository;
     private final RestauranteRepository restauranteRepository;
+    private final utn.back.mordiscoapi.repository.ProductoRepository productoRepository;
 
     /**
      * Guarda una promoción.
@@ -45,6 +46,17 @@ public class PromocionServiceImpl implements IPromocionService {
 
         // Mapeo la DTO a la entidad
         Promocion promocion = PromocionMapper.toEntity(dto);
+        
+        // Si es promoción específica por productos, cargar los productos
+        if (dto.alcance() == utn.back.mordiscoapi.model.enums.AlcancePromocion.PRODUCTOS_ESPECIFICOS 
+            && dto.productosIds() != null && !dto.productosIds().isEmpty()) {
+            var productos = productoRepository.findAllById(dto.productosIds());
+            if (productos.size() != dto.productosIds().size()) {
+                throw new BadRequestException("Algunos productos especificados no existen");
+            }
+            promocion.setProductosAplicables(productos);
+        }
+        
         // Guardar la entidad en la base de datos
         repository.save(promocion);
     }
@@ -117,9 +129,28 @@ public class PromocionServiceImpl implements IPromocionService {
         // Actualizar los campos de la promoción
         promocion.setDescripcion(dto.descripcion());
         promocion.setDescuento(dto.descuento());
+        promocion.setTipoDescuento(dto.tipoDescuento());
+        promocion.setAlcance(dto.alcance());
         promocion.setFechaInicio(dto.fechaInicio());
         promocion.setFechaFin(dto.fechaFin());
+        promocion.setActiva(dto.activa() != null ? dto.activa() : true);
         promocion.setRestaurante(restaurante);
+        
+        // Actualizar productos si es promoción específica
+        if (dto.alcance() == utn.back.mordiscoapi.model.enums.AlcancePromocion.PRODUCTOS_ESPECIFICOS) {
+            if (dto.productosIds() != null && !dto.productosIds().isEmpty()) {
+                var productos = productoRepository.findAllById(dto.productosIds());
+                if (productos.size() != dto.productosIds().size()) {
+                    throw new BadRequestException("Algunos productos especificados no existen");
+                }
+                promocion.setProductosAplicables(productos);
+            } else {
+                promocion.getProductosAplicables().clear();
+            }
+        } else {
+            // Si cambió a TODO_MENU, limpiar productos específicos
+            promocion.getProductosAplicables().clear();
+        }
 
         // Guardamos la promoción actualizada
         repository.save(promocion);

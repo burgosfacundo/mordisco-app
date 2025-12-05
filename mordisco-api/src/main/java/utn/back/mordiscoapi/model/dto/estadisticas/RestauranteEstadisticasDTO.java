@@ -6,7 +6,6 @@ import java.util.List;
 public record RestauranteEstadisticasDTO(
         BigDecimal ingresosTotales,
         List<IngresosPorPeriodoDTO> ingresosPorPeriodo,
-        List<ProductoMasVendidoDTO> productosMasVendidos,
-        Double tiempoPromedioPreparacion  // en minutos
+        List<ProductoMasVendidoDTO> productosMasVendidos
 ) {
 }

@@ -30,12 +30,48 @@ public class ProductoServiceImpl implements IProductoService {
 
     private final ProductoRepository repository;
     private final MenuRepository menuRepository;
+    private final utn.back.mordiscoapi.service.DescuentoService descuentoService;
 
 
     @Override
-    public Page<ProductoResponseCardDTO> findAllByIdMenu(int pageNo, int pageSize,Long idMenu) {
+    public Page<ProductoResponseCardDTO> findAllByIdMenu(int pageNo, int pageSize, Long idMenu) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return repository.findAllByIdMenu(pageable,idMenu).map(ProductoMapper::toDtoCard);
+        var productos = repository.findAllByIdMenu(pageable, idMenu);
+        
+        // Aplicar descuentos a cada producto
+        return productos.map(producto -> {
+            var restaurante = producto.getMenu().getRestaurante();
+            var fechaActual = java.time.LocalDate.now();
+            
+            // Obtener la mejor promoción aplicable
+            var promocion = descuentoService.obtenerMejorPromocion(producto, restaurante, fechaActual);
+            
+            if (promocion != null) {
+                var precioConDescuento = descuentoService.calcularPrecioConDescuento(
+                        producto, restaurante, fechaActual
+                );
+                var porcentajeDescuento = descuentoService.calcularPorcentajeDescuento(
+                        producto.getPrecio(), promocion
+                );
+                
+                // Crear DTO con descuentos
+                return new ProductoResponseCardDTO(
+                        producto.getId(),
+                        producto.getNombre(),
+                        producto.getDescripcion(),
+                        producto.getPrecio(),
+                        precioConDescuento,
+                        porcentajeDescuento,
+                        true,
+                        promocion.getDescripcion(),
+                        producto.getDisponible(),
+                        ImagenMapper.toDTO(producto.getImagen())
+                );
+            }
+            
+            // Sin promoción
+            return ProductoMapper.toDtoCard(producto);
+        });
     }
 
     @Override
@@ -44,7 +80,42 @@ public class ProductoServiceImpl implements IProductoService {
                 () -> new NotFoundException("Producto no encontrado")
         );
 
+        return aplicarDescuentos(producto);
+    }
 
+    /**
+     * Aplica descuentos a un producto y retorna el DTO con la información de promoción
+     */
+    private ProductoResponseDTO aplicarDescuentos(utn.back.mordiscoapi.model.entity.Producto producto) {
+        var restaurante = producto.getMenu().getRestaurante();
+        var fechaActual = java.time.LocalDate.now();
+        
+        // Obtener la mejor promoción aplicable
+        var promocion = descuentoService.obtenerMejorPromocion(producto, restaurante, fechaActual);
+        
+        if (promocion != null) {
+            var precioConDescuento = descuentoService.calcularPrecioConDescuento(
+                    producto, restaurante, fechaActual
+            );
+            var porcentajeDescuento = descuentoService.calcularPorcentajeDescuento(
+                    producto.getPrecio(), promocion
+            );
+            
+            return new utn.back.mordiscoapi.model.dto.producto.ProductoResponseDTO(
+                    producto.getId(),
+                    producto.getNombre(),
+                    producto.getDescripcion(),
+                    producto.getPrecio(),
+                    precioConDescuento,
+                    porcentajeDescuento,
+                    true,
+                    promocion.getDescripcion(),
+                    producto.getDisponible(),
+                    utn.back.mordiscoapi.mapper.ImagenMapper.toDTO(producto.getImagen())
+            );
+        }
+        
+        // Sin promoción
         return ProductoMapper.toDto(producto);
     }
 

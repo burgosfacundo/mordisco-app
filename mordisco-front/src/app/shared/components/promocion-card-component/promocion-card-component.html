@@ -5,7 +5,11 @@
               text-xs font-bold uppercase tracking-wider
               bg-linear-to-r from-yellow-500 to-yellow-600
               text-white shadow-lg">
-    -{{ promocion()!.descuento }}%
+    @if (promocion()!.tipoDescuento === 'PORCENTAJE') {
+      -{{ promocion()!.descuento }}%
+    } @else {
+      ${{ promocion()!.descuento }} OFF
+    }
   </div>
 
   <!-- Contenido -->

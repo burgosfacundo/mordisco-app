@@ -14,5 +14,4 @@ export interface RestauranteEstadisticas {
   ingresosTotales: number;
   ingresosPorPeriodo: IngresosPorPeriodo[];
   productosMasVendidos: ProductoMasVendido[];
-  tiempoPromedioPreparacion: number;  // en minutos
 }

@@ -5,6 +5,7 @@ export interface ItemCarrito {
   nombre: string
   descripcion: string
   precio: number
+  precioConDescuento?: number  // Precio con descuento si hay promoción
   cantidad: number
   imagen: ImagenRequest
   restauranteId: number

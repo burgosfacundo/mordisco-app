@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import utn.back.mordiscoapi.model.entity.Pedido;
 import utn.back.mordiscoapi.model.entity.Producto;
 
+import java.util.List;
+
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
     @Query("""
         SELECT
@@ -42,14 +44,17 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
                    SUM(pp.cantidad) as cantidad_vendida,
                    SUM(pp.precio_unitario * pp.cantidad) as ingreso_generado
             FROM productos pr
-            JOIN productos_pedido pp ON pp.producto_id = pr.id
+            JOIN menus m ON pr.menu_id = m.id
+            JOIN restaurantes r ON r.menu_id = m.id
+            JOIN productos_pedidos pp ON pp.producto_id = pr.id
             JOIN pedidos p ON pp.pedido_id = p.id
-            WHERE pr.restaurante_id = :restauranteId
+            WHERE r.id = :restauranteId
             AND p.estado = 'COMPLETADO'
             GROUP BY pr.id, pr.nombre
             ORDER BY cantidad_vendida DESC
             LIMIT 10
             """, nativeQuery = true)
-    java.util.List<Object[]> findProductosMasVendidos(@Param("restauranteId") Long restauranteId);
+    List<Object[]> findProductosMasVendidos(@Param("restauranteId") Long restauranteId);
+
 }
 

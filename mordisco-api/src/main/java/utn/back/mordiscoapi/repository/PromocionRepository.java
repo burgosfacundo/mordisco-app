@@ -47,4 +47,24 @@ public interface PromocionRepository extends JpaRepository<Promocion,Long> {
              WHERE p.restaurante.id = :restauranteId
             """)
     Page<Promocion> findByRestauranteId(Pageable pageable,@Param("restauranteId") Long restauranteId);
+
+    /**
+     * Busca promociones activas de un restaurante en una fecha específica
+     * @param restauranteId ID del restaurante
+     * @param fecha Fecha para validar vigencia
+     * @return Lista de promociones activas
+     */
+    @Query("""
+            SELECT p
+            FROM Promocion p
+            LEFT JOIN FETCH p.productosAplicables
+            WHERE p.restaurante.id = :restauranteId
+            AND p.activa = true
+            AND p.fechaInicio <= :fecha
+            AND p.fechaFin >= :fecha
+            """)
+    List<Promocion> findPromocionesActivasByRestauranteAndFecha(
+            @Param("restauranteId") Long restauranteId,
+            @Param("fecha") java.time.LocalDate fecha
+    );
 }

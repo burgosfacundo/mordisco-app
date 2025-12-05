@@ -18,6 +18,10 @@ public class ProductoMapper {
                 producto.getNombre(),
                 producto.getDescripcion(),
                 producto.getPrecio(),
+                null, // precioConDescuento - se calculará en el servicio
+                null, // porcentajeDescuento - se calculará en el servicio
+                false, // tienePromocion - se calculará en el servicio
+                null, // descripcionPromocion - se calculará en el servicio
                 producto.getDisponible(),
                 ImagenMapper.toDTO(producto.getImagen())
         );
@@ -28,7 +32,12 @@ public class ProductoMapper {
         return new ProductoResponseCardDTO(
                 producto.getId(),
                 producto.getNombre(),
+                producto.getDescripcion(),
                 producto.getPrecio(),
+                null, // precioConDescuento - se calculará en el servicio
+                null, // porcentajeDescuento - se calculará en el servicio
+                false, // tienePromocion - se calculará en el servicio
+                null, // descripcionPromocion - se calculará en el servicio
                 producto.getDisponible(),
                 ImagenMapper.toDTO(producto.getImagen())
         );

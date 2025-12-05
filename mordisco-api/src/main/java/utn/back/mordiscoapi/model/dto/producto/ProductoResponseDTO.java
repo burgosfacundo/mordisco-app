@@ -14,6 +14,14 @@ public record ProductoResponseDTO(
         String descripcion,
         @Schema(description = "Precio del producto", example = "20000")
         BigDecimal precio,
+        @Schema(description = "Precio con descuento aplicado (si hay promoción)", example = "16000")
+        BigDecimal precioConDescuento,
+        @Schema(description = "Porcentaje de descuento aplicado", example = "20.0")
+        Double porcentajeDescuento,
+        @Schema(description = "Indica si el producto tiene una promoción activa", example = "true")
+        Boolean tienePromocion,
+        @Schema(description = "Descripción de la promoción aplicada", example = "20% de descuento")
+        String descripcionPromocion,
         Boolean disponible,
         ImagenResponseDTO imagen
 ) {
