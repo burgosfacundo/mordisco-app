@@ -18,8 +18,12 @@ export class CalificacionCardAdmin implements OnInit{
   ped? :PedidoResponse
 
   ngOnInit(): void {
-    this.findPedido(this.calificacionP()?.pedidoId!)
-    this.findPedido(this.calificacionR()?.pedidoId!)
+    if(this.calificacionP())
+      this.findPedido(this.calificacionP()?.pedidoId!)
+  
+    if(this.calificacionR())
+      this.findPedido(this.calificacionR()?.pedidoId!)
+    
   }
 
   calificacionPromedio1Dec(puntajePromedio : number): number {
@@ -28,7 +32,7 @@ export class CalificacionCardAdmin implements OnInit{
 
   findPedido(id : number){
     this.pService.getById(id).subscribe({
-        next:(d)=> this.ped = d
+        next:(d)=> this.ped = d,
       })
   }
 

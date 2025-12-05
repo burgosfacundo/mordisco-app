@@ -59,7 +59,7 @@ export class DetallePedidoPage implements OnInit {
       this.router.navigate(['/restaurante/pedidos']);
       return;
     }
-
+    console.log("Lo estoy printeando aca: ", Number(id))
     this.pedidoService.getById(Number(id)).subscribe({
       next: (data) => {
         this.pedido = data;
@@ -127,6 +127,44 @@ export class DetallePedidoPage implements OnInit {
     });
   }
 
+  marcarListoParaEntregar(): void {
+    this.confirmationService.confirm({
+      title: 'Cambiar Estado',
+      message: '¿Marcar este pedido como "Listo para entregar"?',
+      confirmText: 'Sí, marcar',
+      cancelText: 'Cancelar',
+      type: 'warning'
+    }).subscribe(confirmed => {
+      if (!confirmed || !this.pedido?.id) return;
+
+      this.pedidoService.changeState(this.pedido.id, EstadoPedido.LISTO_PARA_ENTREGAR).subscribe({
+        next: () => {
+          this.toastService.success('✅ Pedido marcado como "Listo para entregar"');
+          this.loadPedido();
+        }
+      });
+    });
+  }
+
+  marcarListoParaRetirar(): void {
+    this.confirmationService.confirm({
+      title: 'Cambiar Estado',
+      message: '¿Marcar este pedido como "Listo para retirar"?',
+      confirmText: 'Sí, marcar',
+      cancelText: 'Cancelar',
+      type: 'warning'
+    }).subscribe(confirmed => {
+      if (!confirmed || !this.pedido?.id) return;
+
+      this.pedidoService.changeState(this.pedido.id, EstadoPedido.LISTO_PARA_RETIRAR).subscribe({
+        next: () => {
+          this.toastService.success('✅ Pedido marcado como "Listo para retirar"');
+          this.loadPedido();
+        }
+      });
+    });
+  }  
+
   marcarEnCamino(): void {
     this.confirmationService.confirm({
       title: 'Cambiar Estado',
@@ -145,8 +183,16 @@ export class DetallePedidoPage implements OnInit {
       });
     });
   }
+
   volver(): void {
-    this.router.navigate(['/cliente/pedidos']);
+    if(this.isUsuario === 'ROLE_CLIENTE')
+      this.router.navigate(['/cliente/pedidos']);
+    else if(this.isUsuario === 'ROLE_RESTAURANTE')
+      this.router.navigate(['/restaurante/pedidos']);
+    else if(this.isUsuario === 'ROLE_REPARTIDOR')
+      this.router.navigate(['/']);
+    else 
+      this.router.navigate(['/admin/pedidos']);
   }
 
     /**

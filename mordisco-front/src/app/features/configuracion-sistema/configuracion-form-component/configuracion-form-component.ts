@@ -33,7 +33,7 @@ export class ConfiguracionFormComponent implements OnInit{
 
   private initializeForm(): void {
     this.configForm = this.fb.group({
-      comisionPlataforma: ['', [Validators.required, Validators.maxLength(2), Validators.pattern(/^[0-9]+$/)]],
+      porcentajeGananciasRestaurante: ['', [Validators.required, Validators.maxLength(2), Validators.pattern(/^[0-9]+$/)]],
       radioMaximoEntrega: ['', [Validators.required, Validators.maxLength(5),  Validators.pattern(/^[0-9]+$/)]],
       tiempoMaximoEntrega: ['', [Validators.required, Validators.maxLength(5),  Validators.pattern(/^[0-9]+$/)]],
       costoBaseDelivery:  ['', [Validators.required, Validators.maxLength(10),  Validators.pattern(/^[0-9]+$/)]],
@@ -50,7 +50,7 @@ export class ConfiguracionFormComponent implements OnInit{
     this.csService.getConfiguracion().subscribe({
       next:(data)=> {
         this.configForm.patchValue({
-          comisionPlataforma: data.comisionPlataforma,
+          porcentajeGananciasRestaurante: data.porcentajeGananciasRestaurante,
           radioMaximoEntrega: data.radioMaximoEntrega,
           tiempoMaximoEntrega: data.tiempoMaximoEntrega,
           costoBaseDelivery: data.costoBaseDelivery,

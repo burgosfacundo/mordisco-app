@@ -82,7 +82,6 @@ export class MisPedidosClientePage implements OnInit {
       this.router.navigate(['/login'])
       return
     }
-
     this.isLoading.set(true)
 
     if (this.estadoActual === 'TODOS') {

@@ -79,6 +79,7 @@
         </div>
         
         <!-- Botón ir al carrito (visible en desktop) -->
+      @if(!adminMode){   
         @if (carritoService.tieneItems()) {
           <button 
             (click)="irAlCarrito()"
@@ -88,6 +89,7 @@
             Ver Carrito ({{ carritoService.cantidadTotal() }})
           </button>
         }
+      }  
       </div>
 
       <!-- Grid de Productos -->
@@ -95,6 +97,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           @for (producto of productos(); track producto.id) {
             <app-producto-card-with-add
+              [adminMode] = "adminMode"
               [producto]="producto"
               [enCarrito]="carritoService.contieneProducto(producto.id)"
               [cantidad]="carritoService.obtenerCantidad(producto.id)"
@@ -111,22 +114,24 @@
         </div>
       }
     </div>
-
+    
     <!-- Botón flotante de carrito (mobile) -->
-    @if (carritoService.tieneItems()) {
-      <div class="md:hidden fixed bottom-6 right-6 z-40">
-        <button 
-          (click)="irAlCarrito()"
-          class="relative w-16 h-16 bg-primary-600 hover:bg-primary-700 
-                 text-white rounded-full shadow-2xl transition-all duration-200
-                 flex items-center justify-center">
-          <mat-icon>shopping_cart</mat-icon>
-          <span class="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white 
-                       rounded-full flex items-center justify-center text-sm font-bold">
-            {{ carritoService.cantidadTotal() }}
-          </span>
-        </button>
-      </div>
+    @if(!adminMode){
+      @if (carritoService.tieneItems()) {
+        <div class="md:hidden fixed bottom-6 right-6 z-40">
+          <button 
+            (click)="irAlCarrito()"
+            class="relative w-16 h-16 bg-primary-600 hover:bg-primary-700 
+                  text-white rounded-full shadow-2xl transition-all duration-200
+                  flex items-center justify-center">
+            <mat-icon>shopping_cart</mat-icon>
+            <span class="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white 
+                        rounded-full flex items-center justify-center text-sm font-bold">
+              {{ carritoService.cantidadTotal() }}
+            </span>
+          </button>
+        </div>
+      }
     }
   }
 </div>

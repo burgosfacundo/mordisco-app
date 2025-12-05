@@ -1,6 +1,6 @@
 export default interface ConfiguracionSistemaResponseDTO{
         id : number,
-        comisionPlataforma : number,
+        porcentajeGananciasRestaurante : number,
         radioMaximoEntrega : number,
         tiempoMaximoEntrega : number,
         costoBaseDelivery : number,

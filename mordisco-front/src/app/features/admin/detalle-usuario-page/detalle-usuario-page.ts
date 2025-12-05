@@ -69,13 +69,14 @@ export class DetalleUsuarioPage {
         this.isLoading = false
         if(this.user.id){
           this.setFlag();
-          this.cargarCalificacionesPedidos(this.rol!);
-          this.cargarCalificacionesRepartidor(this.rol!);
           if(this.rol === 'ROLE_RESTAURANTE'){
-            this.buscarRestaurante()}
+              this.buscarRestaurante()
+          }else{
+            this.cargarCalificacionesPedidos(this.rol!);
+            this.cargarCalificacionesRepartidor(this.rol!);
+          }  
         }
-      },
-      error: () => {
+      }, error: () => {
         this.isLoading = false;
         this.router.navigate(['/']);
       }
@@ -140,8 +141,9 @@ export class DetalleUsuarioPage {
 
   buscarRestaurante(){
     if(!this.user?.id) return
-    this.rService.getByUsuario(this.user?.id).subscribe({
-      next:(r)=> {this.restaurante= r
+    this.rService.getByUsuario(this.user.id).subscribe({
+      next:(r)=> {
+        this.restaurante= r
         this.cargarCalificacionesPedidos(this.rol!);
       }})
   }

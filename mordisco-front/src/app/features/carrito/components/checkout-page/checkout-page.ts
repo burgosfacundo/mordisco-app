@@ -99,8 +99,8 @@ export class CheckoutPage implements OnInit {
     }
 
     // Cargar monto mínimo del pedido
-    this.configuracionService.getMontoMinimo().subscribe({
-      next: (monto) => this.montoMinimoPedido.set(monto),
+    this.configuracionService.getConfiguracionGeneral().subscribe({
+      next: (cg) => this.montoMinimoPedido.set(cg.montoMinimoPedido),
       error: () => this.montoMinimoPedido.set(0)
     });
 

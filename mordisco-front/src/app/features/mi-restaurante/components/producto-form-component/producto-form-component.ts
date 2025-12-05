@@ -10,6 +10,9 @@ import { FormValidationService } from '../../../../shared/services/form-validati
 import { ToastService } from '../../../../core/services/toast-service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
+import { ConfiguracionSistemaService } from '../../../../shared/services/configuracionSistema/configuracion-sistema-service';
+import ConfiguracionSistemaResponseDTO from '../../../../shared/models/configuracion/configuracion-sistema-response-dto';
+import ConfiguracionSistemaGeneralResponseDTO from '../../../../shared/models/configuracion/configuracion-sistema-general-response-DTO';
 
 @Component({
   selector: 'app-producto-form-component',
@@ -22,6 +25,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private productoService = inject(ProductoService);
   private formValidationService = inject(FormValidationService);
+  private configService = inject(ConfiguracionSistemaService)
   private fb = inject(FormBuilder);
   private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
@@ -31,12 +35,14 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
   private menuId?: number;
   private productoId?: number;
   private imagenId?: number;
+  configuracionActual? : ConfiguracionSistemaGeneralResponseDTO
   protected isLoading = false;
   protected isSubmitting = false;
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadRouteData();
+    this.obtenerConfigSistema();
   }
 
   ngOnDestroy(): void {
@@ -211,5 +217,11 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
     } else {
       this.router.navigate(['/restaurante/menu']);
     }
+  }
+
+  obtenerConfigSistema(){
+    this.configService.getConfiguracionGeneral().subscribe({
+      next: (c) => this.configuracionActual = c
+    })
   }
 }

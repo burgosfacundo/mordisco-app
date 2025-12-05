@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.model.dto.configuracion.ConfiguracionSistemaGeneralResponseDTO;
 import utn.back.mordiscoapi.model.dto.configuracion.ConfiguracionSistemaRequestDTO;
 import utn.back.mordiscoapi.model.dto.configuracion.ConfiguracionSistemaResponseDTO;
 import utn.back.mordiscoapi.model.entity.Usuario;
@@ -44,6 +45,24 @@ public class ConfiguracionSistemaController {
     @GetMapping
     public ResponseEntity<ConfiguracionSistemaResponseDTO> getConfiguracion() {
         return ResponseEntity.ok(configuracionService.getConfiguracionActual());
+    }
+
+    /**
+     * Obtiene la configuración actual del sistema para todos los usuarios
+     */
+    @Operation(
+            summary = "Obtener configuración del sistema para todos los usuarios",
+            description = "Retorna la configuración global actual del sistema Mordisco. "
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Configuración obtenida exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('REPARTIDOR') or hasRole('RESTAURANTE')")
+    @GetMapping("/general")
+    public ResponseEntity<ConfiguracionSistemaGeneralResponseDTO> getConfiguracionGeneral() {
+        return ResponseEntity.ok(configuracionService.getConfiguracionGeneralActual());
     }
 
     /**
@@ -106,20 +125,7 @@ public class ConfiguracionSistemaController {
         return ResponseEntity.ok(costo);
     }
 
-    /**
-     * Obtiene el monto mínimo de pedido
-     */
-    @Operation(
-            summary = "Obtener monto mínimo de pedido",
-            description = "Retorna el monto mínimo configurado para realizar un pedido"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Monto obtenido exitosamente")
-    })
-    @GetMapping("/monto-minimo")
-    public ResponseEntity<BigDecimal> getMontoMinimo() {
-        return ResponseEntity.ok(configuracionService.getMontoMinimoPedido());
-    }
+
 
     /**
      * Verifica si el sistema está en mantenimiento

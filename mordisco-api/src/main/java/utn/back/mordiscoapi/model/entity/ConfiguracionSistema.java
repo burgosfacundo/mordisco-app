@@ -19,7 +19,7 @@ public class ConfiguracionSistema {
     private Long id;
 
     @Column(nullable = false)
-    private BigDecimal comisionPlataforma;
+    private BigDecimal porcentajeGananciasRestaurante;
 
     @Column(nullable = false)
     private BigDecimal radioMaximoEntrega;
@@ -61,8 +61,8 @@ public class ConfiguracionSistema {
     protected void onCreate() {
         this.fechaActualizacion = LocalDateTime.now();
 
-        if (this.comisionPlataforma == null) {
-            this.comisionPlataforma = BigDecimal.valueOf(15.0); // 15%
+        if (this.porcentajeGananciasRestaurante == null) {
+            this.porcentajeGananciasRestaurante = BigDecimal.valueOf(15.0); // 15%
         }
         if (this.radioMaximoEntrega == null) {
             this.radioMaximoEntrega = BigDecimal.valueOf(10.0); // 10 km
@@ -123,7 +123,8 @@ public class ConfiguracionSistema {
      * @return Comisión de la plataforma
      */
     public BigDecimal calcularComisionPlataforma(BigDecimal totalPedido) {
-        return totalPedido.multiply(this.comisionPlataforma)
+        BigDecimal comisionPlataforma = new BigDecimal("100.00").subtract(porcentajeGananciasRestaurante);
+        return totalPedido.multiply(comisionPlataforma)
                 .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
     }
 }

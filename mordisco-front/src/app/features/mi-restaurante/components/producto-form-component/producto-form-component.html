@@ -106,6 +106,13 @@
             @if (getError('precioUnitario')) {
               <p class="form-error">{{ getError('precioUnitario') }}</p>
             }
+            <div class="mt-2 p-3.5 bg-blue-50 border border-blue-200 rounded-lg">
+              <div class="flex items-start gap-3">
+                <div class="text-xs text-blue-900">
+                  Recordá que Mordisco retendrá el {{100 - configuracionActual?.porcentajeGananciasRestaurante!}}% del precio de este producto.
+                </div>
+              </div>
+            </div>
           </fieldset>
 
           <!-- Disponibilidad -->
@@ -135,6 +142,7 @@
               </div>
             </label>
           </fieldset>
+
         </div>
 
         <!-- URL de Imagen -->

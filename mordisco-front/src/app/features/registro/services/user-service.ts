@@ -60,8 +60,6 @@ export class UserService {
   }
 
   darDeBaja(dto : BajaLogisticaDTO, idUsuario : number){
-    console.log("ID:", idUsuario)
-    console.log("dto:", dto)
     return this.http.post<void>(`${environment.apiUrl}/usuarios/${idUsuario}/baja`, dto)
   }
 

@@ -4,18 +4,18 @@
     class="form-container"
 >
     <fieldset class="form-field">
-        <label for="comisionPlataformaID" class="form-label">Comision para la plataforma</label>
+        <label for="porcentajeGananciasRestauranteID" class="form-label">Porcentaje de ganancia para el restaurante</label>
         <input 
             type="text" 
-            id="comisionPlataformaID" 
-            placeholder="Ingresa comision de la plataforma"
-            formControlName="comisionPlataforma" 
+            id="porcentajeGananciasRestauranteID" 
+            placeholder="Ingresa ganancia para el restaurante"
+            formControlName="porcentajeGananciasRestaurante" 
             class="form-input"
             [class.border-red-500]="getError"
             [class.focus:ring-red-500]="getError"
         >
-        @if (getError('comisionPlataforma')) {
-            <p class="form-error">{{ getError('comisionPlataforma') }}</p>
+        @if (getError('porcentajeGananciasRestaurante')) {
+            <p class="form-error">{{ getError('porcentajeGananciasRestaurante') }}</p>
         }
     </fieldset>
     <fieldset class="form-field">

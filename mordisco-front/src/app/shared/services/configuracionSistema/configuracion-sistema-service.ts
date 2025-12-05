@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import ConfiguracionSistemaResponseDTO from '../../models/configuracion/configuracion-sistema-response-dto';
 import { environment } from '../../../../environments/environment';
 import ConfiguracionSistemaRequestDTO from '../../models/configuracion/configuracion-sistema-request-dto';
+import ConfiguracionSistemaGeneralResponseDTO from '../../models/configuracion/configuracion-sistema-general-response-DTO';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,10 @@ export class ConfiguracionSistemaService {
   getConfiguracion() {
     return this.http.get<ConfiguracionSistemaResponseDTO>(`${environment.apiUrl}/configuraciones`)
   }
+
+  getConfiguracionGeneral() {
+    return this.http.get<ConfiguracionSistemaGeneralResponseDTO>(`${environment.apiUrl}/configuraciones/general`)
+  }
  
   actualizarConfiguracion(config : ConfiguracionSistemaRequestDTO){
     return this.http.put<ConfiguracionSistemaResponseDTO>(`${environment.apiUrl}/configuraciones`,config)
@@ -22,10 +27,6 @@ export class ConfiguracionSistemaService {
   calcularCostoDelivery(distanciaKM : number){
     const params = new HttpParams().set('distanciaKm', distanciaKM)
     return this.http.get<number>(`${environment.apiUrl}/configuraciones/calcular-delivery`, {params})
-  }
-
-  getMontoMinimo(){
-    return this.http.get<number>(`${environment.apiUrl}/configuraciones/monto-minimo`)
   }
 
   isEnMantenimiento(){

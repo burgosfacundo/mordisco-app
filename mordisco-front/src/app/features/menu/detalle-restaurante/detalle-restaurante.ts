@@ -37,9 +37,11 @@ export class RestauranteDetallePage implements OnInit {
   menu = signal<MenuResponse | null>(null);
   productos = signal<ProductoResponse[]>([]);
   isLoading = signal(true);
+  adminMode = false
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+    this.adminMode = this.router.url.includes('/admin/restaurante/');
     
     if (!id) {
       this.toastService.success('ID de restaurante inválido');

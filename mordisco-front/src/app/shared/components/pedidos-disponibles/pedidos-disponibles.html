@@ -198,7 +198,7 @@
             <p class="text-xs text-gray-600 font-semibold">Ganarás</p>
             @if (pedido.costoDelivery) {
             <p class="text-lg font-bold text-green-700">
-              ${{ (pedido.costoDelivery * 0.8) | number:'1.2-2' }}
+              ${{ (pedido.costoDelivery * (configuracionGeneral?.porcentajeGananciasRepartidor! * 0.01)) | number:'1.2-2' }}
             </p>
             } @else {
             <p class="text-xs text-gray-400">N/D</p>

@@ -13,7 +13,6 @@ export class UsuarioCardComponent {
   private router = inject(Router)
 
   getInitials(): string {
-    console.log(this.usuario())
     const first = this.usuario()?.nombre.charAt(0) || '';
     const last = this.usuario()?.apellido.charAt(0) || '';
     return (first + last).toUpperCase() || 'U';

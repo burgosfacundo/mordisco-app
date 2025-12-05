@@ -43,9 +43,7 @@ export class UsuariosPage {
 
   loadUsuarios(): void {
     this.usuarioService.getAll(this.pageUsuarios,this.sizeUsuarios).subscribe({
-      next: (data) => {
-        console.log(data.content);
-        
+      next: (data) => {        
         this.usuarios = data.content;
         this.lengthUsuarios = data.totalElements
         this.isLoadingUsuarios = false;

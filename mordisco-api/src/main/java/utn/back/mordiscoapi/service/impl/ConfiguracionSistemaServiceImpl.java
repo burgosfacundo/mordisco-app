@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.ConfiguracionSistemaMapper;
+import utn.back.mordiscoapi.model.dto.configuracion.ConfiguracionSistemaGeneralResponseDTO;
 import utn.back.mordiscoapi.model.dto.configuracion.ConfiguracionSistemaRequestDTO;
 import utn.back.mordiscoapi.model.dto.configuracion.ConfiguracionSistemaResponseDTO;
 import utn.back.mordiscoapi.model.entity.ConfiguracionSistema;
@@ -35,6 +36,18 @@ public class ConfiguracionSistemaServiceImpl implements IConfiguracionSistemaSer
                 .orElseGet(this::crearConfiguracionPorDefecto);
 
         return ConfiguracionSistemaMapper.toDTO(config);
+    }
+
+    /**
+     * Obtiene la configuración actual del sistema para todos los usuarios que no sean admin
+     * Si no existe, crea una con valores por defecto
+     */
+    @Override
+    public ConfiguracionSistemaGeneralResponseDTO getConfiguracionGeneralActual() {
+        ConfiguracionSistema config = configuracionRepository.findConfiguracionActual()
+                .orElseGet(this::crearConfiguracionPorDefecto);
+
+        return ConfiguracionSistemaMapper.toGeneralDTO(config);
     }
 
     /**
@@ -80,27 +93,6 @@ public class ConfiguracionSistemaServiceImpl implements IConfiguracionSistemaSer
         return config.calcularCostoDelivery(distanciaKm);
     }
 
-    /**
-     * Obtiene el monto mínimo de pedido configurado
-     */
-    @Override
-    public BigDecimal getMontoMinimoPedido() {
-        ConfiguracionSistema config = configuracionRepository.findConfiguracionActual()
-                .orElseGet(this::crearConfiguracionPorDefecto);
-
-        return config.getMontoMinimoPedido();
-    }
-
-    /**
-     * Obtiene el radio máximo de entrega configurado
-     */
-    @Override
-    public BigDecimal getRadioMaximoEntrega() {
-        ConfiguracionSistema config = configuracionRepository.findConfiguracionActual()
-                .orElseGet(this::crearConfiguracionPorDefecto);
-
-        return config.getRadioMaximoEntrega();
-    }
 
     /**
      * Verifica si el sistema está en modo mantenimiento
@@ -142,12 +134,12 @@ public class ConfiguracionSistemaServiceImpl implements IConfiguracionSistemaSer
         log.warn("⚠️ No existe configuración del sistema. Creando valores por defecto...");
 
         ConfiguracionSistema config = ConfiguracionSistema.builder()
-                .comisionPlataforma(BigDecimal.valueOf(15.0))
+                .porcentajeGananciasRestaurante(BigDecimal.valueOf(80.0))
                 .radioMaximoEntrega(BigDecimal.valueOf(10.0))
-                .tiempoMaximoEntrega(45)
-                .costoBaseDelivery(BigDecimal.valueOf(200.0))
-                .costoPorKilometro(BigDecimal.valueOf(50.0))
-                .montoMinimoPedido(BigDecimal.valueOf(500.0))
+                .tiempoMaximoEntrega(60)
+                .costoBaseDelivery(BigDecimal.valueOf(2500.00))
+                .costoPorKilometro(BigDecimal.valueOf(100.00))
+                .montoMinimoPedido(BigDecimal.valueOf(1000.0))
                 .porcentajeGananciasRepartidor(BigDecimal.valueOf(80.0))
                 .modoMantenimiento(false)
                 .fechaActualizacion(LocalDateTime.now())

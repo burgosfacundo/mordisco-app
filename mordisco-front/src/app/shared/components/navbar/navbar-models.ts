@@ -1,9 +1,11 @@
 export interface NavbarMenuItem {
-  label: string;
-  icon: string;
+  label?: string;
+  icon?: string;
   route?: string;
   action?: () => void;
   children?: NavbarMenuItem[];
+  type?: 'button' | 'info'; 
+  content?: string; 
 }
 
 export interface NavbarConfig {

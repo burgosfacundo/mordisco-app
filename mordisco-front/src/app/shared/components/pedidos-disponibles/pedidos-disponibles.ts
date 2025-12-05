@@ -7,6 +7,8 @@ import { GeolocationService } from '../../services/geolocation/geolocation-servi
 import { Ubicacion } from '../../models/ubicacion/ubicacion.model';
 import { ConfirmationService } from '../../../core/services/confirmation-service';
 import { ToastService } from '../../../core/services/toast-service';
+import { ConfiguracionSistemaService } from '../../services/configuracionSistema/configuracion-sistema-service';
+import ConfiguracionSistemaGeneralResponseDTO from '../../models/configuracion/configuracion-sistema-general-response-DTO';
 
 interface PedidoConDistancia extends PedidoResponse {
   distanciaKm?: number;
@@ -24,13 +26,13 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
   private geolocationService = inject(GeolocationService);
   private toastService = inject(ToastService);
   private confirmationService = inject(ConfirmationService);
-
+  private configService = inject(ConfiguracionSistemaService)
   pedidosDisponibles = signal<PedidoConDistancia[]>([]);
   isLoading = signal<boolean>(true);
   lastUpdate = signal<Date>(new Date());
   ubicacionActual = signal<Ubicacion | null>(null);
   errorUbicacion = signal<string | null>(null);
-  
+  configuracionGeneral? : ConfiguracionSistemaGeneralResponseDTO
   private refreshSubscription?: Subscription;
 
   @Output() pedidoAceptado = new EventEmitter<number>();
@@ -91,6 +93,7 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
         next: (response) => {
           const pedidosConDistancia = this.calcularDistancias(response.content, ubicacion);
           this.pedidosDisponibles.set(pedidosConDistancia);
+          this.obtenerConfiguracionSistema();
           this.lastUpdate.set(new Date());
           this.isLoading.set(false);
         }
@@ -245,5 +248,11 @@ export class PedidosDisponiblesComponent implements OnInit, OnDestroy {
     if (diff < 60) return `Hace ${diff}s`;
     const minutos = Math.floor(diff / 60);
     return `Hace ${minutos}m`;
+  }
+
+  obtenerConfiguracionSistema(){
+    this.configService.getConfiguracionGeneral().subscribe({
+      next: (c)=> this.configuracionGeneral = c
+     })
   }
 }

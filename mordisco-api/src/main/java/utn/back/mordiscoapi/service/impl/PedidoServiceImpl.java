@@ -78,7 +78,7 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setTotal(total);
 
         // Validar monto mínimo del pedido
-        BigDecimal montoMinimo = configuracionService.getMontoMinimoPedido();
+        BigDecimal montoMinimo = configuracionService.getConfiguracionGeneralActual().montoMinimoPedido();
         if (total.compareTo(montoMinimo) < 0) {
             throw new BadRequestException(
                     String.format("El monto mínimo del pedido es $%.2f. Tu pedido es de $%.2f",
@@ -515,7 +515,7 @@ public class PedidoServiceImpl implements IPedidoService {
             );
 
             // Obtener radio máximo de entrega desde configuración
-            BigDecimal radioMaximo = configuracionService.getRadioMaximoEntrega();
+            BigDecimal radioMaximo = configuracionService.getConfiguracionGeneralActual().radioMaximoEntrega();
 
             // Validar que la distancia no exceda el radio máximo
             if (distanciaKm.compareTo(radioMaximo) > 0) {
@@ -639,7 +639,7 @@ public class PedidoServiceImpl implements IPedidoService {
         Pageable pageable = PageRequest.of(page, size);
 
         // Obtener radio máximo de entrega desde configuración
-        BigDecimal radioMaximo = configuracionService.getRadioMaximoEntrega();
+        BigDecimal radioMaximo = configuracionService.getConfiguracionGeneralActual().radioMaximoEntrega();
 
         // Query para pedidos EN_CAMINO sin repartidor asignado, cerca de la ubicación
         return pedidoRepository.findPedidosDisponiblesParaRepartidor(

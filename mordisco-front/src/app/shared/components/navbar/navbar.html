@@ -84,23 +84,33 @@
         </div>
 
         <!-- Menu Items -->
-        @for (item of config().profileMenuItems; track item.label) {
-          @if (item.label === 'Cerrar Sesión') {
-            <mat-divider></mat-divider>
+        @for (item of config().profileMenuItems; track item.label || $index) {
+          @if (item.type === 'info') {
+            <!-- Elemento de información (no clickeable) -->
+            <div class="px-4 py-3  bg-#E4DBDF" (click)="$event.stopPropagation()">
+              <div class="flex items-start gap-2 text-xs text-gray-600">
+                <mat-icon class="text-blue-500 !text-base mt-0.5">help_outline</mat-icon>
+                <p class="leading-relaxed text-xs" [innerHTML]="item.content"></p>
+              </div>
+            </div>
+          } @else {
+            @if (item.label === 'Cerrar Sesión') {
+              <mat-divider></mat-divider>
+            }
+            
+            <button 
+              mat-menu-item 
+              (click)="onMenuItemClick(item)"
+              [class.text-red-600]="item.action === logout">
+              <mat-icon [class.text-red-600]="item.action === logout">
+                {{ item.icon }}
+              </mat-icon>
+              <span>{{ item.label }}</span>
+            </button>
           }
-          
-          <button 
-            mat-menu-item 
-            (click)="onMenuItemClick(item)"
-            [class.text-red-600]="item.action === logout">
-            <mat-icon [class.text-red-600]="item.action === logout">
-              {{ item.icon }}
-            </mat-icon>
-            <span>{{ item.label }}</span>
-          </button>
         }
       </mat-menu>
-    }
+          }
 
     <!-- Botón Login -->
     @if (config().showLoginButton) {

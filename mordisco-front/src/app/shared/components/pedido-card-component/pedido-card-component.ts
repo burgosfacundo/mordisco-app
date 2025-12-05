@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import PedidoResponse from '../../models/pedido/pedido-response';
 import { 
@@ -9,6 +9,8 @@ import {
   getSiguienteEstado
 } from '../../models/enums/estado-pedido';
 import { TipoEntrega } from '../../models/enums/tipo-entrega';
+import { ConfiguracionSistemaService } from '../../services/configuracionSistema/configuracion-sistema-service';
+import ConfiguracionSistemaGeneralResponseDTO from '../../models/configuracion/configuracion-sistema-general-response-DTO';
 
 @Component({
   selector: 'app-pedido-card-component',
@@ -16,7 +18,11 @@ import { TipoEntrega } from '../../models/enums/tipo-entrega';
   imports: [CommonModule],
   templateUrl: './pedido-card-component.html'
 })
-export class PedidoCardComponent {
+export class PedidoCardComponent implements OnInit{
+
+  private configService = inject(ConfiguracionSistemaService)
+
+
   pedido = input<PedidoResponse>();
   isUsuario = input<string>();
   
@@ -27,9 +33,22 @@ export class PedidoCardComponent {
   verDetalles = output<number>();
   cancelar = output<number>()
   deshacerCancelacion = output<number>()
-
+  configSistema? : ConfiguracionSistemaGeneralResponseDTO
   EstadoPedido = EstadoPedido;
   TipoEntrega = TipoEntrega;
+
+  ngOnInit(): void {
+    this.obtenerConfiguraciones()
+  }
+
+  obtenerConfiguraciones(){
+    if(this.pedido()){
+      this.configService.getConfiguracionGeneral().subscribe({
+        next: (cs) => this.configSistema = cs,
+        error: (e) => console.log("Error al cargar las configuraciones", e)
+      })
+    }
+  }
 
   getEstadoBadgeClass(): string {
     const estado = this.pedido()?.estado as EstadoPedido;

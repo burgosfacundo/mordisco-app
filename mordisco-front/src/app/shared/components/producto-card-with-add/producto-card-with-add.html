@@ -72,16 +72,17 @@
             </p>
           }
         </div>
-        
-        <button 
-          (click)="onAgregar()"
-          [disabled]="!producto()!.disponible"
-          class="w-12 h-12 rounded-full bg-primary-600 hover:bg-primary-700
-                 disabled:bg-gray-300 disabled:cursor-not-allowed
-                 text-white flex items-center justify-center
-                 transition-all duration-200 hover:scale-110 active:scale-95">
-          <mat-icon>{{ enCarrito() ? 'add' : 'add_shopping_cart' }}</mat-icon>
-        </button>
+        @if(!adminMode()){
+          <button 
+            (click)="onAgregar()"
+            [disabled]="!producto()!.disponible"
+            class="w-12 h-12 rounded-full bg-primary-600 hover:bg-primary-700
+                  disabled:bg-gray-300 disabled:cursor-not-allowed
+                  text-white flex items-center justify-center
+                  transition-all duration-200 hover:scale-110 active:scale-95">
+            <mat-icon>{{ enCarrito() ? 'add' : 'add_shopping_cart' }}</mat-icon>
+          </button>
+        }
       </div>
     </div>
   </div>

@@ -1,5 +1,6 @@
 package utn.back.mordiscoapi.mapper;
 
+import utn.back.mordiscoapi.model.dto.configuracion.ConfiguracionSistemaGeneralResponseDTO;
 import utn.back.mordiscoapi.model.dto.configuracion.ConfiguracionSistemaRequestDTO;
 import utn.back.mordiscoapi.model.dto.configuracion.ConfiguracionSistemaResponseDTO;
 import utn.back.mordiscoapi.model.entity.ConfiguracionSistema;
@@ -11,7 +12,7 @@ public class ConfiguracionSistemaMapper {
 
         return new ConfiguracionSistemaResponseDTO(
                 entity.getId(),
-                entity.getComisionPlataforma(),
+                entity.getPorcentajeGananciasRestaurante(),
                 entity.getRadioMaximoEntrega(),
                 entity.getTiempoMaximoEntrega(),
                 entity.getCostoBaseDelivery(),
@@ -30,7 +31,7 @@ public class ConfiguracionSistemaMapper {
     public static void applyUpdate(ConfiguracionSistemaRequestDTO dto, ConfiguracionSistema entity) {
         if (dto == null || entity == null) return;
 
-        entity.setComisionPlataforma(dto.comisionPlataforma());
+        entity.setPorcentajeGananciasRestaurante(dto.comisionPlataforma());
         entity.setRadioMaximoEntrega(dto.radioMaximoEntrega());
         entity.setTiempoMaximoEntrega(dto.tiempoMaximoEntrega());
         entity.setCostoBaseDelivery(dto.costoBaseDelivery());
@@ -39,5 +40,19 @@ public class ConfiguracionSistemaMapper {
         entity.setPorcentajeGananciasRepartidor(dto.porcentajeGananciasRepartidor());
         entity.setModoMantenimiento(dto.modoMantenimiento());
         entity.setMensajeMantenimiento(dto.mensajeMantenimiento());
+    }
+
+    public static ConfiguracionSistemaGeneralResponseDTO toGeneralDTO(ConfiguracionSistema entity) {
+        if (entity == null) return null;
+
+        return new ConfiguracionSistemaGeneralResponseDTO(
+                entity.getPorcentajeGananciasRestaurante(),
+                entity.getRadioMaximoEntrega(),
+                entity.getTiempoMaximoEntrega(),
+                entity.getCostoBaseDelivery(),
+                entity.getCostoPorKilometro(),
+                entity.getMontoMinimoPedido(),
+                entity.getPorcentajeGananciasRepartidor()
+        );
     }
 }
