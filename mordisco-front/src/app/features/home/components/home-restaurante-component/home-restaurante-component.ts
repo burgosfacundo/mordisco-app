@@ -140,5 +140,7 @@ export class HomeRestauranteComponent implements OnInit {
     this.loadRestauranteData();
   }
 
-
+  verDetalles(pedidoId: number): void {
+    this.router.navigate(['/restaurante/pedidos/detalle', pedidoId]);
+  }
 }

@@ -37,15 +37,33 @@ export class CarritoService {
   
   tieneItems = computed(() => this._items().length > 0)
   
-  resumen = computed((): CarritoResumen => ({
-    items: this._items(),
-    subtotal: this.subtotal(),
-    costoEnvio: 0,
-    total: this.total(),
-    cantidadItems: this.cantidadTotal(),
-    restauranteId: this.restauranteActual()?.id ?? null,
-    restauranteNombre: this.restauranteActual()?.nombre ?? null
-  }))
+  resumen = computed((): CarritoResumen => {
+    const items = this._items();
+    const subtotal = this.subtotal();
+    
+    // Calcular descuentos totales
+    const descuentoTotal = items.reduce((sum, item) => {
+      if (item.precioConDescuento && item.precioConDescuento < item.precio) {
+        const descuentoPorUnidad = item.precio - item.precioConDescuento;
+        return sum + (descuentoPorUnidad * item.cantidad);
+      }
+      return sum;
+    }, 0);
+    
+    const subtotalConDescuento = subtotal - descuentoTotal;
+    
+    return {
+      items: items,
+      subtotal: subtotal,
+      descuentoTotal: descuentoTotal,
+      subtotalConDescuento: subtotalConDescuento,
+      costoEnvio: 0,
+      total: subtotalConDescuento, // Total con descuentos aplicados
+      cantidadItems: this.cantidadTotal(),
+      restauranteId: this.restauranteActual()?.id ?? null,
+      restauranteNombre: this.restauranteActual()?.nombre ?? null
+    };
+  })
 
   constructor() {
     this.cargarDesdeStorage()

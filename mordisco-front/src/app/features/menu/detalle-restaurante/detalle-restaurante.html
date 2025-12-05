@@ -53,13 +53,13 @@
                       {{ star <= (restaurante()!.estrellas || 0) ? 'star' : 'star_border' }}
                     </mat-icon>
                   }
-                  <span class="ml-1 font-semibold">{{ restaurante()!.estrellas || 0 }}/5</span>
+                  <span class="ml-1 font-semibold">{{ calificacionPromedio1Dec() }}/5</span>
                 </div>
                 
                 <!-- Dirección -->
                 <div class="flex items-center gap-2">
                   <mat-icon>location_on</mat-icon>
-                  <span>{{ restaurante()!.direccion.ciudad }}</span>
+                  <span>{{ restaurante()!.direccion.calle }} {{ restaurante()!.direccion.numero }}, {{ restaurante()!.direccion.ciudad }}</span>
                 </div>
               </div>
             </div>

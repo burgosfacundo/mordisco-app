@@ -408,7 +408,7 @@ WHERE
             WHERE p.repartidor_id = :repartidorId
             AND p.estado = 'COMPLETADO'
             AND p.fecha_hora >= DATE_SUB(CURRENT_DATE, INTERVAL 12 WEEK)
-            GROUP BY YEAR(p.fecha_hora), WEEK(p.fecha_hora, 1)
+            GROUP BY CONCAT(YEAR(p.fecha_hora), '-W', LPAD(WEEK(p.fecha_hora, 1), 2, '0'))
             ORDER BY periodo
             """, nativeQuery = true)
     java.util.List<Object[]> findPedidosPorSemanaRepartidor(@Param("repartidorId") Long repartidorId);

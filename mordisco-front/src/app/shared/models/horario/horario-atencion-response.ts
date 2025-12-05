@@ -3,4 +3,5 @@ export default interface HorarioAtencionResponse{
     dia: string
     horaApertura : string
     horaCierre : string
+    cruzaMedianoche: boolean;
 }

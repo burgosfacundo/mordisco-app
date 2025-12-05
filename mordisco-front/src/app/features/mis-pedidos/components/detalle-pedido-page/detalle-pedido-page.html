@@ -31,7 +31,34 @@
         <div class="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
           <div class="space-y-2">
             <p class="text-blue-600 text-sm font-semibold uppercase tracking-wide">Estado</p>
-            <p class="text-2xl font-bold text-blue-900">{{ pedido.estado }}</p>
+            <p class="text-2xl font-bold text-blue-900">
+               @switch (pedido.estado) {
+                  @case (estadoPedidoEnum.PENDIENTE) {
+                    Pendiente
+                  }
+                  @case (estadoPedidoEnum.COMPLETADO) {
+                    Completado
+                  }
+                  @case (estadoPedidoEnum.EN_CAMINO) {
+                    En camino
+                  }
+                  @case (estadoPedidoEnum.EN_PREPARACION) {
+                    En preparación
+                  }
+                  @case (estadoPedidoEnum.LISTO_PARA_ENTREGAR) {
+                    Listo para entregar
+                  }
+                  @case (estadoPedidoEnum.LISTO_PARA_RETIRAR) {
+                    Listo para retirar
+                  }
+                  @case (estadoPedidoEnum.CANCELADO) {
+                    Cancelado
+                  }
+                  @default {
+                    Tipo no válido
+                  }
+                }
+            </p>
           </div>
         </div>
         @if(isUsuario !== 'ROLE_REPARTIDOR'){
@@ -39,7 +66,19 @@
           <div class="bg-linear-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
             <div class="space-y-2">
               <p class="text-orange-600 text-sm font-semibold uppercase tracking-wide">Tipo de Entrega</p>
-              <p class="text-2xl font-bold text-orange-900">{{ pedido.tipoEntrega }}</p>
+              <p class="text-2xl font-bold text-orange-900">
+                @switch (pedido.tipoEntrega) {
+                  @case (tipoEntregaEnum.DELIVERY) {
+                    🚚 Delivery
+                  }
+                  @case (tipoEntregaEnum.RETIRO_POR_LOCAL) {
+                    🏪 Retiro por local
+                  }
+                  @default {
+                    Tipo no válido
+                  }
+                }
+              </p>
             </div>
           </div>
         }

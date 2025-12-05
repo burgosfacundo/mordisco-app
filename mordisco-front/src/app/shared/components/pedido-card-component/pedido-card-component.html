@@ -185,6 +185,16 @@
                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
           Marcar como {{ getSiguienteEstadoLabel() }}
         </button>
+      } @else if (pedido()?.estado === EstadoPedido.LISTO_PARA_RETIRAR) {
+        <button 
+          (click)="onAvanzarEstado()"
+          class="w-full py-2.5 rounded-lg
+                 bg-green-50 text-green-700 font-semibold text-sm
+                 hover:bg-green-100 active:scale-95
+                 transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+          Marcar como Completado
+        </button>
       } @else if (pedido()?.estado === EstadoPedido.LISTO_PARA_ENTREGAR) {
         <button 
           (click)="onAvanzarEstado()"
@@ -200,7 +210,6 @@
 
     @if( this.isUsuario() === 'ROLE_REPARTIDOR') {
       @if (pedido()?.estado === EstadoPedido.LISTO_PARA_ENTREGAR) {
-        <!-- Para asignarse el pedido -->
         <button 
           class="w-full py-2.5 rounded-lg
                  bg-blue-50 text-blue-700 font-semibold text-sm

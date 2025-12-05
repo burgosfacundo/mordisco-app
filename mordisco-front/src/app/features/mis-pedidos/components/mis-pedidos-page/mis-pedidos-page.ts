@@ -284,5 +284,9 @@ export class MisPedidosPage implements OnInit {
   aplicarFiltros(): void {
     this.pagePedidos = 0;
     this.buscar();
-  }  
+  }
+
+  verDetalles(pedidoId: number): void {
+    this.router.navigate(['/restaurante/pedidos/detalle', pedidoId]);
+  }
 }

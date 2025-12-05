@@ -116,7 +116,7 @@ export const routes: Routes = [
       { path: 'promociones/editar/:id', component: PromocionFormComponent },
       { path: 'pedidos', component: MisPedidosPage },
       { path: 'pedidos/detalle/:id', component: DetallePedidoPage },
-      { path: 'estadisticas/:id', component: EstadisticasRestauranteComponent}
+      { path: 'estadisticas', component: EstadisticasRestauranteComponent}
     ]
   },
 
@@ -151,7 +151,7 @@ export const routes: Routes = [
       { path : 'pedidos/historial', component : EntregasPage},
       { path : 'pedidos/detalle/:id', component: DetallePedidoPage},
       { path : 'calificaciones', component : CalificacionPage},
-      { path: 'estadisticas/:id', component: EstadisticasRepartidorComponent }
+      { path : 'estadisticas', component: EstadisticasRepartidorComponent }
     ]
   },
 

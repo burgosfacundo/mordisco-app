@@ -64,9 +64,9 @@ export class CheckoutPage implements OnInit {
   // Computed para el resumen con envío dinámico
   resumenConEnvio = computed(() => {
     const items = this.items();
-    const subtotal = items.reduce((sum, item) => 
-      sum + (item.precio * item.cantidad), 0
-    );
+    const subtotal = items.reduce((sum, item) => (
+      sum + ((item.precioConDescuento ? item.precioConDescuento : item.precio) * item.cantidad)
+    ), 0);
     
     const costoEnvio = this.cobraEnvio() ? this.costoDeliveryCalculado() : 0;
     const total = subtotal + costoEnvio;
@@ -207,7 +207,7 @@ export class CheckoutPage implements OnInit {
       productos: this.items().map(item => ({
         productoId: item.productoId,
         cantidad: item.cantidad,
-        precioUnitario: item.precio
+        precioUnitario: item.precioConDescuento ? item.precioConDescuento : item.precio
       })),
       comentarios: formValue.comentarios || undefined
     };

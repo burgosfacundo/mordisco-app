@@ -14,6 +14,8 @@ public record HorarioAtencionResponseDTO(
         @Schema(description = "Hora de apertura", example = "08:00")
         LocalTime horaApertura,
         @Schema(description = "Hora de cierre", example = "22:00")
-        LocalTime horaCierre
+        LocalTime horaCierre,
+        @Schema(description = "Indica si el horario cruza la medianoche", example = "false")
+        Boolean cruzaMedianoche
 ) {
 }

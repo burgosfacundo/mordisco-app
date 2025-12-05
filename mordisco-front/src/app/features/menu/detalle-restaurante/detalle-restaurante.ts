@@ -99,6 +99,7 @@ export class RestauranteDetallePage implements OnInit {
         nombre: producto.nombre,
         descripcion: producto.descripcion,
         precio: producto.precio,
+        precioConDescuento: producto.precioConDescuento, // Incluir precio con descuento
         imagen: producto.imagen,
         restauranteId: restaurante.id,
         restauranteNombre: restaurante.razonSocial,
@@ -118,5 +119,10 @@ export class RestauranteDetallePage implements OnInit {
 
   irAlCarrito(): void {
     this.router.navigate(['/cliente/carrito']);
+  }
+
+  calificacionPromedio1Dec(): number {
+    const prom = this.restaurante()?.estrellas;
+    return prom ? Number(prom.toFixed(1)) : 0;
   }
 }

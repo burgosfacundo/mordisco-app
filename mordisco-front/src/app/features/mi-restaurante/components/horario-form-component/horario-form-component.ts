@@ -46,7 +46,8 @@ export class HorarioFormComponent implements OnInit{
       horaA : ['', [Validators.required, Validators.min(0), Validators.max(23), Validators.pattern('^[0-9]*$')]],
       minuteA : ['',  [Validators.required, Validators.min(0), Validators.max(59), Validators.pattern('^[0-9]*$')]],      
       horaC : ['', [Validators.required, Validators.min(0), Validators.max(23), Validators.pattern('^[0-9]*$')]],
-      minuteC : ['',  [Validators.required, Validators.min(0), Validators.max(59), Validators.pattern('^[0-9]*$')]]
+      minuteC : ['',  [Validators.required, Validators.min(0), Validators.max(59), Validators.pattern('^[0-9]*$')]],
+      cruzaMedianoche: [false]
     })
 
     const resp = this.aus.getCurrentUser()
@@ -69,11 +70,12 @@ export class HorarioFormComponent implements OnInit{
           horaA: horaA ?? '',
           minuteA: minuteA ?? '',
           horaC: horaC ?? '',
-          minuteC: minuteC ?? ''
+          minuteC: minuteC ?? '',
+          cruzaMedianoche: h.cruzaMedianoche ?? false
         });
       }else{
         this.modoEdicion = false
-        this.formHorarioAtencion.reset({id : null, dia : '', horaA : '', minuteA : '', horaC : '', minuteC :''})
+        this.formHorarioAtencion.reset({id : null, dia : '', horaA : '', minuteA : '', horaC : '', minuteC :'', cruzaMedianoche: false})
       }
       this.loaded.emit();
       })
@@ -104,7 +106,8 @@ export class HorarioFormComponent implements OnInit{
         horarioParaBackend = {
           dia: this.formHorarioAtencion.value.dia, 
           horaApertura: horaApertura,
-          horaCierre: horaCierre
+          horaCierre: horaCierre,
+          cruzaMedianoche: this.formHorarioAtencion.value.cruzaMedianoche
         }
 
         this.hService.update(this.formHorarioAtencion.value.id,horarioParaBackend).subscribe({
@@ -121,7 +124,8 @@ export class HorarioFormComponent implements OnInit{
         horarioParaBackend = {
           dia: this.formHorarioAtencion.value.dia, 
           horaApertura: horaApertura,
-          horaCierre: horaCierre
+          horaCierre: horaCierre,
+          cruzaMedianoche: this.formHorarioAtencion.value.cruzaMedianoche
         }
 
         if(this.restaurante){

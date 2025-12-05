@@ -223,11 +223,11 @@
                     {{ item.nombre }}
                   </p>
                   <p class="text-xs text-gray-600">
-                    {{ item.cantidad }} x ${{ item.precio | number:'1.2-2' }}
+                    {{ item.cantidad }} x ${{ item.precioConDescuento ? item.precioConDescuento : item.precio | number:'1.2-2' }}
                   </p>
                 </div>
                 <p class="text-sm font-bold text-gray-900">
-                  ${{ (item.precio * item.cantidad) | number:'1.2-2' }}
+                  ${{ (item.precioConDescuento ? item.precioConDescuento : item.precio * item.cantidad) | number:'1.2-2' }}
                 </p>
               </div>
             }

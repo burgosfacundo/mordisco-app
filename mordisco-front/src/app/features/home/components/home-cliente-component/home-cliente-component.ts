@@ -78,13 +78,11 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   private obtenerUbicacionYCargarRestaurantes(): void {
     this.geolocationService.obtenerUbicacionActual().subscribe({
       next: (ubicacion) => {
-        console.log('Ubicación obtenida:', ubicacion);
         this.ubicacionActual = ubicacion;
         this.loadRestaurantes();
         this.loadRestaurantesPromociones();
       },
       error: (error) => {
-        console.warn('No se pudo obtener la ubicación:', error);
         this.toastService.info(
           'No se pudo obtener tu ubicación. Se mostrarán restaurantes desde Mar del Plata.'
         );
@@ -98,9 +96,6 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   private loadRestaurantes(): void {
     if (!this.ubicacionActual) return;
 
-    console.log('Cargando restaurantes con ubicación:', this.ubicacionActual);
-    console.log('Término de búsqueda:', this.currentSearchTerm);
-
     this.isLoadingRestaurantes = true;
     
     this.restauranteService.findByLocation(
@@ -112,14 +107,11 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
       this.sizeRestaurantes
     ).subscribe({
       next: (data) => {
-        console.log('Restaurantes cargados:', data.content.length);
-        console.log('Total elementos:', data.totalElements);
         this.restaurantes = data.content;
         this.lengthRestaurantes = data.totalElements;
         this.isLoadingRestaurantes = false;
       },
       error: (error) => {
-        console.error('Error cargando restaurantes:', error);
         this.toastService.error('Error al cargar restaurantes');
         this.isLoadingRestaurantes = false;
       }
@@ -129,7 +121,6 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   private loadRestaurantesPromociones(): void {
     if (!this.ubicacionActual) return;
 
-    console.log('Cargando promociones con ubicación:', this.ubicacionActual);
 
     // Cargar restaurantes con promociones usando el endpoint de ubicación
     this.restauranteService.findWithPromocionByLocation(
@@ -140,13 +131,11 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
       this.sizePromocion
     ).subscribe({
       next: (data) => {
-        console.log('Promociones cargadas:', data.content.length);
         this.restaurantesPromociones = data.content;
         this.lengthPromocion = data.totalElements;
         this.isLoadingPromocion = false;
       },
       error: (error) => {
-        console.error('Error cargando promociones:', error);
         this.isLoadingPromocion = false;
       }
     });

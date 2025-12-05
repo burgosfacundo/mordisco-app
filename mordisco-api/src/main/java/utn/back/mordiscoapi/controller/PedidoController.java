@@ -23,11 +23,6 @@ import utn.back.mordiscoapi.model.dto.usuario.BajaLogicaRequestDTO;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-
 @Tag(name = "Pedidos", description = "Operaciones relacionadas con los pedidos de los restaurantes")
 @RestController
 @RequestMapping("/api/pedidos")
@@ -168,7 +163,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("@pedidoSecurity.esPropietarioRestaurantePedido(#id)")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     @PutMapping("/state/{id}")
     public ResponseEntity<Void> changeState(
             @PathVariable

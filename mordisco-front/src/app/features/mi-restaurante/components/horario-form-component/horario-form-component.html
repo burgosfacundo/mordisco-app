@@ -1,89 +1,140 @@
 <form [formGroup]="formHorarioAtencion" (ngSubmit)="manejarEnvio()" class="form-container">
-    <fieldset class="form-field">
-        <label for="dia" class="form-label">Dia</label>
-        <select id="dia" formControlName="dia"class="form-input"
-            [class.border-red-500]="formHorarioAtencion.get('dia')?.invalid && formHorarioAtencion.get('dia')?.touched">
-            <option value="" disabled selected>Seleccionar tipo</option>
-            <option value="MONDAY">Lunes</option>
-            <option value="TUESDAY">Martes</option>
-            <option value="WEDNESDAY">Miercoles</option>
-            <option value="THURSDAY">Jueves</option>
-            <option value="FRIDAY">Viernes</option>
-            <option value="SATURDAY">Sabado</option>
-            <option value="SUNDAY">Domingo</option>
-        </select> 
-        @if (formHorarioAtencion.get('dia')?.touched && formHorarioAtencion.controls['dia'].errors?.['required']) {
-                <p class="form-error">*Obligatorio</p>
-            } 
-    </fieldset>
+  <fieldset class="form-field">
+    <label for="dia" class="form-label">Dia</label>
+    <select
+      id="dia"
+      formControlName="dia"
+      class="form-input"
+      [class.border-red-500]="
+        formHorarioAtencion.get('dia')?.invalid && formHorarioAtencion.get('dia')?.touched
+      "
+    >
+      <option value="" disabled selected>Seleccionar tipo</option>
+      <option value="MONDAY">Lunes</option>
+      <option value="TUESDAY">Martes</option>
+      <option value="WEDNESDAY">Miercoles</option>
+      <option value="THURSDAY">Jueves</option>
+      <option value="FRIDAY">Viernes</option>
+      <option value="SATURDAY">Sabado</option>
+      <option value="SUNDAY">Domingo</option>
+    </select>
+    @if (formHorarioAtencion.get('dia')?.touched &&
+    formHorarioAtencion.controls['dia'].errors?.['required']) {
+    <p class="form-error">*Obligatorio</p>
+    }
+  </fieldset>
 
-    <fieldset class="form-field">
-        <label class="form-label">Hora de apertura</label>
-        <div class="time-picker-container">
-            <div class="time-input-wrapper">
-                <input type="number" id="horaAId" formControlName="horaA" class="time-input time-input-hour"
-                    [class.border-red-500]="getError('horaA')"
-                    [class.focus:ring-red-500]="getError('horaA')">
-                <span class="time-label">Hora</span>
-                @if (getError('horaA')) {
-                        <p class="form-error">{{ getError('horaA') }}</p>
-                    }
-            </div>    
-        
-        <span class="time-separator">:</span>
-        
-            <div class="time-input-wrapper">
-                <input type="number" id="minuteAId" formControlName="minuteA" class="time-input time-input-minute"
-                    [class.border-red-500]="getError('minuteA')"
-                    [class.focus:ring-red-500]="getError('minuteA')">
-                <span class="time-label">Minuto</span>
-                @if (getError('minuteA')) {
-                        <p class="form-error">{{ getError('minuteA') }}</p>
-                    }
-            </div>
-        </div> 
-    </fieldset>
+  <fieldset class="form-field">
+    <label class="form-label">Hora de apertura</label>
+    <div class="time-picker-container">
+      <div class="time-input-wrapper">
+        <input
+          type="number"
+          id="horaAId"
+          formControlName="horaA"
+          class="time-input time-input-hour"
+          [class.border-red-500]="getError('horaA')"
+          [class.focus:ring-red-500]="getError('horaA')"
+        />
+        <span class="time-label">Hora</span>
+        @if (getError('horaA')) {
+        <p class="form-error">{{ getError('horaA') }}</p>
+        }
+      </div>
 
-    <fieldset class="form-field">
-        <label class="form-label">Hora de cierre</label>
-        <div class="time-picker-container">
-            <div class="time-input-wrapper">
-                <input type="number" id="horaCId" formControlName="horaC" class="time-input time-input-hour"
-                    [class.border-red-500]="getError('horaC')"
-                    [class.focus:ring-red-500]="getError('horaC')">
-                <span class="time-label">Hora</span>
-                @if (getError('horaC')) {
-                        <p class="form-error">{{ getError('horaC') }}</p>
-                    }
-            </div>    
-        
-        <span class="time-separator">:</span>
-        
-            <div class="time-input-wrapper">
-                <input type="number" id="minuteCId" formControlName="minuteC" class="time-input time-input-minute"
-                    [class.border-red-500]="getError('minuteC')"
-                    [class.focus:ring-red-500]="getError('minuteC')">
-                <span class="time-label">Minuto</span>
-                @if (getError('minuteC')) {
-                        <p class="form-error">{{ getError('minuteC') }}</p>
-                    }
-            </div>
-        </div> 
-    </fieldset>
-    <div style="margin-top: 24px;">
-        <button 
-            type="submit" 
-            [disabled]="formHorarioAtencion.invalid || isSubmitting()" 
-            class="form-button">
-            @if (isSubmitting()) {
-                <span class="inline-flex items-center justify-center gap-2">
-                    <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    {{modoEdicion ? 'Editando...' : 'Creando...' }}
-                </span>
-            } @else {
-                    {{modoEdicion ? 'Editar' : 'Crear' }}
-            }
-        </button>
-    </div>       
+      <span class="time-separator">:</span>
+
+      <div class="time-input-wrapper">
+        <input
+          type="number"
+          id="minuteAId"
+          formControlName="minuteA"
+          class="time-input time-input-minute"
+          [class.border-red-500]="getError('minuteA')"
+          [class.focus:ring-red-500]="getError('minuteA')"
+        />
+        <span class="time-label">Minuto</span>
+        @if (getError('minuteA')) {
+        <p class="form-error">{{ getError('minuteA') }}</p>
+        }
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-field">
+    <label class="form-label">Hora de cierre</label>
+    <div class="time-picker-container">
+      <div class="time-input-wrapper">
+        <input
+          type="number"
+          id="horaCId"
+          formControlName="horaC"
+          class="time-input time-input-hour"
+          [class.border-red-500]="getError('horaC')"
+          [class.focus:ring-red-500]="getError('horaC')"
+        />
+        <span class="time-label">Hora</span>
+        @if (getError('horaC')) {
+        <p class="form-error">{{ getError('horaC') }}</p>
+        }
+      </div>
+
+      <span class="time-separator">:</span>
+
+      <div class="time-input-wrapper">
+        <input
+          type="number"
+          id="minuteCId"
+          formControlName="minuteC"
+          class="time-input time-input-minute"
+          [class.border-red-500]="getError('minuteC')"
+          [class.focus:ring-red-500]="getError('minuteC')"
+        />
+        <span class="time-label">Minuto</span>
+        @if (getError('minuteC')) {
+        <p class="form-error">{{ getError('minuteC') }}</p>
+        }
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Checkbox para horarios nocturnos -->
+  <fieldset class="form-field">
+    <div class="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <input
+        type="checkbox"
+        id="cruzaMedianoche"
+        formControlName="cruzaMedianoche"
+        class="mt-1 w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+      />
+      <div class="flex-1">
+        <label for="cruzaMedianoche" class="font-medium text-gray-900 cursor-pointer">
+          Cruza medianoche (horario nocturno)
+        </label>
+        <p class="text-sm text-gray-600 mt-1">
+          Marcar si el horario cierra al día siguiente.
+          <span class="font-medium">Ejemplo:</span> Viernes 22:00 - Sábado 02:00
+        </p>
+      </div>
+    </div>
+  </fieldset>
+
+  <div style="margin-top: 24px">
+    <button
+      type="submit"
+      [disabled]="formHorarioAtencion.invalid || isSubmitting()"
+      class="form-button"
+    >
+      @if (isSubmitting()) {
+      <span class="inline-flex items-center justify-center gap-2">
+        <span
+          class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+        ></span>
+        {{ modoEdicion ? 'Editando...' : 'Creando...' }}
+      </span>
+      } @else {
+      {{ modoEdicion ? 'Editar' : 'Crear' }}
+      }
+    </button>
+  </div>
 </form>
-

@@ -28,7 +28,6 @@ export class PedidoCardComponent {
   cancelar = output<number>()
   deshacerCancelacion = output<number>()
 
-  // Exponer enums para el template
   EstadoPedido = EstadoPedido;
   TipoEntrega = TipoEntrega;
 
@@ -60,7 +59,6 @@ export class PedidoCardComponent {
       pedido.estado as EstadoPedido,
       pedido.tipoEntrega as TipoEntrega
     );
-    
     return siguienteEstado ? ESTADO_PEDIDO_LABELS[siguienteEstado] : null;
   }
 

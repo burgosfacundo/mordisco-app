@@ -71,7 +71,7 @@ export class NavBarConfigFactory {
         { label: 'Mi Restaurante', icon: 'restaurant', route: '/restaurante' },
         { label: 'Menú', icon: 'menu_book', route: '/restaurante/menu' },
         { label: 'Pedidos', icon: 'receipt_long', route: '/restaurante/pedidos' },
-        { label: 'Estadísticas', icon: 'analytics', route: '/restaurante/estadisticas/:id' },
+        { label: 'Estadísticas', icon: 'analytics', route: '/restaurante/estadisticas' },
         { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
       ]
     }
@@ -106,7 +106,7 @@ export class NavBarConfigFactory {
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Calificaciones', icon: 'delivery_dining', route: '/repartidor/calificaciones' },
           { label: 'Historial', icon: 'history', route: '/repartidor/pedidos/historial' },
-          { label: 'Estadísticas', icon: 'analytics', route: '/repartidor/estadisticas/:id' },
+          { label: 'Estadísticas', icon: 'analytics', route: '/repartidor/estadisticas' },
           { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
         ]
       }
@@ -120,7 +120,7 @@ export class NavBarConfigFactory {
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Calificaciones', icon: 'delivery_dining', route: '/repartidor/calificaciones' },
           { label: 'Historial', icon: 'history', route: '/repartidor/historial' },
-          { label: 'Estadísticas', icon: 'analytics', route: '/repartidor/estadisticas/:id' },
+          { label: 'Estadísticas', icon: 'analytics', route: '/repartidor/estadisticas' },
           { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
         ]
       };

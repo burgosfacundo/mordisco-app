@@ -21,7 +21,7 @@
   --color-primary-800: #7a130e;
   --color-primary-900: #5a0e0a;
 
---font-sans: "Montserrat", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui;
+  --font-sans: "Montserrat", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui;
   --font-display: "Montserrat", ui-sans-serif, system-ui;
 
   --radius-sm: 0.375rem;

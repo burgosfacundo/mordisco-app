@@ -16,7 +16,7 @@ import { CalificacionComponent } from '../../../../shared/components/calificacio
 import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
+
 @Component({
   selector: 'app-detalle-pedido-page',
   standalone: true,

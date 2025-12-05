@@ -19,7 +19,8 @@ public class HorarioAtencionMapper {
         return new HorarioAtencionResponseDTO(horarioAtencion.getId(),
                 horarioAtencion.getDia(),
                 horarioAtencion.getHoraApertura(),
-                horarioAtencion.getHoraCierre());
+                horarioAtencion.getHoraCierre(),
+                horarioAtencion.getCruzaMedianoche());
     }
 
     /**
@@ -32,6 +33,7 @@ public class HorarioAtencionMapper {
                 .dia(dto.dia())
                 .horaApertura(dto.horaApertura())
                 .horaCierre(dto.horaCierre())
+                .cruzaMedianoche(dto.cruzaMedianoche() != null ? dto.cruzaMedianoche() : false)
                 .restaurante(restaurante)
                 .build();
     }
@@ -40,5 +42,6 @@ public class HorarioAtencionMapper {
         target.setDia(dto.dia());
         target.setHoraApertura(dto.horaApertura());
         target.setHoraCierre(dto.horaCierre());
+        target.setCruzaMedianoche(dto.cruzaMedianoche() != null ? dto.cruzaMedianoche() : false);
     }
 }

@@ -40,6 +40,7 @@ public class HorariosServiceImpl implements IHorarioService {
                     horario.dia(),
                     horario.horaApertura(),
                     horario.horaCierre(),
+                    horario.cruzaMedianoche(),
                     horariosExistentes,
                     null // null porque es creación
             );
@@ -77,6 +78,7 @@ public class HorariosServiceImpl implements IHorarioService {
                     dto.dia(),
                     dto.horaApertura(),
                     dto.horaCierre(),
+                    dto.cruzaMedianoche(),
                     horariosExistentes,
                     idHorario // excluir el horario que se está actualizando
             );
