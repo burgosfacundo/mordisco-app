@@ -100,8 +100,12 @@ export class DetallePedidoPage implements OnInit {
 
   setCalificados(p : PedidoResponse){
     if(this.isUsuario === 'ROLE_CLIENTE'){
-      this.obtenerCalificacionPedido(p)
-      this.obtenerCalificacionRepartidor(p)
+      if(p.estado === EstadoPedido.COMPLETADO && p.tipoEntrega === TipoEntrega.DELIVERY && (!this.calificacionPedido || !this.calificacionRepartidor)){
+        this.obtenerCalificacionPedido(p)
+        this.obtenerCalificacionRepartidor(p)
+      }else if(p.estado === EstadoPedido.COMPLETADO && p.tipoEntrega === TipoEntrega.RETIRO_POR_LOCAL && !this.calificacionPedido){
+        this.obtenerCalificacionPedido(p)
+      }
     }
   }
 
