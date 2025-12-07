@@ -68,9 +68,19 @@
 
     <!-- Grid de Productos -->
     @if (arrProductos && arrProductos.length > 0) {
-      <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (producto of arrProductos; track producto.id) {
-          <li class="fade-in card-base flex flex-col">
+          <li [class.opacity-50]="!producto.disponible" class="fade-in card-base flex flex-col relative">
+    
+            <!-- Badge de no disponible -->
+            @if (!producto.disponible) {
+              <div class="absolute top-4 right-4 z-10">
+                <div class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg">
+                  No disponible
+                </div>
+              </div>
+            }
+
             <!-- Card del producto -->
             <app-producto-card-component 
               [producto]="producto"
