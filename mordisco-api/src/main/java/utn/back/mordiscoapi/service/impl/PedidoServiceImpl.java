@@ -17,7 +17,6 @@ import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
-import utn.back.mordiscoapi.model.dto.productoPedido.ProductoPedidoDTO;
 import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.repository.*;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
@@ -312,37 +311,12 @@ public class PedidoServiceImpl implements IPedidoService {
 
     private void notificarCambioEstado(Pedido pedido, EstadoPedido nuevoEstado) {
         switch (nuevoEstado) {
-            case EN_PREPARACION -> {
-                // Publicar evento de pedido en preparación
-                eventPublisher.publishEvent(new PedidoEnPreparacionEvent(pedido));
-            }
-
-            case LISTO_PARA_RETIRAR -> {
-                // Publicar evento de pedido listo para retirar
-                eventPublisher.publishEvent(new PedidoListoParaRetirarEvent(pedido));
-            }
-
-            case LISTO_PARA_ENTREGAR -> {
-                // Publicar evento para notificar a repartidores
-                eventPublisher.publishEvent(new PedidoListoParaEntregarEvent(pedido));
-            }
-
-            //faltan los nuevos estados
-
-            case EN_CAMINO -> {
-                // Publicar evento de pedido en camino
-                eventPublisher.publishEvent(new PedidoEnCaminoEvent(pedido));
-            }
-
-            case COMPLETADO -> {
-                // Publicar evento de pedido completado
-                eventPublisher.publishEvent(new PedidoCompletadoEvent(pedido));
-            }
-
-            case CANCELADO -> {
-                // Publicar evento de pedido cancelado
-                eventPublisher.publishEvent(new PedidoCanceladoEvent(pedido, "Cancelado por el sistema"));
-            }
+            case EN_PREPARACION -> eventPublisher.publishEvent(new PedidoEnPreparacionEvent(pedido));
+            case LISTO_PARA_RETIRAR -> eventPublisher.publishEvent(new PedidoListoParaRetirarEvent(pedido));
+            case LISTO_PARA_ENTREGAR -> eventPublisher.publishEvent(new PedidoListoParaEntregarEvent(pedido));
+            case EN_CAMINO -> eventPublisher.publishEvent(new PedidoEnCaminoEvent(pedido));
+            case COMPLETADO -> eventPublisher.publishEvent(new PedidoCompletadoEvent(pedido));
+            case CANCELADO -> eventPublisher.publishEvent(new PedidoCanceladoEvent(pedido, "Cancelado por el sistema"));
         }
     }
 
@@ -753,7 +727,7 @@ public class PedidoServiceImpl implements IPedidoService {
             String tipoEntrega,
             String fechaInicio,
             String fechaFin,
-            String variable) throws NotFoundException {
+            String variable) {
 
         LocalDateTime ini = (fechaInicio == null || fechaInicio.isBlank())
                 ? null
@@ -780,7 +754,7 @@ public class PedidoServiceImpl implements IPedidoService {
             String tipoEntrega,
             String fechaInicio,
             String fechaFin,
-            String variable) throws NotFoundException {
+            String variable) {
 
         LocalDateTime ini = (fechaInicio == null || fechaInicio.isBlank())
                 ? null
@@ -805,7 +779,7 @@ public class PedidoServiceImpl implements IPedidoService {
      * Busca los pedidos de un repartidor por filtro especifico
      */
     @Override
-    public Page<PedidoResponseDTO> filtrarPedidosRepartidor(int pageNo, int pageSize, Long id, String estado, String fechaInicio, String fechaFin, String variable) throws NotFoundException {
+    public Page<PedidoResponseDTO> filtrarPedidosRepartidor(int pageNo, int pageSize, Long id, String estado, String fechaInicio, String fechaFin, String variable)  {
         LocalDateTime ini = (fechaInicio == null || fechaInicio.isBlank())
                 ? null
                 : LocalDateTime.parse(fechaInicio);
