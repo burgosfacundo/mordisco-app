@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { BarraBuscadoraComponent } from '../../../shared/components/barra-buscadora-component/barra-buscadora-component';
+import { PromptService } from '../../../core/services/confirmation-prompt-service';
 
 @Component({
   selector: 'app-entregas-page',
@@ -25,7 +26,7 @@ export class EntregasPage {
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
   private repartidorService = inject(RepartidorService);
-  private confirmationService = inject(ConfirmationService);
+  private promptService = inject(PromptService)
   pedidos?: PedidoResponse[];
   adminMode = input<boolean>(false)
   admin_idUser = input<number>()
@@ -78,22 +79,29 @@ export class EntregasPage {
     });
   }
 
-  marcarRecibido(pedidoId: number): void {
-    this.confirmationService.confirm({
+  marcarRecibido(pedido: PedidoResponse): void {
+    this.promptService.show({
       title: 'Marcar como entregado',
-      message: '¿Estás seguro que este pedido fue recibido por el cliente? Esta acción no se puede deshacer.',
-      confirmText: 'Rechazar',
+      message: 'Indica el PIN del pedido proporcionado por el cliente',
+      placeholder: 'Ej: XXXXX',
+      required: true,
+      confirmText: 'Entrgado',
       type: 'danger'
-    }).subscribe(confirmed => {
-      if (!confirmed) return;
-
-      this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
-        next: () => {
-          this.toastService.success('✅ Pedido marcado como "Completado"');
-          this.loadPedidos();
-        }
-      });
-    });
+    }).subscribe(result => {
+      if (!result.confirmed) return;
+      const PIN : string = result.value ?? ""
+      if(PIN === pedido.pin){
+        this.pedidoService.marcarComoEntregado(pedido.id).subscribe({
+          next: () => {
+            this.toastService.success('✅ Pedido marcado como "Completado"');
+            this.loadPedidos();
+          }
+        });
+      }else{
+          this.promptService.updateValue(""); // limpia el valor
+          this.promptService.shakeInput();    // vibra el input
+          this.toastService.error("PIN incorrecto");
+      }});  
   }
 
 

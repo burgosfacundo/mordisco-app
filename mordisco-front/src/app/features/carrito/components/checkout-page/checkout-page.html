@@ -92,6 +92,16 @@
                         [value]="direccion.id"
                         class="mt-1">
                       <div class="flex-1">
+                        @if(direccion.alias){
+                          <p class="font-semibold text-gray-900"> {{ direccion.alias }}</p>
+                          <p class="text-sm text-gray-600 mt-1">{{ direccion.calle }} {{ direccion.numero }}
+                            @if (direccion.piso) {
+                              , Piso {{ direccion.piso }}
+                            }
+                            @if (direccion.depto) {
+                              {{ direccion.depto }}
+                            }</p>
+                        }@else{
                         <p class="font-semibold text-gray-900">
                           {{ direccion.calle }} {{ direccion.numero }}
                           @if (direccion.piso) {
@@ -101,6 +111,7 @@
                             {{ direccion.depto }}
                           }
                         </p>
+                        }
                         <p class="text-sm text-gray-600 mt-1">
                           {{ direccion.ciudad }} - CP: {{ direccion.codigoPostal }}
                         </p>

@@ -22,6 +22,7 @@ export class DireccionFormComponent implements OnInit , OnChanges{
   direccion = input<DireccionResponse>();
   onSaved = output<void>();
   onCancelled = output<void>();
+  isRestaurante = input<boolean>(false)
 
   formDirecciones!: FormGroup;
   protected isSubmitting = signal(false);
@@ -51,13 +52,14 @@ export class DireccionFormComponent implements OnInit , OnChanges{
 
   private initializeForm(): void {
     this.formDirecciones = this.fb.group({
-      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-z0-9 .]+$/)]],
       numero: ['', [Validators.required, Validators.maxLength(5),  Validators.pattern(/^[0-9]+$/)]],
       piso: ['', [Validators.maxLength(20)]],
       depto: ['', [Validators.maxLength(20)]],
       codigoPostal: ['', [Validators.required, Validators.maxLength(10)]],
       referencias: ['', [Validators.maxLength(250)]],
-      ciudad: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-z\s]+$/)]]
+      ciudad: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-z\s]+$/)]],
+      alias: ['', [Validators.maxLength(50)]],
     });
   }
 
@@ -71,7 +73,8 @@ export class DireccionFormComponent implements OnInit , OnChanges{
       depto: this.direccion()?.depto || '',
       codigoPostal: this.direccion()?.codigoPostal,
       referencias: this.direccion()?.referencias || '',
-      ciudad: this.direccion()?.ciudad
+      ciudad: this.direccion()?.ciudad,
+      alias : this.direccion()?.alias || ''
     });
   }
 

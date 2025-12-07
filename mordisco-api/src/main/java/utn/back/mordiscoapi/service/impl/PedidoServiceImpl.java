@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.enums.*;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
@@ -39,6 +40,7 @@ public class PedidoServiceImpl implements IPedidoService {
     private final ProductoRepository productoRepository;
     private final UsuarioRepository usuarioRepository;
     private final PagoRepository pagoRepository;
+    private final PinService pinService;
 
     private final MercadoPagoService mercadoPagoService;
     private final ConfiguracionSistemaServiceImpl configuracionService;
@@ -73,7 +75,7 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setFechaHora(LocalDateTime.now());
         pedido.setRestaurante(restaurante);
         pedido.setCliente(cliente);
-
+        pedido.setPin(pinService.generarPin());
         BigDecimal total = calcularTotalYValidarProductos(pedido);
         pedido.setTotal(total);
 
@@ -174,7 +176,7 @@ public class PedidoServiceImpl implements IPedidoService {
             throw new NotFoundException("El restaurante no existe");
         }
 
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("fechaHora").descending());
         return pedidoRepository.findAllByRestaurante_Id(pageable,idRestaurante)
                 .map(PedidoMapper::toDTO);
     }
@@ -351,7 +353,7 @@ public class PedidoServiceImpl implements IPedidoService {
             throw new NotFoundException("Usuario no encontrado");
         }
 
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("fechaHora").descending());
 
         return pedidoRepository.findAllByCliente_IdAndEstado(pageable,idCliente, estado)
                 .map(PedidoMapper::toDTO);
@@ -368,7 +370,7 @@ public class PedidoServiceImpl implements IPedidoService {
             throw new NotFoundException("Usuario no encontrado");
         }
 
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Pageable pageable = PageRequest.of(pageNo, pageSize,Sort.by("fechaHora").descending());
         return pedidoRepository.findAllByCliente_Id(pageable,idCliente)
                 .map(PedidoMapper::toDTO);
     }
@@ -385,7 +387,7 @@ public class PedidoServiceImpl implements IPedidoService {
             throw new NotFoundException("Restaurante no encontrado");
         }
 
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("fechaHora").descending());
         return pedidoRepository.findAllByRestaurante_IdAndEstado(pageable,idRestaurante, estado)
                 .map(PedidoMapper::toDTO);
     }
@@ -588,7 +590,7 @@ public class PedidoServiceImpl implements IPedidoService {
 
         pedidoRepository.save(pedido);
         
-        log.info("🚚 Repartidor #{} asignado al pedido #{}. Estado: EN_CAMINO", 
+        log.info("🚚 Repartidor #{} asignado al pedido #{}. Estado: EN_CAMINO",
                 repartidorId, pedidoId);
     }
 

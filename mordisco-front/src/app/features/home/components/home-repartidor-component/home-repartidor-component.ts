@@ -13,7 +13,7 @@ import { ToastService } from '../../../../core/services/toast-service';
 import { PedidosDisponiblesComponent } from '../../../../shared/components/pedidos-disponibles/pedidos-disponibles';
 import { GananciasRepartidorComponent } from '../../../../shared/components/ganancias-repartidor/ganancias-repartidor';
 import { CommonModule } from '@angular/common';
-import { ConfirmationService } from '../../../../core/services/confirmation-service';
+import { PromptService } from '../../../../core/services/confirmation-prompt-service';
 
 @Component({
   selector: 'app-home-repartidor-component',
@@ -25,7 +25,7 @@ export class HomeRepartidorComponent {
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
   private repartidorService = inject(RepartidorService);
-  private confirmationService = inject(ConfirmationService);
+  private promptService = inject(PromptService);
   private router = inject(Router)
 
   // Tab activa
@@ -83,22 +83,29 @@ export class HomeRepartidorComponent {
     });
   }
 
-  marcarRecibido(pedidoId: number): void {
-    this.confirmationService.confirm({
+  marcarRecibido(pedido: PedidoResponse): void {
+    this.promptService.show({
       title: 'Marcar como entregado',
-      message: '¿Estás seguro que este pedido fue recibido por el cliente? Esta acción no se puede deshacer.',
-      confirmText: 'Entregado',
-      type: 'warning'
-    }).subscribe(confirmed => {
-      if (!confirmed) return;
-
-      this.pedidoService.marcarComoEntregado(pedidoId).subscribe({
-        next: () => {
-          this.toastService.success('✅ Pedido marcado como "Completado"');
-          this.loadPedidosEnCamino();
-        }
-      });
-    });
+      message: 'Indica el PIN del pedido proporcionado por el cliente',
+      placeholder: 'Ej: XXXXX',
+      required: true,
+      confirmText: 'Entrgado',
+      type: 'danger'
+    }).subscribe(result => {
+      if (!result.confirmed) return;
+      const PIN : string = result.value?.toUpperCase() ?? ""
+      if(PIN === pedido.pin?.toUpperCase()){
+        this.pedidoService.marcarComoEntregado(pedido.id).subscribe({
+          next: () => {
+            this.toastService.success('✅ Pedido marcado como "Completado"');
+            this.loadPedidosEnCamino();
+          }
+        });
+      }else{
+          this.promptService.updateValue(""); // limpia el valor
+          this.promptService.shakeInput();    // vibra el input
+          this.toastService.error("PIN incorrecto");
+      }});  
   }
 
 

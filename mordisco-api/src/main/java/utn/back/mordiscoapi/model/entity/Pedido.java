@@ -75,6 +75,9 @@ public class Pedido {
     private LocalDateTime fechaAceptacionRepartidor;
 
     @Column
+    private String pin;
+
+    @Column
     private LocalDateTime fechaEntrega;
 
     @ManyToOne(fetch = FetchType.EAGER)

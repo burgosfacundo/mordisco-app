@@ -59,7 +59,7 @@ public class ConfiguracionSistemaController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('CLIENTE') or hasRole('REPARTIDOR') or hasRole('RESTAURANTE')")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('REPARTIDOR') or hasRole('RESTAURANTE') or hasRole('ADMIN')")
     @GetMapping("/general")
     public ResponseEntity<ConfiguracionSistemaGeneralResponseDTO> getConfiguracionGeneral() {
         return ResponseEntity.ok(configuracionService.getConfiguracionGeneralActual());

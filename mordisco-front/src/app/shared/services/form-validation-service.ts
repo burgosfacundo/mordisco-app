@@ -42,6 +42,10 @@ export class FormValidationService {
     if (errors['pattern']) {
       return this.getPatternErrorMessage(fieldName, control.value);
     }
+      // Validación de coincidencia de contraseñas
+    if (errors['passwordMismatch']) {
+      return '*Las contraseñas no coinciden';
+    }  
 
     // Error genérico
     return '*Campo inválido';
@@ -84,4 +88,17 @@ export class FormValidationService {
       'focus:ring-red-500': this.hasError(control)
     };
   }
+}
+
+export function passwordMatchValidator(form: AbstractControl) {
+  const password = form.get('password')?.value;
+  const confirmPassword = form.get('confirmPassword')?.value;
+
+  if (password !== confirmPassword) {
+    form.get('confirmPassword')?.setErrors({ passwordMismatch: true });
+  } else {
+    form.get('confirmPassword')?.setErrors(null);
+  }
+
+  return null;
 }

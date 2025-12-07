@@ -22,5 +22,6 @@ export default interface PedidoResponse{
     subtotalProductos?: number,
     bajaLogica? : boolean,
     motivoBaja? : string,
-    fechaBaja? : string
+    fechaBaja? : string,
+    pin? : string
 }

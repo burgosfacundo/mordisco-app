@@ -31,6 +31,9 @@ public record DireccionRequestDTO(
     @Size(message = "La referencia no puede contener mas de 255 caracteres", max = 255)
     @Schema(description = "Referencia de la dirección", example = "Edificio al lado de porton rojo")
     String referencias,
+    @Size(message = "El alias no puede contener mas de 50 caracteres", max = 50)
+    @Schema(description = "Alias de la dirección", example = "Casa de mi madre")
+    String alias,
     @Size(message = "La ciudad no puede contener mas de 50 caracteres", max = 50)
     @NotBlank(message = "La ciudad es obligatoria")
     @Schema(description = "Ciudad de la dirección", example = "Mar del Plata")

@@ -20,6 +20,7 @@ export class LoginForm implements OnInit {
 
   protected loginForm!: FormGroup;
 
+  showPassword = false;
   isSubmitting = signal(false);
 
   ngOnInit(): void {
@@ -62,5 +63,7 @@ export class LoginForm implements OnInit {
     );
   }
   
-
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
 }

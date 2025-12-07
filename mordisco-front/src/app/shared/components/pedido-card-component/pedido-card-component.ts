@@ -29,7 +29,7 @@ export class PedidoCardComponent implements OnInit{
   aceptarPedido = output<number>();
   rechazarPedido = output<number>();
   cambiarEstado = output<{ pedidoId: number, nuevoEstado: EstadoPedido }>();
-  marcarRecibido = output<number>();
+  marcarRecibido = output<PedidoResponse>();
   verDetalles = output<number>();
   cancelar = output<number>()
   deshacerCancelacion = output<number>()
@@ -111,8 +111,8 @@ export class PedidoCardComponent implements OnInit{
   }
 
   onMarcarRecibido(): void {
-    if (this.pedido()?.id) {
-      this.marcarRecibido.emit(this.pedido()!.id);
+    if (this.pedido()) {
+      this.marcarRecibido.emit(this.pedido()!);
     }
   }
 

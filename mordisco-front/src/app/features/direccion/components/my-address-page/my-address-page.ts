@@ -7,6 +7,7 @@ import { DireccionService } from '../../services/direccion-service';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
 import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
+import { CarritoFlotanteComponent } from '../../../../shared/components/carrito-flotante-component/carrito-flotante-component';
 
 @Component({
   selector: 'app-my-address-page',
@@ -14,7 +15,8 @@ import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-
   imports: [
     CommonModule,
     DireccionFormComponent,
-    DireccionCardComponent
+    DireccionCardComponent,
+    CarritoFlotanteComponent
   ],
   templateUrl: './my-address-page.html'
 })

@@ -43,6 +43,8 @@ public record PedidoResponseDTO(
     @Schema(description = "Fecha de la baja lógica")
     java.time.LocalDateTime fechaBaja,
     @Schema(description = "Estado del pedido antes de ser cancelado por admin", example = "EN_PROCESO")
-    EstadoPedido estadoAntesDeCancelado
+    EstadoPedido estadoAntesDeCancelado,
+    @Schema(description = "Pin que debe entregar el cliente al respartidor", example = "AA13")
+    String pin
 ) {
 }

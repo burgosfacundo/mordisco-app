@@ -23,6 +23,7 @@ public class DireccionMapper {
                 direccion.getDepto(),
                 direccion.getCodigoPostal(),
                 direccion.getReferencias(),
+                direccion.getAlias(),
                 direccion.getLatitud(),
                 direccion.getLongitud(),
                 direccion.getCiudad());
@@ -42,6 +43,7 @@ public class DireccionMapper {
                 .codigoPostal(Sanitize.trimToNull(dto.codigoPostal()))
                 .ciudad(Sanitize.collapseSpaces(dto.ciudad()))
                 .referencias(Sanitize.trimToNull(dto.referencias()))
+                .alias(Sanitize.trimToNull(dto.alias()))
                 .build();
     }
 
@@ -58,5 +60,6 @@ public class DireccionMapper {
         target.setCodigoPostal(Sanitize.trimToNull(dto.codigoPostal()));
         target.setCiudad(Sanitize.collapseSpaces(dto.ciudad()));
         target.setReferencias(Sanitize.trimToNull(dto.referencias()));
+        target.setAlias(Sanitize.trimToNull(dto.alias()));
     }
 }

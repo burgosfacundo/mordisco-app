@@ -77,6 +77,11 @@
             Ref: {{ pedidoResponse()?.direccionEntrega?.referencias }}
           </p>
         }
+        @if(pedidoResponse()?.estado === estadoPedidoEnum.EN_CAMINO || pedidoResponse()?.estado === estadoPedidoEnum.EN_PREPARACION || pedidoResponse()?.estado === estadoPedidoEnum.LISTO_PARA_ENTREGAR){
+          <h4 class="font-semibold text-gray-900 mb-2 text-sm uppercase tracking-wide">
+            PIN: {{pedidoResponse()?.pin}}
+          </h4>
+        }
       </div>
     }
 

@@ -29,6 +29,8 @@ export class PromptService {
   getCurrentConfig = this.currentConfig.asReadonly();
   getInputValue = this.inputValue.asReadonly();
 
+  private shakeTrigger: (() => void) | null = null;
+
   /**
    * Muestra el diálogo con input
    */
@@ -101,5 +103,14 @@ export class PromptService {
     this.currentConfig.set(null);
     this.currentResult = null;
     this.inputValue.set('');
+  }
+
+
+  registerShakeTrigger(fn: () => void) {
+    this.shakeTrigger = fn;
+  }
+
+  shakeInput() {
+    this.shakeTrigger?.();
   }
 }

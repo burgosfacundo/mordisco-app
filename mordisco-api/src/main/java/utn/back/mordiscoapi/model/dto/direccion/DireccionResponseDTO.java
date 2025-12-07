@@ -18,6 +18,8 @@ public record DireccionResponseDTO (
         String codigoPostal,
         @Schema(description = "Referencia de la dirección", example = "Edificio al lado de porton rojo")
         String referencias,
+        @Schema(description = "Alias de la dirección", example = "Casa de mi madre")
+        String alias,
         @Schema(description = "Latitud de la dirección", example = "-38.00965070799693")
         Double latitud,
         @Schema(description = "Longitud de la dirección", example = "-57.55554272466376")

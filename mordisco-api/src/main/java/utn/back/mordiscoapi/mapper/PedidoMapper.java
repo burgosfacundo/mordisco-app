@@ -75,7 +75,8 @@ public class PedidoMapper {
                 pedido.getBajaLogica(),
                 pedido.getMotivoBaja(),
                 pedido.getFechaBaja(),
-                pedido.getEstadoAntesDeCancelado()
+                pedido.getEstadoAntesDeCancelado(),
+                pedido.getPin()
                 );
     }
 }

@@ -115,7 +115,24 @@
     @if (getError('referencias')) {
       <p class="form-error">{{ getError('referencias') }}</p>
     }
-  </fieldset>  <!-- Botones -->
+  </fieldset> 
+  @if(!isRestaurante()){
+    <fieldset>
+      <label for="aliasID" class="form-label">Alias (opcional)</label>
+      <input 
+        type="text" 
+        id="aliasID" 
+        formControlName="alias" 
+        placeholder="Ej: Trabajo"
+        class="form-input"
+        [class.border-red-500]="getError('alias')"
+        [class.focus:ring-red-500]="getError('alias')">
+      @if (getError('alias')) {
+        <p class="form-error">{{ getError('alias') }}</p>
+      }
+    </fieldset>
+  }
+  <!-- Botones -->
   <div class="flex gap-3 pt-4">
     <button 
       type="submit" 
@@ -129,12 +146,13 @@
       } @else {
         {{ isEditMode() ? 'Actualizar' : 'Guardar' }} Dirección
       }
-    </button><button 
-  type="button" 
-  (click)="cancelar()"
-  [disabled]="isSubmitting()"
-  class="flex-1 btn-outline">
-  {{ isEditMode() ? ' Cancelar' : 'Limpiar' }}
-</button>
+    </button>
+    <button 
+      type="button" 
+      (click)="cancelar()"
+      [disabled]="isSubmitting()"
+      class="flex-1 btn-outline">
+      {{ isEditMode() ? ' Cancelar' : 'Limpiar' }}
+    </button>
   </div>
 </form>

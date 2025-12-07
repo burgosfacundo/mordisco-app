@@ -1,5 +1,5 @@
 // prompt-dialog.component.ts
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { PromptService } from '../../../../core/services/confirmation-prompt-service';
@@ -27,15 +27,16 @@ import { PromptService } from '../../../../core/services/confirmation-prompt-ser
         <div class="modal-body">
           <p>{{ config?.message }}</p>
           
-          <input 
-            type="text"
-            [placeholder]="config?.placeholder || ''"
-            [value]="inputValue"
-            (input)="onInputChange($event)"
-            (keyup.enter)="confirm()"
-            class="dialog-input"
-            autofocus
-          />
+        <input 
+          type="text"
+          [placeholder]="config?.placeholder || ''"
+          [value]="inputValue"
+          (input)="onInputChange($event)"
+          (keyup.enter)="confirm()"
+          class="dialog-input"
+          [class.shake]="shake()"
+          autofocus
+        />
         </div>
 
         <div class="modal-actions">
@@ -180,6 +181,18 @@ import { PromptService } from '../../../../core/services/confirmation-prompt-ser
     .btn-info:hover:not(:disabled) {
       background: #2563eb;
     }
+
+    .shake {
+      animation: shake 0.3s;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-4px); }
+      100% { transform: translateX(0); }
+    }    
   `],
   animations: [
     trigger('fadeIn', [
@@ -205,7 +218,12 @@ import { PromptService } from '../../../../core/services/confirmation-prompt-ser
 export class PromptDialogComponent {
   // prompt-dialog.component.ts
   private promptService = inject(PromptService);
-  
+  shake = signal(false);
+
+  constructor() {
+    this.promptService.registerShakeTrigger(() => this.triggerShake());
+  }
+
   get isDialogOpen() {
     return this.promptService.getDialogState();
   }
@@ -237,4 +255,8 @@ export class PromptDialogComponent {
     this.promptService.cancel();
   }
 
+  triggerShake() {
+    this.shake.set(true);
+    setTimeout(() => this.shake.set(false), 300);
+  }
 }

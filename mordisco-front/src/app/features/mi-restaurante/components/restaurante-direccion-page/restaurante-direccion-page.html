@@ -19,6 +19,7 @@
       <div class="bg-white rounded-xl shadow-md p-6">
         <app-direccion-form-component
           #direccionForm
+          [isRestaurante]="true"
           [direccion]="direccion()"
           (onSaved)="handleSaved()"
           (onCancelled)="handleCancel()">
