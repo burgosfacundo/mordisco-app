@@ -31,6 +31,7 @@ public class PedidoMapper {
                     .build();
 
             return ProductoPedido.builder()
+                    .precioUnitario(productoPedidoDTO.precioUnitario())
                     .producto(producto)
                     .cantidad(productoPedidoDTO.cantidad())
                     .build();

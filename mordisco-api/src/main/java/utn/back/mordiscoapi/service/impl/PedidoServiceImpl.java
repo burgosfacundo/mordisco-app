@@ -17,6 +17,7 @@ import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
+import utn.back.mordiscoapi.model.dto.productoPedido.ProductoPedidoDTO;
 import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.repository.*;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
@@ -77,6 +78,7 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setCliente(cliente);
         pedido.setPin(pinService.generarPin());
         BigDecimal total = calcularTotalYValidarProductos(pedido);
+        System.out.println(total);
         pedido.setTotal(total);
 
         // Validar monto mínimo del pedido
@@ -112,13 +114,9 @@ public class PedidoServiceImpl implements IPedidoService {
             // Actualizar el total para incluir el costo de delivery (para el cliente)
             // Total = Subtotal productos + Costo delivery
             pedido.setTotal(total.add(costoDelivery));
-
-            log.info("📍 Pedido #{} - Distancia: {} km, Costo delivery: ${}, Total con envío: ${}",
-                    pedido.getId(), distanciaKm, costoDelivery, pedido.getTotal());
         } else {
             // Para RETIRO_POR_LOCAL, el total y subtotal son iguales
             pedido.setSubtotalProductos(total);
-            log.info("🏪 Pedido #{} - Retiro por local, Total: ${}", pedido.getId(), total);
         }
 
         if (pedido.getDireccionEntrega() != null) {
@@ -230,7 +228,6 @@ public class PedidoServiceImpl implements IPedidoService {
             throw new BadRequestException("El pedido ya se encuentra en ese estado");
         }
 
-        // ✅ VALIDAR SEGÚN TIPO DE ENTREGA
         if (!estadoActual.puedeCambiarA(nuevoEstado, pedido.getTipoEntrega())) {
             throw new BadRequestException(
                     String.format("No se puede cambiar de '%s' a '%s' para pedidos de tipo '%s'",
@@ -240,7 +237,6 @@ public class PedidoServiceImpl implements IPedidoService {
             );
         }
 
-        // ✅ VALIDACIONES ESPECÍFICAS POR ESTADO
         validarCambioEstadoEspecifico(pedido, nuevoEstado);
 
         // Actualizar estado
@@ -423,8 +419,6 @@ public class PedidoServiceImpl implements IPedidoService {
 
         // Publicar evento de pedido cancelado
         eventPublisher.publishEvent(new PedidoCanceladoEvent(pedido, "Cancelado por el usuario"));
-
-        log.info("❌ Pedido #{} cancelado", id);
     }
 
 
@@ -459,11 +453,8 @@ public class PedidoServiceImpl implements IPedidoService {
                 );
             }
 
-            // Asignar precio actual del producto
-            item.setPrecioUnitario(producto.getPrecio());
-
             // Calcular subtotal
-            BigDecimal subtotal = producto.getPrecio()
+            BigDecimal subtotal = item.getPrecioUnitario()
                     .multiply(BigDecimal.valueOf(item.getCantidad()));
             total = total.add(subtotal);
         }
@@ -599,10 +590,8 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setEstado(EstadoPedido.ASIGNADO_A_REPARTIDOR);
 
         pedidoRepository.save(pedido);
-        
-        log.info("🚚 Repartidor #{} asignado al pedido #{}. Esta en camino al restaurante ",
-                repartidorId, pedidoId);
-    }
+
+}
 
     @Transactional
     @Override
@@ -632,16 +621,9 @@ public class PedidoServiceImpl implements IPedidoService {
         pedidoRepository.save(pedido);
 
         // Registrar ganancia del repartidor
-        try {
-            gananciaRepartidorService.registrarGanancia(pedido);
-        } catch (NotFoundException e) {
-            log.error("Error al registrar ganancia del repartidor: {}", e.getMessage());
-        }
+        gananciaRepartidorService.registrarGanancia(pedido);
 
-        log.info("✅ Pedido #{} marcado como entregado por repartidor #{}",
-                pedidoId, repartidorId);
-
-        // TODO: Notificar al cliente
+        eventPublisher.publishEvent(new PedidoCompletadoEvent(pedido));
     }
 
     @Override
