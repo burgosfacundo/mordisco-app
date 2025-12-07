@@ -1,15 +1,9 @@
-<!-- ============================================ -->
-<!-- ESTADO DE CARGA -->
-<!-- ============================================ -->
 <div class="loading-container">
     @if(isLoading){
   <div class="loading-spinner"></div>
   <p class="loading-text">Cargando pedido...</p>}
 </div>
 
-<!-- ============================================ -->
-<!-- ESTADO DE ERROR -->
-<!-- ============================================ -->
 <div class="empty-state">
   @if (error && !isLoading) {
     <svg xmlns="http://www.w3.org/2000/svg" class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -23,16 +17,10 @@
   }
 </div>
 
-<!-- ============================================ -->
-<!-- CONTENIDO PRINCIPAL DEL PEDIDO -->
-<!-- ============================================ -->
 <div class="min-h-screen bg-gray-50 py-8 px-4 fade-in">
   @if (pedido && isLoading) {
   <div class="max-w-4xl mx-auto">
 
-    <!-- ========================================== -->
-    <!-- HEADER DEL PEDIDO -->
-    <!-- ========================================== -->
     <div class="bg-white rounded-2xl shadow-md p-6 mb-6 slide-up">
       <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
         <!-- Información del pedido -->
@@ -65,9 +53,6 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- INFORMACIÓN DEL RESTAURANTE -->
-    <!-- ========================================== -->
     <div class="bg-white rounded-2xl shadow-md p-6 mb-6 slide-up">
       <div class="flex items-center gap-2 mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,9 +76,6 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- INFORMACIÓN DEL CLIENTE -->
-    <!-- ========================================== -->
     <div class="bg-white rounded-2xl shadow-md p-6 mb-6 slide-up">
       <div class="flex items-center gap-2 mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -118,9 +100,6 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- DIRECCIÓN DE ENTREGA -->
-    <!-- ========================================== -->
     <div class="bg-white rounded-2xl shadow-md p-6 mb-6 slide-up">
       @if (pedido.direccionEntrega) {
       <div class="flex items-center gap-2 mb-4">
@@ -152,9 +131,6 @@
     }
     </div>
 
-    <!-- ========================================== -->
-    <!-- LISTA DE PRODUCTOS -->
-    <!-- ========================================== -->
     <div class="bg-white rounded-2xl shadow-md p-6 mb-6 slide-up">
       <div class="flex items-center gap-2 mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -198,9 +174,6 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- BOTONES DE ACCIÓN -->
-    <!-- ========================================== -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 slide-up">
       
       <!-- Botón: Llamar al Cliente -->
@@ -254,9 +227,7 @@
 }
 </div>
 
-<!-- ============================================ -->
-<!-- MODAL: CONFIRMAR ENTREGA -->
-<!-- ============================================ -->
+
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 fade-in" (click)="cerrarModalEntregado()">
   @if (showModalEntregado) {
   <div class="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto slide-up"
@@ -315,9 +286,7 @@
 }
 </div>
 
-<!-- ============================================ -->
-<!-- MODAL: CANCELAR PEDIDO -->
-<!-- ============================================ -->
+
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 fade-in"(click)="cerrarModalCancelado()">
   @if (showModalCancelado) {
   <div class="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto slide-up"
