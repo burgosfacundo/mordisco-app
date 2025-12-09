@@ -49,7 +49,6 @@ public class GananciaRepartidorServiceImpl implements IGananciaRepartidorService
         
         // Si no tiene costo de delivery calculado, usar valor por defecto
         if (costoDelivery == null || costoDelivery.compareTo(BigDecimal.ZERO) <= 0) {
-            log.warn("⚠️ Pedido #{} no tiene costo de delivery calculado, usando valor por defecto", pedido.getId());
             costoDelivery = config.getCostoBaseDelivery();
         }
 
@@ -70,12 +69,6 @@ public class GananciaRepartidorServiceImpl implements IGananciaRepartidorService
                 .build();
 
         gananciaRepository.save(ganancia);
-
-        log.info("💰 Ganancia registrada para repartidor #{}: ${} ({}% de ${} costo delivery)",
-                pedido.getRepartidor().getId(),
-                gananciaRepartidor,
-                config.getPorcentajeGananciasRepartidor(),
-                costoDelivery);
     }
 
     @Override
