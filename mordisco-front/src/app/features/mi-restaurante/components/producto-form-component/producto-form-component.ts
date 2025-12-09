@@ -11,7 +11,6 @@ import { ToastService } from '../../../../core/services/toast-service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 import { ConfiguracionSistemaService } from '../../../../shared/services/configuracionSistema/configuracion-sistema-service';
-import ConfiguracionSistemaResponseDTO from '../../../../shared/models/configuracion/configuracion-sistema-response-dto';
 import ConfiguracionSistemaGeneralResponseDTO from '../../../../shared/models/configuracion/configuracion-sistema-general-response-DTO';
 
 @Component({
@@ -53,18 +52,18 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
       this.productoForm = this.fb.group({
       nombreProducto: ['', [Validators.required, Validators.minLength(3),Validators.maxLength(100)]],
       descripcion: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.minLength(10),
         Validators.maxLength(500)
       ]],
       precioUnitario: [0, [
-        Validators.required, 
+        Validators.required,
         Validators.min(0.01),
         Validators.max(999999)
       ]],
       disponible: [true, [Validators.required]],
       imagenUrl: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.pattern(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i)
       ]]
     });
@@ -73,7 +72,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
   private loadRouteData(): void {
     this.route.params.subscribe(params => {
       const urlSegments = this.route.snapshot.url;
-      
+
       if (params['id'] && urlSegments[2]?.path === 'editar') {
         this.isEditMode = true;
         this.productoId = +params['id'];
@@ -81,7 +80,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
       }else if (params['menuId'] && urlSegments[2]?.path === 'nuevo') {
         this.menuId = +params['menuId'];
         this.isEditMode = false;
-        
+
         if (!this.menuId || isNaN(this.menuId)) {
           this.router.navigate(['/restaurante/menu']);
         }
@@ -94,14 +93,14 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
 
   private cargarProducto(id: number): void {
     this.isLoading = true;
-    
+
     this.productoService.getById(id).subscribe({
       next: (producto) => {
         if (!producto) {
           this.router.navigate(['/restaurante/menu']);
           return;
         }
-        
+
         this.llenarFormulario(producto);
         this.menuId = producto.idMenu;
         this.isLoading = false;
@@ -124,7 +123,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
       imagenUrl: p.imagen?.url || ''
     });
   }
-  
+
   onSubmit(): void {
     if (this.productoForm.invalid) {
       this.productoForm.markAllAsTouched();
@@ -145,7 +144,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
 
   private crearProducto(): void {
     const formValues = this.productoForm.value;
-    
+
     const request: ProductoRequest = {
       idMenu: this.menuId!,
       nombre: formValues.nombreProducto.trim(),
@@ -171,7 +170,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
 
   private actualizarProducto(): void {
     const formValues = this.productoForm.value;
-    
+
     const update: ProductoUpdate = {
       nombre: formValues.nombreProducto.trim(),
       descripcion: formValues.descripcion.trim(),
