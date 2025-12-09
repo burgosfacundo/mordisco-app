@@ -154,7 +154,7 @@
       </div>
     </div>
 
-    @if ( this.isUsuario() === 'ROLE_RESTAURANTE') {
+    @if ( this.isUsuario() === 'ROLE_RESTAURANTE' && pedido()?.estado !== EstadoPedido.CANCELADO) {
     
     <!-- Ganancia -->
     <div class="bg-green-50 rounded-lg p-1 text-center">
