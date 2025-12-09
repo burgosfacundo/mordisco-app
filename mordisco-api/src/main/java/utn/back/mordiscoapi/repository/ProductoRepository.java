@@ -35,14 +35,20 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     );
 
     /**
-     * Encuentra los productos más vendidos de un restaurante
+     * Encuentra los productos más vendidos de un restaurante (ingresos después de descontar comisión de la plataforma)
      * @param restauranteId ID del restaurante
      * @return Lista de productos más vendidos
      */
     @Query(value = """
             SELECT pr.id, pr.nombre,
                    SUM(pp.cantidad) as cantidad_vendida,
-                   SUM(pp.precio_unitario * pp.cantidad) as ingreso_generado
+                   SUM(
+                       pp.precio_unitario * pp.cantidad *
+                       (SELECT cs.porcentaje_ganancias_restaurante
+                        FROM configuracion_sistema cs
+                        ORDER BY cs.fecha_actualizacion DESC
+                        LIMIT 1) / 100
+                   ) as ingreso_generado
             FROM productos pr
             JOIN menus m ON pr.menu_id = m.id
             JOIN restaurantes r ON r.menu_id = m.id

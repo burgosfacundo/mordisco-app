@@ -316,7 +316,14 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     @Query(value = """
             SELECT r.id, r.razon_social,
                    COUNT(p.id) as pedidos_completados,
-                   COALESCE(SUM(p.subtotal_productos), 0) as ingreso_generado
+                   COALESCE(
+                       SUM(
+                           p.subtotal_productos *
+                           (SELECT cs.porcentaje_ganancias_restaurante
+                            FROM configuracion_sistema cs
+                            ORDER BY cs.fecha_actualizacion DESC
+                            LIMIT 1) / 100
+                       ), 0) as ingreso_generado
             FROM restaurantes r
             LEFT JOIN pedidos p ON p.restaurante_id = r.id AND p.estado = 'COMPLETADO'
             WHERE r.activo = true
@@ -327,22 +334,39 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     List<Object[]> findRestaurantesMasActivos();
 
     /**
-     * Calcula los ingresos totales de un restaurante
+     * Calcula los ingresos totales de un restaurante (después de descontar comisión de la plataforma)
      * @param restauranteId ID del restaurante
      * @return Ingresos totales
      */
-    @Query("SELECT COALESCE(SUM(p.subtotalProductos), 0) FROM Pedido p " +
-           "WHERE p.restaurante.id = :restauranteId AND p.estado = 'COMPLETADO'")
+    @Query(value = """
+            SELECT COALESCE(
+                SUM(
+                    p.subtotal_productos *
+                    (SELECT cs.porcentaje_ganancias_restaurante
+                     FROM configuracion_sistema cs
+                     ORDER BY cs.fecha_actualizacion DESC
+                     LIMIT 1) / 100
+                ), 0)
+            FROM pedidos p
+            WHERE p.restaurante_id = :restauranteId AND p.estado = 'COMPLETADO'
+            """, nativeQuery = true)
     BigDecimal calcularIngresosTotalesRestaurante(@Param("restauranteId") Long restauranteId);
 
     /**
-     * Calcula los ingresos por mes de un restaurante (últimos 12 meses)
+     * Calcula los ingresos por mes de un restaurante (últimos 12 meses, después de descontar comisión de la plataforma)
      * @param restauranteId ID del restaurante
      * @return Lista de ingresos por mes
      */
     @Query(value = """
             SELECT DATE_FORMAT(p.fecha_hora, '%Y-%m') as periodo,
-                   COALESCE(SUM(p.subtotal_productos), 0) as ingresos
+                   COALESCE(
+                       SUM(
+                           p.subtotal_productos *
+                           (SELECT cs.porcentaje_ganancias_restaurante
+                            FROM configuracion_sistema cs
+                            ORDER BY cs.fecha_actualizacion DESC
+                            LIMIT 1) / 100
+                       ), 0) as ingresos
             FROM pedidos p
             WHERE p.restaurante_id = :restauranteId
             AND p.estado = 'COMPLETADO'
