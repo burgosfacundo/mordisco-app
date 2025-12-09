@@ -32,7 +32,9 @@ public class EstadisticasAdminServiceImpl implements IEstadisticasAdminService {
         // 2. Total de pedidos completados
         Integer totalPedidos = pedidoRepository.countTotalPedidosCompletados();
 
-        // 3. Ingresos totales de la plataforma
+        // 3. Comisiones de la plataforma (separadas)
+        BigDecimal comisionRestaurantes = pedidoRepository.calcularComisionRestaurantes();
+        BigDecimal comisionDelivery = pedidoRepository.calcularComisionDelivery();
         BigDecimal ingresosTotales = pedidoRepository.calcularIngresosTotalesPlataforma();
 
         // 4. Métodos de pago más usados
@@ -47,6 +49,8 @@ public class EstadisticasAdminServiceImpl implements IEstadisticasAdminService {
         return new AdminEstadisticasDTO(
                 usuariosTotales,
                 totalPedidos,
+                comisionRestaurantes,
+                comisionDelivery,
                 ingresosTotales,
                 metodosPago,
                 restaurantesMasActivos,

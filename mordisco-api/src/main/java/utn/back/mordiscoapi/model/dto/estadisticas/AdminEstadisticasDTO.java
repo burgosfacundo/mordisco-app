@@ -6,6 +6,8 @@ import java.util.List;
 public record AdminEstadisticasDTO(
         UsuariosTotalesDTO usuariosTotales,
         Integer totalPedidos,
+        BigDecimal comisionRestaurantes,
+        BigDecimal comisionDelivery,
         BigDecimal ingresosTotalesPlataforma,
         List<MetodoPagoEstadisticaDTO> metodosPagoMasUsados,
         List<RestauranteMasActivoDTO> restaurantesMasActivos,

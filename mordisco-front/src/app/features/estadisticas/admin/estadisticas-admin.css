@@ -37,6 +37,35 @@
   margin-bottom: 24px;
 }
 
+/* Revenue Cards */
+.revenue-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+  .revenue-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.revenue-card.total {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.revenue-card.total mat-card-title,
+.revenue-card.total .stat-number,
+.revenue-card.total .stat-subtitle {
+  color: white !important;
+}
+
+.revenue-card.total .card-icon {
+  color: white !important;
+}
+
 .stat-card {
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -69,6 +98,14 @@
 
 .card-icon.revenue {
   color: #ff9800;
+}
+
+.card-icon.restaurant {
+  color: #f44336;
+}
+
+.card-icon.delivery {
+  color: #00bcd4;
 }
 
 .stat-number {

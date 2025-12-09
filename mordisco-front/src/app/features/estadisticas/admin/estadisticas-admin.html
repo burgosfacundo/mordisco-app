@@ -47,16 +47,43 @@
         <div class="stat-subtitle">Pedidos completados</div>
       </mat-card-content>
     </mat-card>
+  </div>
+
+  <!-- Cards de Ingresos (3 columnas) -->
+  <div class="revenue-cards">
+    <!-- Comisión Restaurantes -->
+    <mat-card class="stat-card revenue-card">
+      <mat-card-header>
+        <mat-icon class="card-icon restaurant">restaurant</mat-icon>
+        <mat-card-title>Comisión Restaurantes</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-number">{{ formatCurrency(stats.comisionRestaurantes) }}</div>
+        <div class="stat-subtitle">Comisiones sobre ventas</div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Comisión Delivery -->
+    <mat-card class="stat-card revenue-card">
+      <mat-card-header>
+        <mat-icon class="card-icon delivery">local_shipping</mat-icon>
+        <mat-card-title>Comisión Delivery</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-number">{{ formatCurrency(stats.comisionDelivery) }}</div>
+        <div class="stat-subtitle">Comisiones sobre envíos</div>
+      </mat-card-content>
+    </mat-card>
 
     <!-- Ingresos Totales -->
-    <mat-card class="stat-card">
+    <mat-card class="stat-card revenue-card total">
       <mat-card-header>
         <mat-icon class="card-icon revenue">attach_money</mat-icon>
         <mat-card-title>Ingresos Totales</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="stat-number">{{ formatCurrency(stats.ingresosTotalesPlataforma) }}</div>
-        <div class="stat-subtitle">Ingresos de la plataforma</div>
+        <div class="stat-subtitle">Total comisiones plataforma</div>
       </mat-card-content>
     </mat-card>
   </div>

@@ -320,10 +320,75 @@ WHERE
     Integer countTotalPedidosCompletados();
 
     /**
-     * Calcula los ingresos totales de la plataforma (subtotal de productos)
-     * @return Ingresos totales
+     * Calcula las comisiones de la plataforma sobre ventas de restaurantes
+     * Comisión = subtotal_productos * (100 - porcentajeGananciasRestaurante) / 100
+     * @return Total de comisiones sobre restaurantes
      */
-    @Query("SELECT COALESCE(SUM(p.subtotalProductos), 0) FROM Pedido p WHERE p.estado = 'COMPLETADO'")
+    @Query(value = """
+            SELECT COALESCE(
+                SUM(
+                    p.subtotal_productos *
+                    (100 - (SELECT cs.porcentaje_ganancias_restaurante
+                            FROM configuracion_sistema cs
+                            ORDER BY cs.fecha_actualizacion DESC
+                            LIMIT 1)) / 100
+                ), 0)
+            FROM pedidos p
+            WHERE p.estado = 'COMPLETADO'
+            """, nativeQuery = true)
+    java.math.BigDecimal calcularComisionRestaurantes();
+
+    /**
+     * Calcula las comisiones de la plataforma sobre delivery
+     * Comisión = costo_delivery * (100 - porcentajeGananciasRepartidor) / 100
+     * Solo para pedidos tipo DELIVERY
+     * @return Total de comisiones sobre delivery
+     */
+    @Query(value = """
+            SELECT COALESCE(
+                SUM(
+                    p.costo_delivery *
+                    (100 - (SELECT cs.porcentaje_ganancias_repartidor
+                            FROM configuracion_sistema cs
+                            ORDER BY cs.fecha_actualizacion DESC
+                            LIMIT 1)) / 100
+                ), 0)
+            FROM pedidos p
+            WHERE p.estado = 'COMPLETADO'
+            AND p.tipo_entrega = 'DELIVERY'
+            AND p.costo_delivery IS NOT NULL
+            """, nativeQuery = true)
+    java.math.BigDecimal calcularComisionDelivery();
+
+    /**
+     * Calcula los ingresos totales de la plataforma (suma de comisiones de restaurantes + delivery)
+     * @return Ingresos totales de la plataforma
+     */
+    @Query(value = """
+            SELECT COALESCE(
+                (SELECT SUM(
+                    p.subtotal_productos *
+                    (100 - (SELECT cs.porcentaje_ganancias_restaurante
+                            FROM configuracion_sistema cs
+                            ORDER BY cs.fecha_actualizacion DESC
+                            LIMIT 1)) / 100
+                )
+                FROM pedidos p
+                WHERE p.estado = 'COMPLETADO')
+                +
+                (SELECT SUM(
+                    p.costo_delivery *
+                    (100 - (SELECT cs.porcentaje_ganancias_repartidor
+                            FROM configuracion_sistema cs
+                            ORDER BY cs.fecha_actualizacion DESC
+                            LIMIT 1)) / 100
+                )
+                FROM pedidos p
+                WHERE p.estado = 'COMPLETADO'
+                AND p.tipo_entrega = 'DELIVERY'
+                AND p.costo_delivery IS NOT NULL)
+            , 0)
+            """, nativeQuery = true)
     java.math.BigDecimal calcularIngresosTotalesPlataforma();
 
     /**

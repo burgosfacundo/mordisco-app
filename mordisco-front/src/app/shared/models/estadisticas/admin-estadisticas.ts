@@ -28,6 +28,8 @@ export interface RepartidorMasActivo {
 export interface AdminEstadisticas {
   usuariosTotales: UsuariosTotales;
   totalPedidos: number;
+  comisionRestaurantes: number;
+  comisionDelivery: number;
   ingresosTotalesPlataforma: number;
   metodosPagoMasUsados: MetodoPagoEstadistica[];
   restaurantesMasActivos: RestauranteMasActivo[];
