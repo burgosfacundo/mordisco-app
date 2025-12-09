@@ -122,7 +122,9 @@ WHERE
             LEFT JOIN pedidos p ON p.repartidor_id = u.id AND p.estado = 'COMPLETADO'
             LEFT JOIN ganancias_repartidor gr ON gr.repartidor_id = u.id
             WHERE u.rol_id = (SELECT id FROM roles WHERE nombre = 'REPARTIDOR')
+              AND u.baja_logica = false
             GROUP BY u.id, u.nombre, u.apellido
+            HAVING COUNT(p.id) > 0
             ORDER BY entregas_realizadas DESC
             LIMIT 10
             """, nativeQuery = true)
