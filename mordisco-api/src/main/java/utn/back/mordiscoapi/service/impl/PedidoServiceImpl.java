@@ -139,6 +139,9 @@ public class PedidoServiceImpl implements IPedidoService {
             return preference;
 
         } else if (dto.metodoPago() == MetodoPago.EFECTIVO) {
+            // Forzar carga de relaciones necesarias para eventos asíncronos
+            restaurante.getUsuario().getId(); // Forzar carga del usuario del restaurante
+
             // Para efectivo, publicar evento de nuevo pedido
             eventPublisher.publishEvent(new PedidoCreatedEvent(pedido));
 
@@ -217,7 +220,7 @@ public class PedidoServiceImpl implements IPedidoService {
     public void changeState(Long id, EstadoPedido nuevoEstado)
             throws NotFoundException, BadRequestException {
 
-        Pedido pedido = pedidoRepository.findById(id)
+        Pedido pedido = pedidoRepository.findByIdWithRelations(id)
                 .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
 
         EstadoPedido estadoActual = pedido.getEstado();
@@ -379,7 +382,7 @@ public class PedidoServiceImpl implements IPedidoService {
      */
     @Override
     public void cancelarPedido(Long id) throws NotFoundException, BadRequestException {
-        var pedido = pedidoRepository.findById(id)
+        var pedido = pedidoRepository.findByIdWithRelations(id)
                 .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
 
         EstadoPedido estadoActual = pedido.getEstado();
@@ -572,7 +575,7 @@ public class PedidoServiceImpl implements IPedidoService {
     public void marcarComoEntregado(Long pedidoId, Long repartidorId)
             throws NotFoundException, BadRequestException {
 
-        Pedido pedido = pedidoRepository.findById(pedidoId)
+        Pedido pedido = pedidoRepository.findByIdWithRelations(pedidoId)
                 .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
 
         // Validar que el repartidor sea el asignado

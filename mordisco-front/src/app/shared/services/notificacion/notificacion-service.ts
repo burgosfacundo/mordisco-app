@@ -8,7 +8,7 @@ import { environment } from '../../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class NotificacionService {
   private client?: Client;
-  private subscription?: StompSubscription;
+  private subscriptions: StompSubscription[] = [];
   private snackBar = inject(MatSnackBar);
   
   private readonly STORAGE_KEY = 'mordisco_notificaciones';
@@ -35,6 +35,7 @@ export class NotificacionService {
     this.cargarNotificacionesDesdeStorage();
   }
 
+
   conectar(userId: number, role: string): void {
     if (this.client?.connected) {
       return;
@@ -43,7 +44,7 @@ export class NotificacionService {
     const wsUrl = environment.apiUrl.replace(/^http/, 'ws') + '/ws';
 
     this.client = new Client({
-       webSocketFactory: () => new WebSocket(wsUrl),
+      webSocketFactory: () => new WebSocket(wsUrl),
       
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
@@ -51,10 +52,10 @@ export class NotificacionService {
       
       onConnect: () => {
         this._conectado.set(true);
+
+        const topicUsuario = `/topic/usuario/${userId}`;
         
-        const topic = this.obtenerTopic(userId, role);
-        
-        this.subscription = this.client?.subscribe(topic, (message) => {
+        const sub = this.client?.subscribe(topicUsuario, (message) => {
           try {
             const notif = JSON.parse(message.body);
             this.procesarNotificacion(notif);
@@ -62,6 +63,29 @@ export class NotificacionService {
             console.error('❌ Error al parsear notificación:', error);
           }
         });
+        
+        if (sub) {
+          this.subscriptions.push(sub);
+        }
+
+        // Si es repartidor, también suscribirse al broadcast
+        const roleNormalizado = role.toUpperCase().replace('ROLE_', '');
+        if (roleNormalizado === 'REPARTIDOR') {
+          const topicRepartidores = '/topic/repartidores';
+          
+          const subRepartidores = this.client?.subscribe(topicRepartidores, (message) => {
+            try {
+              const notif = JSON.parse(message.body);
+              this.procesarNotificacion(notif);
+            } catch (error) {
+              console.error('❌ Error al parsear notificación:', error);
+            }
+          });
+          
+          if (subRepartidores) {
+            this.subscriptions.push(subRepartidores);
+          }
+        }
       },
       
       onDisconnect: () => {
@@ -69,10 +93,12 @@ export class NotificacionService {
       },
       
       onStompError: (frame) => {
+        console.error('❌ Error STOMP:', frame);
         this._conectado.set(false);
       },
       
       onWebSocketError: (event) => {
+        console.error('❌ Error WebSocket:', event);
         this._conectado.set(false);
       },
 
@@ -85,10 +111,15 @@ export class NotificacionService {
   }
 
   desconectar(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = undefined;
-    }
+    // Desuscribirse de todos los topics
+    this.subscriptions.forEach(sub => {
+      try {
+        sub.unsubscribe();
+      } catch (error) {
+        console.error('Error al desuscribirse:', error);
+      }
+    });
+    this.subscriptions = [];
     
     if (this.client) {
       this.client.deactivate();
@@ -96,31 +127,6 @@ export class NotificacionService {
     }
     
     this._conectado.set(false);
-  }
-
-  private obtenerTopic(userId: number, role: string): string {
-    const roleNormalizado = role.toUpperCase().replace('ROLE_', '');
-    
-    let topic: string;
-    
-    switch (roleNormalizado) {
-      case 'RESTAURANTE':
-        topic = `/topic/restaurante/${userId}`;
-        break;
-      case 'CLIENTE':
-        topic = `/topic/cliente/${userId}`;
-        break;
-      case 'REPARTIDOR':
-        topic = `/topic/repartidor/${userId}`;
-        break;
-      case 'ADMIN':
-        topic = `/topic/admin/${userId}`;
-        break;
-      default:
-        topic = `/topic/usuario/${userId}`;
-    }
-    
-    return topic;
   }
 
   private procesarNotificacion(data: any): void {

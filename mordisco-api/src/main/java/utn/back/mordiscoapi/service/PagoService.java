@@ -63,8 +63,8 @@ public class PagoService {
 
             Long pedidoId = Long.parseLong(externalReference);
 
-            // Buscar el pago en la BD
-            Pago pago = pagoRepository.findByPedidoId(pedidoId)
+            // Buscar el pago en la BD con relaciones cargadas para eventos
+            Pago pago = pagoRepository.findByPedidoIdWithRelations(pedidoId)
                     .orElseThrow(() -> new RuntimeException("Pago no encontrado para pedido #" + pedidoId));
 
             // Actualizar información del pago

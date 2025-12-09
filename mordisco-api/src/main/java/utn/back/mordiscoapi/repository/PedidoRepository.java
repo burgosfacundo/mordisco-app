@@ -429,6 +429,19 @@ WHERE
             ORDER BY periodo
             """, nativeQuery = true)
     java.util.List<Object[]> findPedidosPorMesRepartidor(@Param("repartidorId") Long repartidorId);
-    
+
+    /**
+     * Encuentra un pedido por ID con sus relaciones cargadas (para eventos)
+     * Carga: cliente, restaurante y usuario del restaurante
+     */
+    @Query("""
+            SELECT p FROM Pedido p
+            LEFT JOIN FETCH p.cliente
+            LEFT JOIN FETCH p.restaurante r
+            LEFT JOIN FETCH r.usuario
+            WHERE p.id = :id
+            """)
+    java.util.Optional<Pedido> findByIdWithRelations(@Param("id") Long id);
+
 }
 
