@@ -393,16 +393,17 @@ WHERE
 
     /**
      * Encuentra los métodos de pago más usados con estadísticas
+     * Incluye todos los pedidos excepto CANCELADO (ya que el pago fue procesado)
      * @return Lista de métodos de pago con cantidad y porcentaje
      */
     @Query(value = """
-            SELECT 
+            SELECT
                 pago.metodo_pago,
                 COUNT(*) as cantidad,
-                (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM pedidos WHERE estado = 'COMPLETADO')) as porcentaje
+                (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM pedidos WHERE estado != 'CANCELADO')) as porcentaje
             FROM pedidos p
             JOIN pagos pago ON p.id = pago.pedido_id
-            WHERE p.estado = 'COMPLETADO'
+            WHERE p.estado != 'CANCELADO'
             GROUP BY pago.metodo_pago
             ORDER BY cantidad DESC
             """, nativeQuery = true)

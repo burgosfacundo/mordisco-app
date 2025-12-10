@@ -146,16 +146,15 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     @Transactional
     @Override
     public void delete(Long id) throws NotFoundException, BadRequestException {
-        if (!repository.existsById(id)){
-            throw new NotFoundException("Usuario no encontrado");
-        }
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         long pedidosActivos = repository.countPedidosActivosComoCliente(id);
 
         if (pedidosActivos > 0) {
             String mensaje = String.format(
-                    "No se puede eliminar la cuenta. Tienes %d pedido%s activo%s. " +
-                            "Debe esperar a que se completen o cancelarlos antes de eliminar tu cuenta.",
+                    "No se puede bloquear la cuenta. El usuario tiene %d pedido%s activo%s. " +
+                            "Debe esperar a que se completen o cancelarlos antes de bloquear la cuenta.",
                     pedidosActivos,
                     pedidosActivos == 1 ? "" : "s",
                     pedidosActivos == 1 ? "" : "s"
@@ -164,7 +163,11 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
             throw new BadRequestException(mensaje);
         }
 
-        repository.deleteById(id);
+        // Baja lógica - bloqueo por administrador
+        usuario.setBajaLogica(true);
+        usuario.setFechaBaja(java.time.LocalDateTime.now());
+        usuario.setMotivoBaja("Bloqueado por administrador");
+        repository.save(usuario);
     }
 
     /**
@@ -185,14 +188,10 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
 
     @Override
     public void deleteMe() throws NotFoundException, BadRequestException {
-        var userAuthenticated = authUtils.getUsuarioAutenticado()
+        Usuario usuario = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("No autenticado"));
 
-        if(!repository.existsById(userAuthenticated.getId())){
-            throw new NotFoundException("Usuario no encontrado");
-        }
-
-        long pedidosActivos = repository.countPedidosActivosComoCliente(userAuthenticated.getId());
+        long pedidosActivos = repository.countPedidosActivosComoCliente(usuario.getId());
 
         if (pedidosActivos > 0) {
             String mensaje = String.format(
@@ -206,7 +205,11 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
             throw new BadRequestException(mensaje);
         }
 
-        repository.deleteById(userAuthenticated.getId());
+        // Baja lógica en lugar de eliminación física
+        usuario.setBajaLogica(true);
+        usuario.setFechaBaja(java.time.LocalDateTime.now());
+        usuario.setMotivoBaja("Eliminación solicitada por el usuario");
+        repository.save(usuario);
     }
 
     /**

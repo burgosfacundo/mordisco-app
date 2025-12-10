@@ -23,17 +23,19 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     /**
      * Cuenta los pedidos activos de un usuario (como cliente)
+     * Estados activos: todos excepto COMPLETADO y CANCELADO
      *
      * @param usuarioId ID del usuario
      * @return Cantidad de pedidos activos
      */
     @Query("SELECT COUNT(p) FROM Pedido p " +
             "WHERE p.cliente.id = :usuarioId " +
-            "AND p.estado IN ('PENDIENTE', 'EN_PROCESO', 'EN_CAMINO')")
+            "AND p.estado NOT IN ('COMPLETADO', 'CANCELADO')")
     long countPedidosActivosComoCliente(@Param("usuarioId") Long usuarioId);
 
     /**
      * Obtiene los pedidos activos de un usuario como cliente
+     * Estados activos: todos excepto COMPLETADO y CANCELADO
      *
      * @param usuarioId ID del usuario
      * @param pageable Paginación
@@ -41,7 +43,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      */
     @Query("SELECT p FROM Pedido p " +
             "WHERE p.cliente.id = :usuarioId " +
-            "AND p.estado IN ('PENDIENTE', 'EN_PROCESO', 'EN_CAMINO') " +
+            "AND p.estado NOT IN ('COMPLETADO', 'CANCELADO') " +
             "ORDER BY p.fechaHora DESC")
     Page<Pedido> findPedidosActivosComoCliente(
             @Param("usuarioId") Long usuarioId,
@@ -103,11 +105,11 @@ WHERE
     );
 
     /**
-     * Cuenta usuarios por rol
+     * Cuenta usuarios activos por rol (excluye usuarios con baja lógica)
      * @param rolId ID del rol
-     * @return Cantidad de usuarios con ese rol
+     * @return Cantidad de usuarios activos con ese rol
      */
-    @Query("SELECT COUNT(u) FROM Usuario u WHERE u.rol.id = :rolId")
+    @Query("SELECT COUNT(u) FROM Usuario u WHERE u.rol.id = :rolId AND u.bajaLogica = false")
     Integer countByRolId(@Param("rolId") Long rolId);
 
     /**
