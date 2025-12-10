@@ -7,14 +7,14 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 form-field">
         <fieldset>
             <label for="nombre" class="form-label">Nombre</label>
-            <input 
-                type="text" 
-                id="nombre" 
+            <input
+                type="text"
+                id="nombre"
                 placeholder="Ingrese el nombre"
-                formControlName="nombre" 
+                formControlName="nombre"
                 class="form-input"
-                [class.border-red-500]="getError"
-                [class.focus:ring-red-500]="getError"
+                [class.border-red-500]="getError('nombre')"
+                [class.focus:ring-red-500]="getError('nombre')"
             >
             @if (getError('nombre')) {
                 <p class="form-error">{{ getError('nombre') }}</p>
@@ -23,14 +23,14 @@
 
         <fieldset>
             <label for="apellido" class="form-label">Apellido</label>
-            <input 
-                type="text" 
-                id="apellido" 
+            <input
+                type="text"
+                id="apellido"
                 placeholder="Ingrese el apellido"
-                formControlName="apellido" 
+                formControlName="apellido"
                 class="form-input"
-                [class.border-red-500]="getError"
-                [class.focus:ring-red-500]="getError"
+                [class.border-red-500]="getError('apellido')"
+                [class.focus:ring-red-500]="getError('apellido')"
             >
             @if (getError('apellido')) {
                 <p class="form-error">{{ getError('apellido') }}</p>
@@ -42,14 +42,14 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 form-field">
         <fieldset>
             <label for="telefono" class="form-label">Teléfono</label>
-            <input 
-                type="text" 
-                id="telefono" 
+            <input
+                type="text"
+                id="telefono"
                 placeholder="+54 9 223 123456"
-                formControlName="telefono" 
+                formControlName="telefono"
                 class="form-input"
-                [class.border-red-500]="getError"
-                [class.focus:ring-red-500]="getError"
+                [class.border-red-500]="getError('telefono')"
+                [class.focus:ring-red-500]="getError('telefono')"
             >
             @if (getError('telefono')) {
                 <p class="form-error">{{ getError('telefono') }}</p>
@@ -78,14 +78,14 @@
     <!-- Fila 3: Email (campo completo) -->
     <fieldset class="form-field">
         <label for="email" class="form-label">Email</label>
-        <input 
-            type="email" 
-            id="email" 
+        <input
+            type="email"
+            id="email"
             placeholder="Ingresa tu email"
-            formControlName="email" 
+            formControlName="email"
             class="form-input"
-            [class.border-red-500]="getError"
-            [class.focus:ring-red-500]="getError"
+            [class.border-red-500]="getError('email')"
+            [class.focus:ring-red-500]="getError('email')"
         >
         @if (getError('email')) {
             <p class="form-error">{{ getError('email') }}</p>
@@ -96,14 +96,14 @@
     <fieldset class="form-field">
         <label for="password" class="form-label">Contraseña</label>
         <div class="relative">    
-            <input 
-                [type]="showPassword ? 'text' : 'password'" 
-                id="password" 
+            <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
                 placeholder="Ingresa tu contraseña"
-                formControlName="password" 
+                formControlName="password"
                 class="form-input"
-                [class.border-red-500]="getError"
-                [class.focus:ring-red-500]="getError"
+                [class.border-red-500]="getError('password')"
+                [class.focus:ring-red-500]="getError('password')"
             >
             <button
                 type="button"

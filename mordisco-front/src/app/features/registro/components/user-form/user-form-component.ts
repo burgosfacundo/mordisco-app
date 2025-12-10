@@ -36,7 +36,7 @@ export class UserFormComponent implements OnInit{
       email: ['', [Validators.required, Validators.minLength(5),Validators.email,Validators.maxLength(100)]],
       password: ['', [Validators.required, Validators.minLength(8),Validators.maxLength(50), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]],
       password2: ['', [Validators.required, Validators.minLength(8),Validators.maxLength(50), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]],      
-      rolId: ['', Validators.required,Validators.min(1),Validators.max(4)]
+      rolId: ['', [Validators.required, Validators.min(1), Validators.max(4)]]
     }, { validators : this.passwordsMatchValidator});
   }
 
