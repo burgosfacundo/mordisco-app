@@ -52,7 +52,6 @@
                        text-gray-700 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400
                        transition-all cursor-pointer hover:bg-gray-50">
                 <option value="">Todos</option>
-                <option value="ROLE_ADMIN">Admin</option>
                 <option value="ROLE_CLIENTE">Cliente</option>
                 <option value="ROLE_RESTAURANTE">Restaurante</option>
                 <option value="ROLE_REPARTIDOR">Repartidor</option>
@@ -111,10 +110,12 @@
       @if (usuarios && usuarios.length > 0) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
           @for (usuario of usuarios; track usuario.id) {
-            <app-usuario-card-component 
-              [usuario]="usuario"
-              class="block h-full">
-            </app-usuario-card-component>
+            @if (usuario.rol !== "ROLE_ADMIN") {
+              <app-usuario-card-component 
+                [usuario]="usuario"
+                class="block h-full">
+              </app-usuario-card-component>
+            }
           }
         </div>
 
