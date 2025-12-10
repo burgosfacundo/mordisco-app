@@ -76,16 +76,15 @@ public class DireccionServiceImpl implements IDireccionService {
         Direccion d = DireccionMapper.fromCreateDTO(dto);
         d.setUsuario(u);
 
-        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
-                .ifPresent(latLng -> {
-                    d.setLatitud(latLng.lat());
-                    d.setLongitud(latLng.lng());
-                });
+        // Geocodificar la dirección
+        var coordenadas = geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal());
 
-        if (d.getLatitud() == null || d.getLongitud() == null) {
-            throw new BadRequestException("La dirección es incorrecta");
+        if (coordenadas.isEmpty()) {
+            throw new BadRequestException("No se pudo encontrar la dirección ingresada. Por favor, verifique que la calle, número, ciudad y código postal sean correctos.");
         }
 
+        d.setLatitud(coordenadas.get().lat());
+        d.setLongitud(coordenadas.get().lng());
 
         direccionRepository.save(d);
         return DireccionMapper.toDTO(d);
@@ -132,17 +131,19 @@ public class DireccionServiceImpl implements IDireccionService {
             throw new BadRequestException(mensaje.toString());
         }
 
-        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
-                .ifPresent(latLng -> {
-                    d.setLatitud(latLng.lat());
-                    d.setLongitud(latLng.lng());
-                });
+        // Aplicar los cambios del DTO antes de geocodificar
+        DireccionMapper.applyUpdate(dto, d);
 
-        if (d.getLatitud() == null || d.getLongitud() == null) {
-            throw new BadRequestException("La dirección es incorrecta");
+        // Geocodificar con los nuevos valores
+        var coordenadas = geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal());
+
+        if (coordenadas.isEmpty()) {
+            throw new BadRequestException("No se pudo encontrar la dirección ingresada. Por favor, verifique que la calle, número, ciudad y código postal sean correctos.");
         }
 
-        DireccionMapper.applyUpdate(dto, d);
+        d.setLatitud(coordenadas.get().lat());
+        d.setLongitud(coordenadas.get().lng());
+
         direccionRepository.save(d);
         return DireccionMapper.toDTO(d);
 

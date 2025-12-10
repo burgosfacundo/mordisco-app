@@ -10,7 +10,7 @@ import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteUpdateDTO;
 
 public interface IRestauranteService {
-    void save(RestauranteCreateDTO restauranteCreateDTO);
+    void save(RestauranteCreateDTO restauranteCreateDTO) throws BadRequestException;
 
     RestauranteResponseDTO findById(Long id) throws NotFoundException;
 

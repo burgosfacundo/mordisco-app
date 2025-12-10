@@ -124,8 +124,9 @@ export class RestauranteFormComponent implements OnInit {
         next: () => {
           this.toastService.success('✅ Restaurante actualizado correctamente');
           this.router.navigate(['/']);
+          this.isSubmitting = false;
         },
-        complete: () => {
+        error: () => {
           this.isSubmitting = false;
         }
       });
@@ -153,8 +154,9 @@ export class RestauranteFormComponent implements OnInit {
         next: () => {
           this.toastService.success('✅ Restaurante creado correctamente');
           this.router.navigate(['/']);
+          this.isSubmitting = false;
         },
-        complete: () => {
+        error: () => {
           this.isSubmitting = false;
         }
       });

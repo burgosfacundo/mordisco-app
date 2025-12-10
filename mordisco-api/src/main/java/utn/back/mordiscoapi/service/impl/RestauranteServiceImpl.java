@@ -39,15 +39,19 @@ public class RestauranteServiceImpl implements IRestauranteService {
      */
     @Transactional
     @Override
-    public void save(RestauranteCreateDTO restauranteCreateDTO) {
+    public void save(RestauranteCreateDTO restauranteCreateDTO) throws BadRequestException {
         Restaurante restaurante = RestauranteMapper.toEntity(restauranteCreateDTO);
         var d = restaurante.getDireccion();
 
-        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
-                .ifPresent(latLng -> {
-                    d.setLatitud(latLng.lat());
-                    d.setLongitud(latLng.lng());
-                });
+        // Geocodificar la dirección del restaurante
+        var coordenadas = geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal());
+
+        if (coordenadas.isEmpty()) {
+            throw new BadRequestException("No se pudo encontrar la dirección del restaurante. Por favor, verifique que la calle, número, ciudad y código postal sean correctos.");
+        }
+
+        d.setLatitud(coordenadas.get().lat());
+        d.setLongitud(coordenadas.get().lng());
 
         restauranteRepository.save(restaurante);
     }

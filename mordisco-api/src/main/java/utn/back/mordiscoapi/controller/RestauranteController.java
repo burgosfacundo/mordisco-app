@@ -82,7 +82,7 @@ public class RestauranteController {
     @PostMapping("/save")
     public ResponseEntity<Void> save(@RequestBody
                                        @Valid
-                                       RestauranteCreateDTO dto) {
+                                       RestauranteCreateDTO dto) throws BadRequestException {
         restauranteService.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
