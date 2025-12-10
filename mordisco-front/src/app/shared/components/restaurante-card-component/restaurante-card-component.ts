@@ -23,18 +23,20 @@ export class RestauranteCardComponent implements OnInit {
     this.getHorariosByRestaurante();
   }
 
+  isAbierto(): boolean {
+    const h = this.getHorarioDeHoy();
+    if (!h) return false;
+    return this.isOpenNow(h);
+  }
+
   getHorarios(): string {
     const h = this.getHorarioDeHoy();
 
     if (!h) return 'Cerrado';
 
-    return this.isOpenNow(h)
-      ? `${this.formatHHmm(h.horaApertura)} - ${this.formatHHmm(h.horaCierre)}`
-      : 'Cerrado';
-  }
+    if (!this.isOpenNow(h)) return 'Cerrado';
 
-  isAbierto(){
-    return this.getHorarios() === 'Cerrado' ? false : true
+    return `${this.formatHHmm(h.horaApertura)} - ${this.formatHHmm(h.horaCierre)}`;
   }
 
   getHorariosByRestaurante(){
