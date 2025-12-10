@@ -21,6 +21,7 @@ import ConfiguracionSistemaGeneralResponseDTO from '../../../../shared/models/co
 import { MetodoPago } from '../../../../shared/models/enums/metodo-pago';
 import PagoResponseDTO from '../../../../shared/models/pago/pago-response-dto';
 import { PagoService } from '../../../../shared/services/pagos/pago-service';
+import { PromptService } from '../../../../core/services/confirmation-prompt-service';
 
 @Component({
   selector: 'app-detalle-pedido-page',
@@ -44,6 +45,7 @@ export class DetallePedidoPage implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private configService = inject(ConfiguracionSistemaService)
   private pagoService = inject(PagoService)
+  private promptService = inject(PromptService);
  
   configSist? : ConfiguracionSistemaGeneralResponseDTO
 
@@ -212,6 +214,36 @@ export class DetallePedidoPage implements OnInit {
     });
   }
 
+  marcarRecibido(): void {
+    if (!this.pedido) return;
+
+    this.promptService.show({
+      title: 'Marcar como entregado',
+      message: 'Indica el PIN del pedido proporcionado por el cliente',
+      placeholder: 'Ej: XXXXX',
+      required: true,
+      confirmText: 'Entregado',
+      type: 'danger'
+    }).subscribe(result => {
+      if (!result.confirmed || !this.pedido) return;
+
+      const PIN: string = result.value?.toUpperCase() ?? "";
+
+      if (PIN === this.pedido.pin?.toUpperCase()) {
+        this.pedidoService.marcarComoEntregado(this.pedido.id).subscribe({
+          next: () => {
+            this.toastService.success('✅ Pedido marcado como "Completado"');
+            this.loadPedido();
+          }
+        });
+      } else {
+        this.promptService.updateValue(""); // limpia el valor
+        this.promptService.shakeInput();    // vibra el input
+        this.toastService.error("PIN incorrecto");
+      }
+    });
+  }
+
   volver(): void {
     if(this.isUsuario === 'ROLE_CLIENTE')
       this.router.navigate(['/cliente/pedidos']);
@@ -263,9 +295,9 @@ export class DetallePedidoPage implements OnInit {
           type: 'danger'
         }).subscribe(confirmed => {
           if (!confirmed) return;
-          this.pedidoService.cancel(this.pedido?.id!).subscribe({
+          this.cService.eliminarCalificacionRepartidor(id).subscribe({
                   next: () => {
-                    this.toastService.success('✅ Pedido cancelado');
+                    this.toastService.success('✅ Calificación eliminada');
                     this.loadPedido();
                   }
           });
@@ -280,9 +312,9 @@ export class DetallePedidoPage implements OnInit {
           type: 'danger'
         }).subscribe(confirmed => {
           if (!confirmed) return;
-          this.pedidoService.cancel(this.pedido?.id!).subscribe({
+          this.cService.eliminarCalificacionPedido(id).subscribe({
                   next: () => {
-                    this.toastService.success('✅ Pedido cancelado');
+                    this.toastService.success('✅ Calificación eliminada');
                     this.loadPedido();
                   }
           });

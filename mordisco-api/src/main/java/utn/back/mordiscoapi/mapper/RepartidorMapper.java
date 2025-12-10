@@ -8,6 +8,6 @@ import utn.back.mordiscoapi.model.entity.Usuario;
 public class RepartidorMapper {
 
     public static RepartidorBasicDTO toRepartidorBasicDTO (Usuario r){
-        return new RepartidorBasicDTO(r.getId(), r.getNombre(), r.getApellido());
+        return new RepartidorBasicDTO(r.getId(), r.getNombre(), r.getApellido(), r.getTelefono());
     }
 }

@@ -9,5 +9,6 @@ import DireccionResponse from '../../../../shared/models/direccion/direccion-res
 export class DireccionCardComponent {
 
   direccion = input<DireccionResponse>()
+  hideAlias = input<boolean>(false)
 
 }

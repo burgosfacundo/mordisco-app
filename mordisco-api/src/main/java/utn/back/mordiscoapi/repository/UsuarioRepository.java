@@ -131,4 +131,28 @@ WHERE
             LIMIT 10
             """, nativeQuery = true)
     List<Object[]> findRepartidoresMasActivos();
+
+    /**
+     * Cuenta los pedidos activos de un usuario (como repartidor)
+     * Estados activos: todos excepto COMPLETADO y CANCELADO
+     *
+     * @param usuarioId ID del usuario
+     * @return Cantidad de pedidos activos
+     */
+    @Query("SELECT COUNT(p) FROM Pedido p " +
+            "WHERE p.repartidor.id = :usuarioId " +
+            "AND p.estado NOT IN ('COMPLETADO', 'CANCELADO')")
+    long countPedidosActivosComoRepartidor(@Param("usuarioId") Long usuarioId);
+
+    /**
+     * Cuenta los pedidos activos del restaurante de un usuario
+     * Estados activos: todos excepto COMPLETADO y CANCELADO
+     *
+     * @param usuarioId ID del usuario (debe tener rol RESTAURANTE)
+     * @return Cantidad de pedidos activos del restaurante
+     */
+    @Query("SELECT COUNT(p) FROM Pedido p " +
+            "WHERE p.restaurante.usuario.id = :usuarioId " +
+            "AND p.estado NOT IN ('COMPLETADO', 'CANCELADO')")
+    long countPedidosActivosDeRestaurante(@Param("usuarioId") Long usuarioId);
 }

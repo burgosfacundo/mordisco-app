@@ -26,7 +26,7 @@ public interface IUsuarioService {
     Page<UsuarioCardDTO> findByRolId(int pageNo,int pageSize,Long id) throws NotFoundException;
     void update(Long id, UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;
     void updateMe(UsuarioUpdateDTO dto) throws NotFoundException, BadRequestException;
-    void darDeBaja(Long usuarioId, String motivo) throws NotFoundException;
+    void darDeBaja(Long usuarioId, String motivo) throws NotFoundException, BadRequestException;
     void reactivar(Long usuarioId) throws NotFoundException;
     Page<UsuarioCardDTO> filtrarUsuarios (int pageNo, int pageSize, String search, String bajaLogica, String rol) throws NotFoundException;
 }

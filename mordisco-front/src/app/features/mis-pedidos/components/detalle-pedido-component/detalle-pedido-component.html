@@ -108,6 +108,23 @@
       </div>
     }
 
+
+    <!-- Información del Repartidor (si está asignado) -->
+    @if (pedidoResponse()?.repartidor && pedidoResponse()?.tipoEntrega === tipoEntregaEnum.DELIVERY) {
+      <div class="border-b border-gray-200 pb-4">
+        <h4 class="font-semibold text-gray-900 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
+          <mat-icon class="text-green-600">delivery_dining</mat-icon>
+          Repartidor Asignado
+        </h4>
+        <p class="text-sm font-semibold text-gray-900 mb-1">
+          {{ pedidoResponse()?.repartidor?.nombre }} {{ pedidoResponse()?.repartidor?.apellido }}
+        </p>
+        <p class="text-sm text-gray-700">
+          <span class="font-semibold">Teléfono:</span> {{ pedidoResponse()?.repartidor?.telefono }}
+        </p>
+      </div>
+    }
+
     <!-- Total -->
     <div class="flex items-center justify-between pt-2">
       <span class="font-bold text-gray-900 text-lg">Total:</span>

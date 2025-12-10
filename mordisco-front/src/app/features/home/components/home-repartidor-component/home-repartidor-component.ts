@@ -89,7 +89,7 @@ export class HomeRepartidorComponent {
       message: 'Indica el PIN del pedido proporcionado por el cliente',
       placeholder: 'Ej: XXXXX',
       required: true,
-      confirmText: 'Entrgado',
+      confirmText: 'Entregado',
       type: 'danger'
     }).subscribe(result => {
       if (!result.confirmed) return;

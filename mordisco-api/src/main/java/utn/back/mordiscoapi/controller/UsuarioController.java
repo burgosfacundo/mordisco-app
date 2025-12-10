@@ -340,7 +340,7 @@ public class UsuarioController {
     public ResponseEntity<Void> darDeBaja(
             @PathVariable Long id,
             @RequestBody @Valid BajaLogicaRequestDTO dto)
-            throws NotFoundException {
+            throws NotFoundException, BadRequestException {
         service.darDeBaja(id, dto.motivo());
         return ResponseEntity.ok().build();
     }

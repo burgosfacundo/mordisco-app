@@ -78,7 +78,7 @@
       <div class="flex items-start gap-3">
         <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
           <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
         </div>
@@ -87,6 +87,11 @@
           <p class="text-sm font-semibold text-gray-900 truncate">
             {{ pedido()?.restaurante?.razonSocial || 'Sin restaurante' }}
           </p>
+          @if (pedido()?.restaurante?.direccion) {
+            <p class="text-xs text-gray-600 mt-0.5">
+              {{ pedido()?.restaurante?.direccion?.calle }} {{ pedido()?.restaurante?.direccion?.numero }}, {{ pedido()?.restaurante?.direccion?.ciudad }}
+            </p>
+          }
         </div>
       </div>
     }
@@ -142,7 +147,7 @@
     <div class="flex items-start gap-3">
       <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
         <svg class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
@@ -153,6 +158,34 @@
         </p>
       </div>
     </div>
+
+    <!-- PIN del Pedido (solo para CLIENTE) -->
+    @if (isUsuario() === 'ROLE_CLIENTE' && pedido()?.pin &&
+         (pedido()?.estado === EstadoPedido.EN_CAMINO ||
+          pedido()?.estado === EstadoPedido.LISTO_PARA_RETIRAR ||
+          pedido()?.estado === EstadoPedido.ASIGNADO_A_REPARTIDOR)) {
+      <div class="bg-amber-50 border-2 border-amber-300 rounded-lg p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-amber-200 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-xs text-amber-700 font-bold uppercase tracking-wide mb-1">
+              PIN de Verificación
+            </p>
+            <p class="text-2xl font-bold text-amber-900 tracking-wider font-mono">
+              {{ pedido()?.pin }}
+            </p>
+            <p class="text-xs text-amber-600 mt-1">
+              Proporciona este PIN para confirmar la entrega
+            </p>
+          </div>
+        </div>
+      </div>
+    }
 
     @if ( this.isUsuario() === 'ROLE_RESTAURANTE' && pedido()?.estado !== EstadoPedido.CANCELADO) {
     
@@ -254,7 +287,7 @@
                  hover:bg-pink-100 active:scale-95
                  transition-all duration-200
                  focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2">
-          El repartidor ya tiene el pedido. Marcar "En Camino"
+          Marcar "En Camino"
         </button>
       }
     } 

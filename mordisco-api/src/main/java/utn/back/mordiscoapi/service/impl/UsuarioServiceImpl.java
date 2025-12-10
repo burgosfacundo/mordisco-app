@@ -191,24 +191,70 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         Usuario usuario = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("No autenticado"));
 
-        long pedidosActivos = repository.countPedidosActivosComoCliente(usuario.getId());
+        // Validar pedidos activos según el rol
+        if (usuario.getRol() != null) {
+            String rolNombre = usuario.getRol().getNombre();
+            long pedidosActivos = 0;
+            String mensajeError = "";
 
-        if (pedidosActivos > 0) {
-            String mensaje = String.format(
-                    "No se puede eliminar la cuenta. Tienes %d pedido%s activo%s. " +
-                            "Debe esperar a que se completen o cancelarlos antes de eliminar tu cuenta.",
-                    pedidosActivos,
-                    pedidosActivos == 1 ? "" : "s",
-                    pedidosActivos == 1 ? "" : "s"
-            );
+            switch (rolNombre) {
+                case "ROLE_CLIENTE":
+                    pedidosActivos = repository.countPedidosActivosComoCliente(usuario.getId());
+                    if (pedidosActivos > 0) {
+                        mensajeError = String.format(
+                                "No se puede eliminar la cuenta. Tienes %d pedido%s activo%s como cliente. " +
+                                        "Debes esperar a que se completen o cancelarlos antes de eliminar tu cuenta.",
+                                pedidosActivos,
+                                pedidosActivos == 1 ? "" : "s",
+                                pedidosActivos == 1 ? "" : "s"
+                        );
+                    }
+                    break;
+                case "ROLE_REPARTIDOR":
+                    pedidosActivos = repository.countPedidosActivosComoRepartidor(usuario.getId());
+                    if (pedidosActivos > 0) {
+                        mensajeError = String.format(
+                                "No se puede eliminar la cuenta. Tienes %d pedido%s activo%s asignado%s como repartidor. " +
+                                        "Debes esperar a que se completen o sean reasignados antes de eliminar tu cuenta.",
+                                pedidosActivos,
+                                pedidosActivos == 1 ? "" : "s",
+                                pedidosActivos == 1 ? "" : "s",
+                                pedidosActivos == 1 ? "" : "s"
+                        );
+                    }
+                    break;
+                case "ROLE_RESTAURANTE":
+                    pedidosActivos = repository.countPedidosActivosDeRestaurante(usuario.getId());
+                    if (pedidosActivos > 0) {
+                        mensajeError = String.format(
+                                "No se puede eliminar la cuenta. Tu restaurante tiene %d pedido%s activo%s. " +
+                                        "Debes esperar a que se completen o cancelarlos antes de eliminar tu cuenta.",
+                                pedidosActivos,
+                                pedidosActivos == 1 ? "" : "s",
+                                pedidosActivos == 1 ? "" : "s"
+                        );
+                    }
+                    break;
+                // ROLE_ADMIN y otros roles no requieren validación
+            }
 
-            throw new BadRequestException(mensaje);
+            if (pedidosActivos > 0) {
+                throw new BadRequestException(mensajeError);
+            }
         }
 
         // Baja lógica en lugar de eliminación física
         usuario.setBajaLogica(true);
         usuario.setFechaBaja(java.time.LocalDateTime.now());
         usuario.setMotivoBaja("Eliminación solicitada por el usuario");
+
+        // Si el usuario tiene rol RESTAURANTE, desactivar el restaurante
+        if (usuario.getRol() != null && "ROLE_RESTAURANTE".equals(usuario.getRol().getNombre())) {
+            if (usuario.getRestaurante() != null) {
+                usuario.getRestaurante().setActivo(false);
+            }
+        }
+
         repository.save(usuario);
     }
 
@@ -321,13 +367,49 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
 
     /**
      * Da de baja lógicamente a un usuario
+     * Valida que no tenga pedidos activos según su rol
      * Si el usuario tiene rol RESTAURANTE, también desactiva el restaurante
      */
     @Transactional
     @Override
-    public void darDeBaja(Long usuarioId, String motivo) throws NotFoundException {
+    public void darDeBaja(Long usuarioId, String motivo) throws NotFoundException, BadRequestException {
         Usuario usuario = repository.findById(usuarioId)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        // Validar pedidos activos según el rol
+        if (usuario.getRol() != null) {
+            String rolNombre = usuario.getRol().getNombre();
+            long pedidosActivos = 0;
+            String tipoUsuario = "";
+
+            switch (rolNombre) {
+                case "ROLE_CLIENTE":
+                    pedidosActivos = repository.countPedidosActivosComoCliente(usuarioId);
+                    tipoUsuario = "cliente";
+                    break;
+                case "ROLE_REPARTIDOR":
+                    pedidosActivos = repository.countPedidosActivosComoRepartidor(usuarioId);
+                    tipoUsuario = "repartidor";
+                    break;
+                case "ROLE_RESTAURANTE":
+                    pedidosActivos = repository.countPedidosActivosDeRestaurante(usuarioId);
+                    tipoUsuario = "restaurante";
+                    break;
+                // ROLE_ADMIN y otros roles no requieren validación
+            }
+
+            if (pedidosActivos > 0) {
+                String mensaje = String.format(
+                        "No se puede bloquear la cuenta. El %s tiene %d pedido%s activo%s. " +
+                                "Debe esperar a que se completen o cancelarlos antes de bloquear la cuenta.",
+                        tipoUsuario,
+                        pedidosActivos,
+                        pedidosActivos == 1 ? "" : "s",
+                        pedidosActivos == 1 ? "" : "s"
+                );
+                throw new BadRequestException(mensaje);
+            }
+        }
 
         usuario.setBajaLogica(true);
         usuario.setMotivoBaja(motivo);
@@ -341,7 +423,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         }
 
         repository.save(usuario);
-        
+
         // Publicar evento de cuenta bloqueada
         eventPublisher.publishEvent(new CuentaBloqueadaEvent(
                 usuario.getId(), usuario.getEmail(), usuario.getNombre(), motivo));

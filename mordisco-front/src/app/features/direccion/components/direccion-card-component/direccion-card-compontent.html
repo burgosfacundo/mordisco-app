@@ -11,7 +11,7 @@
     </div>
     <div class="flex-1 min-w-0">
       <p class="text-sm text-gray-500 font-medium">Dirección</p>
-      @if(direccion()?.alias){
+      @if(direccion()?.alias && !hideAlias()){
         <p class="text-base font-bold text-gray-900">{{direccion()?.alias}}</p>
       }@else {
         <p class="text-base font-bold text-gray-900">{{ direccion()?.calle }} {{ direccion()?.numero }}</p>
@@ -31,7 +31,7 @@
   </div>
 
   <div class="h-px bg-gray-200"></div>
-    @if(direccion()?.alias){
+    @if(direccion()?.alias && !hideAlias()){
       <p class="text-sm text-gray-700">{{ direccion()?.calle }} {{ direccion()?.numero }}</p>
     }
   <!-- Ciudad y CP -->
