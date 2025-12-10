@@ -115,6 +115,7 @@ export class MisPedidosClientePage implements OnInit {
       EstadoPedido.PENDIENTE,
       EstadoPedido.EN_PREPARACION,
       EstadoPedido.LISTO_PARA_RETIRAR,
+      EstadoPedido.ASIGNADO_A_REPARTIDOR,
       EstadoPedido.EN_CAMINO,
       EstadoPedido.COMPLETADO,
       EstadoPedido.CANCELADO

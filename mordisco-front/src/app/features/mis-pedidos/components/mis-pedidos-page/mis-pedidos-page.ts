@@ -17,6 +17,7 @@ import { BarraBuscadoraComponent } from '../../../../shared/components/barra-bus
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PagoService } from '../../../../shared/services/pagos/pago-service';
 
 @Component({
   selector: 'app-mis-pedidos-page',
@@ -51,6 +52,7 @@ export class MisPedidosPage implements OnInit {
   idUsuario? : number
   arrPedidos?: PedidoResponse[];
   restaurante?: RestauranteResponse;
+  
 
   sizePedidos = 10;
   pagePedidos = 0;
@@ -136,6 +138,7 @@ export class MisPedidosPage implements OnInit {
       EstadoPedido.EN_PREPARACION,
       EstadoPedido.LISTO_PARA_RETIRAR,
       EstadoPedido.LISTO_PARA_ENTREGAR,
+      EstadoPedido.ASIGNADO_A_REPARTIDOR,
       EstadoPedido.EN_CAMINO,
       EstadoPedido.COMPLETADO,
       EstadoPedido.CANCELADO

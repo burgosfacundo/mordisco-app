@@ -49,7 +49,7 @@ public interface RepartidorRepository extends JpaRepository<Usuario, Long> {
     Page<Pedido> findPedidosByRepartidor(@Param("idR") Long id, Pageable pageable);
 
     @Query(
-            value = "SELECT * FROM pedidos p WHERE p.repartidor_id = :idR AND p.estado = 'EN_CAMINO'",
+            value = "SELECT * FROM pedidos p WHERE p.repartidor_id = :idR AND (p.estado = 'EN_CAMINO' OR p.estado = 'ASIGNADO_A_REPARTIDOR')",
             nativeQuery = true)
     Page<Pedido> findPedidosAEntregarByRepartidor(@Param("idR") Long id, Pageable pageable);
 

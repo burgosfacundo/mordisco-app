@@ -256,7 +256,6 @@ public class PedidoServiceImpl implements IPedidoService {
      */
     private void validarCambioEstadoEspecifico(Pedido pedido, EstadoPedido nuevoEstado)
             throws BadRequestException {
-
         switch (nuevoEstado) {
             case EN_CAMINO -> {
                 // Solo válido para DELIVERY
@@ -280,6 +279,15 @@ public class PedidoServiceImpl implements IPedidoService {
                     );
                 }
             }
+            case ASIGNADO_A_REPARTIDOR -> {
+                // Solo válido para DELIVERY
+                if (pedido.getTipoEntrega() != TipoEntrega.DELIVERY) {
+                    throw new BadRequestException(
+                            "El estado 'PEDIDO_ASIGNADO_A_REPARTIDOR' solo es válido para pedidos de delivery"
+                    );
+                }
+            }
+
             case LISTO_PARA_ENTREGAR -> {
                 // Solo válido para DELIVERY
                 if (pedido.getTipoEntrega() != TipoEntrega.DELIVERY) {
@@ -322,6 +330,8 @@ public class PedidoServiceImpl implements IPedidoService {
                 // Publicar evento para notificar a repartidores
                 eventPublisher.publishEvent(new PedidoListoParaEntregarEvent(pedido));
             }
+
+            //faltan los nuevos estados
 
             case EN_CAMINO -> {
                 // Publicar evento de pedido en camino
@@ -586,11 +596,11 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setFechaAceptacionRepartidor(LocalDateTime.now());
         
         // Cambiar estado a EN_CAMINO cuando el repartidor acepta
-        pedido.setEstado(EstadoPedido.EN_CAMINO);
+        pedido.setEstado(EstadoPedido.ASIGNADO_A_REPARTIDOR);
 
         pedidoRepository.save(pedido);
         
-        log.info("🚚 Repartidor #{} asignado al pedido #{}. Estado: EN_CAMINO",
+        log.info("🚚 Repartidor #{} asignado al pedido #{}. Esta en camino al restaurante ",
                 repartidorId, pedidoId);
     }
 
@@ -667,7 +677,7 @@ public class PedidoServiceImpl implements IPedidoService {
             throw new BadRequestException("El pedido no te corresponde");
         }
 
-        if (pedido.getEstado() != EstadoPedido.EN_CAMINO) {
+        if (pedido.getEstado().equals(EstadoPedido.EN_CAMINO) || pedido.getEstado().equals(EstadoPedido.ASIGNADO_A_REPARTIDOR)) {
             throw new BadRequestException("Pedido no esta activo");
         }
 

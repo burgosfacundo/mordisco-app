@@ -11,6 +11,10 @@ import {
 import { TipoEntrega } from '../../models/enums/tipo-entrega';
 import { ConfiguracionSistemaService } from '../../services/configuracionSistema/configuracion-sistema-service';
 import ConfiguracionSistemaGeneralResponseDTO from '../../models/configuracion/configuracion-sistema-general-response-DTO';
+import { RepartidorService } from '../../services/repartidor/repartidor-service';
+import { PagoService } from '../../services/pagos/pago-service';
+import PagoResponseDTO from '../../models/pago/pago-response-dto';
+import { MetodoPago } from '../../models/enums/metodo-pago';
 
 @Component({
   selector: 'app-pedido-card-component',
@@ -21,9 +25,10 @@ import ConfiguracionSistemaGeneralResponseDTO from '../../models/configuracion/c
 export class PedidoCardComponent implements OnInit{
 
   private configService = inject(ConfiguracionSistemaService)
-
+  private pagoService = inject(PagoService)
 
   pedido = input<PedidoResponse>();
+  pagoPedido? : PagoResponseDTO
   isUsuario = input<string>();
   
   aceptarPedido = output<number>();
@@ -36,9 +41,12 @@ export class PedidoCardComponent implements OnInit{
   configSistema? : ConfiguracionSistemaGeneralResponseDTO
   EstadoPedido = EstadoPedido;
   TipoEntrega = TipoEntrega;
+  MetodoPago = MetodoPago
+
 
   ngOnInit(): void {
     this.obtenerConfiguraciones()
+    this.obtenerPagoPedido()
   }
 
   obtenerConfiguraciones(){
@@ -48,6 +56,13 @@ export class PedidoCardComponent implements OnInit{
         error: (e) => console.log("Error al cargar las configuraciones", e)
       })
     }
+  }
+
+  obtenerPagoPedido(){
+    if(!this.pedido()) return; 
+    this.pagoService.getPagoByPedidoId(this.pedido()?.id!).subscribe({
+      next:(d)=> this.pagoPedido = d
+    })
   }
 
   getEstadoBadgeClass(): string {

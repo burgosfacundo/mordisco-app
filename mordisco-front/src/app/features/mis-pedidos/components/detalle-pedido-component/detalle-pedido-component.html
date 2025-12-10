@@ -8,6 +8,13 @@
       <span [class]="getEstadoBadgeClass()">
         <span class="material-icons text-sm">{{ getEstadoIcon() }}</span>
         {{ getEstadoLabel() }}
+        @if(pedidoResponse()?.estado === estadoPedidoEnum.LISTO_PARA_ENTREGAR){
+          Buscando repartidor...
+        }@else if (pedidoResponse()?.estado === estadoPedidoEnum.ASIGNADO_A_REPARTIDOR) {
+          {{pedidoResponse()?.repartidor?.nombre}} {{pedidoResponse()?.repartidor?.apellido}}
+        }@else if (pedidoResponse()?.estado === estadoPedidoEnum.EN_CAMINO) {
+          {{pedidoResponse()?.repartidor?.nombre}} {{pedidoResponse()?.repartidor?.apellido}} con tu pedido
+        }
       </span>
           <span class="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide
                        bg-white text-primary-600 shadow-md">

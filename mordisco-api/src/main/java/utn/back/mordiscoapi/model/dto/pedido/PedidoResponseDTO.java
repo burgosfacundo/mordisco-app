@@ -5,6 +5,9 @@ import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.enums.TipoEntrega;
 import utn.back.mordiscoapi.model.dto.direccion.DireccionResponseDTO;
 import utn.back.mordiscoapi.model.dto.productoPedido.ProductoPedidoResponseDTO;
+import utn.back.mordiscoapi.model.dto.repartidor.RepartidorBasicDTO;
+import utn.back.mordiscoapi.model.dto.repartidor.RepartidorResponseDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,6 +39,8 @@ public record PedidoResponseDTO(
     BigDecimal distanciaKm,
     @Schema(description = "Subtotal solo productos (sin delivery)", example = "120.00")
     BigDecimal subtotalProductos,
+    @Schema(description = "Repartidor asigando")
+    RepartidorBasicDTO repartidor,
     @Schema(description = "Indica si el pedido está dado de baja", example = "false")
     Boolean bajaLogica,
     @Schema(description = "Motivo de la baja lógica", example = "Violación de términos de servicio")

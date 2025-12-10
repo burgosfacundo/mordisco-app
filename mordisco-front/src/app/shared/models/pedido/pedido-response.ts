@@ -4,6 +4,7 @@ import { TipoEntrega } from "../enums/tipo-entrega"
 import { EstadoPedido } from "../enums/estado-pedido"
 import DireccionResponse from "../direccion/direccion-response"
 import ProductoPedidoResponse from "../producto/producto-pedido-response"
+import RepartidorBasicDTO from "../repartidor/repartidor-basic-dto"
 
 
 export default interface PedidoResponse{
@@ -20,6 +21,7 @@ export default interface PedidoResponse{
     costoDelivery?: number,
     distanciaKm?: number,
     subtotalProductos?: number,
+    repartidor : RepartidorBasicDTO,
     bajaLogica? : boolean,
     motivoBaja? : string,
     fechaBaja? : string,

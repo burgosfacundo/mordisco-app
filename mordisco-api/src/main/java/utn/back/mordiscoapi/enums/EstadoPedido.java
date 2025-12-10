@@ -18,6 +18,7 @@ public enum EstadoPedido {
 
     // Estados para DELIVERY
     LISTO_PARA_ENTREGAR("Listo para Entregar", "Pedido listo para que el repartidor lo retire"),
+    ASIGNADO_A_REPARTIDOR ("Pedido asignado a repartidor", "Pedido aceptado por un repartidor"),
     EN_CAMINO("En Camino", "El repartidor está llevando tu pedido"),
 
     // Estado final común
@@ -35,7 +36,7 @@ public enum EstadoPedido {
     );
 
     private static final Set<EstadoPedido> ESTADOS_DELIVERY = EnumSet.of(
-            PENDIENTE, EN_PREPARACION, LISTO_PARA_ENTREGAR, EN_CAMINO, COMPLETADO, CANCELADO
+            PENDIENTE, EN_PREPARACION, LISTO_PARA_ENTREGAR, ASIGNADO_A_REPARTIDOR, EN_CAMINO, COMPLETADO, CANCELADO
     );
 
     /**
@@ -92,7 +93,8 @@ public enum EstadoPedido {
         return switch (this) {
             case PENDIENTE -> nuevoEstado == EN_PREPARACION || nuevoEstado == CANCELADO;
             case EN_PREPARACION -> nuevoEstado == LISTO_PARA_ENTREGAR || nuevoEstado == CANCELADO;
-            case LISTO_PARA_ENTREGAR -> nuevoEstado == EN_CAMINO || nuevoEstado == CANCELADO;
+            case LISTO_PARA_ENTREGAR -> nuevoEstado == ASIGNADO_A_REPARTIDOR || nuevoEstado == CANCELADO;
+            case ASIGNADO_A_REPARTIDOR -> nuevoEstado == EN_CAMINO || nuevoEstado == CANCELADO;
             case EN_CAMINO -> nuevoEstado == COMPLETADO || nuevoEstado == CANCELADO;
             default -> false;
         };
@@ -119,7 +121,8 @@ public enum EstadoPedido {
             case DELIVERY -> switch (this) {
                 case PENDIENTE -> EN_PREPARACION;
                 case EN_PREPARACION -> LISTO_PARA_ENTREGAR;
-                case LISTO_PARA_ENTREGAR -> EN_CAMINO;
+                case LISTO_PARA_ENTREGAR -> ASIGNADO_A_REPARTIDOR;
+                case ASIGNADO_A_REPARTIDOR -> EN_CAMINO;
                 case EN_CAMINO -> COMPLETADO;
                 default -> this;
             };

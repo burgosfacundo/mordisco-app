@@ -346,7 +346,7 @@ obtenerTextoEstado(estado: EstadoPedido | null | undefined): string {
 }
   /**
    * Obtiene la clase CSS según el estado del pedido
-   */
+
 obtenerClaseEstado(estado?: EstadoPedido | null): string {
   // Validación ANTES de usar como índice
   if (!estado) {
@@ -365,6 +365,7 @@ obtenerClaseEstado(estado?: EstadoPedido | null): string {
   
   return clases[estado] || 'bg-gray-100 text-gray-700';
 }
+     */
   /**
    * Obtiene el emoji según el tipo de entrega
    */

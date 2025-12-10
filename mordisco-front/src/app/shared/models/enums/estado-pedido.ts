@@ -5,6 +5,7 @@ export enum EstadoPedido {
   EN_PREPARACION = 'EN_PREPARACION',
   LISTO_PARA_RETIRAR = 'LISTO_PARA_RETIRAR',
   LISTO_PARA_ENTREGAR = 'LISTO_PARA_ENTREGAR',
+  ASIGNADO_A_REPARTIDOR = 'ASIGNADO_A_REPARTIDOR',
   EN_CAMINO = 'EN_CAMINO',
   COMPLETADO = 'COMPLETADO',
   CANCELADO = 'CANCELADO'
@@ -15,6 +16,7 @@ export const ESTADO_PEDIDO_LABELS: Record<EstadoPedido, string> = {
   [EstadoPedido.EN_PREPARACION]: 'En Preparación',
   [EstadoPedido.LISTO_PARA_RETIRAR]: 'Listo para Retirar',
   [EstadoPedido.LISTO_PARA_ENTREGAR]: 'Listo para Entregar',
+  [EstadoPedido.ASIGNADO_A_REPARTIDOR]: 'Pedido asignado a repartidor',
   [EstadoPedido.EN_CAMINO]: 'En Camino',
   [EstadoPedido.COMPLETADO]: 'Completado',
   [EstadoPedido.CANCELADO]: 'Cancelado'
@@ -25,6 +27,7 @@ export const ESTADO_PEDIDO_COLORS: Record<EstadoPedido, string> = {
   [EstadoPedido.EN_PREPARACION]: 'bg-blue-100 text-blue-700',
   [EstadoPedido.LISTO_PARA_RETIRAR]: 'bg-green-100 text-green-700',
   [EstadoPedido.LISTO_PARA_ENTREGAR]: 'bg-purple-100 text-purple-700',
+  [EstadoPedido.ASIGNADO_A_REPARTIDOR]: 'bg-pink-100 text-pink-700',
   [EstadoPedido.EN_CAMINO]: 'bg-indigo-100 text-indigo-700',
   [EstadoPedido.COMPLETADO]: 'bg-emerald-100 text-emerald-700',
   [EstadoPedido.CANCELADO]: 'bg-red-100 text-red-700'
@@ -35,6 +38,7 @@ export const ESTADO_PEDIDO_ICONS: Record<EstadoPedido, string> = {
   [EstadoPedido.EN_PREPARACION]: 'restaurant',
   [EstadoPedido.LISTO_PARA_RETIRAR]: 'shopping_bag',
   [EstadoPedido.LISTO_PARA_ENTREGAR]: 'inventory_2',
+  [EstadoPedido.ASIGNADO_A_REPARTIDOR]: 'how_to_reg',
   [EstadoPedido.EN_CAMINO]: 'local_shipping',
   [EstadoPedido.COMPLETADO]: 'check_circle',
   [EstadoPedido.CANCELADO]: 'cancel'
@@ -57,6 +61,7 @@ export function getEstadosValidosPorTipo(tipoEntrega: TipoEntrega): EstadoPedido
       EstadoPedido.PENDIENTE,
       EstadoPedido.EN_PREPARACION,
       EstadoPedido.LISTO_PARA_ENTREGAR,
+      EstadoPedido.ASIGNADO_A_REPARTIDOR,
       EstadoPedido.EN_CAMINO,
       EstadoPedido.COMPLETADO,
       EstadoPedido.CANCELADO
@@ -80,10 +85,11 @@ export function getSiguienteEstado(
     }
   } else {
     switch (estadoActual) {
-      case EstadoPedido.PENDIENTE: return EstadoPedido.EN_PREPARACION;
-      case EstadoPedido.EN_PREPARACION: return EstadoPedido.LISTO_PARA_ENTREGAR;
-      case EstadoPedido.LISTO_PARA_ENTREGAR: return EstadoPedido.EN_CAMINO;
-      case EstadoPedido.EN_CAMINO: return EstadoPedido.COMPLETADO;
+                case EstadoPedido.PENDIENTE : return EstadoPedido.EN_PREPARACION;
+                case EstadoPedido.EN_PREPARACION : return EstadoPedido.LISTO_PARA_ENTREGAR;
+                case EstadoPedido.LISTO_PARA_ENTREGAR : return EstadoPedido.ASIGNADO_A_REPARTIDOR;
+                case EstadoPedido.ASIGNADO_A_REPARTIDOR : return EstadoPedido.EN_CAMINO;
+                case EstadoPedido.EN_CAMINO : return EstadoPedido.COMPLETADO;
       default: return null;
     }
   }
@@ -142,6 +148,11 @@ export function getEstadoDescripcion(
       RESTAURANTE: 'Pedido listo - esperando repartidor',
       REPARTIDOR: 'Pedido listo para retirar del restaurante'
     },
+    [EstadoPedido.ASIGNADO_A_REPARTIDOR]: {
+      CLIENTE: 'Tu fue asignado a un repartidor',
+      RESTAURANTE: 'Pedido listo - Un repartidor va en camino',
+      REPARTIDOR: 'El restaurante te espera con el pedido listo'
+    },       
     [EstadoPedido.EN_CAMINO]: {
       CLIENTE: '¡Tu pedido está en camino!',
       RESTAURANTE: 'El repartidor está llevando el pedido',

@@ -16,6 +16,11 @@ import { CalificacionComponent } from '../../../../shared/components/calificacio
 import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmationService } from '../../../../core/services/confirmation-service';
 import { MatDialog } from '@angular/material/dialog';
+import { ConfiguracionSistemaService } from '../../../../shared/services/configuracionSistema/configuracion-sistema-service';
+import ConfiguracionSistemaGeneralResponseDTO from '../../../../shared/models/configuracion/configuracion-sistema-general-response-DTO';
+import { MetodoPago } from '../../../../shared/models/enums/metodo-pago';
+import PagoResponseDTO from '../../../../shared/models/pago/pago-response-dto';
+import { PagoService } from '../../../../shared/services/pagos/pago-service';
 
 @Component({
   selector: 'app-detalle-pedido-page',
@@ -37,12 +42,17 @@ export class DetallePedidoPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
-  private dialog = inject(MatDialog);
+  private configService = inject(ConfiguracionSistemaService)
+  private pagoService = inject(PagoService)
+ 
+  configSist? : ConfiguracionSistemaGeneralResponseDTO
 
   protected pedido?: PedidoResponse;
   protected isLoading = true;
   protected isUsuario = this.authService.currentUser()?.role;
- 
+  MetodoPago = MetodoPago
+  pagoPedido? : PagoResponseDTO
+
   calificacionPedido? : CalificacionPedidoResponseDTO
   calificacionRepartidor? : CalificacionRepartidorResponseDTO
   readonly tipoEntregaEnum = TipoEntrega;
@@ -50,6 +60,20 @@ export class DetallePedidoPage implements OnInit {
 
   ngOnInit(): void {
     this.loadPedido();
+    this.getConfigSistema();
+  }
+
+  obtenerPagoPedido(id : number){
+    this.pagoService.getPagoByPedidoId(id).subscribe({
+      next:(d)=> this.pagoPedido = d
+    })
+  }
+
+  getConfigSistema(){
+    this.configService.getConfiguracionGeneral().subscribe({
+      next:(d)=> this.configSist = d,
+      error:(e)=> console.log("No se pudo obtener la configuracion actual", e)
+    })
   }
 
   private loadPedido(): void {
@@ -59,11 +83,11 @@ export class DetallePedidoPage implements OnInit {
       this.router.navigate(['/restaurante/pedidos']);
       return;
     }
-    console.log("Lo estoy printeando aca: ", Number(id))
     this.pedidoService.getById(Number(id)).subscribe({
       next: (data) => {
         this.pedido = data;
         this.setCalificados(this.pedido)
+        this.obtenerPagoPedido(this.pedido.id)
         this.isLoading = false
       },
       error: () => {
@@ -167,8 +191,8 @@ export class DetallePedidoPage implements OnInit {
 
   marcarEnCamino(): void {
     this.confirmationService.confirm({
-      title: 'Cambiar Estado',
-      message: '¿Marcar este pedido como "En Camino"?',
+      title: 'Cambiar Estado a "En camino"',
+      message: '¿Ya le entregaste al repartidor el pedido?',
       confirmText: 'Sí, marcar',
       cancelText: 'Cancelar',
       type: 'warning'
