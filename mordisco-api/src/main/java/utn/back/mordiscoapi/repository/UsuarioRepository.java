@@ -114,17 +114,27 @@ WHERE
 
     /**
      * Encuentra los repartidores más activos
+     * Calcula las ganancias del repartidor basándose en el porcentaje configurado:
+     * ganancia_repartidor = costo_delivery * porcentaje_ganancias_repartidor / 100
      * @return Lista de repartidores con más entregas
      */
     @Query(value = """
             SELECT u.id, u.nombre, u.apellido,
                    COUNT(p.id) as entregas_realizadas,
-                   COALESCE(SUM(gr.ganancia_repartidor), 0) as ganancia_generada
+                   COALESCE(SUM(
+                       p.costo_delivery *
+                       (SELECT cs.porcentaje_ganancias_repartidor
+                        FROM configuracion_sistema cs
+                        ORDER BY cs.fecha_actualizacion DESC
+                        LIMIT 1) / 100
+                   ), 0) as ganancia_generada
             FROM usuarios u
-            LEFT JOIN pedidos p ON p.repartidor_id = u.id AND p.estado = 'COMPLETADO'
-            LEFT JOIN ganancias_repartidor gr ON gr.repartidor_id = u.id
+            INNER JOIN pedidos p ON p.repartidor_id = u.id
             WHERE u.rol_id = (SELECT id FROM roles WHERE nombre = 'ROLE_REPARTIDOR')
               AND u.baja_logica = false
+              AND p.estado = 'COMPLETADO'
+              AND p.tipo_entrega = 'DELIVERY'
+              AND p.costo_delivery IS NOT NULL
             GROUP BY u.id, u.nombre, u.apellido
             HAVING COUNT(p.id) > 0
             ORDER BY entregas_realizadas DESC
