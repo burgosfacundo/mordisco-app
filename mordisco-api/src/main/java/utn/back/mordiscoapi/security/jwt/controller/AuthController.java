@@ -100,6 +100,7 @@ public class AuthController {
                 accessToken,
                 usuario.getId(),
                 usuario.getEmail(),
+                usuario.getNombre(),
                 usuario.getRol().getNombre(),
                 accessTokenExpiration,
                 false, // bajaLogica siempre false si pasa la validación
@@ -136,6 +137,7 @@ public class AuthController {
                     newAccessToken,
                     usuario.getId(),
                     usuario.getEmail(),
+                    usuario.getNombre(),
                     usuario.getRol().getNombre(),
                     accessTokenExpiration,
                     false, // bajaLogica siempre false en refresh

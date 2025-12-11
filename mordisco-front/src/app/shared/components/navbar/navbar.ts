@@ -148,10 +148,11 @@ export class NavbarComponent implements OnInit {
 
   getUserInitials(): string {
     const user = this.currentUser();
-    if (!user?.email) return 'U';
+    console.log(this.currentUser());
     
-    const email = user.email.split('@')[0];
-    return email.substring(0, 2).toUpperCase();
+    if (!user?.nombre) return 'U';
+
+    return user.nombre.substring(0, 2).toUpperCase();
   }
 
   toggleMobileMenu(): void {
