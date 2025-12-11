@@ -1,16 +1,17 @@
 <main class="pt-20">
     <div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-12">
         <section class="space-y-6">
-            <section class="flex justify-between pt-1">
+            <section class="flex justify-between items-center pt-1 gap-2">
             <h2 class="titulo-seccion"> Mis horarios de atencion</h2>
-                <button 
-                (click)="crearHorario()" 
-                class="btn-primary">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                <button
+                (click)="crearHorario()"
+                class="btn-primary whitespace-nowrap">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 4v16m8-8H4" />
                     </svg>
-                Agregar nuevo horario
+                <span class="hidden md:inline">Agregar nuevo horario</span>
+                <span class="md:hidden">Agregar</span>
                 </button>
             </section>
             @if (isLoading) {
