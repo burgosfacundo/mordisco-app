@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import { UserService } from '../../../registro/services/user-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
@@ -6,7 +7,7 @@ import { RestauranteService } from '../../../../shared/services/restaurante/rest
 
 @Component({
   selector: 'app-home-admin-component',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './home-admin-component.html'
 })
 export class HomeAdminComponent implements OnInit {
