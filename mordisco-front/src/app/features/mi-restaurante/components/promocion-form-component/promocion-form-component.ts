@@ -49,22 +49,29 @@ export class PromocionFormComponent implements OnInit {
   promocionId?: number;
   restauranteId?: number;
   isSubmitting = false;
-  
+
   // Enums para el template
   tiposDescuento = Object.values(TipoDescuento);
   alcancesPromocion = Object.values(AlcancePromocion);
   AlcancePromocion = AlcancePromocion; // Para usar en el template
-  
+
   // Productos del restaurante
   productos: ProductoResponse[] = [];
   productosSeleccionados: Set<number> = new Set();
 
+  // Fecha mínima para calendarios (hoy)
+  minDate = new Date();
+
+  // Fechas dinámicas para validación cruzada
+  minFechaFin: Date | null = null;
+  maxFechaInicio: Date | null = null;
+
   ngOnInit(): void {
     this.initForm();
-    
+
     this.promocionId = this.route.snapshot.params['id'];
     this.restauranteId = this.route.snapshot.params['idRestaurante']
-    
+
     // Si no hay restauranteId en la ruta (modo edición), obtenerlo del usuario autenticado
     if (!this.restauranteId) {
       this.obtenerRestauranteId();
@@ -77,10 +84,30 @@ export class PromocionFormComponent implements OnInit {
       this.isEditMode = true;
       this.cargarPromocion();
     }
-    
+
     // Escuchar cambios en tipo de descuento para actualizar validaciones
     this.promocionForm.get('tipoDescuento')?.valueChanges.subscribe(() => {
       this.actualizarValidacionesDescuento();
+    });
+
+    // Escuchar cambios en fechaInicio para actualizar minFechaFin
+    this.promocionForm.get('fechaInicio')?.valueChanges.subscribe((fechaInicio) => {
+      if (fechaInicio) {
+        // La fecha fin puede ser el mismo día (permite promociones de un solo día)
+        this.minFechaFin = new Date(fechaInicio);
+      } else {
+        this.minFechaFin = null;
+      }
+    });
+
+    // Escuchar cambios en fechaFin para actualizar maxFechaInicio
+    this.promocionForm.get('fechaFin')?.valueChanges.subscribe((fechaFin) => {
+      if (fechaFin) {
+        // La fecha inicio puede ser el mismo día (permite promociones de un solo día)
+        this.maxFechaInicio = new Date(fechaFin);
+      } else {
+        this.maxFechaInicio = null;
+      }
     });
   }
 
@@ -122,12 +149,12 @@ export class PromocionFormComponent implements OnInit {
     if (!this.isEditMode && inicio < hoy) {
       return { fechaInicioAnterior: true };
     }
-    
-    // Fecha fin debe ser posterior a fecha inicio
-    if (fin <= inicio) {
+
+    // Fecha fin debe ser igual o posterior a fecha inicio (permite promociones de un solo día)
+    if (fin < inicio) {
       return { fechaFinInvalida: true };
     }
-    
+
     return null;
   }
   

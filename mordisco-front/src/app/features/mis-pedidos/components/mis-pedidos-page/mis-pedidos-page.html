@@ -67,12 +67,11 @@
                 Desde
               </label>
               <div class="relative">
-                <input 
+                <input
                   type="date"
                   [(ngModel)]="filtroFechaInicio"
-                  class="w-full bg-gray-50/50 border border-gray-200 rounded-md px-3 py-1.5
-                        text-gray-700 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400
-                        transition-all cursor-pointer hover:bg-gray-50">
+                  [max]="maxFechaInicio || maxDate"
+                  class="date-input text-xs">
               </div>
             </div>
 
@@ -82,12 +81,12 @@
                 Hasta
               </label>
               <div class="relative">
-                <input 
+                <input
                   type="date"
                   [(ngModel)]="filtroFechaFin"
-                  class="w-full bg-gray-50/50 border border-gray-200 rounded-md px-3 py-1.5
-                        text-gray-700 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400
-                        transition-all cursor-pointer hover:bg-gray-50">
+                  [min]="minFechaFin || undefined"
+                  [max]="maxDate"
+                  class="date-input text-xs">
               </div>
             </div>
 

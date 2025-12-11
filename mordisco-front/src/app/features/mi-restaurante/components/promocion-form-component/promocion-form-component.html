@@ -157,13 +157,15 @@
           Fecha de Inicio *
         </label>
         <mat-form-field appearance="outline" class="w-full">
-          <input 
-            matInput 
+          <input
+            matInput
             [matDatepicker]="pickerInicio"
+            [min]="minDate"
+            [max]="maxFechaInicio || undefined"
             formControlName="fechaInicio"
             placeholder="Selecciona una fecha">
-          <mat-datepicker-toggle 
-          matIconSuffix 
+          <mat-datepicker-toggle
+          matIconSuffix
           [for]="pickerInicio"
           ></mat-datepicker-toggle>
           <mat-datepicker #pickerInicio></mat-datepicker>
@@ -181,9 +183,10 @@
           Fecha de Fin *
         </label>
         <mat-form-field appearance="outline" class="w-full">
-          <input 
-            matInput 
+          <input
+            matInput
             [matDatepicker]="pickerFin"
+            [min]="minFechaFin || minDate"
             formControlName="fechaFin"
             placeholder="Selecciona una fecha">
           <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>

@@ -235,6 +235,69 @@ body {
            bg-white/95 backdrop-blur-sm;
   }
 
+  /* ========== DATE INPUTS ========== */
+  .date-input {
+    @apply w-full px-4 py-2.5 rounded-lg
+           bg-white border-2 border-gray-200
+           text-gray-800 text-sm font-medium
+           shadow-sm
+           focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500
+           transition-all duration-300 ease-in-out
+           cursor-pointer
+           hover:border-primary-400 hover:shadow-md
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100;
+  }
+
+  .date-input::-webkit-calendar-picker-indicator {
+    @apply cursor-pointer
+           w-5 h-5
+           opacity-60 hover:opacity-100
+           transition-opacity duration-200
+           filter-none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23E3291D'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'/%3E%3C/svg%3E");
+  }
+
+  .date-input::-webkit-datetime-edit-fields-wrapper {
+    @apply text-gray-800 font-medium;
+  }
+
+  .date-input::-webkit-datetime-edit-text {
+    @apply text-gray-400 px-0.5;
+  }
+
+  .date-input::-webkit-datetime-edit-year-field,
+  .date-input::-webkit-datetime-edit-month-field,
+  .date-input::-webkit-datetime-edit-day-field {
+    @apply text-gray-800 font-semibold;
+  }
+
+  .date-input::-webkit-datetime-edit-year-field:focus,
+  .date-input::-webkit-datetime-edit-month-field:focus,
+  .date-input::-webkit-datetime-edit-day-field:focus {
+    @apply bg-primary-100 text-primary-700 rounded;
+  }
+
+  .date-input:invalid {
+    @apply border-red-400 bg-red-50/50 ring-2 ring-red-200;
+  }
+
+  .date-input:disabled::-webkit-calendar-picker-indicator {
+    @apply opacity-30;
+  }
+
+  /* Contenedor de fecha con icono mejorado */
+  .date-field-wrapper {
+    @apply relative flex items-center;
+  }
+
+  .date-field-icon {
+    @apply absolute left-3 pointer-events-none text-primary-500 w-5 h-5;
+  }
+
+  .date-input-with-icon {
+    @apply pl-10;
+  }
+
   /* ========== LOADING ========== */
   .loading-container {
     @apply flex flex-col items-center justify-center
@@ -761,5 +824,268 @@ body {
   html {
     font-size: 16px;
   }
+}
+
+/* ============================
+   Material DatePicker Styles
+   ============================ */
+
+/* Calendario contenedor */
+:host ::ng-deep .mat-datepicker-content {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+:host ::ng-deep .mat-calendar {
+  font-family: var(--font-sans) !important;
+}
+
+/* Header del calendario */
+:host ::ng-deep .mat-calendar-header {
+  background: linear-gradient(135deg, #E3291D 0%, #c92016 100%) !important;
+  color: white !important;
+  padding: 16px !important;
+}
+
+:host ::ng-deep .mat-calendar-controls {
+  margin: 0 !important;
+}
+
+:host ::ng-deep .mat-calendar-period-button {
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+}
+
+:host ::ng-deep .mat-calendar-arrow {
+  fill: white !important;
+}
+
+:host ::ng-deep .mat-calendar-previous-button,
+:host ::ng-deep .mat-calendar-next-button {
+  color: white !important;
+}
+
+:host ::ng-deep .mat-calendar-previous-button:hover,
+:host ::ng-deep .mat-calendar-next-button:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Tabla del calendario */
+:host ::ng-deep .mat-calendar-table {
+  border-spacing: 4px !important;
+  border-collapse: separate !important;
+}
+
+/* Headers de días de la semana */
+:host ::ng-deep .mat-calendar-table-header th {
+  color: #6b7280 !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  padding: 8px 0 !important;
+}
+
+/* Celdas del calendario */
+:host ::ng-deep .mat-calendar-body-cell {
+  border-radius: 8px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+:host ::ng-deep .mat-calendar-body-cell-content {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Días habilitados */
+:host ::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled) .mat-calendar-body-cell-content {
+  color: #1f2937 !important;
+  cursor: pointer !important;
+  background-color: transparent !important;
+}
+
+/* Hover en días habilitados */
+:host ::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover .mat-calendar-body-cell-content {
+  background-color: #fee2e2 !important;
+  color: #E3291D !important;
+  transform: scale(1.1) !important;
+}
+
+/* Día de hoy */
+:host ::ng-deep .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border: 2px solid #E3291D !important;
+  border-radius: 8px !important;
+}
+
+:host ::ng-deep .mat-calendar-body-today:not(.mat-calendar-body-selected) .mat-calendar-body-cell-content {
+  color: #E3291D !important;
+  font-weight: 700 !important;
+  background-color: #fff1f0 !important;
+}
+
+/* Día seleccionado */
+:host ::ng-deep .mat-calendar-body-selected {
+  background-color: #E3291D !important;
+  box-shadow: 0 4px 6px -1px rgb(227 41 29 / 0.3) !important;
+}
+
+:host ::ng-deep .mat-calendar-body-selected .mat-calendar-body-cell-content {
+  background-color: #E3291D !important;
+  color: white !important;
+  font-weight: 700 !important;
+  transform: scale(1.05) !important;
+}
+
+:host ::ng-deep .mat-calendar-body-selected:hover .mat-calendar-body-cell-content {
+  background-color: #c92016 !important;
+}
+
+/* Días deshabilitados */
+:host ::ng-deep .mat-calendar-body-disabled {
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+:host ::ng-deep .mat-calendar-body-disabled .mat-calendar-body-cell-content {
+  color: #d1d5db !important;
+  background-color: #f9fafb !important;
+  text-decoration: line-through !important;
+  opacity: 0.4 !important;
+  font-weight: 400 !important;
+}
+
+:host ::ng-deep .mat-calendar-body-disabled:hover .mat-calendar-body-cell-content {
+  background-color: #f9fafb !important;
+  transform: none !important;
+}
+
+/* Rango de fechas (para cuando se implementen rangos) */
+:host ::ng-deep .mat-calendar-body-in-range::before {
+  background-color: #fee2e2 !important;
+}
+
+:host ::ng-deep .mat-calendar-body-range-start,
+:host ::ng-deep .mat-calendar-body-range-end {
+  background-color: #E3291D !important;
+}
+
+/* Input del datepicker en Material Form Field */
+:host ::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white !important;
+}
+
+:host ::ng-deep .mat-mdc-form-field-focus-overlay {
+  background-color: transparent !important;
+}
+
+:host ::ng-deep .mat-datepicker-toggle {
+  color: #E3291D !important;
+}
+
+:host ::ng-deep .mat-datepicker-toggle:hover {
+  opacity: 0.8;
+}
+
+/* Estilos globales para Material DatePicker sin :host (fallback) */
+.mat-datepicker-content {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+.mat-calendar {
+  font-family: var(--font-sans) !important;
+}
+
+.mat-calendar-header {
+  background: linear-gradient(135deg, #E3291D 0%, #c92016 100%) !important;
+  color: white !important;
+  padding: 16px !important;
+}
+
+.mat-calendar-period-button {
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+.mat-calendar-arrow {
+  fill: white !important;
+}
+
+.mat-calendar-previous-button,
+.mat-calendar-next-button {
+  color: white !important;
+}
+
+.mat-calendar-table {
+  border-spacing: 4px !important;
+  border-collapse: separate !important;
+}
+
+.mat-calendar-body-cell {
+  border-radius: 8px !important;
+}
+
+.mat-calendar-body-cell-content {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.mat-calendar-body-disabled .mat-calendar-body-cell-content {
+  color: #d1d5db !important;
+  background-color: #f9fafb !important;
+  cursor: not-allowed !important;
+  text-decoration: line-through !important;
+  opacity: 0.4 !important;
+}
+
+.mat-calendar-body-cell:not(.mat-calendar-body-disabled) .mat-calendar-body-cell-content {
+  color: #1f2937 !important;
+  cursor: pointer !important;
+}
+
+.mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover .mat-calendar-body-cell-content {
+  background-color: #fee2e2 !important;
+  color: #E3291D !important;
+  transform: scale(1.1) !important;
+}
+
+.mat-calendar-body-selected {
+  background-color: #E3291D !important;
+  box-shadow: 0 4px 6px -1px rgb(227 41 29 / 0.3) !important;
+}
+
+.mat-calendar-body-selected .mat-calendar-body-cell-content {
+  background-color: #E3291D !important;
+  color: white !important;
+  font-weight: 700 !important;
+}
+
+.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border: 2px solid #E3291D !important;
+  border-radius: 8px !important;
+}
+
+.mat-calendar-body-today:not(.mat-calendar-body-selected) .mat-calendar-body-cell-content {
+  color: #E3291D !important;
+  font-weight: 700 !important;
+  background-color: #fff1f0 !important;
+}
+
+.mat-datepicker-toggle {
+  color: #E3291D !important;
 }
 

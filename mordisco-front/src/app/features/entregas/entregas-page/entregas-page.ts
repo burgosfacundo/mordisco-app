@@ -38,11 +38,23 @@ export class EntregasPage {
   filtroFechaFin: string = '';
   searchValue: string = '';
   idUser? : number
-  
+
+  // Fecha máxima para filtros (hoy) en formato YYYY-MM-DD
+  maxDate: string = new Date().toISOString().split('T')[0];
+
+  // Fechas dinámicas para validación cruzada (en formato YYYY-MM-DD)
+  get minFechaFin(): string | null {
+    return this.filtroFechaInicio ? this.filtroFechaInicio : null;
+  }
+
+  get maxFechaInicio(): string | null {
+    return this.filtroFechaFin ? this.filtroFechaFin : this.maxDate;
+  }
+
   sizePedidos : number = 5;
   pagePedidos : number = 0;
   length : number = 5;
-  
+
   isLoading = true;
 
   ngOnInit(): void {
