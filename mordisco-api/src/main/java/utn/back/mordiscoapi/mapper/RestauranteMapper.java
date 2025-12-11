@@ -30,12 +30,12 @@ public class RestauranteMapper {
                 .build();
 
         Direccion direccion = Direccion.builder()
-                .calle(Sanitize.collapseSpaces(dto.direccion().calle()))
+                .calle(Sanitize.toTitleCase(dto.direccion().calle()))
                 .numero(Sanitize.trimToNull(dto.direccion().numero()))
                 .piso(Sanitize.trimToNull(dto.direccion().piso()))
                 .depto(Sanitize.trimToNull(dto.direccion().depto()))
                 .codigoPostal(Sanitize.trimToNull(dto.direccion().codigoPostal()))
-                .ciudad(Sanitize.collapseSpaces(dto.direccion().ciudad()))
+                .ciudad(Sanitize.toTitleCase(dto.direccion().ciudad()))
                 .referencias(Sanitize.trimToNull(dto.direccion().referencias()))
                 .usuario(usuario)
                 .build();

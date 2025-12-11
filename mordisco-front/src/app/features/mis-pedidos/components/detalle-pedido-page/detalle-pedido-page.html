@@ -416,8 +416,59 @@
         </section>
       }
 
-      <!-- Información del Repartidor (solo para cliente cuando hay repartidor asignado) -->
-      @if (isUsuario === 'ROLE_CLIENTE' || isUsuario === 'ROLE_RESTAURANTE' && pedido.repartidor && pedido.tipoEntrega === tipoEntregaEnum.DELIVERY) {
+      <!-- Dirección del Restaurante (solo para cliente cuando es RETIRO_POR_LOCAL) -->
+      @if (isUsuario === 'ROLE_CLIENTE' && pedido.tipoEntrega === tipoEntregaEnum.RETIRO_POR_LOCAL && pedido.restaurante) {
+        <section class="space-y-4">
+          <h2 class="titulo-seccion">
+            🏪 Retirar pedido en
+          </h2>
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-base font-bold text-gray-900 mb-2">{{ pedido.restaurante.razonSocial }}</p>
+                @if (pedido.restaurante.direccion) {
+                  <p class="text-sm text-gray-700">
+                    {{ pedido.restaurante.direccion.calle }} {{ pedido.restaurante.direccion.numero }}
+                  </p>
+                  @if (pedido.restaurante.direccion.piso || pedido.restaurante.direccion.depto) {
+                    <p class="text-sm text-gray-600">
+                      @if (pedido.restaurante.direccion.piso) {
+                        Piso {{ pedido.restaurante.direccion.piso }}
+                      }
+                      @if (pedido.restaurante.direccion.depto) {
+                        Depto {{ pedido.restaurante.direccion.depto }}
+                      }
+                    </p>
+                  }
+                  <div class="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                      <p class="text-xs text-gray-500 font-medium">Ciudad</p>
+                      <p class="text-sm font-semibold text-gray-900">{{ pedido.restaurante.direccion.ciudad }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 font-medium">Código Postal</p>
+                      <p class="text-sm font-semibold text-gray-900">{{ pedido.restaurante.direccion.codigoPostal }}</p>
+                    </div>
+                  </div>
+                } @else {
+                  <p class="text-sm text-gray-500 italic">Dirección no disponible</p>
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- Información del Repartidor (solo para cliente/restaurante cuando hay repartidor Y es DELIVERY) -->
+      @if ((isUsuario === 'ROLE_CLIENTE' || isUsuario === 'ROLE_RESTAURANTE') && pedido.repartidor && pedido.tipoEntrega === tipoEntregaEnum.DELIVERY) {
         <section class="space-y-4">
           <h2 class="titulo-seccion">
             🚴 Tu Repartidor

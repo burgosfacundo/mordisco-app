@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.model.entity.Pedido;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -92,22 +91,13 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
     INNER JOIN usuarios u ON p.usuario_id = u.id
     INNER JOIN restaurantes r ON p.restaurante_id = r.id
     LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-    WHERE 
-        -- FILTRO ESTADO
+    WHERE
         (:estado IS NULL OR :estado = '' OR p.estado = :estado)
-
-        -- FILTRO TIPO ENTREGA
         AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
-
-        -- FILTRO FECHA INICIO
         AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
-
-        -- FILTRO FECHA FIN
         AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
-
-        -- BUSCADOR TEXTO LIBRE
         AND (
-                :search IS NULL OR :search = '' 
+                :search IS NULL OR :search = ''
                 OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
                 OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
                 OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -125,13 +115,13 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
     INNER JOIN usuarios u ON p.usuario_id = u.id
     INNER JOIN restaurantes r ON p.restaurante_id = r.id
     LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-    WHERE 
+    WHERE
         (:estado IS NULL OR :estado = '' OR p.estado = :estado)
         AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
         AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
         AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
         AND (
-                :search IS NULL OR :search = '' 
+                :search IS NULL OR :search = ''
                 OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
                 OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
                 OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -158,14 +148,14 @@ FROM pedidos p
 INNER JOIN usuarios u ON p.usuario_id = u.id
 INNER JOIN restaurantes r ON p.restaurante_id = r.id
 LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-WHERE 
+WHERE
     p.restaurante_id = :restauranteId
     AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
     AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
     AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
     AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
     AND (
-        :search IS NULL OR :search = '' 
+        :search IS NULL OR :search = ''
         OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -181,14 +171,14 @@ FROM pedidos p
 INNER JOIN usuarios u ON p.usuario_id = u.id
 INNER JOIN restaurantes r ON p.restaurante_id = r.id
 LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-WHERE 
+WHERE
     p.restaurante_id = :restauranteId
     AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
     AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
     AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
     AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
     AND (
-        :search IS NULL OR :search = '' 
+        :search IS NULL OR :search = ''
         OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -216,14 +206,14 @@ WHERE
     INNER JOIN usuarios u ON p.usuario_id = u.id
     INNER JOIN restaurantes r ON p.restaurante_id = r.id
     LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-    WHERE 
+    WHERE
         p.usuario_id = :clienteId
         AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
         AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
         AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
-        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)   
+        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
         AND (
-            :search IS NULL OR :search = '' 
+            :search IS NULL OR :search = ''
             OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
             OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
             OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -237,14 +227,14 @@ WHERE
     INNER JOIN usuarios u ON p.usuario_id = u.id
     INNER JOIN restaurantes r ON p.restaurante_id = r.id
     LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-    WHERE 
+    WHERE
         p.usuario_id = :clienteId
         AND (:tipoEntrega IS NULL OR :tipoEntrega = '' OR p.tipo_entrega = :tipoEntrega)
         AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
         AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
-        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)   
+        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
         AND (
-            :search IS NULL OR :search = '' 
+            :search IS NULL OR :search = ''
             OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
             OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
             OR LOWER(p.tipo_entrega) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -270,13 +260,13 @@ WHERE
     INNER JOIN usuarios u ON p.usuario_id = u.id
     INNER JOIN restaurantes r ON p.restaurante_id = r.id
     LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-    WHERE 
+    WHERE
         p.repartidor_id = :repartidorId
         AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
         AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
         AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
         AND (
-            :search IS NULL OR :search = '' 
+            :search IS NULL OR :search = ''
             OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
             OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
             OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
@@ -289,13 +279,13 @@ WHERE
     INNER JOIN usuarios u ON p.usuario_id = u.id
     INNER JOIN restaurantes r ON p.restaurante_id = r.id
     LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-    WHERE 
+    WHERE
         p.repartidor_id = :repartidorId
         AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
         AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
         AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
         AND (
-            :search IS NULL OR :search = '' 
+            :search IS NULL OR :search = ''
             OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
             OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
             OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
@@ -393,17 +383,19 @@ WHERE
 
     /**
      * Encuentra los métodos de pago más usados con estadísticas
-     * Incluye todos los pedidos excepto CANCELADO (ya que el pago fue procesado)
+     * Solo cuenta pedidos COMPLETADOS ya que:
+     * - MercadoPago: pago procesado inmediatamente
+     * - Efectivo: pago procesado al completar el pedido (entrega)
      * @return Lista de métodos de pago con cantidad y porcentaje
      */
     @Query(value = """
             SELECT
                 pago.metodo_pago,
                 COUNT(*) as cantidad,
-                (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM pedidos WHERE estado != 'CANCELADO')) as porcentaje
+                (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM pedidos WHERE estado = 'COMPLETADO')) as porcentaje
             FROM pedidos p
             JOIN pagos pago ON p.id = pago.pedido_id
-            WHERE p.estado != 'CANCELADO'
+            WHERE p.estado = 'COMPLETADO'
             GROUP BY pago.metodo_pago
             ORDER BY cantidad DESC
             """, nativeQuery = true)
@@ -415,8 +407,8 @@ WHERE
      * @return Tiempo promedio en minutos
      */
     @Query("""
-            SELECT AVG(TIMESTAMPDIFF(MINUTE, p.fechaHora, 
-                CASE 
+            SELECT AVG(TIMESTAMPDIFF(MINUTE, p.fechaHora,
+                CASE
                     WHEN p.tipoEntrega = 'DELIVERY' THEN p.fechaAceptacionRepartidor
                     ELSE p.fechaEntrega
                 END))

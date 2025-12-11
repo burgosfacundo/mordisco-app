@@ -123,7 +123,7 @@ WHERE
             FROM usuarios u
             LEFT JOIN pedidos p ON p.repartidor_id = u.id AND p.estado = 'COMPLETADO'
             LEFT JOIN ganancias_repartidor gr ON gr.repartidor_id = u.id
-            WHERE u.rol_id = (SELECT id FROM roles WHERE nombre = 'REPARTIDOR')
+            WHERE u.rol_id = (SELECT id FROM roles WHERE nombre = 'ROLE_REPARTIDOR')
               AND u.baja_logica = false
             GROUP BY u.id, u.nombre, u.apellido
             HAVING COUNT(p.id) > 0

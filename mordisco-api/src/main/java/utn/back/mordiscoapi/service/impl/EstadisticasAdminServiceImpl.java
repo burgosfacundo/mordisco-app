@@ -69,12 +69,6 @@ public class EstadisticasAdminServiceImpl implements IEstadisticasAdminService {
 
     private List<MetodoPagoEstadisticaDTO> obtenerMetodosPagoMasUsados() {
         List<Object[]> results = pedidoRepository.findMetodosPagoMasUsados();
-        System.out.println("DEBUG ADMIN: Métodos de pago - Total results: " + results.size());
-        
-        if (!results.isEmpty()) {
-            Object[] first = results.get(0);
-            System.out.println("DEBUG ADMIN: First row - metodo: " + first[0] + ", cantidad: " + first[1] + ", porcentaje: " + first[2]);
-        }
 
         return results.stream()
                 .map(row -> new MetodoPagoEstadisticaDTO(

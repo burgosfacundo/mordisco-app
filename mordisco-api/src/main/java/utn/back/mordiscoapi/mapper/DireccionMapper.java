@@ -36,12 +36,12 @@ public class DireccionMapper {
      */
     public Direccion fromCreateDTO(DireccionRequestDTO dto) {
         return Direccion.builder()
-                .calle(Sanitize.collapseSpaces(dto.calle()))
+                .calle(Sanitize.toTitleCase(dto.calle()))
                 .numero(Sanitize.trimToNull(dto.numero()))
                 .piso(Sanitize.trimToNull(dto.piso()))
                 .depto(Sanitize.trimToNull(dto.depto()))
                 .codigoPostal(Sanitize.trimToNull(dto.codigoPostal()))
-                .ciudad(Sanitize.collapseSpaces(dto.ciudad()))
+                .ciudad(Sanitize.toTitleCase(dto.ciudad()))
                 .referencias(Sanitize.trimToNull(dto.referencias()))
                 .alias(Sanitize.trimToNull(dto.alias()))
                 .build();
@@ -53,12 +53,12 @@ public class DireccionMapper {
      * @param target entidad manejada por JPA
      */
     public void applyUpdate(DireccionRequestDTO dto, Direccion target) {
-        target.setCalle(Sanitize.collapseSpaces(dto.calle()));
+        target.setCalle(Sanitize.toTitleCase(dto.calle()));
         target.setNumero(Sanitize.trimToNull(dto.numero()));
         target.setPiso(Sanitize.trimToNull(dto.piso()));
         target.setDepto(Sanitize.trimToNull(dto.depto()));
         target.setCodigoPostal(Sanitize.trimToNull(dto.codigoPostal()));
-        target.setCiudad(Sanitize.collapseSpaces(dto.ciudad()));
+        target.setCiudad(Sanitize.toTitleCase(dto.ciudad()));
         target.setReferencias(Sanitize.trimToNull(dto.referencias()));
         target.setAlias(Sanitize.trimToNull(dto.alias()));
     }
