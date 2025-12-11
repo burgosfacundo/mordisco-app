@@ -8,7 +8,7 @@ public record ConfiguracionSistemaRequestDTO(
         @NotNull(message = "La comisión de la plataforma es obligatoria")
         @DecimalMin(value = "0.0", message = "La comisión debe ser mayor o igual a 0")
         @DecimalMax(value = "30.0", message = "La comisión no puede ser mayor a 30%")
-        BigDecimal comisionPlataforma,
+        BigDecimal porcentajeGananciasRestaurante,
 
         @NotNull(message = "El radio máximo de entrega es obligatorio")
         @DecimalMin(value = "1.0", message = "El radio debe ser al menos 1 km")

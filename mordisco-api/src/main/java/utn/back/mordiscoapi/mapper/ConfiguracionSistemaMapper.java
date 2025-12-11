@@ -31,7 +31,7 @@ public class ConfiguracionSistemaMapper {
     public static void applyUpdate(ConfiguracionSistemaRequestDTO dto, ConfiguracionSistema entity) {
         if (dto == null || entity == null) return;
 
-        entity.setPorcentajeGananciasRestaurante(dto.comisionPlataforma());
+        entity.setPorcentajeGananciasRestaurante(dto.porcentajeGananciasRestaurante());
         entity.setRadioMaximoEntrega(dto.radioMaximoEntrega());
         entity.setTiempoMaximoEntrega(dto.tiempoMaximoEntrega());
         entity.setCostoBaseDelivery(dto.costoBaseDelivery());
