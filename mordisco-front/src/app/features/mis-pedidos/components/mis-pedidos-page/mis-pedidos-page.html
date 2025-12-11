@@ -205,22 +205,23 @@
           <p class="loading-text">Cargando pedidos...</p>
         </div>
       } @else {
-        @if (arrPedidos && arrPedidos.length > 0) {
-          <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @for (pedido of arrPedidos; track pedido.id) {
-              <li class="fade-in">
-                <app-pedido-card-component 
-                  [isUsuario]="'ROLE_RESTAURANTE'"
-                  [pedido]="pedido"
-                  (aceptarPedido)="aceptarPedido($event)"
-                  (rechazarPedido)="rechazarPedido($event)"
-                  (cambiarEstado)="cambiarEstado($event)"
-                  (verDetalles)="verDetalles($event)"
-                  class="block h-full">
-                </app-pedido-card-component>
-              </li>
-            }
-          </ul>
+          @if (arrPedidos && arrPedidos.length > 0) {
+            <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+              @for (pedido of arrPedidos; track pedido.id) {
+                <li class="fade-in">
+                  <app-pedido-card-component 
+                    [isUsuario]="'ROLE_RESTAURANTE'"
+                    [pedido]="pedido"
+                    (aceptarPedido)="aceptarPedido($event)"
+                    (rechazarPedido)="rechazarPedido($event)"
+                    (cambiarEstado)="cambiarEstado($event)"
+                    (marcarRecibido)="marcarEntregado($event)"
+                    (verDetalles)="verDetalles($event)"
+                    class="block">
+                  </app-pedido-card-component>
+                </li>
+              }
+            </ul>
 
           <!-- Paginador -->
           <div class="flex justify-center mt-8">

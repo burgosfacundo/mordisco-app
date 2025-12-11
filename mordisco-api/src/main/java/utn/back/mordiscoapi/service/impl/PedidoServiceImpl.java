@@ -579,15 +579,17 @@ public class PedidoServiceImpl implements IPedidoService {
                 .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
 
         // Validar que el repartidor sea el asignado
-        if (pedido.getRepartidor() == null ||
-                !pedido.getRepartidor().getId().equals(repartidorId)) {
-            throw new BadRequestException("Este pedido no está asignado a ti");
+        if(pedido.getTipoEntrega().equals(TipoEntrega.DELIVERY)) {
+            if (pedido.getRepartidor() == null ||
+                    !pedido.getRepartidor().getId().equals(repartidorId)) {
+                throw new BadRequestException("Este pedido no está asignado a ti");
+            }
         }
-
+        //Validar restaurante??
         // Validar estado
-        if (pedido.getEstado() != EstadoPedido.EN_CAMINO) {
+        if (pedido.getEstado() != EstadoPedido.EN_CAMINO && pedido.getEstado() != EstadoPedido.LISTO_PARA_RETIRAR) {
             throw new BadRequestException(
-                    "Solo se pueden marcar como entregados pedidos EN_CAMINO"
+                    "Solo se pueden marcar como entregados pedidos EN_CAMINO o LISTO_PARA_RETIRAR"
             );
         }
 
@@ -598,8 +600,9 @@ public class PedidoServiceImpl implements IPedidoService {
         pedidoRepository.save(pedido);
 
         // Registrar ganancia del repartidor
-        gananciaRepartidorService.registrarGanancia(pedido);
-
+        if(pedido.getTipoEntrega().equals(TipoEntrega.DELIVERY)){
+            gananciaRepartidorService.registrarGanancia(pedido);
+        }
         eventPublisher.publishEvent(new PedidoCompletadoEvent(pedido));
     }
 

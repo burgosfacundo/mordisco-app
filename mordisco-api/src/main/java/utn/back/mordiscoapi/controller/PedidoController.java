@@ -336,7 +336,7 @@ public class PedidoController {
     """
     )
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('REPARTIDOR')")
+    @PreAuthorize("hasRole('REPARTIDOR') or hasRole('RESTAURANTE')")
     @PutMapping("/{pedidoId}/entregar")
     public ResponseEntity<Void> marcarComoEntregado(
             @PathVariable Long pedidoId,

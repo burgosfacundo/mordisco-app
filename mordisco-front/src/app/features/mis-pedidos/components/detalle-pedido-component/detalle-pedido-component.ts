@@ -1,4 +1,4 @@
-import { Component,input,output } from '@angular/core';
+import { Component,inject,input,output } from '@angular/core';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
@@ -17,6 +17,7 @@ import {
   templateUrl: './detalle-pedido-component.html'
 })
 export class DetallePedidoComponent {
+
   pedidoResponse = input<PedidoResponse>();
   onCancelar = output<number>();
   onVerDetalles = output<number>();

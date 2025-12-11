@@ -18,6 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PagoService } from '../../../../shared/services/pagos/pago-service';
+import { PromptService } from '../../../../core/services/confirmation-prompt-service';
 
 @Component({
   selector: 'app-mis-pedidos-page',
@@ -40,6 +41,7 @@ export class MisPedidosPage implements OnInit {
   private auS = inject(AuthService);
   private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
+  private promptService = inject(PromptService)
   private toastService = inject(ToastService);
 
   private searchSubject = new Subject<string>();
@@ -218,6 +220,31 @@ export class MisPedidosPage implements OnInit {
         }
       });
     });
+  }
+
+  marcarEntregado(pedido: PedidoResponse){
+    this.promptService.show({
+      title: 'Marcar como entregado',
+      message: 'Indica el PIN del pedido proporcionado por el cliente',
+      placeholder: 'Ej: XXXXX',
+      required: true,
+      confirmText: 'Entregado',
+      type: 'danger'
+    }).subscribe(result => {
+      if (!result.confirmed) return;
+      const PIN : string = result.value?.toUpperCase() ?? ""
+      if(PIN === pedido.pin?.toUpperCase()){
+        this.pService.marcarComoEntregado(pedido.id).subscribe({
+          next: () => {
+            this.toastService.success('✅ Pedido marcado como "Completado"');
+            this.cargarPedidos();
+          }
+        });
+      }else{
+          this.promptService.updateValue(""); // limpia el valor
+          this.promptService.shakeInput();    // vibra el input
+          this.toastService.error("PIN incorrecto");
+      }});      
   }
 
   onSearchChanged(text: string) {

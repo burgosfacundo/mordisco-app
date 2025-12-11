@@ -200,8 +200,8 @@
       } @else {
         @if (pedidos().length > 0) {
           <!-- Grid de pedidos -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @for (pedido of pedidos(); track pedido.id) {
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+              @for (pedido of pedidos(); track pedido.id) {
               <app-detalle-pedido-component
                 [pedidoResponse]="pedido"
                 (onCancelar)="cancelarPedido($event)"
