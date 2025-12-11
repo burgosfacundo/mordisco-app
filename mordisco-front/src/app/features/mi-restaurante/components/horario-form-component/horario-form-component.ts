@@ -8,8 +8,79 @@ import { HorarioService } from '../../../../shared/services/horario/horario-serv
 import HorarioAtencionResponse from '../../../../shared/models/horario/horario-atencion-response';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import HorarioAtencionRequest from '../../../../shared/models/horario/horario-atencion-request';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ToastService } from '../../../../core/services/toast-service';
+
+// Validadores personalizados para hora y minutos
+function hourValidator(control: AbstractControl): ValidationErrors | null {
+  const value = control.value;
+
+  // Si está vacío o es null/undefined, el required lo maneja
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  const strValue = String(value).trim();
+
+  // Si después de trim está vacío
+  if (strValue === '') {
+    return null;
+  }
+
+  // Validar que solo contenga números
+  if (!/^\d+$/.test(strValue)) {
+    return { invalidHourFormat: true };
+  }
+
+  // Validar que tenga máximo 2 dígitos
+  if (strValue.length > 2) {
+    return { invalidHourFormat: true };
+  }
+
+  const numValue = parseInt(strValue, 10);
+
+  // Validar rango 0-23
+  if (isNaN(numValue) || numValue < 0 || numValue > 23) {
+    return { invalidHour: true };
+  }
+
+  return null;
+}
+
+function minuteValidator(control: AbstractControl): ValidationErrors | null {
+  const value = control.value;
+
+  // Si está vacío o es null/undefined, el required lo maneja
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  const strValue = String(value).trim();
+
+  // Si después de trim está vacío
+  if (strValue === '') {
+    return null;
+  }
+
+  // Validar que solo contenga números
+  if (!/^\d+$/.test(strValue)) {
+    return { invalidMinuteFormat: true };
+  }
+
+  // Validar que tenga máximo 2 dígitos
+  if (strValue.length > 2) {
+    return { invalidMinuteFormat: true };
+  }
+
+  const numValue = parseInt(strValue, 10);
+
+  // Validar rango 0-59
+  if (isNaN(numValue) || numValue < 0 || numValue > 59) {
+    return { invalidMinute: true };
+  }
+
+  return null;
+}
 
 @Component({
   selector: 'app-horario-form-component',
@@ -43,10 +114,10 @@ export class HorarioFormComponent implements OnInit{
     this.formHorarioAtencion = this.fb.group({
       id : [null],
       dia: ['', Validators.required],
-      horaA : ['', [Validators.required, Validators.min(0), Validators.max(23), Validators.pattern('^[0-9]*$')]],
-      minuteA : ['',  [Validators.required, Validators.min(0), Validators.max(59), Validators.pattern('^[0-9]*$')]],      
-      horaC : ['', [Validators.required, Validators.min(0), Validators.max(23), Validators.pattern('^[0-9]*$')]],
-      minuteC : ['',  [Validators.required, Validators.min(0), Validators.max(59), Validators.pattern('^[0-9]*$')]],
+      horaA : ['', [Validators.required, hourValidator]],
+      minuteA : ['',  [Validators.required, minuteValidator]],
+      horaC : ['', [Validators.required, hourValidator]],
+      minuteC : ['',  [Validators.required, minuteValidator]],
       cruzaMedianoche: [false]
     })
 

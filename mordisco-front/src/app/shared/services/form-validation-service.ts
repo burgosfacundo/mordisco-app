@@ -45,7 +45,33 @@ export class FormValidationService {
       // Validación de coincidencia de contraseñas
     if (errors['passwordMismatch']) {
       return '*Las contraseñas no coinciden';
-    }  
+    }
+
+    // Validaciones de hora
+    if (errors['invalidHourFormat']) {
+      return '*Formato inválido (máx 2 dígitos)';
+    }
+
+    if (errors['invalidHour']) {
+      return '*Debe estar entre 0 y 23';
+    }
+
+    // Validaciones de minutos
+    if (errors['invalidMinuteFormat']) {
+      return '*Formato inválido (máx 2 dígitos)';
+    }
+
+    if (errors['invalidMinute']) {
+      return '*Debe estar entre 0 y 59';
+    }
+
+    if (errors['min']) {
+      return `*Valor mínimo: ${errors['min'].min}`;
+    }
+
+    if (errors['max']) {
+      return `*Valor máximo: ${errors['max'].max}`;
+    }
 
     // Error genérico
     return '*Campo inválido';

@@ -29,35 +29,43 @@
     <div class="time-picker-container">
       <div class="time-input-wrapper">
         <input
-          type="number"
+          type="text"
+          inputmode="numeric"
           id="horaAId"
           formControlName="horaA"
           class="time-input time-input-hour"
           [class.border-red-500]="getError('horaA')"
           [class.focus:ring-red-500]="getError('horaA')"
+          maxlength="2"
+          pattern="[0-9]*"
         />
         <span class="time-label">Hora</span>
-        @if (getError('horaA')) {
-        <p class="form-error">{{ getError('horaA') }}</p>
-        }
       </div>
 
       <span class="time-separator">:</span>
 
       <div class="time-input-wrapper">
         <input
-          type="number"
+          type="text"
+          inputmode="numeric"
           id="minuteAId"
           formControlName="minuteA"
           class="time-input time-input-minute"
           [class.border-red-500]="getError('minuteA')"
           [class.focus:ring-red-500]="getError('minuteA')"
+          maxlength="2"
+          pattern="[0-9]*"
         />
         <span class="time-label">Minuto</span>
-        @if (getError('minuteA')) {
-        <p class="form-error">{{ getError('minuteA') }}</p>
-        }
       </div>
+    </div>
+    <div class="time-errors-container">
+      @if (getError('horaA')) {
+        <p class="form-error">Hora: {{ getError('horaA') }}</p>
+      }
+      @if (getError('minuteA')) {
+        <p class="form-error">Minuto: {{ getError('minuteA') }}</p>
+      }
     </div>
   </fieldset>
 
@@ -66,35 +74,43 @@
     <div class="time-picker-container">
       <div class="time-input-wrapper">
         <input
-          type="number"
+          type="text"
+          inputmode="numeric"
           id="horaCId"
           formControlName="horaC"
           class="time-input time-input-hour"
           [class.border-red-500]="getError('horaC')"
           [class.focus:ring-red-500]="getError('horaC')"
+          maxlength="2"
+          pattern="[0-9]*"
         />
         <span class="time-label">Hora</span>
-        @if (getError('horaC')) {
-        <p class="form-error">{{ getError('horaC') }}</p>
-        }
       </div>
 
       <span class="time-separator">:</span>
 
       <div class="time-input-wrapper">
         <input
-          type="number"
+          type="text"
+          inputmode="numeric"
           id="minuteCId"
           formControlName="minuteC"
           class="time-input time-input-minute"
           [class.border-red-500]="getError('minuteC')"
           [class.focus:ring-red-500]="getError('minuteC')"
+          maxlength="2"
+          pattern="[0-9]*"
         />
         <span class="time-label">Minuto</span>
-        @if (getError('minuteC')) {
-        <p class="form-error">{{ getError('minuteC') }}</p>
-        }
       </div>
+    </div>
+    <div class="time-errors-container">
+      @if (getError('horaC')) {
+        <p class="form-error">Hora: {{ getError('horaC') }}</p>
+      }
+      @if (getError('minuteC')) {
+        <p class="form-error">Minuto: {{ getError('minuteC') }}</p>
+      }
     </div>
   </fieldset>
 

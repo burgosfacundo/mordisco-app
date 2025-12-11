@@ -490,11 +490,19 @@ body {
   @apply flex flex-col items-center gap-1;
 }
 
+.time-errors-container {
+  @apply min-h-[18px] mt-1 flex flex-col gap-0.5;
+}
+
+.time-errors-container .form-error {
+  @apply text-red-600 text-[0.65rem] font-medium leading-tight text-center;
+}
+
 .time-input {
   @apply w-11 h-11 text-center text-lg font-semibold rounded-md border
          transition-all duration-200
          focus:outline-none focus:ring-2 focus:ring-primary-200
-         [&::-webkit-inner-spin-button]:appearance-none 
+         [&::-webkit-inner-spin-button]:appearance-none
          [&::-webkit-outer-spin-button]:appearance-none;
 }
 
