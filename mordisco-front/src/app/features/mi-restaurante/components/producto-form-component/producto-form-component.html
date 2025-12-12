@@ -50,14 +50,14 @@
             formControlName="nombreProducto"
             class="form-input"
             placeholder="Ej: Hamburguesa Clásica, Pizza Margarita"
-            maxlength="100"
+            maxlength="50"
             [class.border-red-500]="getError('nombreProducto')"
             [class.focus:ring-red-500]="getError('nombreProducto')">
           @if (getError('nombreProducto')) {
             <p class="form-error">{{ getError('nombreProducto') }}</p>
           }
           <p class="text-xs text-gray-500 mt-1">
-            {{ productoForm.get('nombreProducto')?.value?.length || 0 }}/100 caracteres
+            {{ productoForm.get('nombreProducto')?.value?.length || 0 }}/50 caracteres
           </p>
         </fieldset>
 

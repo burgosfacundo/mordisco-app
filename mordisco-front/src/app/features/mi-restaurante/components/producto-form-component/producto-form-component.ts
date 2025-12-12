@@ -50,7 +50,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
 
   private initializeForm(): void {
       this.productoForm = this.fb.group({
-      nombreProducto: ['', [Validators.required, Validators.minLength(3),Validators.maxLength(100)]],
+      nombreProducto: ['', [Validators.required, Validators.minLength(3),Validators.maxLength(50)]],
       descripcion: ['', [
         Validators.required,
         Validators.minLength(10),
@@ -58,7 +58,7 @@ export class ProductoFormComponent implements OnInit, OnDestroy {
       ]],
       precioUnitario: [0, [
         Validators.required,
-        Validators.min(0.01),
+        Validators.min(500),
         Validators.max(999999)
       ]],
       disponible: [true, [Validators.required]],

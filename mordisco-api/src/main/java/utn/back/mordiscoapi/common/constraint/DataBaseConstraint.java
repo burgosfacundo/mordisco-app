@@ -12,7 +12,6 @@ public enum DataBaseConstraint {
     RESTAURANTE_IMAGEN("UK_restaurante_imagen", "La imagen ya está en uso por otro restaurante."),
     RESTAURANTE_DIRECCION("UK_restaurante_direccion", "La dirección ya está en uso por otro restaurante."),
     MENU_RESTAURANTE("UK_menu_restaurante","El restaurante ya tiene un menu creado"),
-    PRODUCTO_NOMBRE("UK_producto_nombre", "El nombre del producto no puede ser mayor a 50 caracteres."),
     PRODUCTO_IMAGEN("UK_producto_imagen", "La imagen ya está en uso por otro producto o restaurante."),
     USUARIO_TELEFONO("UK_usuario_telefono", "El teléfono ya está registrado."),
     USUARIO_EMAIL("UK_usuario_email", "El email ya está registrado."),
