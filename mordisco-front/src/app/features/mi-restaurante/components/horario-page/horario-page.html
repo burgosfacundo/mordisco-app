@@ -21,18 +21,29 @@
                     <p class="loading-text">Cargando direcciones...</p>
                 </div>
             }@else {
-                @if (arrHorarios && arrHorarios.length>0) {
+                @if (arrHorariosPaginados && arrHorariosPaginados.length>0) {
                     <ul class="grid-direcciones">
-                        @for(horario of arrHorarios; track $index){
+                        @for(horario of arrHorariosPaginados; track $index){
                             <li class="card-base fade-in">
                                 <app-horario-card-component [horario]="horario"></app-horario-card-component>
-                                <div class="flex gap-3 p-4">                        
+                                <div class="flex gap-3 p-4">
                                     <button (click)="modificarHorario(horario)" class="btn-outline flex-1">Editar</button>
                                     <button (click)="confirmarEliminacion(horario.id)" class="btn-ghost flex-1 text-red-600 hover:bg-red-50">Eliminar</button>
-                                </div>    
+                                </div>
                             </li>
                         }
-                    </ul> 
+                    </ul>
+
+                    <!-- Paginador -->
+                    <div class="flex justify-center mt-8">
+                        <mat-paginator
+                            [length]="lengthHorario"
+                            [pageSize]="sizeHorario"
+                            [pageIndex]="pageHorario"
+                            (page)="onPageChange($event)"
+                            class="bg-white rounded-xl shadow-md">
+                        </mat-paginator>
+                    </div>
                 }@else{
                     <!-- Empty State -->
                     <div class="empty-state">

@@ -34,7 +34,36 @@ export class HorarioRestauranteComponent {
   isAbierto(): boolean {
     const ahora = new Date();
     const diaActual = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'][ahora.getDay()];
-    return this.horario()!.dia === diaActual;
+
+    // Primero verifica si es el día correcto
+    if (this.horario()!.dia !== diaActual) {
+      return false;
+    }
+
+    // Luego verifica si está dentro del horario
+    const open = this.toMinutes(this.horario()!.horaApertura);
+    const close = this.toMinutes(this.horario()!.horaCierre);
+    const now = this.nowInMinutes();
+
+    if (open === close) return false;
+
+    // Si cruza medianoche: abierto si ahora >= apertura O ahora < cierre
+    if (this.horario()!.cruzaMedianoche) {
+      return now >= open || now < close;
+    }
+
+    // Horario normal: abierto si ahora está entre apertura y cierre
+    return now >= open && now < close;
+  }
+
+  private nowInMinutes(): number {
+    const now = new Date();
+    return now.getHours() * 60 + now.getMinutes();
+  }
+
+  private toMinutes(time: string): number {
+    const [h, m, s] = time.split(':').map(Number);
+    return (h || 0) * 60 + (m || 0) + Math.floor((s || 0) / 60);
   }
 
   getEstadoBadgeClass(): string {

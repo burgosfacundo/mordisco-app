@@ -133,16 +133,27 @@
         </button>
       </div>
 
-      @if (horariosDeAtencion && horariosDeAtencion.length > 0) {
+      @if (horariosDeAtencionPaginados && horariosDeAtencionPaginados.length > 0) {
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (horario of horariosDeAtencion; track horario.id) {
+          @for (horario of horariosDeAtencionPaginados; track horario.id) {
             <li class="fade-in">
-              <app-horario-restaurante-component 
+              <app-horario-restaurante-component
                 [horario]="horario">
               </app-horario-restaurante-component>
             </li>
           }
         </ul>
+
+        <!-- Paginador -->
+        <div class="flex justify-center mt-8">
+          <mat-paginator
+            [length]="lengthHorario"
+            [pageSize]="sizeHorario"
+            [pageIndex]="pageHorario"
+            (page)="onPageChangeHorario($event)"
+            class="bg-white rounded-xl shadow-md">
+          </mat-paginator>
+        </div>
       } @else {
         <div class="empty-state">
           <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -173,7 +184,7 @@
       </div>
 
       @if (promociones && promociones.length > 0) {
-        <ul class="grid-promociones">
+        <ul class=".grid-promociones-card">
           @for (promocion of promociones; track promocion.id) {
             <li class="fade-in">
               <app-promocion-card-component

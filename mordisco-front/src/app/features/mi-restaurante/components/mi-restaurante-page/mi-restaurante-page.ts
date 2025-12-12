@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { AuthService } from '../../../../shared/services/auth-service';
@@ -35,7 +35,7 @@ import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-
 ],
   templateUrl: './mi-restaurante-page.html'
 })
-export class MiRestaurantePageComponent implements OnInit {
+export class MiRestaurantePageComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private restauranteService = inject(RestauranteService);
   private horarioService = inject(HorarioService);
@@ -49,21 +49,80 @@ export class MiRestaurantePageComponent implements OnInit {
   calificaciones?: CalificacionPedidoResponseDTO[];
   promociones?: PromocionResponse[];
   horariosDeAtencion?: HorarioAtencionResponse[];
+  horariosDeAtencionPaginados?: HorarioAtencionResponse[];
 
   // Paginación Promociones
-  sizePromocion: number = 5;
+  sizePromocion: number = this.getPageSizeForPromocion();
   pagePromocion: number = 0;
   lengthPromocion: number = 0;
 
   // Paginación Calificaciones
-  sizeCalificacion: number = 5;
+  sizeCalificacion: number = this.getPageSizeForCalificacion();
   pageCalificacion: number = 0;
   lengthCalificacion: number = 0;
 
+  // Paginación Horarios
+  sizeHorario: number = this.getPageSizeForCalificacion();
+  pageHorario: number = 0;
+  lengthHorario: number = 0;
+
   isLoadingRestaurante = true;
+  private eventListeners: (() => void)[] = [];
 
   ngOnInit(): void {
+    this.setupEventListeners();
     this.cargarRestaurante();
+  }
+
+  ngOnDestroy(): void {
+    this.eventListeners.forEach(cleanup => cleanup());
+  }
+
+  private getPageSizeForPromocion(): number {
+    const width = window.innerWidth;
+    if (width >= 1280) return 5;  // xl
+    if (width >= 1024) return 4;  // lg
+    if (width >= 640) return 3;   // sm
+    return 1;                      // mobile
+  }
+
+  private getPageSizeForCalificacion(): number {
+    const width = window.innerWidth;
+    if (width >= 1024) return 3;  // lg
+    if (width >= 768) return 2;   // md
+    return 1;                      // mobile
+  }
+
+  private setupEventListeners(): void {
+    const resizeListener = () => {
+      const newSizePromocion = this.getPageSizeForPromocion();
+      const newSizeCalificacion = this.getPageSizeForCalificacion();
+
+      let needsReload = false;
+
+      if (newSizePromocion !== this.sizePromocion) {
+        this.sizePromocion = newSizePromocion;
+        this.pagePromocion = 0;
+        needsReload = true;
+      }
+
+      if (newSizeCalificacion !== this.sizeCalificacion) {
+        this.sizeCalificacion = newSizeCalificacion;
+        this.sizeHorario = newSizeCalificacion;
+        this.pageCalificacion = 0;
+        this.pageHorario = 0;
+        needsReload = true;
+      }
+
+      if (needsReload && this.restaurante?.id) {
+        this.cargarPromociones();
+        this.cargarCalificaciones();
+        this.paginarHorarios();
+      }
+    };
+
+    window.addEventListener('resize', resizeListener);
+    this.eventListeners.push(() => window.removeEventListener('resize', resizeListener));
   }
 
   private cargarRestaurante(): void {
@@ -130,9 +189,29 @@ export class MiRestaurantePageComponent implements OnInit {
       idRestaurante
     ).subscribe({
       next: (response) => {
-        this.horariosDeAtencion = response
+
+        const ordenDias = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+        this.horariosDeAtencion = response.sort((a, b) => {
+          return ordenDias.indexOf(a.dia) - ordenDias.indexOf(b.dia);
+        });
+        this.lengthHorario = this.horariosDeAtencion.length;
+        this.paginarHorarios();
       }
     });
+  }
+
+  private paginarHorarios(): void {
+    if (!this.horariosDeAtencion) return;
+
+    const start = this.pageHorario * this.sizeHorario;
+    const end = start + this.sizeHorario;
+    this.horariosDeAtencionPaginados = this.horariosDeAtencion.slice(start, end);
+  }
+
+  onPageChangeHorario(event: PageEvent): void {
+    this.pageHorario = event.pageIndex;
+    this.sizeHorario = event.pageSize;
+    this.paginarHorarios();
   }
 
   onEditarRestaurante(): void {

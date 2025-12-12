@@ -13,6 +13,7 @@ import HorarioAtencionResponse from '../../models/horario/horario-atencion-respo
 })
 export class RestauranteCardComponent implements OnInit {
   restaurante = input<RestauranteForCard>()
+  mostrarPromocion = input<boolean>(false)
   listaHorarios : HorarioAtencionResponse [] = []
   private haService = inject(HorarioService)
   menuVer = output<number>();
@@ -73,10 +74,13 @@ export class RestauranteCardComponent implements OnInit {
 
     if (open === close) return false;
 
-    if (close > open) return now >= open && now < close;
+    // Si cruza medianoche: abierto si ahora >= apertura O ahora < cierre
+    if (h.cruzaMedianoche) {
+      return now >= open || now < close;
+    }
 
-
-    return now >= open || now < close;
+    // Horario normal: abierto si ahora está entre apertura y cierre
+    return now >= open && now < close;
   }
 
   private formatHHmm(time: string): string {

@@ -1,24 +1,31 @@
 <article class="card-base card-restaurante group cursor-pointer">
   <div class="relative w-full aspect-4/3 overflow-hidden rounded-t-xl bg-gray-200">
-    <img 
-      [src]="restaurante()!.logo.url" 
+    <img
+      [src]="restaurante()!.logo.url"
       [alt]="restaurante()!.logo.nombre"
       loading="lazy"
       class="absolute inset-0 transition-transform duration-300 group-hover:scale-110">
-    
+
     <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent
                 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
     </div>
 
     @if (isAbierto()) {
-      <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full 
-                  bg-green-500 text-white text-xs font-semibold shadow-lg">
+      <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full
+                  bg-green-500 text-white text-[10px] font-semibold shadow-lg">
         Abierto
       </div>
     }@else {
-      <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full 
-                 bg-primary-500 text-white text-xs font-semibold shadow-lg">
+      <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full
+                 bg-primary-500 text-white text-[10px] font-semibold shadow-lg">
         Cerrado
+      </div>
+    }
+
+    @if (mostrarPromocion()) {
+      <div class="absolute top-2 right-2 px-2 py-0.5 rounded-full
+                  bg-yellow-400 text-gray-900 text-[10px] font-bold shadow-lg uppercase">
+        ¡Promo!
       </div>
     }
   </div>

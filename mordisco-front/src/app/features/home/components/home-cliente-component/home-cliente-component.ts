@@ -38,12 +38,12 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
   restaurantesPromociones?: RestauranteForCard[];
 
   // Paginación para restaurantes regulares
-  sizeRestaurantes: number = 5;
+  sizeRestaurantes: number = this.getPageSizeForScreenSize();
   pageRestaurantes: number = 0;
   lengthRestaurantes: number = 0;
 
   // Paginación para promociones
-  sizePromocion: number = 5;
+  sizePromocion: number = this.getPageSizeForScreenSize();
   pagePromocion: number = 0;
   lengthPromocion: number = 0;
 
@@ -59,19 +59,47 @@ export class HomeClienteComponent  implements OnInit , OnDestroy{
     this.eventListeners.forEach(cleanup => cleanup());
   }
 
+  private getPageSizeForScreenSize(): number {
+    const width = window.innerWidth;
+
+    if (width >= 1280) {
+      return 7; // xl
+    } else if (width >= 1024) {
+      return 6; // lg
+    } else if (width >= 640) {
+      return 4; // sm
+    } else {
+      return 1; // mobile
+    }
+  }
+
   private setupEventListeners(): void {
     const searchListener = (event: Event) => {
       const { detail } = event as CustomEvent<any>;
       const term = detail?.term ?? (typeof detail === 'string' ? detail : '');
       this.currentSearchTerm = term;
-      this.pageRestaurantes = 0; // Reset a primera página al buscar
+      this.pageRestaurantes = 0;
       this.loadRestaurantes();
     };
 
+    const resizeListener = () => {
+      const newSize = this.getPageSizeForScreenSize();
+      if (newSize !== this.sizeRestaurantes || newSize !== this.sizePromocion) {
+        this.sizeRestaurantes = newSize;
+        this.sizePromocion = newSize;
+        this.pageRestaurantes = 0;
+        this.pagePromocion = 0;
+        this.loadRestaurantes();
+        this.loadRestaurantesPromociones();
+      }
+    };
+
     window.addEventListener('search-changed', searchListener);
+    window.addEventListener('resize', resizeListener);
 
     this.eventListeners.push(
-      () => window.removeEventListener('search-changed', searchListener)
+      () => window.removeEventListener('search-changed', searchListener),
+      () => window.removeEventListener('resize', resizeListener)
     );
   }
 

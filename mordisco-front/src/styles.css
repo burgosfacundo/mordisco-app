@@ -177,15 +177,6 @@ body {
   }
 
    /* ========== BADGES ========== */
-  .badge-promocion {
-    @apply absolute top-3 right-3 z-10
-           px-3 py-1 rounded-full
-           text-xs font-bold uppercase tracking-wider
-           bg-linear-to-r from-yellow-500 to-yellow-600
-           text-white shadow-lg
-           animate-pulse;
-  }
-
   .badge-rol {
     @apply inline-flex items-center gap-1.5
            px-2.5 py-1 rounded-full
@@ -337,18 +328,28 @@ body {
   .grid-restaurantes {
     @apply grid gap-6 w-full
            grid-cols-1
-           sm:grid-cols-2
-           lg:grid-cols-3
-           xl:grid-cols-5
+           sm:grid-cols-4
+           lg:grid-cols-6
+           xl:grid-cols-7
            auto-rows-auto;
   }
 
   .grid-promociones {
-    @apply grid gap-5 w-full
+    @apply grid gap-6 w-full
            grid-cols-1
-           sm:grid-cols-2
-           lg:grid-cols-5
-           xl:grid-cols-5;
+           sm:grid-cols-4
+           lg:grid-cols-6
+           xl:grid-cols-7
+           auto-rows-auto;
+  }
+
+  .grid-promociones-card {
+    @apply grid gap-6 w-full
+           grid-cols-1
+           sm:grid-cols-3
+           lg:grid-cols-4
+           xl:grid-cols-5
+           auto-rows-auto;
   }
 
   .grid-direcciones {

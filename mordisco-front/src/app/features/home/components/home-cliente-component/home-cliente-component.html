@@ -75,10 +75,10 @@
       } @else {
         <ul class="grid-promociones">
           @for (restaurante of restaurantesPromociones; track restaurante.id) {
-            <li class="fade-in relative cursor-pointer">
-              <span class="badge-promocion">¡PROMO!</span>
-              <app-restaurante-card-component 
+            <li class="fade-in cursor-pointer">
+              <app-restaurante-card-component
                 [restaurante]="restaurante"
+                [mostrarPromocion]="true"
                 (menuVer)="verMenu($event)"
                 class="block">
               </app-restaurante-card-component>
