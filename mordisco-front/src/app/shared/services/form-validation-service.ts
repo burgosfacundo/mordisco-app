@@ -95,6 +95,18 @@ export class FormValidationService {
       return '*Debe incluir mayúscula, minúscula, número y caracter especial';
     }
 
+    if (lowerFieldName === 'calle') {
+      return '*Solo se permiten letras, números y espacios';
+    }
+
+    if (lowerFieldName === 'numero') {
+      return '*Solo se permiten números';
+    }
+
+    if (lowerFieldName === 'codigopostal') {
+      return '*Formato válido: 4 dígitos (ej: 7600) o CPA (ej: B1636BCN)';
+    }
+
     return '*Formato inválido';
   }
 

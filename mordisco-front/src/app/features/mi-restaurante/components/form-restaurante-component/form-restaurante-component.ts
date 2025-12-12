@@ -63,11 +63,11 @@ export class RestauranteFormComponent implements OnInit {
       logoUrl: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]]
     };
     const addressFields = this.isEditMode ? {} : {
-      calle: ['', [Validators.required, Validators.maxLength(50)]],
-      numero: ['', [Validators.required, Validators.maxLength(50)]],
+      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+$/)]],
+      numero: ['', [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
       piso: ['', [Validators.maxLength(15)]],
       depto: ['', [Validators.maxLength(15)]],
-      codigoPostal: ['', [Validators.required, Validators.maxLength(15)]],
+      codigoPostal: ['', [Validators.required, Validators.maxLength(8), Validators.pattern(/^(\d{4}|[A-Z]\d{4}[A-Z]{3})$/)]],
       ciudad: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
       referencias: ['', [Validators.maxLength(250)]]
     };
