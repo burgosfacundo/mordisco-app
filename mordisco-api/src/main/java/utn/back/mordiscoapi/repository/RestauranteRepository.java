@@ -190,6 +190,16 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             AND d.latitud IS NOT NULL
             AND d.longitud IS NOT NULL
             AND r.razon_social LIKE :searchTerm
+            AND EXISTS (
+                SELECT 1 FROM horarios_atencion ha2
+                WHERE ha2.restaurante_id = r.id
+                AND ha2.dia = DAYNAME(CURRENT_DATE)
+                AND (
+                    (ha2.cruza_medianoche = FALSE AND CURRENT_TIME >= ha2.hora_apertura AND CURRENT_TIME < ha2.hora_cierre)
+                    OR
+                    (ha2.cruza_medianoche = TRUE AND (CURRENT_TIME >= ha2.hora_apertura OR CURRENT_TIME < ha2.hora_cierre))
+                )
+            )
             AND (6371 * acos(
                 cos(radians(:latitud)) *
                 cos(radians(d.latitud)) *
@@ -197,17 +207,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 sin(radians(:latitud)) *
                 sin(radians(d.latitud))
             )) <= :radioKm
-            ORDER BY
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1 FROM horarios_atencion ha2
-                        WHERE ha2.restaurante_id = r.id
-                        AND ha2.dia = DAYNAME(CURRENT_DATE)
-                        AND CURRENT_TIME BETWEEN ha2.hora_apertura AND ha2.hora_cierre
-                    ) THEN 0
-                    ELSE 1
-                END,
-                distancia ASC
+            ORDER BY distancia ASC
             """, 
             countQuery = """
             SELECT COUNT(DISTINCT r.id)
@@ -217,6 +217,16 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             AND d.latitud IS NOT NULL
             AND d.longitud IS NOT NULL
             AND r.razon_social LIKE :searchTerm
+            AND EXISTS (
+                SELECT 1 FROM horarios_atencion ha2
+                WHERE ha2.restaurante_id = r.id
+                AND ha2.dia = DAYNAME(CURRENT_DATE)
+                AND (
+                    (ha2.cruza_medianoche = FALSE AND CURRENT_TIME >= ha2.hora_apertura AND CURRENT_TIME < ha2.hora_cierre)
+                    OR
+                    (ha2.cruza_medianoche = TRUE AND (CURRENT_TIME >= ha2.hora_apertura OR CURRENT_TIME < ha2.hora_cierre))
+                )
+            )
             AND (6371 * acos(
                 cos(radians(:latitud)) *
                 cos(radians(d.latitud)) *
@@ -264,6 +274,16 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             AND d.longitud IS NOT NULL
             AND p.fecha_inicio <= CURRENT_DATE
             AND p.fecha_fin >= CURRENT_DATE
+            AND EXISTS (
+                SELECT 1 FROM horarios_atencion ha2
+                WHERE ha2.restaurante_id = r.id
+                AND ha2.dia = DAYNAME(CURRENT_DATE)
+                AND (
+                    (ha2.cruza_medianoche = FALSE AND CURRENT_TIME >= ha2.hora_apertura AND CURRENT_TIME < ha2.hora_cierre)
+                    OR
+                    (ha2.cruza_medianoche = TRUE AND (CURRENT_TIME >= ha2.hora_apertura OR CURRENT_TIME < ha2.hora_cierre))
+                )
+            )
             AND (6371 * acos(
                 cos(radians(:latitud)) *
                 cos(radians(d.latitud)) *
@@ -271,17 +291,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
                 sin(radians(:latitud)) *
                 sin(radians(d.latitud))
             )) <= :radioKm
-            ORDER BY
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1 FROM horarios_atencion ha2
-                        WHERE ha2.restaurante_id = r.id
-                        AND ha2.dia = DAYNAME(CURRENT_DATE)
-                        AND CURRENT_TIME BETWEEN ha2.hora_apertura AND ha2.hora_cierre
-                    ) THEN 0
-                    ELSE 1
-                END,
-                distancia ASC
+            ORDER BY distancia ASC
             """, 
             countQuery = """
             SELECT COUNT(DISTINCT r.id)
@@ -293,6 +303,16 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
             AND d.longitud IS NOT NULL
             AND p.fecha_inicio <= CURRENT_DATE
             AND p.fecha_fin >= CURRENT_DATE
+            AND EXISTS (
+                SELECT 1 FROM horarios_atencion ha2
+                WHERE ha2.restaurante_id = r.id
+                AND ha2.dia = DAYNAME(CURRENT_DATE)
+                AND (
+                    (ha2.cruza_medianoche = FALSE AND CURRENT_TIME >= ha2.hora_apertura AND CURRENT_TIME < ha2.hora_cierre)
+                    OR
+                    (ha2.cruza_medianoche = TRUE AND (CURRENT_TIME >= ha2.hora_apertura OR CURRENT_TIME < ha2.hora_cierre))
+                )
+            )
             AND (6371 * acos(
                 cos(radians(:latitud)) *
                 cos(radians(d.latitud)) *
