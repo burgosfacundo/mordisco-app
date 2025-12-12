@@ -2,7 +2,7 @@ import { Component, inject, input, OnChanges, OnInit, output, signal, SimpleChan
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DireccionService } from '../../services/direccion-service';
-import { FormValidationService } from '../../../../shared/services/form-validation-service';
+import { FormValidationService, streetNameValidator } from '../../../../shared/services/form-validation-service';
 import DireccionRequest from '../../../../shared/models/direccion/direccion-request';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
 import { ToastService } from '../../../../core/services/toast-service';
@@ -52,7 +52,7 @@ export class DireccionFormComponent implements OnInit , OnChanges{
 
   private initializeForm(): void {
     this.formDirecciones = this.fb.group({
-      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+$/)]],
+      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+$/), streetNameValidator]],
       numero: ['', [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
       piso: ['', [Validators.maxLength(20)]],
       depto: ['', [Validators.maxLength(20)]],

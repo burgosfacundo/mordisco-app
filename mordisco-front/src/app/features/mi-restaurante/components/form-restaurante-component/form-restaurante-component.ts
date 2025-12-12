@@ -5,7 +5,7 @@ import { AuthService } from "../../../../shared/services/auth-service";
 import { ActivatedRoute, Router } from "@angular/router";
 import RestauranteUpdate from "../../../../shared/models/restaurante/restaurante-update";
 import RestauranteRequest from "../../../../shared/models/restaurante/restaurante-request";
-import { FormValidationService } from "../../../../shared/services/form-validation-service";
+import { FormValidationService, streetNameValidator } from "../../../../shared/services/form-validation-service";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
@@ -63,7 +63,7 @@ export class RestauranteFormComponent implements OnInit {
       logoUrl: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]]
     };
     const addressFields = this.isEditMode ? {} : {
-      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+$/)]],
+      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+$/), streetNameValidator]],
       numero: ['', [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
       piso: ['', [Validators.maxLength(15)]],
       depto: ['', [Validators.maxLength(15)]],
