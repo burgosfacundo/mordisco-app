@@ -125,11 +125,7 @@
         <button 
           [routerLink]="['/restaurante/horarios']"
           class="btn-primary">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M12 4v16m8-8H4" />
-          </svg>
-          Gestionar Horarios
+          Gestionar
         </button>
       </div>
 
@@ -179,12 +175,12 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M12 4v16m8-8H4" />
           </svg>
-          Agregar Promoción
+          Agregar
         </button>
       </div>
 
       @if (promociones && promociones.length > 0) {
-        <ul class=".grid-promociones-card">
+        <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
           @for (promocion of promociones; track promocion.id) {
             <li class="fade-in">
               <app-promocion-card-component

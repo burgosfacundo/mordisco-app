@@ -80,10 +80,10 @@ export class MiRestaurantePageComponent implements OnInit, OnDestroy {
 
   private getPageSizeForPromocion(): number {
     const width = window.innerWidth;
-    if (width >= 1280) return 5;  // xl
-    if (width >= 1024) return 4;  // lg
-    if (width >= 640) return 3;   // sm
-    return 1;                      // mobile
+    if (width >= 1280) return 4;  // xl: 4 columnas
+    if (width >= 768) return 3;   // md: 3 columnas
+    if (width >= 640) return 2;   // sm: 2 columnas
+    return 1;                      // mobile: 1 columna
   }
 
   private getPageSizeForCalificacion(): number {

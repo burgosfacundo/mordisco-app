@@ -117,7 +117,7 @@ export class PromocionFormComponent implements OnInit {
     
     this.promocionForm = this.fb.group({
       tipoDescuento: [TipoDescuento.PORCENTAJE, Validators.required],
-      descripcion: ['', [Validators.required, Validators.maxLength(255)]],
+      descripcion: ['', [Validators.required, Validators.maxLength(20)]],
       descuento: ['', [Validators.required, Validators.min(1), Validators.max(100)]],
       alcance: [AlcancePromocion.TODO_MENU, Validators.required],
       fechaInicio: ['', [Validators.required]],
@@ -132,25 +132,18 @@ export class PromocionFormComponent implements OnInit {
   validarFechas(group: FormGroup): {[key: string]: any} | null {
     const fechaInicio = group.get('fechaInicio')?.value;
     const fechaFin = group.get('fechaFin')?.value;
-    
+
     if (!fechaInicio || !fechaFin) {
       return null;
     }
-    
+
     const inicio = new Date(fechaInicio);
     const fin = new Date(fechaFin);
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
     inicio.setHours(0, 0, 0, 0);
     fin.setHours(0, 0, 0, 0);
-    
-    // Solo validar fecha inicio >= hoy si NO estamos en modo edición
-    // En modo edición, permitimos mantener fechas pasadas
-    if (!this.isEditMode && inicio < hoy) {
-      return { fechaInicioAnterior: true };
-    }
 
-    // Fecha fin debe ser igual o posterior a fecha inicio (permite promociones de un solo día)
+    // Solo validar que fecha fin >= fecha inicio (permite promociones de un solo día)
+    // La validación de fecha >= hoy se maneja en el datepicker con [min]
     if (fin < inicio) {
       return { fechaFinInvalida: true };
     }
@@ -161,7 +154,7 @@ export class PromocionFormComponent implements OnInit {
   actualizarValidacionesDescuento(): void {
     const tipoDescuento = this.promocionForm.get('tipoDescuento')?.value;
     const descuentoControl = this.promocionForm.get('descuento');
-    
+
     if (tipoDescuento === TipoDescuento.PORCENTAJE) {
       // Porcentaje: entre 1 y 100
       descuentoControl?.setValidators([Validators.required, Validators.min(1), Validators.max(100)]);
@@ -169,7 +162,9 @@ export class PromocionFormComponent implements OnInit {
       // Monto fijo: mayor a 0, sin límite superior
       descuentoControl?.setValidators([Validators.required, Validators.min(1)]);
     }
-    
+
+    // Marcar como touched para que se muestren los errores
+    descuentoControl?.markAsTouched();
     descuentoControl?.updateValueAndValidity();
   }
 
@@ -205,20 +200,22 @@ export class PromocionFormComponent implements OnInit {
 
     this.promocionService.getById(this.promocionId).subscribe({
       next: (p) => {
-        this.promocionForm.patchValue({
+        // Inicializar productos seleccionados primero
+        if (p.productosIds && p.productosIds.length > 0) {
+          this.productosSeleccionados = new Set(p.productosIds);
+        }
+
+        // Usar reset en lugar de patchValue para forzar la actualización de todos los controles
+        this.promocionForm.reset({
           tipoDescuento: p.tipoDescuento,
           descripcion: p.descripcion,
           descuento: p.descuento,
           alcance: p.alcance,
-          fechaInicio: new Date(p.fechaInicio),
-          fechaFin: new Date(p.fechaFin),
+          fechaInicio: this.parseFecha(p.fechaInicio),
+          fechaFin: this.parseFecha(p.fechaFin),
           productosIds: p.productosIds || []
         });
-        
-        // Inicializar productos seleccionados
-        if (p.productosIds && p.productosIds.length > 0) {
-          this.productosSeleccionados = new Set(p.productosIds);
-        }
+        this.promocionForm.markAsPristine();
       }
     });
   }
@@ -226,17 +223,13 @@ export class PromocionFormComponent implements OnInit {
   onSubmit(): void {
     if (!this.promocionForm.valid) {
       this.markFormGroupTouched(this.promocionForm);
-      
+
       // Mensajes de error específicos
-      if (this.promocionForm.errors?.['fechaInicioAnterior']) {
-        this.toastService.warning('⚠️ La fecha de inicio no puede ser anterior a hoy');
-        return;
-      }
       if (this.promocionForm.errors?.['fechaFinInvalida']) {
-        this.toastService.warning('⚠️ La fecha de fin debe ser posterior a la fecha de inicio');
+        this.toastService.warning('⚠️ La fecha de fin debe ser igual o posterior a la fecha de inicio');
         return;
       }
-      
+
       this.toastService.warning('⚠️ Por favor completa todos los campos correctamente');
       return;
     }
@@ -314,6 +307,11 @@ export class PromocionFormComponent implements OnInit {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  private parseFecha(fecha: string): Date {
+    const [year, month, day] = fecha.split('-').map(Number);
+    return new Date(year, month - 1, day);
   }
 
   markFormGroupTouched(formGroup: FormGroup): void {
