@@ -23,6 +23,8 @@ export class ResetPasswordPage implements OnInit {
     protected resetForm!: FormGroup;
     isSubmitting = signal(false);
     private token: string = '';
+    showNewPassword = false;
+    showConfirmPassword = false;
 
     ngOnInit(): void {
         this.token = this.route.snapshot.queryParamMap.get('token') || '';
@@ -89,5 +91,13 @@ export class ResetPasswordPage implements OnInit {
         }
 
         return this.validationService.getErrorMessage(control, fieldName);
+    }
+
+    toggleNewPasswordVisibility(): void {
+        this.showNewPassword = !this.showNewPassword;
+    }
+
+    toggleConfirmPasswordVisibility(): void {
+        this.showConfirmPassword = !this.showConfirmPassword;
     }
 }

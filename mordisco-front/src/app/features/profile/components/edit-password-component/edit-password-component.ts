@@ -19,6 +19,9 @@ export class EditPasswordComponent implements OnInit {
 
   isSubmitting = signal(false)
   editarPassword!: FormGroup;
+  showCurrentPassword = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
 
 
   ngOnInit(): void {
@@ -56,5 +59,17 @@ export class EditPasswordComponent implements OnInit {
 
   getError(fieldName: string): string | null {
     return this.validationService.getErrorMessage(this.editarPassword.get(fieldName),fieldName);
+  }
+
+  toggleCurrentPasswordVisibility(): void {
+    this.showCurrentPassword = !this.showCurrentPassword;
+  }
+
+  toggleNewPasswordVisibility(): void {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 }
