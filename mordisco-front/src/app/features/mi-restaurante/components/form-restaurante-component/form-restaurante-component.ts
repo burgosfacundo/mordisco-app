@@ -12,6 +12,14 @@ import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { ToastService } from "../../../../core/services/toast-service";
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
+import {
+  CALLE_MIN_LENGTH, CALLE_MAX_LENGTH, CALLE_PATTERN,
+  NUMERO_MAX_LENGTH, NUMERO_PATTERN,
+  PISO_MAX_LENGTH, DEPTO_MAX_LENGTH,
+  CODIGO_POSTAL_MAX_LENGTH, CODIGO_POSTAL_PATTERN,
+  CIUDAD_MAX_LENGTH, CIUDAD_PATTERN,
+  REFERENCIAS_MAX_LENGTH
+} from "../../../../shared/validators/validation-constants";
 
 @Component({
   selector: 'app-restaurante-form-component',
@@ -63,13 +71,13 @@ export class RestauranteFormComponent implements OnInit {
       logoUrl: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]]
     };
     const addressFields = this.isEditMode ? {} : {
-      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+$/), streetNameValidator]],
-      numero: ['', [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
-      piso: ['', [Validators.maxLength(15)]],
-      depto: ['', [Validators.maxLength(15)]],
-      codigoPostal: ['', [Validators.required, Validators.maxLength(8), Validators.pattern(/^(\d{4}|[A-Z]\d{4}[A-Z]{3})$/)]],
-      ciudad: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
-      referencias: ['', [Validators.maxLength(250)]]
+      calle: ['', [Validators.required, Validators.minLength(CALLE_MIN_LENGTH), Validators.maxLength(CALLE_MAX_LENGTH), Validators.pattern(CALLE_PATTERN), streetNameValidator]],
+      numero: ['', [Validators.required, Validators.maxLength(NUMERO_MAX_LENGTH), Validators.pattern(NUMERO_PATTERN)]],
+      piso: ['', [Validators.maxLength(PISO_MAX_LENGTH)]],
+      depto: ['', [Validators.maxLength(DEPTO_MAX_LENGTH)]],
+      codigoPostal: ['', [Validators.required, Validators.maxLength(CODIGO_POSTAL_MAX_LENGTH), Validators.pattern(CODIGO_POSTAL_PATTERN)]],
+      ciudad: ['', [Validators.required, Validators.maxLength(CIUDAD_MAX_LENGTH), Validators.pattern(CIUDAD_PATTERN)]],
+      referencias: ['', [Validators.maxLength(REFERENCIAS_MAX_LENGTH)]]
     };
 
     this.restauranteForm = this.fb.group({

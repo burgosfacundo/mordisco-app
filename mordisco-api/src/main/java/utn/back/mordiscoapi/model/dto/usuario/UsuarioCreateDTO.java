@@ -1,21 +1,23 @@
 package utn.back.mordiscoapi.model.dto.usuario;
 
 import jakarta.validation.constraints.*;
+import utn.back.mordiscoapi.common.validation.ValidationConstants;
 
 
 public record UsuarioCreateDTO(
-        @Size(message = "El nombre del usuario debe tener máximo 50 caracteres", max = 50)
+        @Size(message = "El nombre del usuario debe tener máximo 50 caracteres", max = ValidationConstants.NOMBRE_MAX_LENGTH)
         @NotBlank(message = "El nombre del usuario es obligatorio")
         String nombre,
 
-        @Size(message = "El apellido del usuario debe tener máximo 50 caracteres", max = 50)
+        @Size(message = "El apellido del usuario debe tener máximo 50 caracteres", max = ValidationConstants.NOMBRE_MAX_LENGTH)
         @NotBlank(message = "El apellido del usuario es obligatorio")
         String apellido,
 
         @Pattern(
-                regexp = "^(?=.{6,25}$)[0-9+()\\- ]+$",
-                message = "Teléfono inválido. Permitidos dígitos, + ( ) - y espacios; 6 a 25 caracteres"
+                regexp = ValidationConstants.TELEFONO_PATTERN,
+                message = ValidationConstants.TELEFONO_MESSAGE
         )
+        @Size(max = ValidationConstants.TELEFONO_MAX_LENGTH, message = "El teléfono debe tener máximo " + ValidationConstants.TELEFONO_MAX_LENGTH + " caracteres")
         @NotBlank(message = "El teléfono del usuario es obligatorio")
         String telefono,
 
@@ -24,12 +26,12 @@ public record UsuarioCreateDTO(
         @Email(message = "El email del usuario debe ser válido")
         String email,
 
-        @Size(message = "La contraseña del usuario debe tener mínimo 8 caracteres", min = 8,max = 72)
+        @Size(message = "La contraseña del usuario debe tener mínimo 8 caracteres", min = ValidationConstants.PASSWORD_MIN_LENGTH, max = ValidationConstants.PASSWORD_MAX_LENGTH)
         @Pattern(
-                regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,72}$",
-                message = "La contraseña debe tener 8-72 caracteres, con al menos una mayúscula, una minúscula, un número y un caracter especial"
+                regexp = ValidationConstants.PASSWORD_PATTERN,
+                message = ValidationConstants.PASSWORD_MESSAGE
         )
-        @NotBlank(message = "El contraseña del usuario es obligatoria")
+        @NotBlank(message = "La contraseña del usuario es obligatoria")
         String password,
 
         @NotNull(message = "El rol del usuario es obligatorio")

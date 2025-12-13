@@ -6,6 +6,14 @@ import { FormValidationService, streetNameValidator } from '../../../../shared/s
 import DireccionRequest from '../../../../shared/models/direccion/direccion-request';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
 import { ToastService } from '../../../../core/services/toast-service';
+import {
+  CALLE_MIN_LENGTH, CALLE_MAX_LENGTH, CALLE_PATTERN,
+  NUMERO_MAX_LENGTH, NUMERO_PATTERN,
+  PISO_MAX_LENGTH, DEPTO_MAX_LENGTH,
+  CODIGO_POSTAL_MAX_LENGTH, CODIGO_POSTAL_PATTERN,
+  CIUDAD_MIN_LENGTH, CIUDAD_MAX_LENGTH, CIUDAD_PATTERN,
+  REFERENCIAS_MAX_LENGTH, ALIAS_MAX_LENGTH
+} from '../../../../shared/validators/validation-constants';
 
 @Component({
   selector: 'app-direccion-form-component',
@@ -52,14 +60,14 @@ export class DireccionFormComponent implements OnInit , OnChanges{
 
   private initializeForm(): void {
     this.formDirecciones = this.fb.group({
-      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+$/), streetNameValidator]],
-      numero: ['', [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
-      piso: ['', [Validators.maxLength(20)]],
-      depto: ['', [Validators.maxLength(20)]],
-      codigoPostal: ['', [Validators.required, Validators.maxLength(8), Validators.pattern(/^(\d{4}|[A-Z]\d{4}[A-Z]{3})$/)]],
-      referencias: ['', [Validators.maxLength(250)]],
-      ciudad: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-z\s]+$/)]],
-      alias: ['', [Validators.maxLength(50)]],
+      calle: ['', [Validators.required, Validators.minLength(CALLE_MIN_LENGTH), Validators.maxLength(CALLE_MAX_LENGTH), Validators.pattern(CALLE_PATTERN), streetNameValidator]],
+      numero: ['', [Validators.required, Validators.maxLength(NUMERO_MAX_LENGTH), Validators.pattern(NUMERO_PATTERN)]],
+      piso: ['', [Validators.maxLength(PISO_MAX_LENGTH)]],
+      depto: ['', [Validators.maxLength(DEPTO_MAX_LENGTH)]],
+      codigoPostal: ['', [Validators.required, Validators.maxLength(CODIGO_POSTAL_MAX_LENGTH), Validators.pattern(CODIGO_POSTAL_PATTERN)]],
+      referencias: ['', [Validators.maxLength(REFERENCIAS_MAX_LENGTH)]],
+      ciudad: ['', [Validators.required, Validators.minLength(CIUDAD_MIN_LENGTH), Validators.maxLength(CIUDAD_MAX_LENGTH), Validators.pattern(CIUDAD_PATTERN)]],
+      alias: ['', [Validators.maxLength(ALIAS_MAX_LENGTH)]],
     });
   }
 

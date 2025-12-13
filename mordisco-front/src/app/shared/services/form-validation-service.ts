@@ -85,11 +85,11 @@ export class FormValidationService {
   /**
    * Mensajes específicos para errores de pattern según el tipo de campo
    */
-  private getPatternErrorMessage(fieldName?: string, value?: any): string {
+  private getPatternErrorMessage(fieldName?: string, _value?: any): string {
     const lowerFieldName = fieldName?.toLowerCase();
 
     if (lowerFieldName?.includes('nombre') || lowerFieldName?.includes('apellido')) {
-      return '*Solo se permiten letras';
+      return '*Solo se permiten letras y espacios';
     }
 
     if (lowerFieldName?.includes('telefono')) {
@@ -97,7 +97,7 @@ export class FormValidationService {
     }
 
     if (lowerFieldName?.includes('password') || lowerFieldName?.includes('contraseña')) {
-      return '*Debe incluir mayúscula, minúscula, número y caracter especial';
+      return '*Debe incluir mayúscula, minúscula, número y carácter especial';
     }
 
     if (lowerFieldName === 'calle') {
@@ -110,6 +110,10 @@ export class FormValidationService {
 
     if (lowerFieldName === 'codigopostal') {
       return '*Formato válido: 4 dígitos (ej: 7600) o CPA (ej: B1636BCN)';
+    }
+
+    if (lowerFieldName === 'ciudad') {
+      return '*Solo se permiten letras y espacios';
     }
 
     return '*Formato inválido';

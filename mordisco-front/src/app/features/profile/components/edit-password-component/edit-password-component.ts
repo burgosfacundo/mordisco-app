@@ -4,6 +4,7 @@ import { FormValidationService } from '../../../../shared/services/form-validati
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../../../core/services/toast-service';
+import { PASSWORD_PATTERN, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from '../../../../shared/validators/validation-constants';
 
 @Component({
   selector: 'app-edit-password-component',
@@ -27,8 +28,8 @@ export class EditPasswordComponent implements OnInit {
   ngOnInit(): void {
     this.editarPassword = this.fb.group({
       passwordActual: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(8),Validators.maxLength(50), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]],
-      confirmarPasswordNueva: ['', [Validators.required,Validators.minLength(8),Validators.maxLength(50), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]]
+      password: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH), Validators.maxLength(PASSWORD_MAX_LENGTH), Validators.pattern(PASSWORD_PATTERN)]],
+      confirmarPasswordNueva: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH), Validators.maxLength(PASSWORD_MAX_LENGTH), Validators.pattern(PASSWORD_PATTERN)]]
     });
   }
 

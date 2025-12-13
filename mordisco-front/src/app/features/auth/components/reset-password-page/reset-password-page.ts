@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { environment } from '../../../../../environments/environment';
 import { ToastService } from '../../../../core/services/toast-service';
+import { PASSWORD_PATTERN, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from '../../../../shared/validators/validation-constants';
 
 @Component({
     selector: 'app-reset-password-page',
@@ -40,12 +41,13 @@ export class ResetPasswordPage implements OnInit {
         this.resetForm = this.fb.group({
             newPassword: ['', [
                 Validators.required,
-                Validators.minLength(8),
-                Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@!!%*?&])[A-Za-z\d@!!%*?&]+$/)
+                Validators.minLength(PASSWORD_MIN_LENGTH),
+                Validators.maxLength(PASSWORD_MAX_LENGTH),
+                Validators.pattern(PASSWORD_PATTERN)
                 ]
             ],
             confirmPassword: ['', [Validators.required]]
-        }, 
+        },
         {
             validators: this.passwordMatchValidator
         });

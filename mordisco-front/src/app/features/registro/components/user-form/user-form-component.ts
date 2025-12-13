@@ -5,6 +5,12 @@ import { FormValidationService } from '../../../../shared/services/form-validati
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../../../core/services/toast-service';
+import {
+  NOMBRE_PATTERN, NOMBRE_MIN_LENGTH, NOMBRE_MAX_LENGTH,
+  TELEFONO_PATTERN, TELEFONO_MIN_LENGTH, TELEFONO_MAX_LENGTH,
+  PASSWORD_PATTERN, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
+  EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
+} from '../../../../shared/validators/validation-constants';
 
 @Component({
   selector: 'app-user-form',
@@ -30,12 +36,12 @@ export class UserFormComponent implements OnInit{
 
   inicializarFormulario(){
      this.userForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(2),Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]],
-      apellido: ['', [Validators.required, Validators.minLength(2),Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]],
-      telefono: ['', [Validators.required,Validators.minLength(10),Validators.maxLength(50),Validators.pattern(/^\+\d{1,3}(?:\s?\d){6,14}$/)]],
-      email: ['', [Validators.required, Validators.minLength(5),Validators.email,Validators.maxLength(100)]],
-      password: ['', [Validators.required, Validators.minLength(8),Validators.maxLength(50), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]],
-      password2: ['', [Validators.required, Validators.minLength(8),Validators.maxLength(50), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]],      
+      nombre: ['', [Validators.required, Validators.minLength(NOMBRE_MIN_LENGTH), Validators.maxLength(NOMBRE_MAX_LENGTH), Validators.pattern(NOMBRE_PATTERN)]],
+      apellido: ['', [Validators.required, Validators.minLength(NOMBRE_MIN_LENGTH), Validators.maxLength(NOMBRE_MAX_LENGTH), Validators.pattern(NOMBRE_PATTERN)]],
+      telefono: ['', [Validators.required, Validators.minLength(TELEFONO_MIN_LENGTH), Validators.maxLength(TELEFONO_MAX_LENGTH), Validators.pattern(TELEFONO_PATTERN)]],
+      email: ['', [Validators.required, Validators.minLength(EMAIL_MIN_LENGTH), Validators.email, Validators.maxLength(EMAIL_MAX_LENGTH)]],
+      password: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH), Validators.maxLength(PASSWORD_MAX_LENGTH), Validators.pattern(PASSWORD_PATTERN)]],
+      password2: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH), Validators.maxLength(PASSWORD_MAX_LENGTH), Validators.pattern(PASSWORD_PATTERN)]],
       rolId: ['', [Validators.required, Validators.min(1), Validators.max(4)]]
     }, { validators : this.passwordsMatchValidator});
   }
