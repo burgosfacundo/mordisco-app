@@ -95,4 +95,17 @@ public interface PromocionRepository extends JpaRepository<Promocion,Long> {
     AND p.fechaFin < :fecha
     """)
     void desactivarPromocionesVencidas(@Param("fecha") LocalDate fecha);
+
+    /**
+     * Busca una promoción por ID cargando todas sus relaciones
+     * @param id ID de la promoción
+     * @return Optional con la promoción completa
+     */
+    @Query("""
+            SELECT p
+            FROM Promocion p
+            LEFT JOIN FETCH p.productosAplicables
+            WHERE p.id = :id
+            """)
+    Optional<Promocion> findByIdWithProducts(@Param("id") Long id);
 }

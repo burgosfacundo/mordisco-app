@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
@@ -8,7 +8,7 @@ import { PromocionService } from '../../../../shared/services/promocion/promocio
 import PromocionRequest, { TipoDescuento, AlcancePromocion } from '../../../../shared/models/promocion/promocion-request';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 import { MatDialog } from '@angular/material/dialog';
@@ -43,6 +43,7 @@ export class PromocionFormComponent implements OnInit {
   private menuService = inject(MenuService);
   private authService = inject(AuthService);
   private restauranteService = inject(RestauranteService);
+  private cdr = inject(ChangeDetectorRef);
 
   promocionForm!: FormGroup;
   isEditMode = false;
@@ -53,11 +54,15 @@ export class PromocionFormComponent implements OnInit {
   // Enums para el template
   tiposDescuento = Object.values(TipoDescuento);
   alcancesPromocion = Object.values(AlcancePromocion);
-  AlcancePromocion = AlcancePromocion; // Para usar en el template
+  AlcancePromocion = AlcancePromocion;
 
   // Productos del restaurante
   productos: ProductoResponse[] = [];
   productosSeleccionados: Set<number> = new Set();
+
+  // Warning state para descuentos altos (>50%)
+  showHighDiscountWarning: boolean = false;
+  highDiscountWarningMessage: string = '';
 
   // Fecha mínima para calendarios (hoy)
   minDate = new Date();
@@ -109,6 +114,17 @@ export class PromocionFormComponent implements OnInit {
         this.maxFechaInicio = null;
       }
     });
+
+    // Re-validar cuando cambia alcance (afecta qué productos se consideran)
+    this.promocionForm.get('alcance')?.valueChanges.subscribe(() => {
+      this.promocionForm.get('descuento')?.updateValueAndValidity();
+      this.checkHighDiscountWarning();
+    });
+
+    // Re-validar cuando cambia el valor del descuento
+    this.promocionForm.get('descuento')?.valueChanges.subscribe(() => {
+      this.checkHighDiscountWarning();
+    });
   }
 
   initForm(): void {
@@ -116,10 +132,10 @@ export class PromocionFormComponent implements OnInit {
     hoy.setHours(0, 0, 0, 0);
     
     this.promocionForm = this.fb.group({
-      tipoDescuento: [TipoDescuento.PORCENTAJE, Validators.required],
+      tipoDescuento: ['', Validators.required],
       descripcion: ['', [Validators.required, Validators.maxLength(20)]],
-      descuento: ['', [Validators.required, Validators.min(1), Validators.max(100)]],
-      alcance: [AlcancePromocion.TODO_MENU, Validators.required],
+      descuento: ['', [Validators.required, Validators.min(1)]],
+      alcance: ['', Validators.required],
       fechaInicio: ['', [Validators.required]],
       fechaFin: ['', [Validators.required]],
       productosIds: [[]]
@@ -150,7 +166,82 @@ export class PromocionFormComponent implements OnInit {
 
     return null;
   }
-  
+
+  /**
+   * Validador personalizado para descuentos de tipo MONTO_FIJO
+   * Asegura que el descuento no supere el precio del producto más barato aplicable
+   */
+  validarMontoFijo(): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} | null => {
+      const tipoDescuento = this.promocionForm?.get('tipoDescuento')?.value;
+      const descuento = control.value;
+
+      // Solo validar para MONTO_FIJO
+      if (tipoDescuento !== TipoDescuento.MONTO_FIJO) {
+        return null;
+      }
+
+      // No validar si descuento está vacío (lo maneja required validator)
+      if (!descuento) {
+        return null;
+      }
+
+      const minPrice = this.getApplicableMinPrice();
+
+      // Si no podemos determinar el precio mínimo aún (productos no cargados), no bloquear
+      if (minPrice === null) {
+        return null;
+      }
+
+      // Validación dura: descuento debe ser menor al precio más barato
+      if (descuento >= minPrice) {
+        return {
+          montoExcedesProducto: {
+            descuento: descuento,
+            precioMinimo: minPrice
+          }
+        };
+      }
+
+      return null;
+    };
+  }
+
+  /**
+   * Verifica si el descuento es alto (>50% del producto más barato) y muestra advertencia
+   * Esta advertencia no bloquea el envío, solo alerta al usuario
+   */
+  checkHighDiscountWarning(): void {
+    const tipoDescuento = this.promocionForm.get('tipoDescuento')?.value;
+    const descuento = this.promocionForm.get('descuento')?.value;
+
+    // Resetear estado de advertencia
+    this.showHighDiscountWarning = false;
+    this.highDiscountWarningMessage = '';
+
+    // Solo verificar para MONTO_FIJO
+    if (tipoDescuento !== TipoDescuento.MONTO_FIJO || !descuento) {
+      return;
+    }
+
+    const minPrice = this.getApplicableMinPrice();
+
+    if (minPrice === null) {
+      return;
+    }
+
+    // Umbral de advertencia: 50% del precio del producto más barato
+    const warningThreshold = minPrice * 0.5;
+
+    if (descuento > warningThreshold && descuento < minPrice) {
+      this.showHighDiscountWarning = true;
+      const percentage = Math.round((descuento / minPrice) * 100);
+      this.highDiscountWarningMessage =
+        `Advertencia: El descuento representa el ${percentage}% del producto más barato ($${minPrice.toFixed(2)}). ` +
+        `Verifica que sea correcto.`;
+    }
+  }
+
   actualizarValidacionesDescuento(): void {
     const tipoDescuento = this.promocionForm.get('tipoDescuento')?.value;
     const descuentoControl = this.promocionForm.get('descuento');
@@ -159,13 +250,16 @@ export class PromocionFormComponent implements OnInit {
       // Porcentaje: entre 1 y 100
       descuentoControl?.setValidators([Validators.required, Validators.min(1), Validators.max(100)]);
     } else {
-      // Monto fijo: mayor a 0, sin límite superior
-      descuentoControl?.setValidators([Validators.required, Validators.min(1)]);
+      // Monto fijo: mayor a 0, con validador personalizado
+      descuentoControl?.setValidators([Validators.required, Validators.min(1), this.validarMontoFijo()]);
     }
 
     // Marcar como touched para que se muestren los errores
     descuentoControl?.markAsTouched();
     descuentoControl?.updateValueAndValidity();
+
+    // Verificar condiciones de advertencia
+    this.checkHighDiscountWarning();
   }
 
   obtenerRestauranteId(): void {
@@ -205,17 +299,34 @@ export class PromocionFormComponent implements OnInit {
           this.productosSeleccionados = new Set(p.productosIds);
         }
 
-        // Usar reset en lugar de patchValue para forzar la actualización de todos los controles
-        this.promocionForm.reset({
-          tipoDescuento: p.tipoDescuento,
-          descripcion: p.descripcion,
-          descuento: p.descuento,
-          alcance: p.alcance,
-          fechaInicio: this.parseFecha(p.fechaInicio),
-          fechaFin: this.parseFecha(p.fechaFin),
-          productosIds: p.productosIds || []
-        });
-        this.promocionForm.markAsPristine();
+        // Usar setTimeout para asegurar que las opciones del @for se hayan renderizado
+        setTimeout(() => {
+          console.log(p.alcance);
+          
+          this.promocionForm.patchValue({
+            tipoDescuento: p.tipoDescuento,
+            descripcion: p.descripcion,
+            descuento: p.descuento,
+            alcance: p.alcance,
+            fechaInicio: this.parseFecha(p.fechaInicio),
+            fechaFin: this.parseFecha(p.fechaFin),
+            productosIds: p.productosIds || []
+          });
+
+
+
+          // Actualizar validaciones para el tipo cargado
+          this.actualizarValidacionesDescuento();
+
+          // Marcar como pristine después de cargar datos
+          this.promocionForm.markAsPristine();
+
+          // Forzar detección de cambios para actualizar la vista
+          this.cdr.detectChanges();
+        }, 0);
+
+        console.log(this.promocionForm);
+        
       }
     });
   }
@@ -323,10 +434,15 @@ export class PromocionFormComponent implements OnInit {
   }
 
   getError(fieldName: string): string | null {
-    return this.formValidationService.getErrorMessage(
-      this.promocionForm.get(fieldName),
-      fieldName
-    );
+    const control = this.promocionForm.get(fieldName);
+
+    // Manejar error personalizado de MONTO_FIJO
+    if (fieldName === 'descuento' && control?.errors?.['montoExcedesProducto']) {
+      const error = control.errors['montoExcedesProducto'];
+      return `El descuento no puede ser igual o mayor al producto más barato ($${error.precioMinimo.toFixed(2)})`;
+    }
+
+    return this.formValidationService.getErrorMessage(control, fieldName);
   }
   
   cargarProductos(): void {
@@ -340,6 +456,13 @@ export class PromocionFormComponent implements OnInit {
           this.productoService.getAllByIdMenu(menu.id, 0, 100).subscribe({
             next: (response) => {
               this.productos = response.content;
+
+              // Re-validar después de cargar productos (importante para modo edición)
+              // En modo edición, el descuento se carga antes que los productos
+              if (this.promocionForm.get('tipoDescuento')?.value === TipoDescuento.MONTO_FIJO) {
+                this.promocionForm.get('descuento')?.updateValueAndValidity();
+                this.checkHighDiscountWarning();
+              }
             },
             error: (err: any) => {
               console.error('Error cargando productos:', err);
@@ -359,17 +482,64 @@ export class PromocionFormComponent implements OnInit {
     } else {
       this.productosSeleccionados.add(productoId);
     }
-    
+
     // Actualizar el form control
     this.promocionForm.patchValue({
       productosIds: Array.from(this.productosSeleccionados)
     });
+
+    // Re-validar descuento si es PRODUCTOS_ESPECIFICOS (el precio mínimo cambió)
+    if (this.promocionForm.get('alcance')?.value === AlcancePromocion.PRODUCTOS_ESPECIFICOS) {
+      this.promocionForm.get('descuento')?.updateValueAndValidity();
+      this.checkHighDiscountWarning();
+    }
   }
   
   isProductoSeleccionado(productoId: number): boolean {
     return this.productosSeleccionados.has(productoId);
   }
-  
+
+  /**
+   * Obtiene el precio mínimo entre los productos seleccionados
+   * @returns El precio mínimo o null si no hay productos seleccionados
+   */
+  getMinSelectedProductPrice(): number | null {
+    if (this.productosSeleccionados.size === 0) return null;
+
+    const selectedProducts = this.productos.filter(p =>
+      this.productosSeleccionados.has(p.id)
+    );
+
+    if (selectedProducts.length === 0) return null;
+
+    return Math.min(...selectedProducts.map(p => p.precio));
+  }
+
+  /**
+   * Obtiene el precio mínimo entre todos los productos del menú
+   * @returns El precio mínimo o null si no hay productos disponibles
+   */
+  getMinMenuPrice(): number | null {
+    if (this.productos.length === 0) return null;
+    return Math.min(...this.productos.map(p => p.precio));
+  }
+
+  /**
+   * Obtiene el precio mínimo aplicable basado en el alcance
+   * @returns El precio mínimo o null si no es aplicable
+   */
+  getApplicableMinPrice(): number | null {
+    const alcance = this.promocionForm.get('alcance')?.value;
+
+    if (alcance === AlcancePromocion.PRODUCTOS_ESPECIFICOS) {
+      return this.getMinSelectedProductPrice();
+    } else if (alcance === AlcancePromocion.TODO_MENU) {
+      return this.getMinMenuPrice();
+    }
+
+    return null;
+  }
+
   onCancel(): void {
     if (this.promocionForm.dirty) {
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {

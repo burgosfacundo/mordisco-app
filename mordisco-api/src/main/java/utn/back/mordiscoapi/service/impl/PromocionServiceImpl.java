@@ -7,12 +7,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.PromocionMapper;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionRequestDTO;
 import utn.back.mordiscoapi.model.dto.promocion.PromocionResponseDTO;
+import utn.back.mordiscoapi.model.entity.Producto;
 import utn.back.mordiscoapi.model.entity.Promocion;
+import utn.back.mordiscoapi.model.enums.AlcancePromocion;
+import utn.back.mordiscoapi.model.enums.TipoDescuento;
 import utn.back.mordiscoapi.model.projection.PromocionProjection;
 import utn.back.mordiscoapi.repository.PromocionRepository;
 import utn.back.mordiscoapi.repository.RestauranteRepository;
@@ -30,6 +36,67 @@ public class PromocionServiceImpl implements IPromocionService {
     private final utn.back.mordiscoapi.repository.ProductoRepository productoRepository;
 
     /**
+     * Valida que un descuento de tipo MONTO_FIJO no supere el precio de los productos aplicables
+     * @param dto DTO de la promoción a validar
+     * @throws BadRequestException si el descuento es inválido
+     */
+    private void validarMontoFijo(PromocionRequestDTO dto) throws BadRequestException {
+        // Solo validar para MONTO_FIJO
+        if (dto.tipoDescuento() != TipoDescuento.MONTO_FIJO) {
+            return;
+        }
+
+        List<Producto> productosAplicables;
+
+        if (dto.alcance() == AlcancePromocion.PRODUCTOS_ESPECIFICOS) {
+            // Validar contra productos seleccionados
+            if (dto.productosIds() == null || dto.productosIds().isEmpty()) {
+                throw new BadRequestException("Debe seleccionar al menos un producto para promoción específica");
+            }
+
+            productosAplicables = productoRepository.findAllById(dto.productosIds());
+
+            if (productosAplicables.size() != dto.productosIds().size()) {
+                throw new BadRequestException("Algunos productos especificados no existen");
+            }
+        } else {
+            // Validar contra todos los productos del menú
+            var restaurante = restauranteRepository.findById(dto.restauranteId())
+                .orElseThrow(() -> new BadRequestException("Restaurante no encontrado"));
+
+            if (restaurante.getMenu() == null) {
+                throw new BadRequestException("El restaurante no tiene menú configurado");
+            }
+
+            productosAplicables = productoRepository.findAllByIdMenu(
+                Pageable.unpaged(),
+                restaurante.getMenu().getId()
+            ).getContent();
+
+            if (productosAplicables.isEmpty()) {
+                throw new BadRequestException("El menú no tiene productos. No se puede crear una promoción.");
+            }
+        }
+
+        // Encontrar precio mínimo
+        BigDecimal precioMinimo = productosAplicables.stream()
+            .map(Producto::getPrecio)
+            .min(BigDecimal::compareTo)
+            .orElseThrow(() -> new BadRequestException("No se pudo determinar el precio mínimo"));
+
+        // Convertir descuento a BigDecimal para comparación
+        BigDecimal descuentoBD = BigDecimal.valueOf(dto.descuento());
+
+        // Validar que descuento no supere precio mínimo
+        if (descuentoBD.compareTo(precioMinimo) >= 0) {
+            throw new BadRequestException(
+                String.format("El descuento ($%.2f) no puede ser igual o mayor al precio del producto más barato ($%.2f)",
+                    dto.descuento(), precioMinimo)
+            );
+        }
+    }
+
+    /**
      * Guarda una promoción.
      * @param dto DTO de la promoción a guardar.
      */
@@ -43,6 +110,9 @@ public class PromocionServiceImpl implements IPromocionService {
             // Si la fecha de inicio es posterior a la fecha de fin, lanzamos una excepción BadRequestException
             throw new BadRequestException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
+
+        // Validar descuento MONTO_FIJO
+        validarMontoFijo(dto);
 
         // Mapeo la DTO a la entidad
         Promocion promocion = PromocionMapper.toEntity(dto);
@@ -73,20 +143,19 @@ public class PromocionServiceImpl implements IPromocionService {
 
 
     /**
-     * Obtiene una promoción por su ID.
+     * Obtiene una promoción por su ID con todos sus datos.
      * @param id el ID de la promoción a buscar.
-     * @return la promoción proyectada.
+     * @return la promoción completa como DTO.
      * @throws NotFoundException si la promoción no se encuentra.
      */
     @Override
-    public PromocionProjection findById(Long id) throws NotFoundException {
-        // Manejo de Optional
-        // Obtenemos Optional<PromocionProjection> usando el findProjectById creado en el repositorio
-        // Si no existe, lanzamos una excepción NotFoundException
-        // Si existe, devolvemos la promoción
-        return repository.findProjectById(id).orElseThrow(
+    public PromocionResponseDTO findById(Long id) throws NotFoundException {
+        // Obtenemos la entidad completa con sus relaciones cargadas
+        Promocion promocion = repository.findByIdWithProducts(id).orElseThrow(
                 () -> new NotFoundException("Promoción no encontrada")
         );
+        // Mapeamos a DTO que incluye todos los campos necesarios
+        return PromocionMapper.toDTO(promocion);
     }
 
 
@@ -107,14 +176,18 @@ public class PromocionServiceImpl implements IPromocionService {
                 () -> new NotFoundException("Promoción no encontrada")
         );
 
-        if (dto.fechaInicio().isBefore(LocalDate.now())) {
-            // Si la fecha de inicio es anterior a la fecha actual, lanzamos una excepción BadRequestException
-            throw new BadRequestException("La fecha de inicio no puede ser anterior a la fecha actual");
+        // Solo validar fechaInicio >= hoy si se está cambiando la fecha original
+        if (!dto.fechaInicio().equals(promocion.getFechaInicio())
+            && dto.fechaInicio().isBefore(LocalDate.now())) {
+            throw new BadRequestException("La nueva fecha de inicio no puede ser anterior a la fecha actual");
         }
         if (dto.fechaInicio().isAfter(dto.fechaFin())) {
             // Si la fecha de inicio es posterior a la fecha de fin, lanzamos una excepción BadRequestException
             throw new BadRequestException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
+
+        // Validar descuento MONTO_FIJO
+        validarMontoFijo(dto);
 
         // Verificamos si el restaurante existe usando el findById por defecto
         // Si no existe, lanzamos una excepción BadRequestException

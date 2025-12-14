@@ -10,7 +10,7 @@ import utn.back.mordiscoapi.model.projection.PromocionProjection;
 public interface IPromocionService {
     void save(PromocionRequestDTO dto) throws BadRequestException;
     Page<PromocionProjection> findAll(int pageNo,int pageSize);
-    PromocionProjection findById(Long id) throws NotFoundException;
+    PromocionResponseDTO findById(Long id) throws NotFoundException;
     void update(Long id, PromocionRequestDTO dto) throws NotFoundException,BadRequestException;
     void delete(Long idRestaurante,Long idPromocion) throws NotFoundException;
     Page<PromocionResponseDTO> listarPromoPorRestaurante (int pageNo,int pageSize,Long idRestaurante)throws NotFoundException;
