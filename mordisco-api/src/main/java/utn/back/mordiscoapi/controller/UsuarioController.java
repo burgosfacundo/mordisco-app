@@ -373,7 +373,12 @@ public class UsuarioController {
     @Operation(
             summary = "Buscar usuarios con filtro",
             description = """
-            
+            Permite buscar usuarios aplicando filtros opcionales de búsqueda por nombre, estado de baja lógica y rol.
+            Los parámetros de búsqueda son opcionales y se pueden combinar según sea necesario.
+            1. search: Filtra usuarios cuyo nombre contenga la cadena proporcionada (case-insensitive).
+            2. bajaLogica: Filtra usuarios según su estado de baja lógica ("true" para usuarios dados de baja, "false" para activos).
+            3. rol: Filtra usuarios que tengan el rol especificado.
+            4. page y size: Parámetros de paginación para controlar la cantidad de resultados devueltos por página.
             **Rol necesario: ADMIN**
         """
     )

@@ -380,23 +380,22 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         if (usuario.getRol() != null) {
             String rolNombre = usuario.getRol().getNombre();
             long pedidosActivos = 0;
-            String tipoUsuario = "";
-
-            switch (rolNombre) {
-                case "ROLE_CLIENTE":
+            String tipoUsuario = switch (rolNombre) {
+                case "ROLE_CLIENTE" -> {
                     pedidosActivos = repository.countPedidosActivosComoCliente(usuarioId);
-                    tipoUsuario = "cliente";
-                    break;
-                case "ROLE_REPARTIDOR":
+                    yield "cliente";
+                }
+                case "ROLE_REPARTIDOR" -> {
                     pedidosActivos = repository.countPedidosActivosComoRepartidor(usuarioId);
-                    tipoUsuario = "repartidor";
-                    break;
-                case "ROLE_RESTAURANTE":
+                    yield "repartidor";
+                }
+                case "ROLE_RESTAURANTE" -> {
                     pedidosActivos = repository.countPedidosActivosDeRestaurante(usuarioId);
-                    tipoUsuario = "restaurante";
-                    break;
-                // ROLE_ADMIN y otros roles no requieren validación
-            }
+                    yield "restaurante";
+                    // ROLE_ADMIN y otros roles no requieren validación
+                }
+                default -> "";
+            };
 
             if (pedidosActivos > 0) {
                 String mensaje = String.format(
