@@ -148,8 +148,7 @@ export class NavbarComponent implements OnInit {
 
   getUserInitials(): string {
     const user = this.currentUser();
-    console.log(this.currentUser());
-    
+        
     if (!user?.nombre) return 'U';
 
     return user.nombre.substring(0, 2).toUpperCase();
