@@ -20,9 +20,9 @@ public class EstadisticasAdminServiceImpl implements IEstadisticasAdminService {
     private final RestauranteRepository restauranteRepository;
 
     // IDs de roles (deberían coincidir con los de la BD)
-    private static final Long ROL_CLIENTE_ID = 1L;
-    private static final Long ROL_RESTAURANTE_ID = 2L;
-    private static final Long ROL_REPARTIDOR_ID = 3L;
+    private static final Long ROL_CLIENTE_ID = 2L;
+    private static final Long ROL_RESTAURANTE_ID = 3L;
+    private static final Long ROL_REPARTIDOR_ID = 4L;
 
     @Override
     public AdminEstadisticasDTO getEstadisticas() {
