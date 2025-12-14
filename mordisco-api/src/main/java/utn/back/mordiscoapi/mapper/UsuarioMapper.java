@@ -60,7 +60,8 @@ public class UsuarioMapper {
                 usuario.getApellido(),
                 usuario.getEmail(),
                 usuario.getRol().getNombre(),
-                usuario.getBajaLogica()
+                usuario.getBajaLogica(),
+                usuario.getMotivoBaja()
         );
     }
 

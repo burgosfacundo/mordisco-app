@@ -2,13 +2,14 @@
                 transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                 flex flex-col h-full">
   <!-- Header con Avatar -->
-   @if(usuario()?.bajaLogica){ 
-    <div class="bg-linear-to-r from-red-900 to-red-800 p-6">
+  @let u = usuario();
+  @if (u && u.bajaLogica && 'motivo' in u && u.motivo !== "Eliminación solicitada por el usuario") {
+      <div class="bg-linear-to-r from-red-900 to-red-800 p-6">
       <div class="flex items-center gap-4">
       <!-- Avatar con iniciales -->
         <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center
                   text-red-800 font-bold text-xl shadow-lg">
-        BLOCK
+        Block
       </div>
         <div class="flex-1 min-w-0">
           <h3 class="text-white font-bold text-lg truncate">
@@ -23,7 +24,28 @@
         </div>
       </div>
     </div>
-  }@else {
+  }@else if (u && u.bajaLogica && 'motivo' in u && u.motivo === "Eliminación solicitada por el usuario") {
+   <div class="bg-linear-to-r from-red-900 to-red-800 p-6">
+      <div class="flex items-center gap-4">
+      <!-- Avatar con iniciales -->
+        <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center
+                  text-red-800 font-bold text-xl shadow-lg">
+        Delete
+      </div>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-white font-bold text-lg truncate">
+            {{ usuario()?.nombre }} {{ usuario()?.apellido }}
+          </h3>
+          <p class="text-white text-sm truncate">
+            {{ usuario()?.email }}
+          </p>
+          <p class="text-white text-sm truncate">
+            {{ usuario()?.telefono }} 
+          </p>
+        </div>
+      </div>
+    </div>
+  }@else{
     <div class="bg-linear-to-r from-blue-500 to-blue-600 p-6">
       <div class="flex items-center gap-4">
         <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center
@@ -54,6 +76,9 @@
             <span [class]="'badge-' + usuario()!.rol!.toLowerCase().replace('role_', '')">
               {{ usuario()!.rol!.replace('ROLE_', '') }}
             </span>
+            @if(u && u.bajaLogica && 'motivo' in u){
+              <p class="text-red-700">Motivo: {{u.motivo}}</p>
+            }
           </div>
 
               <!-- Botón de acción -->

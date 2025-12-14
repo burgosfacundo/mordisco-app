@@ -1,7 +1,7 @@
 import { Router } from "@angular/router";
 import { Component, inject, input } from '@angular/core';
 import UserCard from '../../models/user/user-card';
-import UserPedido from '../../models/user/user-pedido';
+import UserPedido from "../../models/user/user-pedido";
 
 @Component({
   selector: 'app-usuario-card-component',
@@ -9,7 +9,7 @@ import UserPedido from '../../models/user/user-pedido';
   templateUrl: './usuario-card-component.html'
 })
 export class UsuarioCardComponent {
-  usuario = input<UserCard | UserPedido>();
+  usuario = input<UserCard|UserPedido>();
   private router = inject(Router)
 
   getInitials(): string {
