@@ -50,3 +50,24 @@ export const NUMERO_PATTERN = /^\d+$/;
 
 // ==================== CÓDIGO POSTAL ====================
 export const CODIGO_POSTAL_PATTERN = /^(\d{4}|[A-Z]\d{4}[A-Z]{3})$/;
+
+// ==================== CONFIGURACIÓN SISTEMA ====================
+export const DECIMAL_PATTERN = /^\d+(\.\d{1,2})?$/;
+
+export const PORCENTAJE_GANANCIAS_RESTAURANTE_MIN = 10;
+export const PORCENTAJE_GANANCIAS_RESTAURANTE_MAX = 80;
+
+export const RADIO_MAXIMO_ENTREGA_MIN = 5;
+export const RADIO_MAXIMO_ENTREGA_MAX = 20;
+
+export const COSTO_BASE_DELIVERY_MIN = 1000;
+export const COSTO_BASE_DELIVERY_MAX = 10000;
+
+export const COSTO_POR_KILOMETRO_MIN = 50;
+export const COSTO_POR_KILOMETRO_MAX = 500;
+
+export const MONTO_MINIMO_PEDIDO_MIN = 5000;
+export const MONTO_MINIMO_PEDIDO_MAX = 10000;
+
+export const PORCENTAJE_GANANCIAS_REPARTIDOR_MIN = 10;
+export const PORCENTAJE_GANANCIAS_REPARTIDOR_MAX = 80;

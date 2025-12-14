@@ -49,5 +49,30 @@ public final class ValidationConstants {
     // ==================== IMAGEN ====================
     public static final String IMAGEN_URL_PATTERN = "^https?:\\/\\/.+";
     public static final String IMAGEN_URL_CON_EXTENSION_PATTERN = "^https?:\\/\\/.+\\.(jpg|jpeg|png|gif|webp)(\\?.*)?$";
-    public static final int IMAGEN_NOMBRE_MAX_LENGTH = 50;
+    public static final int IMAGEN_NOMBRE_MAX_LENGTH = 255;
+
+    // ==================== CONFIGURACIÓN SISTEMA ====================
+    public static final String PORCENTAJE_GANANCIAS_RESTAURANTE_MIN = "10.0";
+    public static final String PORCENTAJE_GANANCIAS_RESTAURANTE_MAX = "80.0";
+    public static final String PORCENTAJE_GANANCIAS_RESTAURANTE_MESSAGE = "La comisión debe ser mayor o igual a 10 y no puede ser mayor a 80%";
+
+    public static final String RADIO_MAXIMO_ENTREGA_MIN = "5.0";
+    public static final String RADIO_MAXIMO_ENTREGA_MAX = "20.0";
+    public static final String RADIO_MAXIMO_ENTREGA_MESSAGE = "El radio debe ser al menos 5 km y no puede ser mayor a 20 km";
+
+    public static final String COSTO_BASE_DELIVERY_MIN = "1000.0";
+    public static final String COSTO_BASE_DELIVERY_MAX = "10000.0";
+    public static final String COSTO_BASE_DELIVERY_MESSAGE = "El costo base no puede ser menor a 1000 ni mayor a 10000";
+
+    public static final String COSTO_POR_KILOMETRO_MIN = "50.0";
+    public static final String COSTO_POR_KILOMETRO_MAX = "500.0";
+    public static final String COSTO_POR_KILOMETRO_MESSAGE = "El costo por km no puede ser menor a 50 ni mayor a 500";
+
+    public static final String MONTO_MINIMO_PEDIDO_MIN = "5000.0";
+    public static final String MONTO_MINIMO_PEDIDO_MAX = "10000.0";
+    public static final String MONTO_MINIMO_PEDIDO_MESSAGE = "El monto mínimo no puede ser menor a 5000 ni mayor a 10000";
+
+    public static final String PORCENTAJE_GANANCIAS_REPARTIDOR_MIN = "10.0";
+    public static final String PORCENTAJE_GANANCIAS_REPARTIDOR_MAX = "80.0";
+    public static final String PORCENTAJE_GANANCIAS_REPARTIDOR_MESSAGE = "El porcentaje debe ser mayor o igual a 10 y no puede ser mayor a 80%";
 }

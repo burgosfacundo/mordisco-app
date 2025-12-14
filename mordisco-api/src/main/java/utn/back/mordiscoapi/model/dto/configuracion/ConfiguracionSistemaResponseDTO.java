@@ -7,13 +7,10 @@ public record ConfiguracionSistemaResponseDTO(
         Long id,
         BigDecimal porcentajeGananciasRestaurante,
         BigDecimal radioMaximoEntrega,
-        Integer tiempoMaximoEntrega,
         BigDecimal costoBaseDelivery,
         BigDecimal costoPorKilometro,
         BigDecimal montoMinimoPedido,
         BigDecimal porcentajeGananciasRepartidor,
-        Boolean modoMantenimiento,
-        String mensajeMantenimiento,
         LocalDateTime fechaActualizacion,
         String emailUsuarioModificacion
 ) {}

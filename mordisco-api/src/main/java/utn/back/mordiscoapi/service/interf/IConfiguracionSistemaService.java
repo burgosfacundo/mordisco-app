@@ -13,7 +13,6 @@ public interface IConfiguracionSistemaService {
     ConfiguracionSistemaResponseDTO actualizarConfiguracion(ConfiguracionSistemaRequestDTO dto, Long usuarioId)
             throws NotFoundException;
     BigDecimal calcularCostoDelivery(BigDecimal distanciaKm);
-    boolean isEnMantenimiento();
     BigDecimal calcularGananciaRepartidor(BigDecimal costoDelivery);
     BigDecimal calcularComisionPlataforma(BigDecimal totalPedido);
 }

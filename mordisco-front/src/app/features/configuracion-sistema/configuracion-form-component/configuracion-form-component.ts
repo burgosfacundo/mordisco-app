@@ -5,6 +5,21 @@ import { ConfiguracionSistemaService } from '../../../shared/services/configurac
 import { FormValidationService } from '../../../shared/services/form-validation-service';
 import ConfiguracionSistemaResponseDTO from '../../../shared/models/configuracion/configuracion-sistema-response-dto';
 import { Router } from '@angular/router';
+import {
+  DECIMAL_PATTERN,
+  PORCENTAJE_GANANCIAS_RESTAURANTE_MIN,
+  PORCENTAJE_GANANCIAS_RESTAURANTE_MAX,
+  RADIO_MAXIMO_ENTREGA_MIN,
+  RADIO_MAXIMO_ENTREGA_MAX,
+  COSTO_BASE_DELIVERY_MIN,
+  COSTO_BASE_DELIVERY_MAX,
+  COSTO_POR_KILOMETRO_MIN,
+  COSTO_POR_KILOMETRO_MAX,
+  MONTO_MINIMO_PEDIDO_MIN,
+  MONTO_MINIMO_PEDIDO_MAX,
+  PORCENTAJE_GANANCIAS_REPARTIDOR_MIN,
+  PORCENTAJE_GANANCIAS_REPARTIDOR_MAX
+} from '../../../shared/validators/validation-constants';
 
 @Component({
   selector: 'app-configuracion-form-component',
@@ -33,16 +48,42 @@ export class ConfiguracionFormComponent implements OnInit{
 
   private initializeForm(): void {
     this.configForm = this.fb.group({
-      porcentajeGananciasRestaurante: ['', [Validators.required, Validators.maxLength(2), Validators.pattern(/^[0-9]+$/)]],
-      radioMaximoEntrega: ['', [Validators.required, Validators.maxLength(5),  Validators.pattern(/^[0-9]+$/)]],
-      tiempoMaximoEntrega: ['', [Validators.required, Validators.maxLength(5),  Validators.pattern(/^[0-9]+$/)]],
-      costoBaseDelivery:  ['', [Validators.required, Validators.maxLength(10),  Validators.pattern(/^[0-9]+$/)]],
-      costoPorKilometro: ['', [Validators.required, Validators.maxLength(10),  Validators.pattern(/^[0-9]+$/)]],
-      montoMinimoPedido:['', [Validators.required, Validators.maxLength(10),  Validators.pattern(/^[0-9]+$/)]],
-      porcentajeGananciasRepartidor: ['', [Validators.required, Validators.maxLength(2), Validators.pattern(/^[0-9]+$/)]],
-      modoMantenimiento : [false],
-      mensajeMantenimiento : ['', [Validators.minLength(3), Validators.maxLength(150)]],
-
+      porcentajeGananciasRestaurante: ['', [
+        Validators.required,
+        Validators.min(PORCENTAJE_GANANCIAS_RESTAURANTE_MIN),
+        Validators.max(PORCENTAJE_GANANCIAS_RESTAURANTE_MAX),
+        Validators.pattern(DECIMAL_PATTERN)
+      ]],
+      radioMaximoEntrega: ['', [
+        Validators.required,
+        Validators.min(RADIO_MAXIMO_ENTREGA_MIN),
+        Validators.max(RADIO_MAXIMO_ENTREGA_MAX),
+        Validators.pattern(DECIMAL_PATTERN)
+      ]],
+      costoBaseDelivery: ['', [
+        Validators.required,
+        Validators.min(COSTO_BASE_DELIVERY_MIN),
+        Validators.max(COSTO_BASE_DELIVERY_MAX),
+        Validators.pattern(DECIMAL_PATTERN)
+      ]],
+      costoPorKilometro: ['', [
+        Validators.required,
+        Validators.min(COSTO_POR_KILOMETRO_MIN),
+        Validators.max(COSTO_POR_KILOMETRO_MAX),
+        Validators.pattern(DECIMAL_PATTERN)
+      ]],
+      montoMinimoPedido: ['', [
+        Validators.required,
+        Validators.min(MONTO_MINIMO_PEDIDO_MIN),
+        Validators.max(MONTO_MINIMO_PEDIDO_MAX),
+        Validators.pattern(DECIMAL_PATTERN)
+      ]],
+      porcentajeGananciasRepartidor: ['', [
+        Validators.required,
+        Validators.min(PORCENTAJE_GANANCIAS_REPARTIDOR_MIN),
+        Validators.max(PORCENTAJE_GANANCIAS_REPARTIDOR_MAX),
+        Validators.pattern(DECIMAL_PATTERN)
+      ]]
     });
   }
 
@@ -52,13 +93,10 @@ export class ConfiguracionFormComponent implements OnInit{
         this.configForm.patchValue({
           porcentajeGananciasRestaurante: data.porcentajeGananciasRestaurante,
           radioMaximoEntrega: data.radioMaximoEntrega,
-          tiempoMaximoEntrega: data.tiempoMaximoEntrega,
           costoBaseDelivery: data.costoBaseDelivery,
           costoPorKilometro: data.costoPorKilometro,
           montoMinimoPedido: data.montoMinimoPedido,
-          porcentajeGananciasRepartidor: data.porcentajeGananciasRepartidor,
-          modoMantenimiento :  data.modoMantenimiento,
-          mensajeMantenimiento : data.mensajeMantenimiento,
+          porcentajeGananciasRepartidor: data.porcentajeGananciasRepartidor
         })
       },
       error:() => {

@@ -25,9 +25,6 @@ public class ConfiguracionSistema {
     private BigDecimal radioMaximoEntrega;
 
     @Column(nullable = false)
-    private Integer tiempoMaximoEntrega;
-
-    @Column(nullable = false)
     private BigDecimal costoBaseDelivery;
 
     @Column(nullable = false)
@@ -38,12 +35,6 @@ public class ConfiguracionSistema {
 
     @Column(nullable = false)
     private BigDecimal porcentajeGananciasRepartidor;
-
-    @Column(nullable = false)
-    private Boolean modoMantenimiento;
-
-    @Column(length = 500)
-    private String mensajeMantenimiento;
 
     @Column(nullable = false)
     private LocalDateTime fechaActualizacion;
@@ -67,9 +58,6 @@ public class ConfiguracionSistema {
         if (this.radioMaximoEntrega == null) {
             this.radioMaximoEntrega = BigDecimal.valueOf(10.0); // 10 km
         }
-        if (this.tiempoMaximoEntrega == null) {
-            this.tiempoMaximoEntrega = 45; // 45 minutos
-        }
         if (this.costoBaseDelivery == null) {
             this.costoBaseDelivery = BigDecimal.valueOf(2000.0); // $2000
         }
@@ -81,9 +69,6 @@ public class ConfiguracionSistema {
         }
         if (this.porcentajeGananciasRepartidor == null) {
             this.porcentajeGananciasRepartidor = BigDecimal.valueOf(80.0); // 80%
-        }
-        if (this.modoMantenimiento == null) {
-            this.modoMantenimiento = false;
         }
         if (this.fechaActualizacion == null) {
             this.fechaActualizacion = LocalDateTime.now();

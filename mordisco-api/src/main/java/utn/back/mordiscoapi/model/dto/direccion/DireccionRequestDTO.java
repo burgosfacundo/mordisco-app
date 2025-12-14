@@ -41,7 +41,9 @@ public record DireccionRequestDTO(
     @Schema(description = "Alias de la dirección", example = "Casa de mi madre")
     String alias,
 
-    @Size(message = "La ciudad no puede contener mas de 50 caracteres", max = ValidationConstants.CIUDAD_MAX_LENGTH)
+    @Size(message = "La ciudad debe contener entre 2 y 50 caracteres",
+            min = ValidationConstants.CIUDAD_MIN_LENGTH,
+            max = ValidationConstants.CIUDAD_MAX_LENGTH)
     @NotBlank(message = "La ciudad es obligatoria")
     @Pattern(regexp = ValidationConstants.CIUDAD_PATTERN, message = ValidationConstants.CIUDAD_MESSAGE)
     @Schema(description = "Ciudad de la dirección", example = "Mar del Plata")

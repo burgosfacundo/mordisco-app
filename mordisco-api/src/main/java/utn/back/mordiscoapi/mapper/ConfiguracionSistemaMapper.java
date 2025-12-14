@@ -14,13 +14,10 @@ public class ConfiguracionSistemaMapper {
                 entity.getId(),
                 entity.getPorcentajeGananciasRestaurante(),
                 entity.getRadioMaximoEntrega(),
-                entity.getTiempoMaximoEntrega(),
                 entity.getCostoBaseDelivery(),
                 entity.getCostoPorKilometro(),
                 entity.getMontoMinimoPedido(),
                 entity.getPorcentajeGananciasRepartidor(),
-                entity.getModoMantenimiento(),
-                entity.getMensajeMantenimiento(),
                 entity.getFechaActualizacion(),
                 entity.getUsuarioModificacion() != null
                         ? entity.getUsuarioModificacion().getEmail()
@@ -33,13 +30,10 @@ public class ConfiguracionSistemaMapper {
 
         entity.setPorcentajeGananciasRestaurante(dto.porcentajeGananciasRestaurante());
         entity.setRadioMaximoEntrega(dto.radioMaximoEntrega());
-        entity.setTiempoMaximoEntrega(dto.tiempoMaximoEntrega());
         entity.setCostoBaseDelivery(dto.costoBaseDelivery());
         entity.setCostoPorKilometro(dto.costoPorKilometro());
         entity.setMontoMinimoPedido(dto.montoMinimoPedido());
         entity.setPorcentajeGananciasRepartidor(dto.porcentajeGananciasRepartidor());
-        entity.setModoMantenimiento(dto.modoMantenimiento());
-        entity.setMensajeMantenimiento(dto.mensajeMantenimiento());
     }
 
     public static ConfiguracionSistemaGeneralResponseDTO toGeneralDTO(ConfiguracionSistema entity) {
@@ -48,7 +42,6 @@ public class ConfiguracionSistemaMapper {
         return new ConfiguracionSistemaGeneralResponseDTO(
                 entity.getPorcentajeGananciasRestaurante(),
                 entity.getRadioMaximoEntrega(),
-                entity.getTiempoMaximoEntrega(),
                 entity.getCostoBaseDelivery(),
                 entity.getCostoPorKilometro(),
                 entity.getMontoMinimoPedido(),

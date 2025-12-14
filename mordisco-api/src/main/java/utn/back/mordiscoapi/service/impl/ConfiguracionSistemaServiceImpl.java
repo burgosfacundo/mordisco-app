@@ -93,18 +93,6 @@ public class ConfiguracionSistemaServiceImpl implements IConfiguracionSistemaSer
         return config.calcularCostoDelivery(distanciaKm);
     }
 
-
-    /**
-     * Verifica si el sistema está en modo mantenimiento
-     */
-    @Override
-    public boolean isEnMantenimiento() {
-        ConfiguracionSistema config = configuracionRepository.findConfiguracionActual()
-                .orElseGet(this::crearConfiguracionPorDefecto);
-
-        return config.getModoMantenimiento();
-    }
-
     /**
      * Calcula la ganancia del repartidor para un delivery
      */
@@ -136,12 +124,10 @@ public class ConfiguracionSistemaServiceImpl implements IConfiguracionSistemaSer
         ConfiguracionSistema config = ConfiguracionSistema.builder()
                 .porcentajeGananciasRestaurante(BigDecimal.valueOf(80.0))
                 .radioMaximoEntrega(BigDecimal.valueOf(10.0))
-                .tiempoMaximoEntrega(60)
                 .costoBaseDelivery(BigDecimal.valueOf(2500.00))
                 .costoPorKilometro(BigDecimal.valueOf(100.00))
                 .montoMinimoPedido(BigDecimal.valueOf(1000.0))
                 .porcentajeGananciasRepartidor(BigDecimal.valueOf(80.0))
-                .modoMantenimiento(false)
                 .fechaActualizacion(LocalDateTime.now())
                 .build();
 

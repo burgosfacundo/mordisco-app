@@ -2,14 +2,18 @@ package utn.back.mordiscoapi.model.dto.imagen;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import utn.back.mordiscoapi.common.validation.ValidationConstants;
 
 public record ImagenCreateDTO(
         @NotBlank(message = "El url de la imagen obligatorio")
-        @Size(message = "El url de la imagen debe existir")
         @Schema(description = "Url de la imagen", example = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fhoycocino.com.ar%2Fmilanesa-a-caballo%2F&psig=AOvVaw2lGRENvZyQ6bbjrlNW6fQI&ust=1747762345621000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCICq_5yIsI0DFQAAAAAdAAAAABAE")
+        @Pattern(regexp =  ValidationConstants.IMAGEN_URL_PATTERN, message = "El url de la imagen debe ser una URL válida que comience con http:// o https://")
+        @Pattern(regexp = ValidationConstants.IMAGEN_URL_CON_EXTENSION_PATTERN, message = "El url de la imagen debe finalizar con una extensión de imagen válida (jpg, jpeg, png, gif, webp)")
         String url,
-        @Size(message = "El nombre debe tener como maximo 50 caracteres", max = 50)
+        @Size(message = "El nombre debe tener como maximo " + ValidationConstants.IMAGEN_NOMBRE_MAX_LENGTH + " caracteres",
+                max = ValidationConstants.IMAGEN_NOMBRE_MAX_LENGTH)
         @NotBlank(message = "El nombre de la imagen es obligatorio")
         @Schema(description = "Nombre de la imagen", example = "milanesas a caballo")
         String nombre
