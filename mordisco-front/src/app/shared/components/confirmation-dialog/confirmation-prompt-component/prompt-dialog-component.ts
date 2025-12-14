@@ -26,17 +26,23 @@ import { PromptService } from '../../../../core/services/confirmation-prompt-ser
 
         <div class="modal-body">
           <p>{{ config?.message }}</p>
-          
-        <input 
+
+        <input
           type="text"
           [placeholder]="config?.placeholder || ''"
           [value]="inputValue"
           (input)="onInputChange($event)"
           (keyup.enter)="confirm()"
+          [maxLength]="config?.maxLength || 999999"
           class="dialog-input"
           [class.shake]="shake()"
+          [class.input-error]="hasError()"
           autofocus
         />
+
+        <div *ngIf="hasError()" class="error-message">
+          {{ getErrorMessage() }}
+        </div>
         </div>
 
         <div class="modal-actions">
@@ -119,6 +125,22 @@ import { PromptService } from '../../../../core/services/confirmation-prompt-ser
 
     .dialog-input::placeholder {
       color: #9ca3af;
+    }
+
+    .input-error {
+      border-color: #ef4444 !important;
+    }
+
+    .input-error:focus {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    }
+
+    .error-message {
+      margin-top: 8px;
+      color: #ef4444;
+      font-size: 12px;
+      font-weight: 500;
     }
 
     .modal-actions {
@@ -242,7 +264,15 @@ export class PromptDialogComponent {
   }
 
   isConfirmDisabled(): boolean {
-    return this.config?.required === true && !this.inputValue.trim();
+    return !this.promptService.isValid();
+  }
+
+  hasError(): boolean {
+    return this.inputValue.length > 0 && !this.promptService.isValid();
+  }
+
+  getErrorMessage(): string {
+    return this.promptService.getValidationError();
   }
 
   confirm(): void {

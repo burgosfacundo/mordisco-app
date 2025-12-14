@@ -8,6 +8,8 @@ export interface PromptConfig {
   placeholder?: string;
   defaultValue?: string;
   required?: boolean;
+  minLength?: number;
+  maxLength?: number;
   confirmText?: string;
   cancelText?: string;
   type?: 'danger' | 'warning' | 'info';
@@ -30,6 +32,57 @@ export class PromptService {
   getInputValue = this.inputValue.asReadonly();
 
   private shakeTrigger: (() => void) | null = null;
+
+  /**
+   * Valida el valor del input según la configuración
+   */
+  isValid(): boolean {
+    const config = this.currentConfig();
+    const value = this.inputValue();
+
+    if (!config) return true;
+
+    // Validar required
+    if (config.required && !value.trim()) {
+      return false;
+    }
+
+    // Validar minLength
+    if (config.minLength !== undefined && value.length < config.minLength) {
+      return false;
+    }
+
+    // Validar maxLength
+    if (config.maxLength !== undefined && value.length > config.maxLength) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Obtiene el mensaje de error de validación
+   */
+  getValidationError(): string {
+    const config = this.currentConfig();
+    const value = this.inputValue();
+
+    if (!config) return '';
+
+    if (config.required && !value.trim()) {
+      return 'Este campo es obligatorio';
+    }
+
+    if (config.minLength !== undefined && value.length < config.minLength) {
+      return `Mínimo ${config.minLength} caracteres (actual: ${value.length})`;
+    }
+
+    if (config.maxLength !== undefined && value.length > config.maxLength) {
+      return `Máximo ${config.maxLength} caracteres (actual: ${value.length})`;
+    }
+
+    return '';
+  }
 
   /**
    * Muestra el diálogo con input
@@ -67,10 +120,9 @@ export class PromptService {
   confirm(): void {
     if (!this.currentResult) return;
 
-    const config = this.currentConfig();
-    
-    // Validar si es requerido
-    if (config?.required && !this.inputValue().trim()) {
+    // Validar
+    if (!this.isValid()) {
+      this.shakeInput();
       return;
     }
 

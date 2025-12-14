@@ -154,6 +154,8 @@ export class DetalleUsuarioPage {
       message: 'Indica el motivo del bloqueo',
       placeholder: 'Ej: Muchas quejas sobre incoscistencias',
       required: true,
+      minLength: 10,
+      maxLength: 500,
       confirmText: 'Bloquear Cuenta',
       type: 'danger'
     }).subscribe(result => {
