@@ -1,15 +1,17 @@
 services:
   mysql:
     image: mysql:8.0
+    command: --default-time-zone='-03:00'
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mordisco
       MYSQL_USER: mordisco_user
       MYSQL_PASSWORD: mordisco_pass
+      TZ: America/Argentina/Buenos_Aires
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/liv/mysql
+      - mysql_data:/var/lib/mysql
 
 volumes:
   mysql_data:
