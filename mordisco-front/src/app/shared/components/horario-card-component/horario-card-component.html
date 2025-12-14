@@ -25,9 +25,22 @@
         </div>
         <div class="flex-1">
             <p class="text-xs text-gray-500 uppercase tracking-wide">Horario de atención</p>
-            <p class="text-lg font-bold text-gray-900">
-              {{ formatHora(horario()!.horaApertura) }} - {{ formatHora(horario()!.horaCierre) }}
-            </p>
+            @if (horario()!.cruzaMedianoche) {
+                <p class="text-lg font-bold text-gray-900">
+                  {{ formatHora(horario()!.horaApertura) }} - {{ formatHora(horario()!.horaCierre) }}
+                </p>
+                <p class="text-xs text-blue-600 font-medium mt-1 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    Cierra {{ getDiaSiguiente() }} (horario nocturno)
+                </p>
+            } @else {
+                <p class="text-lg font-bold text-gray-900">
+                  {{ formatHora(horario()!.horaApertura) }} - {{ formatHora(horario()!.horaCierre) }}
+                </p>
+            }
         </div>
     </div>
 </div>

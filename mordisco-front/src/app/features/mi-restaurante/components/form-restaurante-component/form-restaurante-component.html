@@ -111,11 +111,12 @@
 
               <fieldset class="form-field">
                 <label for="numero" class="form-label">Número</label>
-                <input 
-                  type="text" 
-                  id="numero" 
+                <input
+                  type="text"
+                  id="numero"
                   formControlName="numero"
                   placeholder="1234"
+                  inputmode="numeric"
                   class="form-input"
                   [class.border-red-500]="getError('numero')"
                   [class.focus:ring-red-500]="getError('numero')"
@@ -163,12 +164,13 @@
             <div class="grid grid-cols-2 gap-4">
               <fieldset class="form-field">
                 <label for="codigoPostal" class="form-label">Código Postal</label>
-                <input 
-                  type="text" 
-                  id="codigoPostal" 
+                <input
+                  type="text"
+                  id="codigoPostal"
                   formControlName="codigoPostal"
-                  placeholder="7600"
-                  class="form-input"
+                  placeholder="7600 o B1636BCN"
+                  class="form-input uppercase"
+                  maxlength="8"
                   [class.border-red-500]="getError('codigoPostal')"
                   [class.focus:ring-red-500]="getError('codigoPostal')"
                 >

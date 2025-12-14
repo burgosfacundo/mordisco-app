@@ -36,7 +36,7 @@
                   <p class="font-semibold text-gray-900">Delivery</p>
                   <p class="text-sm text-gray-600">Recibe tu pedido en tu domicilio</p>
                   <p class="text-xs text-primary-600 font-semibold mt-1">
-                    + ${{ COSTO_ENVIO | number:'1.2-2' }} de envío
+                    + ${{ resumenConEnvio().costoEnvio | number:'1.2-2' }} de envío
                   </p>
                 </div>
               </div>
@@ -92,6 +92,16 @@
                         [value]="direccion.id"
                         class="mt-1">
                       <div class="flex-1">
+                        @if(direccion.alias){
+                          <p class="font-semibold text-gray-900"> {{ direccion.alias }}</p>
+                          <p class="text-sm text-gray-600 mt-1">{{ direccion.calle }} {{ direccion.numero }}
+                            @if (direccion.piso) {
+                              , Piso {{ direccion.piso }}
+                            }
+                            @if (direccion.depto) {
+                              {{ direccion.depto }}
+                            }</p>
+                        }@else{
                         <p class="font-semibold text-gray-900">
                           {{ direccion.calle }} {{ direccion.numero }}
                           @if (direccion.piso) {
@@ -101,6 +111,7 @@
                             {{ direccion.depto }}
                           }
                         </p>
+                        }
                         <p class="text-sm text-gray-600 mt-1">
                           {{ direccion.ciudad }} - CP: {{ direccion.codigoPostal }}
                         </p>
@@ -223,11 +234,11 @@
                     {{ item.nombre }}
                   </p>
                   <p class="text-xs text-gray-600">
-                    {{ item.cantidad }} x ${{ item.precio | number:'1.2-2' }}
+                    {{ item.cantidad }} x ${{ item.precioConDescuento ? item.precioConDescuento : item.precio | number:'1.2-2' }}
                   </p>
                 </div>
                 <p class="text-sm font-bold text-gray-900">
-                  ${{ (item.precio * item.cantidad) | number:'1.2-2' }}
+                  ${{ (item.precioConDescuento ? item.precioConDescuento : item.precio * item.cantidad) | number:'1.2-2' }}
                 </p>
               </div>
             }
@@ -239,6 +250,19 @@
               <span>Subtotal</span>
               <span class="font-semibold">${{ resumenConEnvio().subtotal | number:'1.2-2' }}</span>
             </div>
+            
+            <!-- Advertencia de monto mínimo -->
+            @if (montoMinimoPedido() > 0 && resumenConEnvio().subtotal < montoMinimoPedido()) {
+              <div class="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
+                <div class="flex items-start gap-2">
+                  <mat-icon class="text-yellow-600 text-base">warning</mat-icon>
+                  <p class="text-xs text-yellow-800">
+                    El monto mínimo del pedido es <strong>${{ montoMinimoPedido() | number:'1.2-2' }}</strong>. 
+                    Te faltan <strong>${{ (montoMinimoPedido() - resumenConEnvio().subtotal) | number:'1.2-2' }}</strong> para continuar.
+                  </p>
+                </div>
+              </div>
+            }
             
             <!-- Mostrar envío SOLO si es DELIVERY -->
             @if (cobraEnvio()) {
@@ -268,7 +292,7 @@
           <div class="space-y-3 pt-4">
             <button 
               type="submit"
-              [disabled]="checkoutForm.invalid || isProcessing()"
+              [disabled]="checkoutForm.invalid || isProcessing() || (montoMinimoPedido() > 0 && resumenConEnvio().subtotal < montoMinimoPedido())"
               class="w-full btn-primary">
               @if (isProcessing()) {
                 <span class="inline-flex items-center gap-2">

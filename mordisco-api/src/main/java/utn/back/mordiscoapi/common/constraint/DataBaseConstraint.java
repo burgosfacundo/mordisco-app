@@ -4,14 +4,14 @@ import java.util.Arrays;
 
 public enum DataBaseConstraint {
 
-    CALIFICACION_RESTAURANTE("UK_calificacion_usuario_restaurante", "Ya calificaste este restaurante."),
+    CALIFICACION_PEDIDO("UK_calificacion_pedido_usuario", "Ya calificaste este pedido."),
+    CALIFICACION_REPARTIDOR_PEDIDO("UK_calificacion_repartidor_pedido","Ya calificaste el repartidor de este pedido."),
     IMAGEN_URL("UK_imagen_url", "La URL de la imagen ya está en uso."),
     RESTAURANTE_USUARIO("UK_restaurante_usuario", "Ese usuario ya está asignado a un restaurante."),
     RESTAURANTE_RAZON_SOCIAL("UK_restaurante_razon_social", "La razón social del restaurante ya está en uso."),
     RESTAURANTE_IMAGEN("UK_restaurante_imagen", "La imagen ya está en uso por otro restaurante."),
     RESTAURANTE_DIRECCION("UK_restaurante_direccion", "La dirección ya está en uso por otro restaurante."),
     MENU_RESTAURANTE("UK_menu_restaurante","El restaurante ya tiene un menu creado"),
-    PRODUCTO_NOMBRE("UK_producto_nombre", "El nombre del producto no puede ser mayor a 50 caracteres."),
     PRODUCTO_IMAGEN("UK_producto_imagen", "La imagen ya está en uso por otro producto o restaurante."),
     USUARIO_TELEFONO("UK_usuario_telefono", "El teléfono ya está registrado."),
     USUARIO_EMAIL("UK_usuario_email", "El email ya está registrado."),

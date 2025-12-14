@@ -1,10 +1,10 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import ProductoCard from '../../models/producto/producto-card';
-import ProductoResponse from '../../models/producto/producto-response';
 
 @Component({
   selector: 'app-producto-card-component',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './producto-card-component.html'
 })
 export class ProductoCardComponent {

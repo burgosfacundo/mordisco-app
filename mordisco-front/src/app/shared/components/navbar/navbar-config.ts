@@ -24,7 +24,6 @@ export class NavBarConfigFactory {
   private static getPublicConfig(): NavbarConfig {
     return {
       showSearch: true,
-      showCitySelector: true,
       showProfileMenu: false,
       showLoginButton: true,
       profileMenuItems: []
@@ -35,7 +34,6 @@ export class NavBarConfigFactory {
     if(home){
       return {
         showSearch: true,
-        showCitySelector: true,
         showProfileMenu: true,
         showLoginButton: false,
         profileMenuItems: [
@@ -43,13 +41,15 @@ export class NavBarConfigFactory {
           { label: 'Mis Direcciones', icon: 'home',route: '/cliente/my-address'},
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Pedidos', icon: 'receipt_long', route: '/cliente/pedidos' },
-          { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
+          { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any },
+          { type: 'info', 
+            content: '¿Necesitas ayuda? <br> Contáctanos al <strong>+54 9 223 501 0868</strong> <br> o email <strong>mordiscoapp@gmail.com</strong>'
+          }
         ]
       }
     } else {
       return {
         showSearch: false,
-        showCitySelector: false,
         showProfileMenu: true,
         showLoginButton: false,
         profileMenuItems: [
@@ -57,7 +57,10 @@ export class NavBarConfigFactory {
           { label: 'Mis Direcciones', icon: 'home',route: '/cliente/my-address'},
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
           { label: 'Mis Pedidos', icon: 'receipt_long', route: '/cliente/pedidos' },
-          { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
+          { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any },
+          { type: 'info', 
+            content: '¿Necesitas ayuda? Contáctanos al <strong>+54 9 223 501 0868</strong> o al mail <strong>mordiscoapp@gmail.com</strong>'
+          }
         ]
       }
     }
@@ -66,7 +69,6 @@ export class NavBarConfigFactory {
   private static getRestauranteConfig(): NavbarConfig {
     return {
       showSearch: false,
-      showCitySelector: false,
       showProfileMenu: true,
       showLoginButton: false,
       profileMenuItems: [
@@ -75,7 +77,11 @@ export class NavBarConfigFactory {
         { label: 'Mi Restaurante', icon: 'restaurant', route: '/restaurante' },
         { label: 'Menú', icon: 'menu_book', route: '/restaurante/menu' },
         { label: 'Pedidos', icon: 'receipt_long', route: '/restaurante/pedidos' },
-        { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
+        { label: 'Estadísticas', icon: 'analytics', route: '/restaurante/estadisticas' },
+        { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any },
+        { type: 'info', 
+          content: '¿Necesitas ayuda? <br> Contáctanos al <strong>+54 9 223 501 0868</strong> <br> o email <strong>mordiscoapp@gmail.com</strong>'
+        }        
       ]
     }
   }
@@ -83,7 +89,6 @@ export class NavBarConfigFactory {
   private static getAdminConfig(): NavbarConfig {
     return {
       showSearch: false,
-      showCitySelector: false,
       showProfileMenu: true,
       showLoginButton: false,
       profileMenuItems: [
@@ -93,7 +98,8 @@ export class NavBarConfigFactory {
         { label: 'Ver Pedidos', icon: 'receipt_long', route: '/admin/pedidos' },
         { label: 'Ver Usuarios', icon: 'people', route: '/admin/usuarios' },
         { label: 'Estadísticas', icon: 'analytics', route: '/admin/estadisticas' },
-        { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
+        { label: 'Configuracion del sistema', icon: 'settings', route: '/admin/configuracion' },        
+        { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }         
       ]
     };
   }
@@ -102,29 +108,35 @@ export class NavBarConfigFactory {
     if(home){
       return {
         showSearch: false,
-        showCitySelector: false,
         showProfileMenu: true,
         showLoginButton: false,
         profileMenuItems: [
           { label: 'Mi Perfil', icon: 'person', route: '/profile' },
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
-          { label: 'Mis Entregas', icon: 'delivery_dining', route: '/repartidor/entregas' },
-          { label: 'Historial', icon: 'history', route: '/repartidor/historial' },
-          { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
+          { label: 'Mis Calificaciones', icon: 'delivery_dining', route: '/repartidor/calificaciones' },
+          { label: 'Historial', icon: 'history', route: '/repartidor/pedidos/historial' },
+          { label: 'Estadísticas', icon: 'analytics', route: '/repartidor/estadisticas' },
+          { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any },
+          { type: 'info', 
+            content: '¿Necesitas ayuda? <br> Contáctanos al <strong>+54 9 223 501 0868</strong> <br> o email <strong>mordiscoapp@gmail.com</strong>'
+          } 
         ]
       }
     } else {
       return {
         showSearch: false,
-        showCitySelector: false,
         showProfileMenu: true,
         showLoginButton: false,
         profileMenuItems: [
           { label: 'Mi Perfil', icon: 'person', route: '/profile' },
           { label: 'Cambiar Contraseña', icon: 'lock', route: '/edit-password' },
-          { label: 'Mis Entregas', icon: 'delivery_dining', route: '/repartidor/entregas' },
-          { label: 'Historial', icon: 'history', route: '/repartidor/historial' },
-          { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any }
+          { label: 'Mis Calificaciones', icon: 'delivery_dining', route: '/repartidor/calificaciones' },
+          { label: 'Historial', icon: 'history', route: '/repartidor/pedidos/historial' },
+          { label: 'Estadísticas', icon: 'analytics', route: '/repartidor/estadisticas' },
+          { label: 'Cerrar Sesión', icon: 'logout', action: 'logout' as any },
+          { type: 'info', 
+            content: '¿Necesitas ayuda? <br> Contáctanos al <strong>+54 9 223 501 0868</strong> <br> o email <strong>mordiscoapp@gmail.com</strong>'
+          }           
         ]
       };
     }

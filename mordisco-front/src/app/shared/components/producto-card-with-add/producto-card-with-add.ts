@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, output, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import ProductoResponse from '../../models/producto/producto-response';
+
 @Component({
   selector: 'app-producto-card-with-add',
   standalone: true,
@@ -12,6 +13,7 @@ export class ProductoCardWithAdd{
   producto = input<ProductoResponse>();
   enCarrito = input<boolean>(false);
   cantidad = input<number>(0);
+  adminMode = input<Boolean>(false)
   
   agregar = output<void>();
 

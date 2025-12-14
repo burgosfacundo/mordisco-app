@@ -1,7 +1,10 @@
 export default interface UserProfile{
-    id? : number,
+    id : number,
     nombre : string,
     apellido : string,
     telefono : string,
-    email : string
+    email : string,
+    bajaLogica : boolean,
+    motivoBaja : string,
+    fechaBaja : string
 }

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -12,13 +12,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../shared/services/auth-service';
-import { Ciudad } from '../../../shared/models/ciudad/ciudad';
-import { CiudadService } from '../../services/ciudad/ciudad-service';
 import { NavbarConfig, NavbarMenuItem } from './navbar-models';
 import { NavBarConfigFactory } from './navbar-config';
-import { CarritoFlotanteComponent } from "../carrito-flotante-component/carrito-flotante-component";
 import { NotificacionesDropdownComponent } from "../notificaciones-dropdown/notificaciones-dropdown";
+import { ConfirmDialogComponent } from '../../store/confirm-dialog-component';
 
 @Component({
   selector: 'app-navbar',
@@ -42,9 +41,8 @@ import { NotificacionesDropdownComponent } from "../notificaciones-dropdown/noti
 })
 export class NavbarComponent implements OnInit {
   private authService = inject(AuthService);
-  private ciudadService = inject(CiudadService);
   private router = inject(Router);
-  ciudades = signal<Ciudad[]>([]);
+  private dialog = inject(MatDialog);
   searchTerm = '';
   showMobileMenu = signal(false);
   isHomePage = false;
@@ -55,7 +53,6 @@ export class NavbarComponent implements OnInit {
 
   currentUser = this.authService.currentUser;
   isAuthenticated = this.authService.isAuthenticated;
-  ciudadSeleccionada = this.ciudadService.ciudadSeleccionada;
   
   userName = computed(() => {
     const user = this.currentUser();
@@ -84,16 +81,11 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.isHomePage) {
-      this.loadCiudades();
-    }
-
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         const url = this.router.url;
         const wasHome = this.isHomePage;
         this.isHomePage = url === '/home' || url === '/';
-
 
         if (this.isHomePage !== wasHome) {
           const user = this.currentUser();
@@ -102,46 +94,11 @@ export class NavbarComponent implements OnInit {
             NavBarConfigFactory.getConfig(user?.role ?? null, authenticated, this.isHomePage)
           );
         }
-
-        if (this.isHomePage && this.ciudades().length === 0) {
-          this.loadCiudades();
-        }
       }
     });
   }
 
-  private loadCiudades(): void {
-    this.ciudadService.getCiudades().subscribe({
-      next: (ciudades) => {
-        this.ciudades.set(ciudades);
-        
-        if (!this.ciudadSeleccionada() && ciudades.length > 0) {
-          this.ciudadService.setCiudad(ciudades[0]);
-        }
-      },
-      error: (err) => {
-        console.error('Error cargando ciudades:', err)
-        
-        this.ciudades.set([this.ciudadSeleccionada()]);
-      }
-    });
-  }
 
-  onCiudadChange(ciudad: Ciudad): void {
-    this.ciudadService.setCiudad(ciudad);
-    this.closeMobileMenu();
-  }
-
-  onCiudadChangeMobile(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const ciudadId = Number(select.value);
-    const ciudad = this.ciudades().find(c => c.id === ciudadId);
-    
-    if (ciudad) {
-      this.ciudadService.setCiudad(ciudad);
-    }
-    this.closeMobileMenu();
-  }
 
   onSearchInput(term: string): void {
     this.searchTerm = term;
@@ -155,10 +112,7 @@ export class NavbarComponent implements OnInit {
 
   private emitSearchEvent(term: string): void {
     window.dispatchEvent(new CustomEvent('search-changed', { 
-      detail: { 
-        term,
-        ciudad: this.ciudadSeleccionada().nombre 
-      } 
+      detail: { term } 
     }));
   }
 
@@ -171,9 +125,16 @@ export class NavbarComponent implements OnInit {
   }
 
   logout(): void {
-    if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-      this.authService.logout();
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro que deseas cerrar sesión?' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.authService.logout();
+      }
+    });
   }
 
   goToLogin(): void {
@@ -187,10 +148,10 @@ export class NavbarComponent implements OnInit {
 
   getUserInitials(): string {
     const user = this.currentUser();
-    if (!user?.email) return 'U';
-    
-    const email = user.email.split('@')[0];
-    return email.substring(0, 2).toUpperCase();
+        
+    if (!user?.nombre) return 'U';
+
+    return user.nombre.substring(0, 2).toUpperCase();
   }
 
   toggleMobileMenu(): void {
@@ -201,9 +162,7 @@ export class NavbarComponent implements OnInit {
     this.showMobileMenu.set(false);
   }
 
-  compareCiudades(c1: Ciudad, c2: Ciudad): boolean {
-    return c1 && c2 ? c1.id === c2.id : c1 === c2;
-  }
+
 
 
   getRoleDisplay(): string {

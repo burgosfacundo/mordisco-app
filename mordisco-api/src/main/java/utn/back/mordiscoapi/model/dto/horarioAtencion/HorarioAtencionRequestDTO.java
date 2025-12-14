@@ -15,5 +15,7 @@ public record HorarioAtencionRequestDTO(
             LocalTime horaApertura,
             @NotNull(message = "El horario de cierre debe ser obligatorio")
             @Schema(description = "Hora de cierre del local", example = "21:00")
-            LocalTime horaCierre) {
+            LocalTime horaCierre,
+            @Schema(description = "Indica si el horario cruza la medianoche (cierra al día siguiente)", example = "false")
+            Boolean cruzaMedianoche) {
 }

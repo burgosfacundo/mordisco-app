@@ -1,11 +1,19 @@
-import { Component, EventEmitter, inject, input, Input, OnChanges, OnInit, output, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, inject, input, OnChanges, OnInit, output, signal, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { DireccionService } from '../../services/direccion-service';
-import { FormValidationService } from '../../../../shared/services/form-validation-service';
+import { FormValidationService, streetNameValidator } from '../../../../shared/services/form-validation-service';
 import DireccionRequest from '../../../../shared/models/direccion/direccion-request';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
+import { ToastService } from '../../../../core/services/toast-service';
+import {
+  CALLE_MIN_LENGTH, CALLE_MAX_LENGTH, CALLE_PATTERN,
+  NUMERO_MAX_LENGTH, NUMERO_PATTERN,
+  PISO_MAX_LENGTH, DEPTO_MAX_LENGTH,
+  CODIGO_POSTAL_MAX_LENGTH, CODIGO_POSTAL_PATTERN,
+  CIUDAD_MIN_LENGTH, CIUDAD_MAX_LENGTH, CIUDAD_PATTERN,
+  REFERENCIAS_MAX_LENGTH, ALIAS_MAX_LENGTH
+} from '../../../../shared/validators/validation-constants';
 
 @Component({
   selector: 'app-direccion-form-component',
@@ -16,12 +24,13 @@ import DireccionResponse from '../../../../shared/models/direccion/direccion-res
 export class DireccionFormComponent implements OnInit , OnChanges{
   private fb = inject(FormBuilder);
   private direccionService = inject(DireccionService);
-  private snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
   protected validationService = inject(FormValidationService);
 
   direccion = input<DireccionResponse>();
   onSaved = output<void>();
   onCancelled = output<void>();
+  isRestaurante = input<boolean>(false)
 
   formDirecciones!: FormGroup;
   protected isSubmitting = signal(false);
@@ -51,13 +60,14 @@ export class DireccionFormComponent implements OnInit , OnChanges{
 
   private initializeForm(): void {
     this.formDirecciones = this.fb.group({
-      calle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-      numero: ['', [Validators.required, Validators.maxLength(5),  Validators.pattern(/^[0-9]+$/)]],
-      piso: ['', [Validators.maxLength(20)]],
-      depto: ['', [Validators.maxLength(20)]],
-      codigoPostal: ['', [Validators.required, Validators.maxLength(10)]],
-      referencias: ['', [Validators.maxLength(250)]],
-      ciudad: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[A-Za-z\s]+$/)]]
+      calle: ['', [Validators.required, Validators.minLength(CALLE_MIN_LENGTH), Validators.maxLength(CALLE_MAX_LENGTH), Validators.pattern(CALLE_PATTERN), streetNameValidator]],
+      numero: ['', [Validators.required, Validators.maxLength(NUMERO_MAX_LENGTH), Validators.pattern(NUMERO_PATTERN)]],
+      piso: ['', [Validators.maxLength(PISO_MAX_LENGTH)]],
+      depto: ['', [Validators.maxLength(DEPTO_MAX_LENGTH)]],
+      codigoPostal: ['', [Validators.required, Validators.maxLength(CODIGO_POSTAL_MAX_LENGTH), Validators.pattern(CODIGO_POSTAL_PATTERN)]],
+      referencias: ['', [Validators.maxLength(REFERENCIAS_MAX_LENGTH)]],
+      ciudad: ['', [Validators.required, Validators.minLength(CIUDAD_MIN_LENGTH), Validators.maxLength(CIUDAD_MAX_LENGTH), Validators.pattern(CIUDAD_PATTERN)]],
+      alias: ['', [Validators.maxLength(ALIAS_MAX_LENGTH)]],
     });
   }
 
@@ -71,7 +81,8 @@ export class DireccionFormComponent implements OnInit , OnChanges{
       depto: this.direccion()?.depto || '',
       codigoPostal: this.direccion()?.codigoPostal,
       referencias: this.direccion()?.referencias || '',
-      ciudad: this.direccion()?.ciudad
+      ciudad: this.direccion()?.ciudad,
+      alias : this.direccion()?.alias || ''
     });
   }
 
@@ -90,13 +101,11 @@ export class DireccionFormComponent implements OnInit , OnChanges{
       // Modo edición
       this.direccionService.update(dir.id, direccionData).subscribe({
         next: () => {
-          this.snackBar.open('✅ Dirección actualizada correctamente', 'Cerrar', { duration: 3000 });
+          this.toastService.success('✅ Dirección actualizada correctamente');
           this.resetForm();
           this.onSaved.emit();
         },
-        error: (error) => {
-          console.error('Error:', error);
-          this.snackBar.open('❌ Error al actualizar la dirección', 'Cerrar', { duration: 4000 });
+        error: () => {
           this.isSubmitting.set(false);
         }
       });
@@ -104,13 +113,11 @@ export class DireccionFormComponent implements OnInit , OnChanges{
       // Modo creación
       this.direccionService.save(direccionData).subscribe({
         next: () => {
-          this.snackBar.open('✅ Dirección guardada correctamente', 'Cerrar', { duration: 3000 });
+          this.toastService.success('✅ Dirección guardada correctamente');
           this.resetForm();
           this.onSaved.emit();
         },
-        error: (error) => {
-          console.error('Error:', error);
-          this.snackBar.open('❌ Error al guardar la dirección', 'Cerrar', { duration: 4000 });
+        error: () => {
           this.isSubmitting.set(false);
         }
       });

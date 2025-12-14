@@ -4,6 +4,7 @@ export default interface DireccionRequest{
     piso?: string,
     depto?: string,
     codigoPostal: string,
+    alias? : string,
     referencias? : string,
     ciudad: string
 }

@@ -1,15 +1,25 @@
 import { Component, inject, OnInit } from "@angular/core";
+import { MatDialog } from '@angular/material/dialog';
 import { RestauranteService } from "../../../../shared/services/restaurante/restaurante-service";
 import { AuthService } from "../../../../shared/services/auth-service";
 import { ActivatedRoute, Router } from "@angular/router";
-import { MatSnackBar } from "@angular/material/snack-bar";
 import RestauranteUpdate from "../../../../shared/models/restaurante/restaurante-update";
 import RestauranteRequest from "../../../../shared/models/restaurante/restaurante-request";
-import { FormValidationService } from "../../../../shared/services/form-validation-service";
+import { FormValidationService, streetNameValidator } from "../../../../shared/services/form-validation-service";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { ToastService } from "../../../../core/services/toast-service";
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
+import {
+  CALLE_MIN_LENGTH, CALLE_MAX_LENGTH, CALLE_PATTERN,
+  NUMERO_MAX_LENGTH, NUMERO_PATTERN,
+  PISO_MAX_LENGTH, DEPTO_MAX_LENGTH,
+  CODIGO_POSTAL_MAX_LENGTH, CODIGO_POSTAL_PATTERN,
+  CIUDAD_MAX_LENGTH, CIUDAD_PATTERN,
+  REFERENCIAS_MAX_LENGTH
+} from "../../../../shared/validators/validation-constants";
 
 @Component({
   selector: 'app-restaurante-form-component',
@@ -29,7 +39,8 @@ export class RestauranteFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
+  private dialog = inject(MatDialog);
 
   restauranteForm!: FormGroup;
   isEditMode = false;
@@ -60,13 +71,13 @@ export class RestauranteFormComponent implements OnInit {
       logoUrl: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]]
     };
     const addressFields = this.isEditMode ? {} : {
-      calle: ['', [Validators.required, Validators.maxLength(50)]],
-      numero: ['', [Validators.required, Validators.maxLength(50)]],
-      piso: ['', [Validators.maxLength(15)]],
-      depto: ['', [Validators.maxLength(15)]],
-      codigoPostal: ['', [Validators.required, Validators.maxLength(15)]],
-      ciudad: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
-      referencias: ['', [Validators.maxLength(250)]]
+      calle: ['', [Validators.required, Validators.minLength(CALLE_MIN_LENGTH), Validators.maxLength(CALLE_MAX_LENGTH), Validators.pattern(CALLE_PATTERN), streetNameValidator]],
+      numero: ['', [Validators.required, Validators.maxLength(NUMERO_MAX_LENGTH), Validators.pattern(NUMERO_PATTERN)]],
+      piso: ['', [Validators.maxLength(PISO_MAX_LENGTH)]],
+      depto: ['', [Validators.maxLength(DEPTO_MAX_LENGTH)]],
+      codigoPostal: ['', [Validators.required, Validators.maxLength(CODIGO_POSTAL_MAX_LENGTH), Validators.pattern(CODIGO_POSTAL_PATTERN)]],
+      ciudad: ['', [Validators.required, Validators.maxLength(CIUDAD_MAX_LENGTH), Validators.pattern(CIUDAD_PATTERN)]],
+      referencias: ['', [Validators.maxLength(REFERENCIAS_MAX_LENGTH)]]
     };
 
     this.restauranteForm = this.fb.group({
@@ -86,8 +97,7 @@ export class RestauranteFormComponent implements OnInit {
           this.imagenId = r.logo.id
       },
       error: () => {
-        this.snackBar.open('❌ Error al cargar el restaurante', 'Cerrar', { duration: 4000 });
-        this.router.navigate(['/mi-restaurante']);
+        this.router.navigate(['/restaurante']);
       }
     });
   }
@@ -95,12 +105,11 @@ export class RestauranteFormComponent implements OnInit {
   onSubmit(): void {
     if (this.restauranteForm.invalid) {
       this.markFormGroupTouched(this.restauranteForm);
-      this.snackBar.open('⚠️ Por favor completa todos los campos correctamente', 'Cerrar', { duration: 3000 });
+      this.toastService.warning('⚠️ Por favor completa todos los campos correctamente');
       return;
     }
 
     if (!this.userId) {
-      this.snackBar.open('❌ No se pudo identificar el usuario', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -121,13 +130,11 @@ export class RestauranteFormComponent implements OnInit {
 
       this.restauranteService.put(restauranteData).subscribe({
         next: () => {
-          this.snackBar.open('✅ Restaurante actualizado correctamente', 'Cerrar', { duration: 3000 });
+          this.toastService.success('✅ Restaurante actualizado correctamente');
           this.router.navigate(['/']);
+          this.isSubmitting = false;
         },
         error: () => {
-          this.snackBar.open('❌ Error al actualizar el restaurante', 'Cerrar', { duration: 4000 });
-        },
-        complete: () => {
           this.isSubmitting = false;
         }
       });
@@ -153,13 +160,11 @@ export class RestauranteFormComponent implements OnInit {
 
       this.restauranteService.save(restauranteData).subscribe({
         next: () => {
-          this.snackBar.open('✅ Restaurante creado correctamente', 'Cerrar', { duration: 3000 });
+          this.toastService.success('✅ Restaurante creado correctamente');
           this.router.navigate(['/']);
+          this.isSubmitting = false;
         },
         error: () => {
-          this.snackBar.open('❌ Error al crear el restaurante', 'Cerrar', { duration: 4000 });
-        },
-        complete: () => {
           this.isSubmitting = false;
         }
       });
@@ -183,11 +188,18 @@ export class RestauranteFormComponent implements OnInit {
 
   onCancel(): void {
     if (this.restauranteForm.dirty) {
-      if (confirm('¿Descartar los cambios realizados?')) {
-        this.router.navigate(['/mi-restaurante']);
-      }
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        width: '400px',
+        data: { mensaje: '¿Descartar los cambios realizados?' }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === true) {
+          this.router.navigate(['/restaurante']);
+        }
+      });
     } else {
-      this.router.navigate(['/mi-restaurante']);
+      this.router.navigate(['/restaurante']);
     }
   }
 }

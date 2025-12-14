@@ -62,12 +62,19 @@ public class SecurityConfiguration {
             "/api/restaurantes/estado",
             "/api/restaurantes/ciudad",
             "/api/restaurantes/nombre",
-            "/api/restaurantes/promociones",
+            "/api/restaurantes/ubicacion",
+            "/api/restaurantes/ubicacion/promociones",
             "/api/restaurantes/horarios/{idRestaurante}",
             "/api/menus/{restauranteId}",
             "/api/promociones/{id}",
             "/api/productos",
-            "/api/productos{id}",
+            "/api/productos/{id}",
+            "/api/calificaciones/pedido/{pedidoId}",
+            "/api/calificaciones/restaurante/{restauranteId}",
+            "/api/calificaciones/repartidor/pedido/{pedidoId}",
+            "/api/calificaciones/restaurante/{restauranteId}/estadisticas",
+
+
 
             "/api/public/**"
     };

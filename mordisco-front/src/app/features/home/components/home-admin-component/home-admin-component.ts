@@ -1,30 +1,19 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { RouterLink } from '@angular/router';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
 import { UserService } from '../../../registro/services/user-service';
-import UserCard from '../../../../shared/models/user/user-card';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { UsuarioCardComponent } from '../../../../shared/components/usuario-card-component/usuario-card-component';
-import { RestauranteCardComponent } from '../../../../shared/components/restaurante-card-component/restaurante-card-component';
-import { PedidoCardComponent } from '../../../../shared/components/pedido-card-component/pedido-card-component';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
-import RestauranteForCard from '../../../../shared/models/restaurante/restaurante-for-card';
-import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
+
 
 @Component({
   selector: 'app-home-admin-component',
-  imports: [RestauranteCardComponent, UsuarioCardComponent, PedidoCardComponent, MatPaginator],
+  imports: [RouterLink],
   templateUrl: './home-admin-component.html'
 })
 export class HomeAdminComponent implements OnInit {
-  private _snackBar = inject(MatSnackBar);
   private restauranteService = inject(RestauranteService);
   private pedidoService = inject(PedidoService);
   private usuarioService = inject(UserService);
-
-  protected restaurantes? : RestauranteForCard[];
-  protected pedidos? : PedidoResponse[];
-  protected usuarios? : UserCard[];
 
   sizeUsuarios : number = 5;
   pageUsuarios : number = 0;
@@ -58,12 +47,10 @@ export class HomeAdminComponent implements OnInit {
     
     this.restauranteService.getAll(this.pageRestaurantes,this.sizeRestaurantes).subscribe({
       next: (data) => {
-        this.restaurantes = data.content;
         this.lengthRestaurantes = data.totalElements
         this.isLoadingRestaurantes = false;
       },
       error: () => {
-        this._snackBar.open('Error al cargar los restaurantes', 'Cerrar', { duration: 3000 });
         this.isLoadingRestaurantes = false;
       }
     });
@@ -73,12 +60,10 @@ export class HomeAdminComponent implements OnInit {
   loadPedidos(): void {
     this.pedidoService.getAll(this.pagePedidos,this.sizePedidos).subscribe({
       next: (data) => {
-        this.pedidos = data.content;
         this.lengthPedidos = data.totalElements
         this.isLoadingPedidos = false;
       },
       error: () => {
-        this._snackBar.open('Error al cargar los pedidos', 'Cerrar', { duration: 3000 });
         this.isLoadingPedidos = false;
       }
     });
@@ -87,36 +72,15 @@ export class HomeAdminComponent implements OnInit {
 
   loadUsuarios(): void {
     this.usuarioService.getAll(this.pageUsuarios,this.sizeUsuarios).subscribe({
-      next: (data) => {
-        console.log(data.content);
-        
-        this.usuarios = data.content;
+      next: (data) => {        
         this.lengthUsuarios = data.totalElements
         this.isLoadingUsuarios = false;
       },
       error: () => {
-        this._snackBar.open('Error al cargar los usuarios', 'Cerrar', { duration: 3000 });
         this.isLoadingUsuarios = false;
       }
     });
   }
 
-  onPageChangePedidos(event: PageEvent): void {
-    this.pagePedidos = event.pageIndex
-    this.sizePedidos = event.pageSize;
-    this.loadPedidos();
-  }
 
-    onPageChangeRestaurantes(event: PageEvent): void {
-    this.pageRestaurantes = event.pageIndex
-    this.sizeRestaurantes = event.pageSize;
-    this.loadRestaurantes();
-  }
-
-
-    onPageChangeUsuarios(event: PageEvent): void {
-    this.pageUsuarios = event.pageIndex
-    this.sizeUsuarios = event.pageSize;
-    this.loadUsuarios();
-  }
 }

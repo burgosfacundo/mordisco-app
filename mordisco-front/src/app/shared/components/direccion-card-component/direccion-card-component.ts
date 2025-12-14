@@ -1,4 +1,4 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import DireccionResponse from '../../models/direccion/direccion-response';
 import { CommonModule } from '@angular/common';
 

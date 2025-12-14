@@ -36,13 +36,49 @@ public class Pedido {
     @Column(nullable = false)
     private BigDecimal total;
 
+    @Column
+    private BigDecimal subtotalProductos;
+
+    @Column
+    private BigDecimal costoDelivery;
+
+    @Column
+    private BigDecimal distanciaKm;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean bajaLogica = false;
+
+    @Column(length = 500)
+    private String motivoBaja;
+
+    @Column
+    private java.time.LocalDateTime fechaBaja;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private EstadoPedido estadoAntesDeCancelado;
+
     @ManyToOne
-    @JoinColumn(name = "usuario_id",nullable = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario cliente;
 
     @ManyToOne
-    @JoinColumn(name = "restaurante_id",nullable = false)
+    @JoinColumn(name = "restaurante_id", nullable = false)
     private Restaurante restaurante;
+
+    @ManyToOne
+    @JoinColumn(name = "repartidor_id")
+    private Usuario repartidor;
+
+    @Column
+    private LocalDateTime fechaAceptacionRepartidor;
+
+    @Column
+    private String pin;
+
+    @Column
+    private LocalDateTime fechaEntrega;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "direccion_id", referencedColumnName = "id")
@@ -52,6 +88,31 @@ public class Pedido {
     @Column(length = 500)
     private String direccionSnapshot;
 
+    @OneToOne(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CalificacionPedido calificacionPedido;
+
+    @OneToOne(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CalificacionRepartidor calificacionRepartidor;
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductoPedido> items;
+
+    public boolean necesitaRepartidor() {
+        return TipoEntrega.DELIVERY.equals(this.tipoEntrega) && this.repartidor == null;
+    }
+
+    public boolean puedeSerAceptadoPorRepartidor() {
+        return EstadoPedido.LISTO_PARA_ENTREGAR.equals(this.estado) && this.repartidor == null;
+    }
+
+    public boolean puedeSerCalificado() {
+        return EstadoPedido.COMPLETADO.equals(this.estado)
+                && this.calificacionPedido == null;
+    }
+
+    public boolean repartidorPuedeSerCalificado() {
+        return EstadoPedido.COMPLETADO.equals(this.estado)
+                && this.repartidor != null
+                && this.calificacionRepartidor == null;
+    }
 }

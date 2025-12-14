@@ -1,0 +1,175 @@
+<div class="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
+  <!-- Header -->
+  <div class="text-center space-y-2  mt-20">
+    <h1 class="titulo-hero">Pedidos del sistema</h1>
+    <p class="text-gray-600 text-lg">Listado de pedidos de todos los restaurantes</p>
+  </div>
+
+    @if (isLoadingPedidos) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando pedidos...</p>
+      </div>
+    } @else {
+        <!-- Barra de búsqueda principal -->
+        <div class="mb-4">
+          <app-barra-buscadora-component   
+            (searchChanged)="onSearchChanged($event)">
+          </app-barra-buscadora-component>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-4">
+          <!-- Sección de filtros -->
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Filtros
+            </h3>
+            
+            <button 
+              (click)="onClearFilters()"
+              class="text-xs text-gray-400 hover:text-gray-600 font-medium flex items-center gap-1 transition-colors">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Limpiar
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+            <!-- Estado del pedido -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-medium text-gray-600">
+                Estado
+              </label>
+              <div class="relative">
+                <select 
+                  [(ngModel)]="filtroEstado"
+                  class="w-full appearance-none bg-gray-50/50 border border-gray-200 rounded-md px-3 py-1.5 pr-8
+                        text-gray-700 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400
+                        transition-all cursor-pointer hover:bg-gray-50">
+                  <option value="">Todos</option>
+                  <option value="PENDIENTE">Pendiente</option>
+                  <option value="EN_PREPARACION">En preparación</option>
+                  <option value="LISTO_PARA_ENTREGAR">Listo para entregar</option>
+                  <option value="LISTO_PARA_RETIRAR">Listo para retirar</option>
+                  <option value="EN_CAMINO">En camino</option>
+                  <option value="COMPLETADO">Completado</option>
+                  <option value="CANCELADO">Cancelado</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tipo de entrega -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-medium text-gray-600">
+                Tipo de entrega
+              </label>
+              <div class="relative">
+                <select 
+                  [(ngModel)]="filtroTipoEntrega"
+                  class="w-full appearance-none bg-gray-50/50 border border-gray-200 rounded-md px-3 py-1.5 pr-8
+                        text-gray-700 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400
+                        transition-all cursor-pointer hover:bg-gray-50">
+                  <option value="">Todos</option>
+                  <option value="DELIVERY"> Delivery</option>
+                  <option value="RETIRO_POR_LOCAL"> Retiro en local</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fecha desde -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-medium text-gray-600">
+                Desde
+              </label>
+              <div class="relative">
+                <input
+                  type="date"
+                  [(ngModel)]="filtroFechaInicio"
+                  [max]="maxFechaInicio || maxDate"
+                  class="date-input text-xs">
+              </div>
+            </div>
+
+            <!-- Fecha hasta -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-medium text-gray-600">
+                Hasta
+              </label>
+              <div class="relative">
+                <input
+                  type="date"
+                  [(ngModel)]="filtroFechaFin"
+                  [min]="minFechaFin || undefined"
+                  [max]="maxDate"
+                  class="date-input text-xs">
+              </div>
+            </div>
+
+            <!-- Botón de aplicar filtros -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-medium text-gray-600 invisible">
+                Acción
+              </label>
+              <button 
+                (click)="aplicarFiltros()"
+                class="w-full h-[30px] bg-red-700 hover:bg-red-900 text-white text-xs font-medium rounded-md
+                      transition-all duration-200 shadow-sm hover:shadow flex items-center justify-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Buscar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        @if (pedidos && pedidos.length > 0) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (pedido of pedidos; track pedido.id) {
+              <app-pedido-card-component
+                [pedido]="pedido"
+                [isUsuario]="'ROLE_ADMIN'"
+                (cancelar)="cancelarPedido($event)"
+                (deshacerCancelacion)="deshacerCancelacion($event)"
+                (verDetalles)="verDetalles($event)"
+                class="block h-full">
+              </app-pedido-card-component>
+          }
+        </div>
+
+        <!-- Paginador -->
+        <div class="flex justify-center mt-8">
+                <mat-paginator
+                  [length]="lengthPedidos"
+                  [pageSize]="sizePedidos"
+                  [pageIndex]="pagePedidos"
+                  (page)="onPageChangePedidos($event)"
+                  class="bg-white rounded-xl shadow-md">
+                </mat-paginator>
+          </div>
+      } @else {
+        <div class="empty-state">
+          <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+          <h3 class="empty-title">No hay pedidos registrados</h3>
+          </div>
+            }
+    }

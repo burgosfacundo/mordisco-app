@@ -53,7 +53,7 @@
                 }
               </div>
               <span class="text-gray-600 text-sm ml-2">
-                ({{ restaurante.estrellas || 0 }} estrellas)
+                ({{calificacionPromedio1Dec() || 0 }} estrellas)
               </span>
             </div>
           </div>
@@ -125,19 +125,15 @@
         <button 
           [routerLink]="['/restaurante/horarios']"
           class="btn-primary">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M12 4v16m8-8H4" />
-          </svg>
-          Gestionar Horarios
+          Gestionar
         </button>
       </div>
 
-      @if (horariosDeAtencion && horariosDeAtencion.length > 0) {
+      @if (horariosDeAtencionPaginados && horariosDeAtencionPaginados.length > 0) {
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (horario of horariosDeAtencion; track horario.id) {
+          @for (horario of horariosDeAtencionPaginados; track horario.id) {
             <li class="fade-in">
-              <app-horario-restaurante-component 
+              <app-horario-restaurante-component
                 [horario]="horario">
               </app-horario-restaurante-component>
             </li>
@@ -179,12 +175,12 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M12 4v16m8-8H4" />
           </svg>
-          Agregar Promoción
+          Agregar
         </button>
       </div>
 
       @if (promociones && promociones.length > 0) {
-        <ul class="grid-promociones">
+        <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
           @for (promocion of promociones; track promocion.id) {
             <li class="fade-in">
               <app-promocion-card-component

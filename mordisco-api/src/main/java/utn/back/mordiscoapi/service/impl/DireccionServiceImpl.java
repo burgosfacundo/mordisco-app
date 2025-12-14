@@ -48,19 +48,43 @@ public class DireccionServiceImpl implements IDireccionService {
         Usuario u = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("Usuario no autenticado"));
 
+        // Validar que no exista una dirección duplicada
+        boolean existeDuplicada = direccionRepository.findAllByUsuarioId(u.getId())
+                .stream()
+                .anyMatch(d ->
+                        d.getCalle().equalsIgnoreCase(dto.calle()) &&
+                        d.getNumero().equals(dto.numero()) &&
+                        java.util.Objects.equals(d.getPiso(), dto.piso()) &&
+                        java.util.Objects.equals(d.getDepto(), dto.depto()) &&
+                        d.getCiudad().equalsIgnoreCase(dto.ciudad()) &&
+                        d.getCodigoPostal().equals(dto.codigoPostal())
+                );
+
+        if (existeDuplicada) {
+            StringBuilder mensaje = new StringBuilder("Ya tienes una dirección registrada en ");
+            mensaje.append(dto.calle()).append(" ").append(dto.numero());
+            if (dto.piso() != null && !dto.piso().isEmpty()) {
+                mensaje.append(", Piso ").append(dto.piso());
+                if (dto.depto() != null && !dto.depto().isEmpty()) {
+                    mensaje.append(" ").append(dto.depto());
+                }
+            }
+            mensaje.append(", ").append(dto.ciudad());
+            throw new BadRequestException(mensaje.toString());
+        }
+
         Direccion d = DireccionMapper.fromCreateDTO(dto);
         d.setUsuario(u);
 
-        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
-                .ifPresent(latLng -> {
-                    d.setLatitud(latLng.lat());
-                    d.setLongitud(latLng.lng());
-                });
+        // Geocodificar la dirección
+        var coordenadas = geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal());
 
-        if (d.getLatitud() == null || d.getLongitud() == null) {
-            throw new BadRequestException("La dirección es incorrecta");
+        if (coordenadas.isEmpty()) {
+            throw new BadRequestException("No se pudo encontrar la dirección ingresada. Por favor, verifique que la calle, número, ciudad y código postal sean correctos.");
         }
 
+        d.setLatitud(coordenadas.get().lat());
+        d.setLongitud(coordenadas.get().lng());
 
         direccionRepository.save(d);
         return DireccionMapper.toDTO(d);
@@ -81,17 +105,45 @@ public class DireccionServiceImpl implements IDireccionService {
             throw new BadRequestException("No tienes permiso para modificar esta dirección");
         }
 
-        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
-                .ifPresent(latLng -> {
-                    d.setLatitud(latLng.lat());
-                    d.setLongitud(latLng.lng());
-                });
+        // Validar que no exista una dirección duplicada (excluyendo la actual)
+        boolean existeDuplicada = direccionRepository.findAllByUsuarioId(usuario.getId())
+                .stream()
+                .filter(dir -> !dir.getId().equals(id)) // Excluir la dirección actual
+                .anyMatch(dir ->
+                        dir.getCalle().equalsIgnoreCase(dto.calle()) &&
+                        dir.getNumero().equals(dto.numero()) &&
+                        java.util.Objects.equals(dir.getPiso(), dto.piso()) &&
+                        java.util.Objects.equals(dir.getDepto(), dto.depto()) &&
+                        dir.getCiudad().equalsIgnoreCase(dto.ciudad()) &&
+                        dir.getCodigoPostal().equals(dto.codigoPostal())
+                );
 
-        if (d.getLatitud() == null || d.getLongitud() == null) {
-            throw new BadRequestException("La dirección es incorrecta");
+        if (existeDuplicada) {
+            StringBuilder mensaje = new StringBuilder("Ya tienes otra dirección registrada en ");
+            mensaje.append(dto.calle()).append(" ").append(dto.numero());
+            if (dto.piso() != null && !dto.piso().isEmpty()) {
+                mensaje.append(", Piso ").append(dto.piso());
+                if (dto.depto() != null && !dto.depto().isEmpty()) {
+                    mensaje.append(" ").append(dto.depto());
+                }
+            }
+            mensaje.append(", ").append(dto.ciudad());
+            throw new BadRequestException(mensaje.toString());
         }
 
+        // Aplicar los cambios del DTO antes de geocodificar
         DireccionMapper.applyUpdate(dto, d);
+
+        // Geocodificar con los nuevos valores
+        var coordenadas = geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal());
+
+        if (coordenadas.isEmpty()) {
+            throw new BadRequestException("No se pudo encontrar la dirección ingresada. Por favor, verifique que la calle, número, ciudad y código postal sean correctos.");
+        }
+
+        d.setLatitud(coordenadas.get().lat());
+        d.setLongitud(coordenadas.get().lng());
+
         direccionRepository.save(d);
         return DireccionMapper.toDTO(d);
 

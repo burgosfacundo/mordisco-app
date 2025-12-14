@@ -6,6 +6,7 @@ import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.entity.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @UtilityClass
 public class PedidoMapper {
@@ -30,6 +31,7 @@ public class PedidoMapper {
                     .build();
 
             return ProductoPedido.builder()
+                    .precioUnitario(productoPedidoDTO.precioUnitario())
                     .producto(producto)
                     .cantidad(productoPedidoDTO.cantidad())
                     .build();
@@ -52,6 +54,9 @@ public class PedidoMapper {
     public static PedidoResponseDTO toDTO(Pedido pedido) {
         var usuario = UsuarioMapper.toUsuarioPedidoDTO(pedido.getCliente());
         var restaurante = RestauranteMapper.toRestaurantePedidoDTO(pedido.getRestaurante());
+        var repartidor = Optional.ofNullable(pedido.getRepartidor())
+                .map(RepartidorMapper::toRepartidorBasicDTO)
+                .orElse(null);
         var productos = pedido.getItems().stream()
                 .map(ProductoPedidoMapper::toDTO)
                 .toList();
@@ -68,7 +73,16 @@ public class PedidoMapper {
                 pedido.getFechaHora(),
                 pedido.getTotal(),
                 direccionEntrega,
-                pedido.getDireccionSnapshot()
+                pedido.getDireccionSnapshot(),
+                pedido.getCostoDelivery(),
+                pedido.getDistanciaKm(),
+                pedido.getSubtotalProductos(),
+                repartidor,
+                pedido.getBajaLogica(),
+                pedido.getMotivoBaja(),
+                pedido.getFechaBaja(),
+                pedido.getEstadoAntesDeCancelado(),
+                pedido.getPin()
                 );
     }
 }

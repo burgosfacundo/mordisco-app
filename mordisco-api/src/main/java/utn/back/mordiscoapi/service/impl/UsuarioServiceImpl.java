@@ -3,9 +3,11 @@ package utn.back.mordiscoapi.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,9 +17,14 @@ import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.config.AppProperties;
+import utn.back.mordiscoapi.event.auth.CuentaBloqueadaEvent;
+import utn.back.mordiscoapi.event.auth.PasswordChangedEvent;
+import utn.back.mordiscoapi.event.auth.PasswordResetRequestedEvent;
+import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.mapper.UsuarioMapper;
 import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
 import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.RolRepository;
@@ -40,6 +47,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     private final AuthUtils authUtils;
     private final AppProperties appProperties;
     private final IEmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
     final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
@@ -52,7 +60,9 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         if (!rolRepository.existsById(dto.rolId())){
             throw new NotFoundException("Rol no encontrado");
         }
-        repository.save(UsuarioMapper.toUsuario(dto));
+        var user = UsuarioMapper.toUsuario(dto);
+        user.setBajaLogica(false);
+        repository.save(user);
     }
 
     /**
@@ -127,28 +137,125 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     }
 
     /**
-     * Elimina un usuario por su ID.
-     * @param id el ID del usuario a eliminar.
-     * @throws NotFoundException si el usuario no se encuentra.
+     * Elimina un usuario validando que no tenga pedidos activos
+     *
+     * @param id del usuario a eliminar
+     * @throws NotFoundException si no se encuentra el usuario
+     * @throws BadRequestException si el usuario tiene pedidos activos
+     */
+    @Transactional
+    @Override
+    public void delete(Long id) throws NotFoundException, BadRequestException {
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        long pedidosActivos = repository.countPedidosActivosComoCliente(id);
+
+        if (pedidosActivos > 0) {
+            String mensaje = String.format(
+                    "No se puede bloquear la cuenta. El usuario tiene %d pedido%s activo%s. " +
+                            "Debe esperar a que se completen o cancelarlos antes de bloquear la cuenta.",
+                    pedidosActivos,
+                    pedidosActivos == 1 ? "" : "s",
+                    pedidosActivos == 1 ? "" : "s"
+            );
+
+            throw new BadRequestException(mensaje);
+        }
+
+        // Baja lógica - bloqueo por administrador
+        usuario.setBajaLogica(true);
+        usuario.setFechaBaja(java.time.LocalDateTime.now());
+        usuario.setMotivoBaja("Bloqueado por administrador");
+        repository.save(usuario);
+    }
+
+    /**
+     *  Obtiene los pedidos activos de un usuario como cliente
      */
     @Override
-    public void delete(Long id) throws NotFoundException {
-        if(!repository.existsById(id)){
+    public Page<PedidoResponseDTO> getPedidosActivosComoCliente(Long usuarioId, int page, int size)
+            throws NotFoundException {
+
+        if (!repository.existsById(usuarioId)) {
             throw new NotFoundException("Usuario no encontrado");
         }
-        repository.deleteById(id);
+
+        Pageable pageable = PageRequest.of(page, size);
+        return repository.findPedidosActivosComoCliente(usuarioId, pageable)
+                .map(PedidoMapper::toDTO);
     }
 
     @Override
     public void deleteMe() throws NotFoundException, BadRequestException {
-        var userAuthenticated = authUtils.getUsuarioAutenticado()
+        Usuario usuario = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("No autenticado"));
 
-        if(!repository.existsById(userAuthenticated.getId())){
-            throw new NotFoundException("Usuario no encontrado");
+        // Validar pedidos activos según el rol
+        if (usuario.getRol() != null) {
+            String rolNombre = usuario.getRol().getNombre();
+            long pedidosActivos = 0;
+            String mensajeError = "";
+
+            switch (rolNombre) {
+                case "ROLE_CLIENTE":
+                    pedidosActivos = repository.countPedidosActivosComoCliente(usuario.getId());
+                    if (pedidosActivos > 0) {
+                        mensajeError = String.format(
+                                "No se puede eliminar la cuenta. Tienes %d pedido%s activo%s como cliente. " +
+                                        "Debes esperar a que se completen o cancelarlos antes de eliminar tu cuenta.",
+                                pedidosActivos,
+                                pedidosActivos == 1 ? "" : "s",
+                                pedidosActivos == 1 ? "" : "s"
+                        );
+                    }
+                    break;
+                case "ROLE_REPARTIDOR":
+                    pedidosActivos = repository.countPedidosActivosComoRepartidor(usuario.getId());
+                    if (pedidosActivos > 0) {
+                        mensajeError = String.format(
+                                "No se puede eliminar la cuenta. Tienes %d pedido%s activo%s asignado%s como repartidor. " +
+                                        "Debes esperar a que se completen o sean reasignados antes de eliminar tu cuenta.",
+                                pedidosActivos,
+                                pedidosActivos == 1 ? "" : "s",
+                                pedidosActivos == 1 ? "" : "s",
+                                pedidosActivos == 1 ? "" : "s"
+                        );
+                    }
+                    break;
+                case "ROLE_RESTAURANTE":
+                    pedidosActivos = repository.countPedidosActivosDeRestaurante(usuario.getId());
+                    if (pedidosActivos > 0) {
+                        mensajeError = String.format(
+                                "No se puede eliminar la cuenta. Tu restaurante tiene %d pedido%s activo%s. " +
+                                        "Debes esperar a que se completen o cancelarlos antes de eliminar tu cuenta.",
+                                pedidosActivos,
+                                pedidosActivos == 1 ? "" : "s",
+                                pedidosActivos == 1 ? "" : "s"
+                        );
+                    }
+                    break;
+                // ROLE_ADMIN y otros roles no requieren validación
+            }
+
+            if (pedidosActivos > 0) {
+                throw new BadRequestException(mensajeError);
+            }
         }
 
-        repository.deleteById(userAuthenticated.getId());
+        // Baja lógica en lugar de eliminación física
+        usuario.setBajaLogica(true);
+        usuario.setFechaBaja(java.time.LocalDateTime.now());
+        usuario.setMotivoBaja("Eliminación solicitada por el usuario");
+
+        // Si el usuario tiene rol RESTAURANTE, desactivar el restaurante
+        if (usuario.getRol() != null && "ROLE_RESTAURANTE".equals(usuario.getRol().getNombre())) {
+            if (usuario.getRestaurante() != null) {
+                usuario.getRestaurante().setActivo(false);
+            }
+        }
+
+        repository.save(usuario);
     }
 
     /**
@@ -171,8 +278,12 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         }
 
         usuario.setPassword(passwordEncoder.encode(dto.newPassword()));
+        repository.save(usuario);
+        
+        // Publicar evento de cambio de contraseña
         String loginLink = appProperties.getFrontendUrl() + "/login";
-        emailService.sendPasswordChangeAlertEmail(usuario.getEmail(), usuario.getNombre(), loginLink);
+        eventPublisher.publishEvent(new PasswordChangedEvent(
+                usuario.getId(), usuario.getEmail(), usuario.getNombre(), loginLink));
     }
 
     /**
@@ -217,14 +328,11 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         // Construir URL de recuperación
         String resetUrl = appProperties.getFrontendUrl() + "/reset-password?token=" + recoveryToken;
 
-        // Enviar email
-        emailService.sendPasswordResetEmail(
-                usuario.getEmail(),
-                usuario.getNombre(),
-                resetUrl
-        );
+        // Publicar evento de solicitud de reset de contraseña
+        eventPublisher.publishEvent(new PasswordResetRequestedEvent(
+                usuario.getId(), usuario.getEmail(), usuario.getNombre(), resetUrl));
 
-        log.info("📧 Email de recuperación enviado a: {}", usuario.getEmail());
+        log.info("📧 Evento de recuperación publicado para: {}", usuario.getEmail());
     }
 
     /**
@@ -249,20 +357,122 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         usuario.setPassword(passwordEncoder.encode(dto.newPassword()));
         repository.save(usuario);
 
-        // Enviar email de confirmación
-        try {
-            String loginLink = appProperties.getFrontendUrl() + "/login";
-
-            emailService.sendPasswordChangeAlertEmail(
-                    usuario.getEmail(),
-                    usuario.getNombre(),
-                    loginLink
-            );
-        } catch (Exception e) {
-            log.warn("No se pudo enviar email de confirmación: {}", e.getMessage());
-        }
+        // Publicar evento de cambio de contraseña
+        String loginLink = appProperties.getFrontendUrl() + "/login";
+        eventPublisher.publishEvent(new PasswordChangedEvent(
+                usuario.getId(), usuario.getEmail(), usuario.getNombre(), loginLink));
 
         log.info("✅ Contraseña restablecida para: {}", email);
+    }
+
+    /**
+     * Da de baja lógicamente a un usuario
+     * Valida que no tenga pedidos activos según su rol
+     * Si el usuario tiene rol RESTAURANTE, también desactiva el restaurante
+     */
+    @Transactional
+    @Override
+    public void darDeBaja(Long usuarioId, String motivo) throws NotFoundException, BadRequestException {
+        Usuario usuario = repository.findById(usuarioId)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        // Validar pedidos activos según el rol
+        if (usuario.getRol() != null) {
+            String rolNombre = usuario.getRol().getNombre();
+            long pedidosActivos = 0;
+            String tipoUsuario = switch (rolNombre) {
+                case "ROLE_CLIENTE" -> {
+                    pedidosActivos = repository.countPedidosActivosComoCliente(usuarioId);
+                    yield "cliente";
+                }
+                case "ROLE_REPARTIDOR" -> {
+                    pedidosActivos = repository.countPedidosActivosComoRepartidor(usuarioId);
+                    yield "repartidor";
+                }
+                case "ROLE_RESTAURANTE" -> {
+                    pedidosActivos = repository.countPedidosActivosDeRestaurante(usuarioId);
+                    yield "restaurante";
+                    // ROLE_ADMIN y otros roles no requieren validación
+                }
+                default -> "";
+            };
+
+            if (pedidosActivos > 0) {
+                String mensaje = String.format(
+                        "No se puede bloquear la cuenta. El %s tiene %d pedido%s activo%s. " +
+                                "Debe esperar a que se completen o cancelarlos antes de bloquear la cuenta.",
+                        tipoUsuario,
+                        pedidosActivos,
+                        pedidosActivos == 1 ? "" : "s",
+                        pedidosActivos == 1 ? "" : "s"
+                );
+                throw new BadRequestException(mensaje);
+            }
+        }
+
+        usuario.setBajaLogica(true);
+        usuario.setMotivoBaja(motivo);
+        usuario.setFechaBaja(java.time.LocalDateTime.now());
+
+        // Si el usuario tiene rol RESTAURANTE, desactivar el restaurante
+        if (usuario.getRol() != null && "ROLE_RESTAURANTE".equals(usuario.getRol().getNombre())) {
+            if (usuario.getRestaurante() != null) {
+                usuario.getRestaurante().setActivo(false);
+            }
+        }
+
+        repository.save(usuario);
+
+        // Publicar evento de cuenta bloqueada
+        eventPublisher.publishEvent(new CuentaBloqueadaEvent(
+                usuario.getId(), usuario.getEmail(), usuario.getNombre(), motivo));
+    }
+
+    /**
+     * Reactiva un usuario dado de baja
+     * Si el usuario tiene rol RESTAURANTE, también activa el restaurante
+     */
+    @Transactional
+    @Override
+    public void reactivar(Long usuarioId) throws NotFoundException {
+        Usuario usuario = repository.findById(usuarioId)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        usuario.setBajaLogica(false);
+        usuario.setMotivoBaja(null);
+        usuario.setFechaBaja(null);
+
+        // Si el usuario tiene rol RESTAURANTE, activar el restaurante
+        if (usuario.getRol() != null && "ROLE_RESTAURANTE".equals(usuario.getRol().getNombre())) {
+            if (usuario.getRestaurante() != null) {
+                usuario.getRestaurante().setActivo(true);
+            }
+        }
+
+        repository.save(usuario);
+    }
+
+    @Override
+    public Page<UsuarioCardDTO> filtrarUsuarios(
+            int pageNo, int pageSize,
+            String search,
+            String bajaLogica,
+            String rol) {
+
+        // Convertir String a Boolean para bajaLogica
+        Boolean bajaLogicaBoolean = null;
+        if (bajaLogica != null && !bajaLogica.isBlank()) {
+            bajaLogicaBoolean = bajaLogica.equals("1"); // "1" = true (bloqueado), "0" = false (activo)
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return repository.filtrarUsuario(
+                search,
+                bajaLogicaBoolean,
+                rol,
+                pageable
+        ).map(UsuarioMapper::toUsuarioCardDTO);
     }
 }
 

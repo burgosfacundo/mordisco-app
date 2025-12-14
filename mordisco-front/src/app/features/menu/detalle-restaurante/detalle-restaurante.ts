@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RestauranteService } from '../../../shared/services/restaurante/restaurante-service';
@@ -12,6 +11,7 @@ import RestauranteResponse from '../../../shared/models/restaurante/restaurante-
 import MenuResponse from '../../../shared/models/menu/menu-response';
 import ProductoResponse from '../../../shared/models/producto/producto-response';
 import { ProductoCardWithAdd } from '../../../shared/components/producto-card-with-add/producto-card-with-add';
+import { ToastService } from '../../../core/services/toast-service';
 
 @Component({
   selector: 'app-restaurante-detalle-page',
@@ -27,7 +27,7 @@ import { ProductoCardWithAdd } from '../../../shared/components/producto-card-wi
 export class RestauranteDetallePage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
   private restauranteService = inject(RestauranteService);
   private menuService = inject(MenuService);
   private productoService = inject(ProductoService);
@@ -37,12 +37,14 @@ export class RestauranteDetallePage implements OnInit {
   menu = signal<MenuResponse | null>(null);
   productos = signal<ProductoResponse[]>([]);
   isLoading = signal(true);
+  adminMode = false
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+    this.adminMode = this.router.url.includes('/admin/restaurante/');
     
     if (!id) {
-      this.snackBar.open('ID de restaurante inválido', 'Cerrar', { duration: 3000 });
+      this.toastService.success('ID de restaurante inválido');
       this.router.navigate(['/home']);
       return;
     }
@@ -56,9 +58,7 @@ export class RestauranteDetallePage implements OnInit {
         this.restaurante.set(restaurante);
         this.cargarMenu(restaurante.id);
       },
-      error: (error) => {
-        console.error('Error al cargar restaurante:', error);
-        this.snackBar.open('Error al cargar el restaurante', 'Cerrar', { duration: 3000 });
+      error: () => {
         this.router.navigate(['/home']);
         this.isLoading.set(false);
       }
@@ -71,8 +71,7 @@ export class RestauranteDetallePage implements OnInit {
         this.menu.set(menu);
         this.cargarProductos(menu.id);
       },
-      error: (error) => {
-        console.error('Error al cargar menú:', error);
+      error: () => {
         this.isLoading.set(false);
       }
     });
@@ -85,8 +84,7 @@ export class RestauranteDetallePage implements OnInit {
         this.productos.set(productosDisponibles);
         this.isLoading.set(false);
       },
-      error: (error) => {
-        console.error('Error al cargar productos:', error);
+      error: () => {
         this.isLoading.set(false);
       }
     });
@@ -103,17 +101,17 @@ export class RestauranteDetallePage implements OnInit {
         nombre: producto.nombre,
         descripcion: producto.descripcion,
         precio: producto.precio,
+        precioConDescuento: producto.precioConDescuento, // Incluir precio con descuento
         imagen: producto.imagen,
         restauranteId: restaurante.id,
         restauranteNombre: restaurante.razonSocial,
         disponible: producto.disponible
       });
 
-      this.snackBar.open(`✅ ${producto.nombre} agregado al carrito`, 'Cerrar', { 
-        duration: 2000 
-      });
+      this.toastService.success(`✅ ${producto.nombre} agregado al carrito`);
     } catch (error: any) {
-      this.snackBar.open(error.message, 'Cerrar', { duration: 4000 });
+      // Mostrar mensaje de advertencia con mejor UX
+      this.toastService.warning(error.message || 'No se pudo agregar el producto al carrito');
     }
   }
 
@@ -123,5 +121,10 @@ export class RestauranteDetallePage implements OnInit {
 
   irAlCarrito(): void {
     this.router.navigate(['/cliente/carrito']);
+  }
+
+  calificacionPromedio1Dec(): number {
+    const prom = this.restaurante()?.estrellas;
+    return prom ? Number(prom.toFixed(1)) : 0;
   }
 }

@@ -1,12 +1,17 @@
 package utn.back.mordiscoapi.service.interf;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface IPedidoService {
     MercadoPagoPreferenceResponse save(PedidoRequestDTO dto) throws NotFoundException, BadRequestException;
@@ -19,4 +24,23 @@ public interface IPedidoService {
     Page<PedidoResponseDTO> findAllByCliente_Id(int pageNo,int pageSize,Long idCliente) throws NotFoundException;
     Page<PedidoResponseDTO> findAllByRestaurante_IdAndEstado(int pageNo,int pageSize,Long idRestaurante, EstadoPedido estado) throws NotFoundException;
     void cancelarPedido(Long id) throws NotFoundException, BadRequestException;
+
+    @Transactional
+    void asignarRepartidor(Long pedidoId, Long repartidorId)
+            throws NotFoundException, BadRequestException;
+
+    @Transactional
+    void marcarComoEntregado(Long pedidoId, Long repartidorId)
+            throws NotFoundException, BadRequestException;
+
+    Page<PedidoResponseDTO> getPedidosDisponiblesParaRepartidor(
+            Double latitud, Double longitud, int page, int size);
+
+    PedidoResponseDTO getPedidoActivoRepartidor(Long id) throws NotFoundException, BadRequestException;
+    void darDeBaja(Long pedidoId, String motivo) throws NotFoundException;
+    void reactivar(Long pedidoId) throws NotFoundException;
+    Page<PedidoResponseDTO> filtrarPedidos(int pageNo,int pageSize,String estado, String tipoEntrega, String fechaInicio, String fechaFin,String variable) throws NotFoundException;
+    Page<PedidoResponseDTO> filtrarPedidosRestaurantes (int pageNo, int pageSize, Long id, String estado, String tipoEntrega, String fechaInicio, String fechaFin, String variable) throws NotFoundException;
+    Page<PedidoResponseDTO> filtrarPedidosCliente (int pageNo,int pageSize,Long id,String estado, String tipoEntrega, String fechaInicio, String fechaFin,String variable) throws NotFoundException;
+    Page<PedidoResponseDTO> filtrarPedidosRepartidor (int pageNo,int pageSize,Long id, String estado, String fechaInicio, String fechaFin,String variable) throws NotFoundException;
 }

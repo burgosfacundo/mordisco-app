@@ -1,10 +1,13 @@
 import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { DireccionFormComponent } from '../direccion-form-component/direccion-form-component';
 import { DireccionCardComponent } from '../direccion-card-component/direccion-card-component';
 import { DireccionService } from '../../services/direccion-service';
 import DireccionResponse from '../../../../shared/models/direccion/direccion-response';
+import { ToastService } from '../../../../core/services/toast-service';
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
+import { CarritoFlotanteComponent } from '../../../../shared/components/carrito-flotante-component/carrito-flotante-component';
 
 @Component({
   selector: 'app-my-address-page',
@@ -12,13 +15,15 @@ import DireccionResponse from '../../../../shared/models/direccion/direccion-res
   imports: [
     CommonModule,
     DireccionFormComponent,
-    DireccionCardComponent
+    DireccionCardComponent,
+    CarritoFlotanteComponent
   ],
   templateUrl: './my-address-page.html'
 })
 export class MyAddressPage implements OnInit {
   private direccionService = inject(DireccionService);
-  private snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
+  private dialog = inject(MatDialog);
 
   @ViewChild('direccionForm') direccionFormComponent?: DireccionFormComponent;
 
@@ -38,9 +43,7 @@ export class MyAddressPage implements OnInit {
         this.direcciones.set(direcciones);
         this.isLoading.set(false);
       },
-      error: (error) => {
-        console.error('Error al cargar direcciones:', error);
-        this.snackBar.open('❌ Error al cargar las direcciones', 'Cerrar', { duration: 3000 });
+      error: () => {
         this.isLoading.set(false);
       }
     });
@@ -65,24 +68,25 @@ export class MyAddressPage implements OnInit {
   }
 
   eliminarDireccion(id: number): void {
-    if (!confirm('¿Estás seguro de eliminar esta dirección?')) {
-      return;
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro de eliminar esta dirección?' }
+    });
 
-    this.direccionService.delete(id).subscribe({
-      next: () => {
-        this.snackBar.open('✅ Dirección eliminada correctamente', 'Cerrar', { duration: 3000 });
-        
-        if (this.direccionParaEditar()?.id === id) {
-          this.handleCancelEdit();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== true) return;
+
+      this.direccionService.delete(id).subscribe({
+        next: () => {
+          this.toastService.success('✅ Dirección eliminada correctamente');
+          
+          if (this.direccionParaEditar()?.id === id) {
+            this.handleCancelEdit();
+          }
+          
+          this.cargarDirecciones();
         }
-        
-        this.cargarDirecciones();
-      },
-      error: (error) => {
-        console.error('Error al eliminar dirección:', error);
-        this.snackBar.open('❌ Error al eliminar la dirección', 'Cerrar', { duration: 4000 });
-      }
+      });
     });
   }
 

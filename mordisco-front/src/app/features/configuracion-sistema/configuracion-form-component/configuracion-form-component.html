@@ -1,0 +1,115 @@
+<form 
+    [formGroup]="configForm" 
+    (ngSubmit)="actualizarConfiguracion()" 
+    class="form-container"
+>
+    <fieldset class="form-field">
+        <label for="porcentajeGananciasRestauranteID" class="form-label">Porcentaje de ganancia para el restaurante (%)</label>
+        <input 
+            type="text" 
+            id="porcentajeGananciasRestauranteID" 
+            placeholder="Ingresa ganancia para el restaurante"
+            formControlName="porcentajeGananciasRestaurante" 
+            class="form-input"
+            [class.border-red-500]="getError('porcentajeGananciasRestaurante')"
+            [class.focus:ring-red-500]="getError('porcentajeGananciasRestaurante')"
+        >
+        @if (getError('porcentajeGananciasRestaurante')) {
+            <p class="form-error">{{ getError('porcentajeGananciasRestaurante') }}</p>
+        }
+    </fieldset>
+    <fieldset class="form-field">
+        <label for="radioMaximoEntregaID" class="form-label">Radio maximo de entrega (km)</label>
+        <input 
+            type="text" 
+            id="radioMaximoEntregaID" 
+            placeholder="Ingresa radio maximo de la entrega"
+            formControlName="radioMaximoEntrega" 
+            class="form-input"
+            [class.border-red-500]="getError('radioMaximoEntrega')"
+            [class.focus:ring-red-500]="getError('radioMaximoEntrega')"
+        >
+        @if (getError('radioMaximoEntrega')) {
+            <p class="form-error">{{ getError('radioMaximoEntrega') }}</p>
+        }
+    </fieldset>
+    <fieldset class="form-field">
+        <label for="costoBaseDeliveryID" class="form-label">Costo base de delivery ($)</label>
+        <input 
+            type="text" 
+            id="costoBaseDeliveryID" 
+            placeholder="Ingresa costo base del delivery"
+            formControlName="costoBaseDelivery" 
+            class="form-input"
+            [class.border-red-500]="getError('costoBaseDelivery')"
+            [class.focus:ring-red-500]="getError('costoBaseDelivery')"
+        >
+        @if (getError('costoBaseDelivery')) {
+            <p class="form-error">{{ getError('costoBaseDelivery') }}</p>
+        }
+    </fieldset>  
+    <fieldset class="form-field">
+        <label for="costoPorKilometroID" class="form-label">Costo por kilometro ($)</label>
+        <input 
+            type="text" 
+            id="costoPorKilometroID" 
+            placeholder="Ingresa costo por kilometro"
+            formControlName="costoPorKilometro" 
+            class="form-input"
+            [class.border-red-500]="getError('costoPorKilometro')"
+            [class.focus:ring-red-500]="getError('costoPorKilometro')"
+        >
+        @if (getError('costoPorKilometro')) {
+            <p class="form-error">{{ getError('costoPorKilometro') }}</p>
+        }
+    </fieldset>    
+    <fieldset class="form-field">
+        <label for="montoMinimoPedidoID" class="form-label">Monto minimo de pedido ($)</label>
+        <input 
+            type="text" 
+            id="montoMinimoPedidoID" 
+            placeholder="Ingresa monto minimo por pedido"
+            formControlName="montoMinimoPedido" 
+            class="form-input"
+            [class.border-red-500]="getError('montoMinimoPedido')"
+            [class.focus:ring-red-500]="getError('montoMinimoPedido')"
+        >
+        @if (getError('montoMinimoPedido')) {
+            <p class="form-error">{{ getError('montoMinimoPedido') }}</p>
+        }
+    </fieldset> 
+    <fieldset class="form-field">
+        <label for="porcentajeGananciasRepartidorID" class="form-label">Porcentaje de ganancias para el repartidor (%)</label>
+        <input 
+            type="text" 
+            id="porcentajeGananciasRepartidorID" 
+            placeholder="Ingresa porcentaje de ganancia para repartidor"
+            formControlName="porcentajeGananciasRepartidor" 
+            class="form-input"
+            [class.border-red-500]="getError('porcentajeGananciasRepartidor')"
+            [class.focus:ring-red-500]="getError('porcentajeGananciasRepartidor')"
+        >
+        @if (getError('porcentajeGananciasRepartidor')) {
+            <p class="form-error">{{ getError('porcentajeGananciasRepartidor') }}</p>
+        }
+    </fieldset>  
+
+    <!-- Botón de submit -->
+    <div style="margin-top: 24px;">
+        <button 
+            type="submit" 
+            [disabled]="configForm.invalid || isSubmitting()" 
+            class="form-button"
+        >
+            @if (isSubmitting()) {
+                <span class="inline-flex items-center justify-center gap-2">
+                    <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    Guardando...
+                </span>
+            } @else {
+                Guardar Cambios
+            }
+        </button>
+    </div>
+
+</form>

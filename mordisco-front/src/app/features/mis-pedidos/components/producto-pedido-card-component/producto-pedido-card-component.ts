@@ -1,4 +1,4 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import ProductoPedidoResponse from '../../../../shared/models/producto/producto-pedido-response';
 import { CommonModule } from '@angular/common';
 

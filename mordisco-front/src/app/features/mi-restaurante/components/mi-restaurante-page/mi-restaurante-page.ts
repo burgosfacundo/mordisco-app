@@ -1,7 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
-import CalificacionRestauranteReponse from '../../../../shared/models/calificacion/calificacion-restaurante-response';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { RestauranteService } from '../../../../shared/services/restaurante/restaurante-service';
 import { HorarioService } from '../../../../shared/services/horario/horario-service';
@@ -17,6 +16,9 @@ import { RestauranteFormComponent } from "../form-restaurante-component/form-res
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import CalificacionPedidoResponseDTO from '../../../../shared/models/calificacion/calificacion-pedido-response-dto';
+import { ToastService } from '../../../../core/services/toast-service';
+import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 
 @Component({
   selector: 'app-mi-restaurante-page',
@@ -28,51 +30,105 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
     PromocionCardComponent,
     CalificacionComponent,
     HorarioRestauranteComponent,
-    MatPaginator,
-    RestauranteFormComponent
-  ],
+    RestauranteFormComponent,
+    MatPaginator
+],
   templateUrl: './mi-restaurante-page.html'
 })
-export class MiRestaurantePageComponent implements OnInit {
+export class MiRestaurantePageComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private restauranteService = inject(RestauranteService);
   private horarioService = inject(HorarioService);
   private promocionService = inject(PromocionService);
   private calificacionService = inject(CalificacionService);
-  private snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
+  private dialog = inject(MatDialog);
   private router = inject(Router);
 
   restaurante?: RestauranteResponse;
-  calificaciones?: CalificacionRestauranteReponse[];
+  calificaciones?: CalificacionPedidoResponseDTO[];
   promociones?: PromocionResponse[];
   horariosDeAtencion?: HorarioAtencionResponse[];
+  horariosDeAtencionPaginados?: HorarioAtencionResponse[];
 
   // Paginación Promociones
-  sizePromocion: number = 5;
+  sizePromocion: number = this.getPageSizeForPromocion();
   pagePromocion: number = 0;
   lengthPromocion: number = 0;
 
   // Paginación Calificaciones
-  sizeCalificacion: number = 5;
+  sizeCalificacion: number = this.getPageSizeForCalificacion();
   pageCalificacion: number = 0;
   lengthCalificacion: number = 0;
 
   // Paginación Horarios
-  sizeHorario: number = 5;
+  sizeHorario: number = this.getPageSizeForCalificacion();
   pageHorario: number = 0;
   lengthHorario: number = 0;
 
   isLoadingRestaurante = true;
+  private eventListeners: (() => void)[] = [];
 
   ngOnInit(): void {
+    this.setupEventListeners();
     this.cargarRestaurante();
+  }
+
+  ngOnDestroy(): void {
+    this.eventListeners.forEach(cleanup => cleanup());
+  }
+
+  private getPageSizeForPromocion(): number {
+    const width = window.innerWidth;
+    if (width >= 1280) return 4;  // xl: 4 columnas
+    if (width >= 768) return 3;   // md: 3 columnas
+    if (width >= 640) return 2;   // sm: 2 columnas
+    return 1;                      // mobile: 1 columna
+  }
+
+  private getPageSizeForCalificacion(): number {
+    const width = window.innerWidth;
+    if (width >= 1024) return 3;  // lg
+    if (width >= 768) return 2;   // md
+    return 1;                      // mobile
+  }
+
+  private setupEventListeners(): void {
+    const resizeListener = () => {
+      const newSizePromocion = this.getPageSizeForPromocion();
+      const newSizeCalificacion = this.getPageSizeForCalificacion();
+
+      let needsReload = false;
+
+      if (newSizePromocion !== this.sizePromocion) {
+        this.sizePromocion = newSizePromocion;
+        this.pagePromocion = 0;
+        needsReload = true;
+      }
+
+      if (newSizeCalificacion !== this.sizeCalificacion) {
+        this.sizeCalificacion = newSizeCalificacion;
+        this.sizeHorario = newSizeCalificacion;
+        this.pageCalificacion = 0;
+        this.pageHorario = 0;
+        needsReload = true;
+      }
+
+      if (needsReload && this.restaurante?.id) {
+        this.cargarPromociones();
+        this.cargarCalificaciones();
+        this.paginarHorarios();
+      }
+    };
+
+    window.addEventListener('resize', resizeListener);
+    this.eventListeners.push(() => window.removeEventListener('resize', resizeListener));
   }
 
   private cargarRestaurante(): void {
     const userId = this.authService.currentUser()?.userId;
 
     if (!userId) {
-      this.snackBar.open('❌ No se encontró información del usuario', 'Cerrar', { duration: 3000 });
       this.authService.logout();
       return;
     }
@@ -101,7 +157,7 @@ export class MiRestaurantePageComponent implements OnInit {
     const idRestaurante = this.restaurante?.id;
     if (!idRestaurante) return;
 
-    this.calificacionService.getAllByRestauranteId(
+    this.calificacionService.getCalificacionesRestaurante(
       idRestaurante,
       this.pageCalificacion,
       this.sizeCalificacion
@@ -130,15 +186,32 @@ export class MiRestaurantePageComponent implements OnInit {
     if (!idRestaurante) return;
 
     this.horarioService.getAllByRestauranteId(
-      idRestaurante,
-      this.pageHorario,
-      this.sizeHorario
+      idRestaurante
     ).subscribe({
       next: (response) => {
-        this.horariosDeAtencion = response.content;
-        this.lengthHorario = response.totalElements;
+
+        const ordenDias = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+        this.horariosDeAtencion = response.sort((a, b) => {
+          return ordenDias.indexOf(a.dia) - ordenDias.indexOf(b.dia);
+        });
+        this.lengthHorario = this.horariosDeAtencion.length;
+        this.paginarHorarios();
       }
     });
+  }
+
+  private paginarHorarios(): void {
+    if (!this.horariosDeAtencion) return;
+
+    const start = this.pageHorario * this.sizeHorario;
+    const end = start + this.sizeHorario;
+    this.horariosDeAtencionPaginados = this.horariosDeAtencion.slice(start, end);
+  }
+
+  onPageChangeHorario(event: PageEvent): void {
+    this.pageHorario = event.pageIndex;
+    this.sizeHorario = event.pageSize;
+    this.paginarHorarios();
   }
 
   onEditarRestaurante(): void {
@@ -150,29 +223,24 @@ export class MiRestaurantePageComponent implements OnInit {
 
   onEliminarPromocion(promocionId: number): void {
     if (!promocionId || !this.restaurante?.id) {
-      this.snackBar.open('❌ Datos insuficientes para eliminar la promoción', 'Cerrar', { duration: 3000 });
       return;
     }
 
-    if (!confirm('¿Estás seguro de eliminar esta promoción?')) {
-      return;
-    }
-
-    this.promocionService.delete(this.restaurante.id, promocionId).subscribe({
-      next: () => {
-        this.snackBar.open('✅ Promoción eliminada correctamente', 'Cerrar', { duration: 3000 });
-        this.cargarPromociones();
-      },
-      error: () => {
-        this.snackBar.open('❌ Error al eliminar la promoción', 'Cerrar', { duration: 4000 });
-      }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { mensaje: '¿Estás seguro de eliminar esta promoción?' }
     });
-  }
 
-  onPageChangeHorario(event: PageEvent): void {
-    this.pageHorario = event.pageIndex;
-    this.sizeHorario = event.pageSize;
-    this.cargarHorarios();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== true) return;
+
+      this.promocionService.delete(this.restaurante!.id, promocionId).subscribe({
+        next: () => {
+          this.toastService.success('✅ Promoción eliminada correctamente');
+          this.cargarPromociones();
+        }
+      });
+    });
   }
 
   onPageChangePromocion(event: PageEvent): void {
@@ -185,5 +253,10 @@ export class MiRestaurantePageComponent implements OnInit {
     this.pageCalificacion = event.pageIndex;
     this.sizeCalificacion = event.pageSize;
     this.cargarCalificaciones();
+  }
+
+  calificacionPromedio1Dec(): number {
+    const prom = this.restaurante?.estrellas
+    return prom ? Number(prom.toFixed(1)) : 0;
   }
 }

@@ -5,6 +5,9 @@ import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.enums.TipoEntrega;
 import utn.back.mordiscoapi.model.dto.direccion.DireccionResponseDTO;
 import utn.back.mordiscoapi.model.dto.productoPedido.ProductoPedidoResponseDTO;
+import utn.back.mordiscoapi.model.dto.repartidor.RepartidorBasicDTO;
+import utn.back.mordiscoapi.model.dto.repartidor.RepartidorResponseDTO;
+import utn.back.mordiscoapi.model.dto.usuario.UsuarioResponseDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,10 +28,28 @@ public record PedidoResponseDTO(
     EstadoPedido estado,
     @Schema(description = "Fecha y hora del pedido", example = "2023-10-01T12:00:00")
     LocalDateTime fechaHora,
-    @Schema(description = "Total del pedido", example = "150.00")
+    @Schema(description = "Total del pedido (incluye delivery si aplica)", example = "150.00")
     BigDecimal total,
     @Schema(description = "Dirección de entrega del pedido")
     DireccionResponseDTO direccionEntrega,
-    String direccionSnapshot
+    String direccionSnapshot,
+    @Schema(description = "Costo del delivery", example = "300.00")
+    BigDecimal costoDelivery,
+    @Schema(description = "Distancia en kilómetros", example = "5.5")
+    BigDecimal distanciaKm,
+    @Schema(description = "Subtotal solo productos (sin delivery)", example = "120.00")
+    BigDecimal subtotalProductos,
+    @Schema(description = "Repartidor asigando")
+    RepartidorBasicDTO repartidor,
+    @Schema(description = "Indica si el pedido está dado de baja", example = "false")
+    Boolean bajaLogica,
+    @Schema(description = "Motivo de la baja lógica", example = "Violación de términos de servicio")
+    String motivoBaja,
+    @Schema(description = "Fecha de la baja lógica")
+    java.time.LocalDateTime fechaBaja,
+    @Schema(description = "Estado del pedido antes de ser cancelado por admin", example = "EN_PROCESO")
+    EstadoPedido estadoAntesDeCancelado,
+    @Schema(description = "Pin que debe entregar el cliente al respartidor", example = "AA13")
+    String pin
 ) {
 }

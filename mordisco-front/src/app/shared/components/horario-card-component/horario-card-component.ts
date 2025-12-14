@@ -1,4 +1,4 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 
 @Component({
@@ -22,6 +22,14 @@ export class HorarioCardComponent {
 
   getDiaNombre() : string {
     return this.DIAS[this.horario()!.dia] || this.horario()!.dia;
+  }
+
+  getDiaSiguiente(): string {
+    const diasOrden = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+    const diaActual = this.horario()!.dia;
+    const indexActual = diasOrden.indexOf(diaActual);
+    const indexSiguiente = (indexActual + 1) % 7;
+    return this.DIAS[diasOrden[indexSiguiente]];
   }
 
     formatHora(hora: string): string {

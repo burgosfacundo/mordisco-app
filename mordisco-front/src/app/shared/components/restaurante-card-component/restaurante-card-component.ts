@@ -1,36 +1,60 @@
-import { Component, inject, input, Input } from '@angular/core';
+import { Component, inject, input, OnInit, output } from '@angular/core';
 import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
 import HorarioAtencion from '../../models/horario/horario-atencion-request';
-import { Router } from '@angular/router';
+import { HorarioService } from '../../services/horario/horario-service';
+import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 
 
 @Component({
   selector: 'app-restaurante-card-component',
+
   imports: [],
   templateUrl: './restaurante-card-component.html'
 })
-export class RestauranteCardComponent {
+export class RestauranteCardComponent implements OnInit {
   restaurante = input<RestauranteForCard>()
-  private router : Router = inject(Router)
+  mostrarPromocion = input<boolean>(false)
+  listaHorarios : HorarioAtencionResponse [] = []
+  private haService = inject(HorarioService)
+  menuVer = output<number>();
+  verCalificaciones = output<number>()
+  adminMode = input<boolean>(false)
+
+  ngOnInit(): void {
+    this.getHorariosByRestaurante();
+  }
+
+  isAbierto(): boolean {
+    const h = this.getHorarioDeHoy();
+    if (!h) return false;
+    return this.isOpenNow(h);
+  }
 
   getHorarios(): string {
     const h = this.getHorarioDeHoy();
 
     if (!h) return 'Cerrado';
 
-    return this.isOpenNow(h)
-      ? `${this.formatHHmm(h.horaApertura)} - ${this.formatHHmm(h.horaCierre)}`
-      : 'Cerrado';
+    if (!this.isOpenNow(h)) return 'Cerrado';
+
+    return `${this.formatHHmm(h.horaApertura)} - ${this.formatHHmm(h.horaCierre)}`;
   }
 
-  isAbierto(){
-    return this.getHorarios() === 'Cerrado' ? false : true
+  getHorariosByRestaurante(){
+    if(this.restaurante()?.id){
+      this.haService.getAllByRestauranteId(this.restaurante()?.id!).subscribe({
+      next : (data) => this.listaHorarios=data,
+      error : (e)=>{
+        console.log("No se ha podido listar los horarios", e)
+      }
+      })
+    }
   }
 
   private getHorarioDeHoy(): HorarioAtencion | undefined {
     const dias = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     const dia = dias[new Date().getDay()];
-    return this.restaurante()?.horariosDeAtencion.find(h => h.dia === dia);
+    return this.listaHorarios.find(h => h.dia === dia);
   }
 
   private nowInMinutes(): number {
@@ -50,10 +74,13 @@ export class RestauranteCardComponent {
 
     if (open === close) return false;
 
-    if (close > open) return now >= open && now < close;
+    // Si cruza medianoche: abierto si ahora >= apertura O ahora < cierre
+    if (h.cruzaMedianoche) {
+      return now >= open || now < close;
+    }
 
-
-    return now >= open || now < close;
+    // Horario normal: abierto si ahora está entre apertura y cierre
+    return now >= open && now < close;
   }
 
   private formatHHmm(time: string): string {
@@ -61,7 +88,15 @@ export class RestauranteCardComponent {
     return `${h.padStart(2, '0')}:${(m ?? '00').padStart(2, '0')}`;
   }
 
-  verMenu(r : RestauranteForCard){
-    this.router.navigate(['/cliente/restaurante', r.id])
+  verMenu(){
+    if (this.restaurante()?.id) {
+      this.menuVer.emit(this.restaurante()!.id);
+    }
+  }
+
+  verCalif(){
+    if (this.restaurante()?.id && this.adminMode()) {
+      this.verCalificaciones.emit(this.restaurante()!.id);
+    }    
   }
 }

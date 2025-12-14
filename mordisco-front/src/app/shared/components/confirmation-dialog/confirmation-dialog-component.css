@@ -1,0 +1,184 @@
+.dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 16px;
+    }
+
+    .dialog-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      max-width: 400px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .dialog-header {
+      padding: 24px 24px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dialog-header-danger {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    }
+
+    .dialog-header-warning {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    }
+
+    .dialog-header-info {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    }
+
+    .dialog-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dialog-header-danger .dialog-icon {
+      background: #dc2626;
+      color: white;
+    }
+
+    .dialog-header-warning .dialog-icon {
+      background: #d97706;
+      color: white;
+    }
+
+    .dialog-header-info .dialog-icon {
+      background: #2563eb;
+      color: white;
+    }
+
+    .dialog-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0;
+    }
+
+    .dialog-body {
+      padding: 16px 24px 24px;
+    }
+
+    .dialog-message {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #4b5563;
+      margin: 0;
+    }
+
+    .dialog-footer {
+      padding: 16px 24px 24px;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn-cancel,
+    .btn-confirm {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-cancel {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .btn-cancel:hover {
+      background: #e5e7eb;
+    }
+
+    .btn-confirm {
+      color: white;
+    }
+
+    .btn-confirm-danger {
+      background: #dc2626;
+    }
+
+    .btn-confirm-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-confirm-warning {
+      background: #d97706;
+    }
+
+    .btn-confirm-warning:hover {
+      background: #b45309;
+    }
+
+    .btn-confirm-info {
+      background: #2563eb;
+    }
+
+    .btn-confirm-info:hover {
+      background: #1d4ed8;
+    }
+
+    @media (max-width: 640px) {
+      .dialog-container {
+        max-width: 100%;
+        margin: 0 16px;
+      }
+
+      .dialog-footer {
+        flex-direction: column-reverse;
+      }
+
+      .btn-cancel,
+      .btn-confirm {
+        width: 100%;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .dialog-overlay {
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .dialog-container {
+      animation: slideIn 0.2s ease-in-out;
+    }

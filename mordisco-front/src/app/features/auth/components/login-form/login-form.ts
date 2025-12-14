@@ -1,9 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ToastService } from '../../../../core/services/toast-service';
 
 @Component({
   selector: 'app-login-form',
@@ -15,11 +15,12 @@ export class LoginForm implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
   protected validationService = inject(FormValidationService);
 
   protected loginForm!: FormGroup;
 
+  showPassword = false;
   isSubmitting = signal(false);
 
   ngOnInit(): void {
@@ -43,20 +44,13 @@ export class LoginForm implements OnInit {
 
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
-        this.snackBar.open('✅ Inicio de sesión exitoso', 'Cerrar', { duration: 3000 });
-        
-   
+        this.toastService.success('Inicio de sesión exitoso');
+        this.isSubmitting.set(false);        
         setTimeout(() => {
           this.router.navigate(['/']);
         }, 100);
       },
       error: () => {
-        this.snackBar.open('❌ Email o contraseña incorrectos', 'Cerrar', { 
-          duration: 4000 
-        });
-        this.isSubmitting.set(false);
-      },
-      complete: () => {
         this.isSubmitting.set(false);
       }
     });
@@ -67,5 +61,9 @@ export class LoginForm implements OnInit {
       this.loginForm.get(fieldName),
       fieldName
     );
+  }
+  
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
   }
 }

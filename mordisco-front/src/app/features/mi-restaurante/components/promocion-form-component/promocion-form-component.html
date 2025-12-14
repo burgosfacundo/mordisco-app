@@ -34,24 +34,52 @@
         }
       </div>
 
-      <!-- Descuento -->
+      <!-- Tipo de Descuento-->
+      <div class="form-field">
+        <label for="tipoDescuento" class="form-label">
+          Tipo de Descuento *
+        </label>
+        <select
+          id="tipoDescuento"
+          formControlName="tipoDescuento"
+          class="form-input">
+          @for (tipo of tiposDescuento; track tipo) {
+            <option [ngValue]="tipo">
+              {{ tipo === 'PORCENTAJE' ? 'Porcentaje (%)' : 'Monto Fijo ($)' }}
+            </option>
+          }
+        </select>
+        <p class="text-xs text-gray-600 mt-1">
+          @if (promocionForm.get('tipoDescuento')?.value === 'PORCENTAJE') {
+            Ingresa un valor entre 1 y 100
+          } @else {
+            Ingresa el monto fijo a descontar
+          }
+        </p>
+      </div>
+
+      <!-- Descuento-->
       <div class="form-field">
         <label for="descuento" class="form-label">
-          Descuento (%) *
+          @if (promocionForm.get('tipoDescuento')?.value === 'PORCENTAJE') {
+            Porcentaje de Descuento (%) *
+          } @else {
+            Monto Fijo de Descuento ($) *
+          }
         </label>
         <div class="relative">
           <input
             id="descuento"
             type="number"
             formControlName="descuento"
-            min="1"
-            max="100"
+            [min]="1"
+            [max]="promocionForm.get('tipoDescuento')?.value === 'PORCENTAJE' ? 100 : null"
             step="0.01"
-            placeholder="Ej: 25"
+            [placeholder]="promocionForm.get('tipoDescuento')?.value === 'PORCENTAJE' ? 'Ej: 25' : 'Ej: 500'"
             class="form-input pr-12"
           >
           <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">
-            %
+            {{ promocionForm.get('tipoDescuento')?.value === 'PORCENTAJE' ? '%' : '$' }}
           </span>
         </div>
         @if (getError('descuento')) {
@@ -59,7 +87,89 @@
             {{ getError('descuento') }}
           </p>
         }
+
+        <!-- Advertencia de descuento alto -->
+        @if (showHighDiscountWarning) {
+          <div class="mt-2 p-3 bg-yellow-50 border border-yellow-300 rounded-lg flex items-start gap-2">
+            <svg class="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <p class="text-sm text-yellow-800">{{ highDiscountWarningMessage }}</p>
+          </div>
+        }
+
+        <!-- Hint cuando productos no cargados -->
+        @if (promocionForm.get('tipoDescuento')?.value === 'MONTO_FIJO' && productos.length === 0) {
+          <p class="text-xs text-gray-500 mt-1">
+            <svg class="inline w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            Cargando productos del menú para validar el monto...
+          </p>
+        }
       </div>
+
+      <!-- Alcance -->
+      <div class="form-field">
+        <label for="alcance" class="form-label">
+          Alcance de la Promoción *
+        </label>
+        <select
+          id="alcance"
+          formControlName="alcance"
+          class="form-input">
+          @for (alcance of alcancesPromocion; track alcance) {
+            <option [ngValue]="alcance">
+              {{ alcance === 'TODO_MENU' ? 'Todo el Menú' : 'Productos Específicos' }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <!-- Selector de Productos (solo si es PRODUCTOS_ESPECIFICOS) -->
+      @if (promocionForm.get('alcance')?.value === AlcancePromocion.PRODUCTOS_ESPECIFICOS) {
+        <div class="form-field">
+          <label class="form-label">
+            Seleccionar Productos *
+          </label>
+          <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
+            @if (productos.length === 0) {
+              <p class="text-gray-500 text-sm text-center py-4">
+                No hay productos disponibles
+              </p>
+            } @else {
+              <div class="space-y-2">
+                @for (producto of productos; track producto.id) {
+                  <label class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      [checked]="isProductoSeleccionado(producto.id)"
+                      (change)="toggleProducto(producto.id)"
+                      class="w-4 h-4 text-primary-600 bg-white border-gray-300 rounded focus:ring-primary-500">
+                    <div class="flex-1 flex items-center gap-3">
+                      @if (producto.imagen.url) {
+                        <img 
+                          [src]="producto.imagen.url" 
+                          [alt]="producto.nombre"
+                          class="w-12 h-12 object-cover rounded">
+                      }
+                      <div class="flex-1">
+                        <p class="font-medium text-gray-900">{{ producto.nombre }}</p>
+                        <p class="text-sm text-gray-600">${{ producto.precio | number:'1.2-2' }}</p>
+                      </div>
+                    </div>
+                  </label>
+                }
+              </div>
+            }
+          </div>
+          @if (productosSeleccionados.size === 0 && promocionForm.get('alcance')?.value === AlcancePromocion.PRODUCTOS_ESPECIFICOS) {
+            <p class="form-error mt-2">
+              Debes seleccionar al menos un producto
+            </p>
+          }
+        </div>
+      }
 
       <!-- Fecha Inicio -->
       <div class="form-field">
@@ -67,13 +177,15 @@
           Fecha de Inicio *
         </label>
         <mat-form-field appearance="outline" class="w-full">
-          <input 
-            matInput 
+          <input
+            matInput
             [matDatepicker]="pickerInicio"
+            [min]="minDate"
+            [max]="maxFechaInicio || undefined"
             formControlName="fechaInicio"
             placeholder="Selecciona una fecha">
-          <mat-datepicker-toggle 
-          matIconSuffix 
+          <mat-datepicker-toggle
+          matIconSuffix
           [for]="pickerInicio"
           ></mat-datepicker-toggle>
           <mat-datepicker #pickerInicio></mat-datepicker>
@@ -91,9 +203,10 @@
           Fecha de Fin *
         </label>
         <mat-form-field appearance="outline" class="w-full">
-          <input 
-            matInput 
+          <input
+            matInput
             [matDatepicker]="pickerFin"
+            [min]="minFechaFin || minDate"
             formControlName="fechaFin"
             placeholder="Selecciona una fecha">
           <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
@@ -116,7 +229,7 @@
         </button>
         <button 
           type="submit"
-          [disabled]="isSubmitting"
+          [disabled]="isSubmitting || !promocionForm.valid || (promocionForm.get('alcance')?.value === AlcancePromocion.PRODUCTOS_ESPECIFICOS && productosSeleccionados.size === 0)"
           class="btn-primary flex-1 order-1 sm:order-2">
           @if (isSubmitting) {
             <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">

@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
+import utn.back.mordiscoapi.mapper.UsuarioMapper;
 import utn.back.mordiscoapi.model.dto.auth.RecoverPasswordDTO;
 import utn.back.mordiscoapi.model.dto.auth.ResetPasswordDTO;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
 
@@ -163,25 +167,59 @@ public class UsuarioController {
     }
 
     /**
-     * Función para eliminar un usuario por su ID.
-     * @param id del usuario a eliminar.
-     * @return Respuesta HTTP con un mensaje de éxito.
-     * @throws NotFoundException Si no se encuentra el usuario con el ID proporcionado.
+     * Obtiene los pedidos activos de un usuario como cliente
      */
-    @Operation(summary = "Eliminar un usuario",
-            description = "Recibe un ID y elimina el usuario correspondiente." +
-                    "** El propio usuario autenticado puede borrar su información**")
+    @Operation(
+            summary = "Obtener pedidos activos del usuario",
+            description = "Retorna los pedidos en estado PENDIENTE, EN_PROCESO o EN_CAMINO del usuario. " +
+                    "Útil para saber por qué no se puede eliminar la cuenta. " +
+                    "**Rol necesario: Usuario propietario o ADMIN**"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204",description = "Usuario eliminado exitosamente"),
-            @ApiResponse(responseCode = "404", description = "No se encontró el usuario con el ID proporcionado"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "200", description = "Pedidos activos obtenidos exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
+    @GetMapping("/{id}/pedidos-activos")
+    public ResponseEntity<Page<PedidoResponseDTO>> getPedidosActivos(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) throws NotFoundException {
+
+        return ResponseEntity.ok(service.getPedidosActivosComoCliente(id, page, size));
+    }
+
+    /**
+     * Elimina un usuario por su ID
+     * Ahora valida que no tenga pedidos activos
+     */
+    @Operation(
+            summary = "Eliminar usuario por ID",
+            description = """
+            Elimina un usuario si no tiene pedidos activos.
+            **Validación:**
+            - No se puede eliminar si tiene pedidos en estado PENDIENTE, EN_PROCESO o EN_CAMINO
+            - Si la validación falla, retorna error 400 con la cantidad de pedidos activos
+            **Consideraciones:**
+            - Si es un restaurante, validar que no tenga pedidos activos en su restaurante
+            - Si es un cliente, validar que no tenga pedidos activos como comprador
+            **Rol necesario: Usuario propietario o ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Usuario eliminado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "400", description = "No se puede eliminar: tiene pedidos activos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.puedeAccederAUsuario(#id)")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable
-                                         Long id) throws NotFoundException {
+    public ResponseEntity<Void> delete(@PathVariable Long id)
+            throws NotFoundException, BadRequestException {
+
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
@@ -277,4 +315,92 @@ public class UsuarioController {
             throws NotFoundException {
         return ResponseEntity.ok(service.findByRolId(page,size,id));
     }
+
+    /**
+     * Da de baja lógicamente a un usuario
+     * Solo accesible por administradores
+     */
+    @Operation(
+            summary = "Dar de baja un usuario",
+            description = """
+            Da de baja lógicamente a un usuario especificando un motivo.
+            Si el usuario tiene rol RESTAURANTE, también desactiva el restaurante asociado.
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario dado de baja exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/baja")
+    public ResponseEntity<Void> darDeBaja(
+            @PathVariable Long id,
+            @RequestBody @Valid BajaLogicaRequestDTO dto)
+            throws NotFoundException, BadRequestException {
+        service.darDeBaja(id, dto.motivo());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Reactiva un usuario dado de baja
+     * Solo accesible por administradores
+     */
+    @Operation(
+            summary = "Reactivar un usuario",
+            description = """
+            Reactiva un usuario que fue dado de baja lógicamente.
+            Si el usuario tiene rol RESTAURANTE, también activa el restaurante asociado.
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario reactivado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/reactivar")
+    public ResponseEntity<Void> reactivar(@PathVariable Long id) throws NotFoundException {
+        service.reactivar(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Buscar usuarios con filtro",
+            description = """
+            Permite buscar usuarios aplicando filtros opcionales de búsqueda por nombre, estado de baja lógica y rol.
+            Los parámetros de búsqueda son opcionales y se pueden combinar según sea necesario.
+            1. search: Filtra usuarios cuyo nombre contenga la cadena proporcionada (case-insensitive).
+            2. bajaLogica: Filtra usuarios según su estado de baja lógica ("true" para usuarios dados de baja, "false" para activos).
+            3. rol: Filtra usuarios que tengan el rol especificado.
+            4. page y size: Parámetros de paginación para controlar la cantidad de resultados devueltos por página.
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario reactivado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<UsuarioCardDTO>> filtrarUsuarios(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String bajaLogica,
+            @RequestParam(required = false) String rol,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+
+        return ResponseEntity.ok(
+                service.filtrarUsuarios(page, size, search, bajaLogica, rol)
+        );
+    }
+
+
 }

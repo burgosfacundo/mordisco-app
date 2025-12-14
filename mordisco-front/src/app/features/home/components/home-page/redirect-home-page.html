@@ -14,6 +14,9 @@
       @case ('ROLE_ADMIN') {
         <app-home-admin-component></app-home-admin-component>
       }
+      @case ('ROLE_REPARTIDOR') {
+        <app-home-repartidor-component></app-home-repartidor-component>
+      }
       @case (null) {
         <app-home-cliente-component></app-home-cliente-component>
       }

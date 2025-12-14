@@ -42,6 +42,41 @@ export class FormValidationService {
     if (errors['pattern']) {
       return this.getPatternErrorMessage(fieldName, control.value);
     }
+      // Validación de coincidencia de contraseñas
+    if (errors['passwordMismatch']) {
+      return '*Las contraseñas no coinciden';
+    }
+
+    // Validaciones de hora
+    if (errors['invalidHourFormat']) {
+      return '*Formato inválido (máx 2 dígitos)';
+    }
+
+    if (errors['invalidHour']) {
+      return '*Debe estar entre 0 y 23';
+    }
+
+    // Validaciones de minutos
+    if (errors['invalidMinuteFormat']) {
+      return '*Formato inválido (máx 2 dígitos)';
+    }
+
+    if (errors['invalidMinute']) {
+      return '*Debe estar entre 0 y 59';
+    }
+
+    if (errors['min']) {
+      return `*Valor mínimo: ${errors['min'].min}`;
+    }
+
+    if (errors['max']) {
+      return `*Valor máximo: ${errors['max'].max}`;
+    }
+
+    // Validación de nombre de calle
+    if (errors['streetNumberAtEnd']) {
+      return '*No incluyas el número de dirección aquí';
+    }
 
     // Error genérico
     return '*Campo inválido';
@@ -50,11 +85,11 @@ export class FormValidationService {
   /**
    * Mensajes específicos para errores de pattern según el tipo de campo
    */
-  private getPatternErrorMessage(fieldName?: string, value?: any): string {
+  private getPatternErrorMessage(fieldName?: string, _value?: any): string {
     const lowerFieldName = fieldName?.toLowerCase();
 
     if (lowerFieldName?.includes('nombre') || lowerFieldName?.includes('apellido')) {
-      return '*Solo se permiten letras';
+      return '*Solo se permiten letras y espacios';
     }
 
     if (lowerFieldName?.includes('telefono')) {
@@ -62,7 +97,23 @@ export class FormValidationService {
     }
 
     if (lowerFieldName?.includes('password') || lowerFieldName?.includes('contraseña')) {
-      return '*Debe incluir mayúscula, minúscula, número y caracter especial';
+      return '*Debe incluir mayúscula, minúscula, número y carácter especial';
+    }
+
+    if (lowerFieldName === 'calle') {
+      return '*Solo se permiten letras, números y espacios';
+    }
+
+    if (lowerFieldName === 'numero') {
+      return '*Solo se permiten números';
+    }
+
+    if (lowerFieldName === 'codigopostal') {
+      return '*Formato válido: 4 dígitos (ej: 7600) o CPA (ej: B1636BCN)';
+    }
+
+    if (lowerFieldName === 'ciudad') {
+      return '*Solo se permiten letras y espacios';
     }
 
     return '*Formato inválido';
@@ -84,4 +135,40 @@ export class FormValidationService {
       'focus:ring-red-500': this.hasError(control)
     };
   }
+}
+
+export function passwordMatchValidator(form: AbstractControl) {
+  const password = form.get('password')?.value;
+  const confirmPassword = form.get('confirmPassword')?.value;
+
+  if (password !== confirmPassword) {
+    form.get('confirmPassword')?.setErrors({ passwordMismatch: true });
+  } else {
+    form.get('confirmPassword')?.setErrors(null);
+  }
+
+  return null;
+}
+
+/**
+ * Validador para nombres de calle que evita que se incluyan números de dirección
+ * Permite: "20 de Septiembre", "9 de Julio", "Calle 1"
+ * Rechaza: "Sarmiento 2685", "Libertad 123", "Av. Mitre 45"
+ */
+export function streetNameValidator(control: AbstractControl): { [key: string]: any } | null {
+  if (!control.value) {
+    return null; // No validar si está vacío (eso lo maneja 'required')
+  }
+
+  const value = control.value.trim();
+
+  // Patrón que detecta un espacio seguido de 2 o más dígitos al final del texto
+  // Esto indica que probablemente están poniendo el número de dirección
+  const hasNumberAtEnd = /\s+\d{2,}$/.test(value);
+
+  if (hasNumberAtEnd) {
+    return { streetNumberAtEnd: true };
+  }
+
+  return null;
 }

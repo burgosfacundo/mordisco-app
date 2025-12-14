@@ -17,5 +17,11 @@ public record RestauranteResponseCardDTO(
         @Schema(description = "Horarios de atencion del restaurante")
         List<HorarioAtencionResponseDTO> horariosDeAtencion,
         @Schema(description = "Estrellas del restaurante")
-        Double estrellas
+        Double estrellas,
+        @Schema(description = "Latitud de la ubicación del restaurante", example = "-38.0055")
+        Double latitud,
+        @Schema(description = "Longitud de la ubicación del restaurante", example = "-57.5426")
+        Double longitud,
+        @Schema(description = "Indica si el restaurante está abierto en este momento", example = "true")
+        Boolean estaAbierto
         ) {}

@@ -1,16 +1,23 @@
-import { Component, EventEmitter, input, Input, output, Output } from '@angular/core';
+import { Component,inject,input,output } from '@angular/core';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
-import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
+
 import { TipoEntrega } from '../../../../shared/models/enums/tipo-entrega';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from "@angular/material/icon";
-
+import { 
+  EstadoPedido, 
+  ESTADO_PEDIDO_LABELS, 
+  ESTADO_PEDIDO_COLORS, 
+  ESTADO_PEDIDO_ICONS,
+  getSiguienteEstado
+} from '../../../../shared/models/enums/estado-pedido';
 @Component({
   selector: 'app-detalle-pedido-component',
   imports: [CommonModule, MatIcon],
   templateUrl: './detalle-pedido-component.html'
 })
 export class DetallePedidoComponent {
+
   pedidoResponse = input<PedidoResponse>();
   onCancelar = output<number>();
   onVerDetalles = output<number>();
@@ -19,39 +26,34 @@ export class DetallePedidoComponent {
   readonly estadoPedidoEnum = EstadoPedido;
 
   getEstadoClasses(): string {
-    const estado = this.pedidoResponse()?.estado;
+    const estado = this.pedidoResponse()?.estado as EstadoPedido;
+    if (!estado) return 'bg-gray-500 text-white';
     
-    // Comparar con el enum correctamente
-    if (estado === EstadoPedido.PENDIENTE) {
-      return 'bg-yellow-500 text-white';
-    } else if (estado === EstadoPedido.EN_PROCESO) {
-      return 'bg-blue-500 text-white';
-    } else if (estado === EstadoPedido.EN_CAMINO) {
-      return 'bg-purple-500 text-white';
-    } else if (estado === EstadoPedido.RECIBIDO) {
-      return 'bg-green-500 text-white';
-    } else if (estado === EstadoPedido.CANCELADO) {
-      return 'bg-red-500 text-white';
-    } else {
-      return 'bg-gray-500 text-white';
-    }
+    const colorClasses = ESTADO_PEDIDO_COLORS[estado] || 'bg-gray-100 text-gray-700';
+
+    return colorClasses.replace('bg-', 'bg-').replace('-100', '-500').replace('text-', 'text-').replace('-700', '-white');
   }
 
-  fromatearEstado(pedidoResponse : PedidoResponse){
-    if (pedidoResponse.estado === EstadoPedido.PENDIENTE) {
-      return 'Pendiente';
-    } else if (pedidoResponse.estado === EstadoPedido.EN_PROCESO) {
-      return 'En Proceso';
-    } else if (pedidoResponse.estado === EstadoPedido.EN_CAMINO) {
-      return 'En Camino';
-    } else if (pedidoResponse.estado === EstadoPedido.RECIBIDO) {
-      return 'Recibido';
-    } else if (pedidoResponse.estado === EstadoPedido.CANCELADO) {
-      return 'Cancelado';
-    } else {
-      return String(pedidoResponse.estado);
-    }
+  getEstadoBadgeClass(): string {
+    const estado = this.pedidoResponse()?.estado as EstadoPedido;
+    if (!estado) return 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-gray-100 text-gray-700';
+    
+    const baseClasses = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide';
+    const colorClasses = ESTADO_PEDIDO_COLORS[estado] || 'bg-gray-100 text-gray-700';
+    
+    return `${baseClasses} ${colorClasses}`;
   }
+
+  getEstadoLabel(): string {
+    const estado = this.pedidoResponse()?.estado as EstadoPedido;
+    return estado ? ESTADO_PEDIDO_LABELS[estado] : 'Desconocido';
+  }
+
+  getEstadoIcon(): string {
+    const estado = this.pedidoResponse()?.estado as EstadoPedido;
+    return estado ? ESTADO_PEDIDO_ICONS[estado] : 'help_outline';
+  }
+
   formatearEntrega(pedidoResponse : PedidoResponse){
     if(pedidoResponse.tipoEntrega === TipoEntrega.DELIVERY){
       return 'Delivery'
@@ -87,7 +89,7 @@ export class DetallePedidoComponent {
    */
   mostrarBotonCancelar(): boolean {
     const estado = this.pedidoResponse()?.estado;
-    return estado === EstadoPedido.PENDIENTE || estado === EstadoPedido.EN_PROCESO;
+    return estado === EstadoPedido.PENDIENTE || estado === EstadoPedido.EN_PREPARACION;
   }
 
   /**

@@ -73,10 +73,10 @@ public class PromocionController {
     /**
      * Función para obtener una promoción por su ID.
      * @param id de la promoción a buscar.
-     * @return Respuesta HTTP con la proyección de la promoción encontrada.
+     * @return Respuesta HTTP con el DTO completo de la promoción encontrada.
      * @throws NotFoundException Si no se encuentra la promoción con el ID proporcionado.
      */
-    @Operation(summary = "Obtener una promoción por ID", description = "Recibe un ID y devuelve la promoción correspondiente") // Anotación para documentar la operación con Swagger
+    @Operation(summary = "Obtener una promoción por ID", description = "Recibe un ID y devuelve la promoción correspondiente con todos sus datos") // Anotación para documentar la operación con Swagger
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "Devuelve la promoción correspondiente"),
             @ApiResponse(responseCode = "404", description = "No se encontró la promoción con el ID proporcionado"),
@@ -84,7 +84,7 @@ public class PromocionController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<PromocionProjection> findById(@PathVariable Long id)
+    public ResponseEntity<PromocionResponseDTO> findById(@PathVariable Long id)
             throws NotFoundException {
         return ResponseEntity.ok(service.findById(id));
     }

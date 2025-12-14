@@ -1,5 +1,19 @@
-@if(showNavbar()){
-  <app-navbar />
-}
-<router-outlet></router-outlet>
-<app-footer></app-footer>
+<div class="flex flex-col min-h-screen">
+  @if(showNavbar()){
+    <app-navbar />
+  }
+
+  <main class="flex-grow">
+    <router-outlet></router-outlet>
+  </main>
+
+  <app-footer></app-footer>
+</div>
+
+<!-- Toast notifications container -->
+<app-toast-container />
+
+<!-- Confirmation dialog -->
+<app-confirmation-dialog />
+
+<app-prompt-dialog></app-prompt-dialog>

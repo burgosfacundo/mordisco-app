@@ -10,6 +10,7 @@ import utn.back.mordiscoapi.model.entity.*;
 import utn.back.mordiscoapi.common.util.Sanitize;
 
 
+
 @Slf4j
 @UtilityClass
 public class RestauranteMapper {
@@ -19,26 +20,29 @@ public class RestauranteMapper {
      * @return la entidad de restaurante con los datos del DTO
      */
     public static Restaurante toEntity(RestauranteCreateDTO dto) {
-        log.debug(dto.toString());
         Usuario usuario = Usuario.builder()
                 .id(dto.idUsuario())
                 .build();
+
         Imagen imagen = Imagen.builder()
                 .url(Sanitize.collapseSpaces(dto.logo().url()))
                 .nombre(Sanitize.collapseSpaces(dto.logo().nombre()))
                 .build();
+
         Direccion direccion = Direccion.builder()
-                .calle(Sanitize.collapseSpaces(dto.direccion().calle()))
+                .calle(Sanitize.toTitleCase(dto.direccion().calle()))
                 .numero(Sanitize.trimToNull(dto.direccion().numero()))
                 .piso(Sanitize.trimToNull(dto.direccion().piso()))
                 .depto(Sanitize.trimToNull(dto.direccion().depto()))
                 .codigoPostal(Sanitize.trimToNull(dto.direccion().codigoPostal()))
-                .ciudad(Sanitize.collapseSpaces(dto.direccion().ciudad()))
+                .ciudad(Sanitize.toTitleCase(dto.direccion().ciudad()))
                 .referencias(Sanitize.trimToNull(dto.direccion().referencias()))
                 .usuario(usuario)
                 .build();
+
         return Restaurante.builder()
                 .razonSocial(Sanitize.trimToNull(dto.razonSocial()))
+                .activo(dto.activo())
                 .imagen(imagen)
                 .usuario(usuario)
                 .direccion(direccion)
@@ -53,14 +57,6 @@ public class RestauranteMapper {
     public static RestauranteResponseDTO toDTO (Restaurante r){
         var imagen = ImagenMapper.toDTO(r.getImagen());
         var direccion = DireccionMapper.toDTO(r.getDireccion());
-        double estrellas = 0.0;
-        if (r.getCalificaciones() != null && !r.getCalificaciones().isEmpty()) {
-            estrellas = r.getCalificaciones()
-                    .stream()
-                    .mapToInt(CalificacionRestaurante::getPuntaje)
-                    .average()
-                    .orElse(0.0);
-        }
 
         return new RestauranteResponseDTO(
                 r.getId(),
@@ -68,9 +64,9 @@ public class RestauranteMapper {
                 r.getActivo(),
                 imagen,
                 r.getMenu() == null ? null : r.getMenu().getId(),
-                estrellas,
+                r.getPromedioCalificaciones(),
                 direccion
-                );
+        );
     }
 
     /**
@@ -80,14 +76,10 @@ public class RestauranteMapper {
      */
     public static RestauranteResponseCardDTO toCardDTO(Restaurante r){
         var imagen = ImagenMapper.toDTO(r.getImagen());
-        double estrellas = 0.0;
-        if (r.getCalificaciones() != null && !r.getCalificaciones().isEmpty()) {
-            estrellas = r.getCalificaciones()
-                    .stream()
-                    .mapToInt(CalificacionRestaurante::getPuntaje)
-                    .average()
-                    .orElse(0.0);
-        }
+        var direccion = r.getDireccion();
+        
+        // Determinar si el restaurante está abierto en este momento
+        boolean estaAbierto = isRestauranteAbierto(r);
 
         return new RestauranteResponseCardDTO(
                 r.getId(),
@@ -95,8 +87,33 @@ public class RestauranteMapper {
                 r.getActivo(),
                 imagen,
                 r.getHorariosAtencion().stream().map(HorarioAtencionMapper::toDTO).toList(),
-                estrellas
+                r.getPromedioCalificaciones(),
+                direccion != null ? direccion.getLatitud() : null,
+                direccion != null ? direccion.getLongitud() : null,
+                estaAbierto
         );
+    }
+
+    /**
+     * Determina si un restaurante está abierto en este momento
+     * @param r la entidad de restaurante
+     * @return true si el restaurante está abierto, false en caso contrario
+     */
+    private static boolean isRestauranteAbierto(Restaurante r) {
+        if (r.getHorariosAtencion() == null || r.getHorariosAtencion().isEmpty()) {
+            return false;
+        }
+
+        var now = java.time.LocalDateTime.now();
+        var currentDay = now.getDayOfWeek();
+        var currentTime = now.toLocalTime();
+
+        return r.getHorariosAtencion().stream()
+                .anyMatch(horario -> 
+                    horario.getDia().equals(currentDay) &&
+                    !currentTime.isBefore(horario.getHoraApertura()) &&
+                    !currentTime.isAfter(horario.getHoraCierre())
+                );
     }
 
 

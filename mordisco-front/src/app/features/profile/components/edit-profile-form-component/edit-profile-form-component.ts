@@ -1,9 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../../registro/services/user-service';
 import { FormValidationService } from '../../../../shared/services/form-validation-service';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ToastService } from '../../../../core/services/toast-service';
+import {
+  NOMBRE_PATTERN, NOMBRE_MIN_LENGTH, NOMBRE_MAX_LENGTH,
+  TELEFONO_PATTERN, TELEFONO_MIN_LENGTH, TELEFONO_MAX_LENGTH
+} from '../../../../shared/validators/validation-constants';
 
 @Component({
   selector: 'app-edit-profile-form-component',
@@ -13,7 +17,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 export class EditProfileFormComponent {
   private fb = inject(FormBuilder);
   private validationService : FormValidationService = inject(FormValidationService)
-  private _snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
   private router = inject(Router);
   private userService = inject(UserService)
 
@@ -27,12 +31,13 @@ export class EditProfileFormComponent {
 
  private inicializarFormulario(): void {
     this.editarPerfil = this.fb.group({
-      nombre: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
-      apellido: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
+      nombre: ['', [Validators.required, Validators.minLength(NOMBRE_MIN_LENGTH), Validators.maxLength(NOMBRE_MAX_LENGTH), Validators.pattern(NOMBRE_PATTERN)]],
+      apellido: ['', [Validators.required, Validators.minLength(NOMBRE_MIN_LENGTH), Validators.maxLength(NOMBRE_MAX_LENGTH), Validators.pattern(NOMBRE_PATTERN)]],
       telefono: ['', [
         Validators.required,
-        Validators.maxLength(15),
-        Validators.pattern(/^\+\d{1,3}(?:\s?\d){6,14}$/)
+        Validators.minLength(TELEFONO_MIN_LENGTH),
+        Validators.maxLength(TELEFONO_MAX_LENGTH),
+        Validators.pattern(TELEFONO_PATTERN)
       ]]
     });
   }
@@ -47,7 +52,6 @@ export class EditProfileFormComponent {
         });
       },
       error: () => {
-        this._snackBar.open('❌ Ocurrió un error al cargar los datos del perfil','',{duration: 3000})
         this.router.navigate(['/'])
       }
     });
@@ -63,12 +67,8 @@ export class EditProfileFormComponent {
 
     this.userService.updateMe(this.editarPerfil.value).subscribe({
       next: () => {
-        this._snackBar.open('✅ Perfil actualizado correctamente','',{duration: 3000});
+        this.toastService.success('✅ Perfil actualizado correctamente')
         this.router.navigate(['/profile'])
-      },
-      error: (e) => {
-        console.error(e);
-        this._snackBar.open('❌ Ocurrió un error al actualizar el perfil','',{duration: 3000});
       }
     });
   }

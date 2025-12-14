@@ -27,6 +27,19 @@ import { MisPedidosClientePage } from './features/mis-pedidos/components/mis-ped
 import { RecoverPasswordPage } from './features/auth/components/recover-password-page/recover-password-page';
 import { ResetPasswordPage } from './features/auth/components/reset-password-page/reset-password-page';
 import { RestauranteDireccionPage } from './features/mi-restaurante/components/restaurante-direccion-page/restaurante-direccion-page';
+import { CalificacionFormPage } from './features/calificacion/calificacion-form-page/calificacion-form-page';
+import { EntregasPage } from './features/entregas/entregas-page/entregas-page';
+import { ConfiguracionFormPage } from './features/configuracion-sistema/configuracion-form-page/configuracion-form-page';
+import { ConfiguracionPage } from './features/configuracion-sistema/configuracion-page/configuracion-page';
+import { DetalleUsuarioPage } from './features/admin/detalle-usuario-page/detalle-usuario-page';
+import { CalificacionPage } from './features/calificacion/calificacion-page/calificacion-page';
+import { UsuariosPage } from './features/admin/usuarios-page/usuarios-page';
+import { PedidosAdminPage } from './features/admin/pedidos-admin-page/pedidos-admin-page';
+import { RestauranteAdminPage } from './features/admin/restaurante-admin-page/restaurante-admin-page';
+import { CalificacionesRestaurante } from './features/admin/calificaciones-restaurante/calificaciones-restaurante';
+import { EstadisticasRestauranteComponent } from './features/estadisticas/restaurante/estadisticas-restaurante';
+import { EstadisticasRepartidorComponent } from './features/estadisticas/repartidor/estadisticas-repartidor';
+import { EstadisticasAdminComponent } from './features/estadisticas/admin/estadisticas-admin';
 
 export const routes: Routes = [
   // ==========================================
@@ -102,7 +115,8 @@ export const routes: Routes = [
       { path: 'promociones/nueva/:idRestaurante', component: PromocionFormComponent },
       { path: 'promociones/editar/:id', component: PromocionFormComponent },
       { path: 'pedidos', component: MisPedidosPage },
-      { path: 'pedidos/detalle/:id', component: DetallePedidoPage }
+      { path: 'pedidos/detalle/:id', component: DetallePedidoPage },
+      { path: 'estadisticas', component: EstadisticasRestauranteComponent}
     ]
   },
 
@@ -113,20 +127,15 @@ export const routes: Routes = [
     path: 'cliente',
     canActivate: [authGuard, roleGuard(['ROLE_CLIENTE'])],
     children: [
-        { path: 'my-address',component: MyAddressPage },
-      // Ver restaurante y menú
+      { path: 'my-address',component: MyAddressPage },
       { path: 'restaurante/:id', component: RestauranteDetallePage },
-      
-      // Carrito y checkout
       { path: 'carrito', component: CarritoPage },
       { path: 'checkout', component: CheckoutPage },
-      
-      // Confirmaciones de pago
+      { path: 'calificar/:var/:id', component : CalificacionFormPage},
+      { path: 'calificar/:var/:id', component : CalificacionFormPage},
       { path: 'pedidos/pago-exitoso', component: PagoExitosoPage },
       { path: 'pedidos/pago-fallido', component: PagoFallidoPage },
       { path: 'pedidos/pago-pendiente', component: PagoExitosoPage },
-      
-      // Mis pedidos
       { path: 'pedidos', component: MisPedidosClientePage },
       { path: 'pedidos/detalle/:id', component: DetallePedidoPage }
     ]
@@ -139,7 +148,10 @@ export const routes: Routes = [
     path: 'repartidor',
     canActivate: [authGuard, roleGuard(['ROLE_REPARTIDOR'])],
     children: [
-      // Por implementar
+      { path : 'pedidos/historial', component : EntregasPage},
+      { path : 'pedidos/detalle/:id', component: DetallePedidoPage},
+      { path : 'calificaciones', component : CalificacionPage},
+      { path : 'estadisticas', component: EstadisticasRepartidorComponent }
     ]
   },
 
@@ -150,7 +162,16 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [authGuard, roleGuard(['ROLE_ADMIN'])],
     children: [
-      // Por implementar
+      {path : 'configuracion', component : ConfiguracionPage},
+      {path : 'configuracion/edit', component :ConfiguracionFormPage},
+      {path : 'pedidos/detalle/:id', component: DetallePedidoPage },
+      {path : 'usuarios', component: UsuariosPage},
+      {path : 'detalle-usuario/:idRol/:idUser', component : DetalleUsuarioPage},
+      {path : 'pedidos', component: PedidosAdminPage},
+      {path : 'restaurantes', component: RestauranteAdminPage},
+      {path : 'restaurante/:id', component: RestauranteDetallePage },
+      {path : 'restaurante/calificaciones/:id', component: CalificacionesRestaurante},
+      {path : 'estadisticas', component : EstadisticasAdminComponent }
     ]
   },
 

@@ -50,14 +50,14 @@
             formControlName="nombreProducto"
             class="form-input"
             placeholder="Ej: Hamburguesa Clásica, Pizza Margarita"
-            maxlength="100"
+            maxlength="50"
             [class.border-red-500]="getError('nombreProducto')"
             [class.focus:ring-red-500]="getError('nombreProducto')">
           @if (getError('nombreProducto')) {
             <p class="form-error">{{ getError('nombreProducto') }}</p>
           }
           <p class="text-xs text-gray-500 mt-1">
-            {{ productoForm.get('nombreProducto')?.value?.length || 0 }}/100 caracteres
+            {{ productoForm.get('nombreProducto')?.value?.length || 0 }}/50 caracteres
           </p>
         </fieldset>
 
@@ -72,14 +72,14 @@
             rows="5"
             class="form-input resize-none"
             placeholder="Describe el producto, sus ingredientes principales o características..."
-            maxlength="500"
+            maxlength="255"
             [class.border-red-500]="getError('descripcion')"
             [class.focus:ring-red-500]="getError('descripcion')"></textarea>
           @if (getError('descripcion')) {
             <p class="form-error">{{ getError('descripcion') }}</p>
           }
           <p class="text-xs text-gray-500 mt-1">
-            {{ productoForm.get('descripcion')?.value?.length || 0 }}/500 caracteres
+            {{ productoForm.get('descripcion')?.value?.length || 0 }}/255 caracteres
           </p>
         </fieldset>
 
@@ -97,8 +97,6 @@
                 id="precioUnitarioID"
                 formControlName="precioUnitario"
                 class="form-input pl-10 text-lg font-semibold"
-                step="0.01"
-                min="0.01"
                 max="999999"
                 [class.border-red-500]="getError('precioUnitario')"
                 [class.focus:ring-red-500]="getError('precioUnitario')">
@@ -106,6 +104,13 @@
             @if (getError('precioUnitario')) {
               <p class="form-error">{{ getError('precioUnitario') }}</p>
             }
+            <div class="mt-2 p-3.5 bg-blue-50 border border-blue-200 rounded-lg">
+              <div class="flex items-start gap-3">
+                <div class="text-xs text-blue-900">
+                  Recordá que Mordisco retendrá el {{100 - configuracionActual?.porcentajeGananciasRestaurante!}}% del precio de este producto.
+                </div>
+              </div>
+            </div>
           </fieldset>
 
           <!-- Disponibilidad -->
@@ -135,6 +140,7 @@
               </div>
             </label>
           </fieldset>
+
         </div>
 
         <!-- URL de Imagen -->

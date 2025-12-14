@@ -5,15 +5,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionRequestDTO;
 import utn.back.mordiscoapi.model.dto.horarioAtencion.HorarioAtencionResponseDTO;
 import utn.back.mordiscoapi.service.interf.IHorarioService;
+
+import java.util.List;
 
 @Tag(name = "Promociones", description = "Operaciones relacionadas con las promociones de los restaurantes")
 @RestController
@@ -29,17 +31,16 @@ public class HorarioController {
             @Valid @Positive @PathVariable Long idRestaurante,
             @RequestBody @Valid HorarioAtencionRequestDTO dto
     )
-            throws NotFoundException{
+            throws NotFoundException, BadRequestException {
         Long createdId=horarioService.save(idRestaurante, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdId);
     }
 
     @GetMapping("/{idRestaurante}")
-    public ResponseEntity<Page<HorarioAtencionResponseDTO>> getAllByIdRestaurante(
-            @RequestParam @Valid int page, @RequestParam @Valid @Positive int size,
+    public ResponseEntity<List<HorarioAtencionResponseDTO>> getAllByIdRestaurante(
             @Valid @Positive @PathVariable Long idRestaurante
     ) throws NotFoundException {
-        return ResponseEntity.ok().body(horarioService.findAllByIdRestaurante(page,size,idRestaurante));
+        return ResponseEntity.ok().body(horarioService.findAllByIdRestaurante(idRestaurante));
     }
 
 
@@ -49,7 +50,7 @@ public class HorarioController {
     public ResponseEntity<Void> update(
             @Valid @Positive @PathVariable Long idHorario,
             @Valid @RequestBody HorarioAtencionRequestDTO dto
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         horarioService.update(idHorario,dto);
         return ResponseEntity.ok().build();
     }

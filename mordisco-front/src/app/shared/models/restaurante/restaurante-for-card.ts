@@ -9,4 +9,7 @@ export default interface RestauranteForCard {
     logo : ImagenResponse
     horariosDeAtencion : HorarioAtencion[]
     estrellas: number
+    latitud?: number
+    longitud?: number
+    estaAbierto?: boolean
 }

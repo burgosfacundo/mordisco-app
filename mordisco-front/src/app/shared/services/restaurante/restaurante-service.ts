@@ -23,14 +23,30 @@ export class RestauranteService {
     return this.http.get<PaginationResponse<RestauranteForCard>>(`${environment.apiUrl}/restaurantes`, {params})
   }
 
-  getAllActivosByCiudad(ciudad : string, page : number, size : number) : Observable<PaginationResponse<RestauranteForCard>>{
-    const params = new HttpParams().set('page',page).set('size',size).set('ciudad',ciudad);
-    return this.http.get<PaginationResponse<RestauranteForCard>>(`${environment.apiUrl}/restaurantes/ciudades`, {params})
+  findByLocation(latitud: number, longitud: number, radioKm: number, searchTerm: string | null, page: number, size: number): Observable<PaginationResponse<RestauranteForCard>> {
+    let params = new HttpParams()
+      .set('latitud', latitud)
+      .set('longitud', longitud)
+      .set('radioKm', radioKm)
+      .set('page', page)
+      .set('size', size);
+    
+    if (searchTerm && searchTerm.trim()) {
+      params = params.set('searchTerm', searchTerm.trim());
+    }
+    
+    return this.http.get<PaginationResponse<RestauranteForCard>>(`${environment.apiUrl}/restaurantes/ubicacion`, {params});
   }
 
-  getAllWithPromocionActivaByCiudad(ciudad : string, page : number , size : number) : Observable<PaginationResponse<RestauranteForCard>>{
-    const params = new HttpParams().set('page',page).set('size',size).set('ciudad',ciudad);
-    return this.http.get<PaginationResponse<RestauranteForCard>>(`${environment.apiUrl}/restaurantes/promociones`, {params})
+  findWithPromocionByLocation(latitud: number, longitud: number, radioKm: number, page: number, size: number): Observable<PaginationResponse<RestauranteForCard>> {
+    const params = new HttpParams()
+      .set('latitud', latitud)
+      .set('longitud', longitud)
+      .set('radioKm', radioKm)
+      .set('page', page)
+      .set('size', size);
+    
+    return this.http.get<PaginationResponse<RestauranteForCard>>(`${environment.apiUrl}/restaurantes/ubicacion/promociones`, {params});
   }
 
   getByUsuario(idUsuario : number): Observable<RestauranteResponse> {
@@ -48,4 +64,28 @@ export class RestauranteService {
   delete(id : number) : Observable<string>{
     return this.http.delete<string>(`${environment.apiUrl}/restaurantes/delete/${id}`)
   }
+
+
+  filtrarRestaurantes(
+    search: string,
+    activo: string,
+    page: number,
+    size: number
+  ): Observable<PaginationResponse<RestauranteForCard>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (search && search.trim() !== '') {
+      params = params.set('search', search.trim());
+    }
+    if (activo && activo !== '') {
+      params = params.set('activo', activo);
+    }
+
+    return this.http.get<PaginationResponse<RestauranteForCard>>(
+      `${environment.apiUrl}/restaurantes/buscar`, 
+      { params }
+    );
+  }  
 }

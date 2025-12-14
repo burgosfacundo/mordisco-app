@@ -30,6 +30,8 @@ public class Direccion {
 
     private String referencias;
 
+    private String alias;
+
     @Column(nullable = false, length = 50)
     private Double latitud;
 

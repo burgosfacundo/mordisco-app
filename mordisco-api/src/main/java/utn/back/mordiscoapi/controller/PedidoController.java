@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.enums.EstadoPedido;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
@@ -18,8 +19,9 @@ import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
+import utn.back.mordiscoapi.model.dto.usuario.BajaLogicaRequestDTO;
+import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.service.interf.IPedidoService;
-
 
 @Tag(name = "Pedidos", description = "Operaciones relacionadas con los pedidos de los restaurantes")
 @RestController
@@ -90,7 +92,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN') or @pedidoSecurity.esPropietarioPedido(#id) or @pedidoSecurity.esPropietarioRestaurantePedido(#id)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REPARTIDOR') or @pedidoSecurity.esPropietarioPedido(#id) or @pedidoSecurity.esPropietarioRestaurantePedido(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> findById(@PathVariable
                                                       Long id) throws NotFoundException {
@@ -161,7 +163,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("@pedidoSecurity.esPropietarioRestaurantePedido(#id)")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     @PutMapping("/state/{id}")
     public ResponseEntity<Void> changeState(
             @PathVariable
@@ -268,5 +270,268 @@ public class PedidoController {
             @RequestParam int size) throws NotFoundException {
         return ResponseEntity.ok(pedidoService.findAllByRestaurante_IdAndEstado(page,size,id, estado));
     }
+
+
+    /**
+     * 🆕 Obtener pedidos disponibles para repartidor
+     */
+    @Operation(
+            summary = "Obtener pedidos disponibles para repartidor",
+            description = """
+        Retorna pedidos en estado EN_CAMINO sin repartidor asignado,
+        filtrados por proximidad a la ubicación del repartidor.
+        **Rol necesario: REPARTIDOR**
+    """
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @GetMapping("/disponibles-repartidor")
+    public ResponseEntity<Page<PedidoResponseDTO>> getPedidosDisponibles(
+            @RequestParam Double latitud,
+            @RequestParam Double longitud,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return ResponseEntity.ok(
+                pedidoService.getPedidosDisponiblesParaRepartidor(latitud, longitud, page, size)
+        );
+    }
+
+
+    @Operation(
+            summary = "Aceptar pedido como repartidor",
+            description = """
+        Permite a un repartidor aceptar un pedido disponible.
+        **Validaciones:**
+        - El pedido debe estar EN_CAMINO
+        - No debe tener repartidor asignado
+        - El repartidor debe estar APROBADO
+        **Rol necesario: REPARTIDOR**
+    """
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @PostMapping("/{pedidoId}/aceptar-repartidor")
+    public ResponseEntity<Void> aceptarPedido(
+            @PathVariable Long pedidoId,
+            Authentication authentication) throws NotFoundException, BadRequestException {
+
+        Usuario repartidor = (Usuario) authentication.getPrincipal();
+        pedidoService.asignarRepartidor(pedidoId, repartidor.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 🆕 Marcar pedido como entregado
+     */
+    @Operation(
+            summary = "Marcar pedido como entregado",
+            description = """
+        Permite al repartidor confirmar que entregó el pedido.
+        **Validaciones:**
+        - El pedido debe estar asignado al repartidor
+        - El pedido debe estar EN_CAMINO
+        **Rol necesario: REPARTIDOR**
+    """
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR') or hasRole('RESTAURANTE')")
+    @PutMapping("/{pedidoId}/entregar")
+    public ResponseEntity<Void> marcarComoEntregado(
+            @PathVariable Long pedidoId,
+            Authentication authentication) throws NotFoundException, BadRequestException {
+
+        Usuario repartidor = (Usuario) authentication.getPrincipal();
+        pedidoService.marcarComoEntregado(pedidoId, repartidor.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Obtener pedido activo del repartidor",
+            description = "Retorna el pedido que el repartidor tiene actualmente asignado y en curso"
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    @GetMapping("/mi-pedido-activo")
+    public ResponseEntity<PedidoResponseDTO> getMiPedidoActivo(Authentication authentication)
+            throws NotFoundException, BadRequestException {
+
+        Usuario repartidor = (Usuario) authentication.getPrincipal();
+        PedidoResponseDTO pedido = pedidoService.getPedidoActivoRepartidor(repartidor.getId());
+
+        return ResponseEntity.ok(pedido);
+    }
+
+    /**
+     * Cancela un pedido con motivo obligatorio
+     * Solo accesible por administradores
+     */
+    @Operation(
+            summary = "Cancela un pedido con motivo obligatorio",
+            description = """
+            Cancela un pedido especificando un motivo.
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido cancelado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Pedido no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/baja")
+    public ResponseEntity<Void> darDeBaja(
+            @PathVariable Long id,
+            @RequestBody @Valid BajaLogicaRequestDTO dto)
+            throws NotFoundException {
+        pedidoService.darDeBaja(id, dto.motivo());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Anula cancelacion de un pedido con motivo obligatorio
+     * Solo accesible por administradores
+     */
+    @Operation(
+            summary = "Anula cancelacion de un pedido",
+            description = """
+            Anula cancelacion de un pedido si fue cancelado por un administrador.
+            **Rol necesario: ADMIN**
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido activo exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Pedido no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/reactivar")
+    public ResponseEntity<Void> reactivar(@PathVariable Long id) throws NotFoundException {
+        pedidoService.reactivar(id);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Busca entre los pedidos por alguna palabra clave especifica
+     */
+    @Operation(
+            summary = "Busca entre los pedidos por alguna palabra clave especifica",
+            description = """
+            Busca por palabra clave coincidencias en los pedidos.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos con coincidencias encontradas"),
+            @ApiResponse(responseCode = "404", description = "Pedidos sin coincidencias"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<PedidoResponseDTO>> searchPedidos(@RequestParam(required = false) String search,
+                                                                 @RequestParam(required = false) String estado,
+                                                                 @RequestParam(required = false) String tipoEntrega,
+                                                                 @RequestParam(required = false) String fechaInicio,
+                                                                 @RequestParam(required = false) String fechaFin,
+                                                                 @RequestParam int page,
+                                                                 @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.filtrarPedidos(page,size,estado,tipoEntrega, fechaInicio, fechaFin,search));
+    }
+
+    /**
+     * Busca entre los pedidos por restaurante ID alguna palabra clave especifica
+     */
+    @Operation(
+            summary = "Busca entre los pedidos por alguna palabra clave especifica",
+            description = """
+            Busca por palabra clave coincidencias en los pedidos.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos con coincidencias encontradas"),
+            @ApiResponse(responseCode = "404", description = "Pedidos sin coincidencias"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
+    @GetMapping("/buscar-by-restaurante/{idRest}")
+    public ResponseEntity<Page<PedidoResponseDTO>> searchPedidosRestaurante(
+            @PathVariable Long idRest,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) String tipoEntrega,
+            @RequestParam(required = false) String fechaInicio,
+            @RequestParam(required = false) String fechaFin,
+            @RequestParam int page,
+            @RequestParam int size) throws NotFoundException {
+
+        return ResponseEntity.ok(
+                pedidoService.filtrarPedidosRestaurantes(
+                        page, size, idRest, estado, tipoEntrega, fechaInicio, fechaFin, search
+                )
+        );
+    }
+    /**
+     * Busca entre los pedidos por alguna palabra clave especifica
+     */
+    @Operation(
+            summary = "Busca entre los pedidos por alguna palabra clave especifica",
+            description = """
+            Busca por palabra clave coincidencias en los pedidos.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos con coincidencias encontradas"),
+            @ApiResponse(responseCode = "404", description = "Pedidos sin coincidencias"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('ADMIN')")
+    @GetMapping("/buscar-by-cliente/{idCli}")
+    public ResponseEntity<Page<PedidoResponseDTO>> searchPedidosCliente(@PathVariable Long idCli,
+                                                                 @RequestParam(required = false) String search,
+                                                                 @RequestParam(required = false) String estado,
+                                                                 @RequestParam(required = false) String tipoEntrega,
+                                                                 @RequestParam(required = false) String fechaInicio,
+                                                                 @RequestParam(required = false) String fechaFin,
+                                                                 @RequestParam int page,
+                                                                 @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.filtrarPedidosCliente(page,size,idCli,estado,tipoEntrega, fechaInicio, fechaFin,search));
+    }
+    /**
+     * Busca entre los pedidos por alguna palabra clave especifica
+     */
+    @Operation(
+            summary = "Busca entre los pedidos por alguna palabra clave especifica",
+            description = """
+            Busca por palabra clave coincidencias en los pedidos.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos con coincidencias encontradas"),
+            @ApiResponse(responseCode = "404", description = "Pedidos sin coincidencias"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('REPARTIDOR') or hasRole('ADMIN')")
+    @GetMapping("/buscar-by-repartidor/{idRep}")
+    public ResponseEntity<Page<PedidoResponseDTO>> searchPedidosRepartidor(@PathVariable Long idRep,
+                                                                 @RequestParam(required = false) String search,
+                                                                 @RequestParam(required = false) String estado,
+                                                                 @RequestParam(required = false) String fechaInicio,
+                                                                 @RequestParam(required = false) String fechaFin,
+                                                                 @RequestParam int page,
+                                                                 @RequestParam int size) throws NotFoundException {
+        return ResponseEntity.ok(pedidoService.filtrarPedidosRepartidor(page,size,idRep,estado, fechaInicio, fechaFin,search));
+    }
+
+
+
+
 }
 

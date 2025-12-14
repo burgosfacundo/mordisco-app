@@ -35,30 +35,78 @@ public class EmailServiceImpl implements IEmailService {
      * @param name the name of the user whose password was changed.
      */
     @Override
-    public void sendPasswordChangeAlertEmail(String to, String name,String loginLink) throws InternalServerErrorException {
-        String html = emailTemplateBuilder.buildPasswordChangeAlert(name,loginLink);
+    public void sendPasswordChangeAlertEmail(String to, String name, String loginLink) throws InternalServerErrorException {
+        String html = emailTemplateBuilder.buildPasswordChangeAlert(name, loginLink);
         emailSender.sendHtmlEmail(to, "Aviso: tu contraseña ha sido modificada", html);
     }
 
-
     @Override
-    public void sendNuevoPedidoEmail(String to, String nombre, Long pedidoId, String restaurante,String link)
+    public void sendNuevoPedidoEmail(String to, String nombre, Long pedidoId, String restaurante, String link)
             throws InternalServerErrorException {
-        String html = emailTemplateBuilder.buildNuevoPedidoEmail(nombre, pedidoId, restaurante,link);
+        String html = emailTemplateBuilder.buildNuevoPedidoEmail(nombre, pedidoId, restaurante, link);
         emailSender.sendHtmlEmail(to, "Nuevo pedido recibido", html);
     }
 
     @Override
-    public void sendCambioEstadoPedidoEmail(String to, String nombre, Long pedidoId, String nuevoEstado,String link)
+    public void sendPedidoEnPreparacionEmail(String to, String nombre, Long pedidoId, String link)
             throws InternalServerErrorException {
-        String html = emailTemplateBuilder.buildCambioEstadoPedidoEmail(nombre, pedidoId, nuevoEstado,link);
-        emailSender.sendHtmlEmail(to, "Tu pedido ha sido actualizado ", html);
+        String html = emailTemplateBuilder.buildPedidoEnPreparacionEmail(nombre, pedidoId, link);
+        emailSender.sendHtmlEmail(to, "Tu pedido está en preparación", html);
     }
 
     @Override
-    public void sendPedidoEnCaminoEmail(String to, String nombre, Long pedidoId,String link)
+    public void sendPedidoListoParaRetirarEmail(String to, String nombre, Long pedidoId, String link)
             throws InternalServerErrorException {
-        String html = emailTemplateBuilder.buildPedidoEnCaminoEmail(nombre, pedidoId,link);
+        String html = emailTemplateBuilder.buildPedidoListoParaRetirarEmail(nombre, pedidoId, link);
+        emailSender.sendHtmlEmail(to, "¡Tu pedido está listo para retirar!", html);
+    }
+
+    @Override
+    public void sendPedidoEnCaminoEmail(String to, String nombre, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String html = emailTemplateBuilder.buildPedidoEnCaminoEmail(nombre, pedidoId, link);
         emailSender.sendHtmlEmail(to, "¡Tu pedido está en camino!", html);
+    }
+
+    @Override
+    public void sendPedidoCanceladoEmailCliente(String to, String nombre, Long pedidoId, String motivo, String link)
+            throws InternalServerErrorException {
+        String html = emailTemplateBuilder.buildPedidoCanceladoEmailCliente(nombre, pedidoId, motivo, link);
+        emailSender.sendHtmlEmail(to, "Tu pedido ha sido cancelado", html);
+    }
+
+    @Override
+    public void sendPedidoCanceladoEmailRestaurante(String to, String nombreRestaurante, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String html = emailTemplateBuilder.buildPedidoCanceladoEmailRestaurante(nombreRestaurante, pedidoId, link);
+        emailSender.sendHtmlEmail(to, "Pedido cancelado", html);
+    }
+
+    @Override
+    public void sendPagoConfirmadoEmailCliente(String to, String nombre, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String html = emailTemplateBuilder.buildPagoConfirmadoEmailCliente(nombre, pedidoId, link);
+        emailSender.sendHtmlEmail(to, "Pago confirmado", html);
+    }
+
+    @Override
+    public void sendPagoConfirmadoEmailRestaurante(String to, String nombreRestaurante, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String html = emailTemplateBuilder.buildPagoConfirmadoEmailRestaurante(nombreRestaurante, pedidoId, link);
+        emailSender.sendHtmlEmail(to, "Pago recibido", html);
+    }
+
+    @Override
+    public void sendPagoRechazadoEmailCliente(String to, String nombre, Long pedidoId, String motivo, String link)
+            throws InternalServerErrorException {
+        String html = emailTemplateBuilder.buildPagoRechazadoEmailCliente(nombre, pedidoId, motivo, link);
+        emailSender.sendHtmlEmail(to, "Pago rechazado", html);
+    }
+
+    @Override
+    public void sendPagoRechazadoEmailRestaurante(String to, String nombreRestaurante, Long pedidoId, String link)
+            throws InternalServerErrorException {
+        String html = emailTemplateBuilder.buildPagoRechazadoEmailRestaurante(nombreRestaurante, pedidoId, link);
+        emailSender.sendHtmlEmail(to, "Pago rechazado", html);
     }
 }

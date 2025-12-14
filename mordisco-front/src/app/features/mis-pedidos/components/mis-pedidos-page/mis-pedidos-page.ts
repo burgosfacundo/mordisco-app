@@ -1,7 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +11,14 @@ import { AuthService } from '../../../../shared/services/auth-service';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 import RestauranteResponse from '../../../../shared/models/restaurante/restaurante-response';
 import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
+import { ConfirmationService } from '../../../../core/services/confirmation-service';
+import { ToastService } from '../../../../core/services/toast-service';
+import { BarraBuscadoraComponent } from '../../../../shared/components/barra-buscadora-component/barra-buscadora-component';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PagoService } from '../../../../shared/services/pagos/pago-service';
+import { PromptService } from '../../../../core/services/confirmation-prompt-service';
 
 @Component({
   selector: 'app-mis-pedidos-page',
@@ -21,7 +28,9 @@ import { EstadoPedido } from '../../../../shared/models/enums/estado-pedido';
     PedidoCardComponent,
     MatPaginatorModule,
     MatTabsModule,
-    MatIconModule
+    MatIconModule,
+    BarraBuscadoraComponent,
+    FormsModule
   ],
   templateUrl: './mis-pedidos-page.html',
   styleUrl: './mis-pedidos-page.css'
@@ -30,11 +39,33 @@ export class MisPedidosPage implements OnInit {
   private pService = inject(PedidoService);
   private rService = inject(RestauranteService);
   private auS = inject(AuthService);
-  private _snackBar = inject(MatSnackBar);
   private router = inject(Router);
+  private confirmationService = inject(ConfirmationService);
+  private promptService = inject(PromptService)
+  private toastService = inject(ToastService);
 
+  private searchSubject = new Subject<string>();
+  @ViewChild(BarraBuscadoraComponent) barraBuscadora!: BarraBuscadoraComponent;
+
+  filtroTipoEntrega: string = '';
+  filtroFechaInicio: string = '';
+  filtroFechaFin: string = '';
+  searchValue: string = '';
+  idUsuario? : number
   arrPedidos?: PedidoResponse[];
   restaurante?: RestauranteResponse;
+
+  // Fecha máxima para filtros (hoy) en formato YYYY-MM-DD
+  maxDate: string = new Date().toISOString().split('T')[0];
+
+  // Fechas dinámicas para validación cruzada (en formato YYYY-MM-DD)
+  get minFechaFin(): string | null {
+    return this.filtroFechaInicio ? this.filtroFechaInicio : null;
+  }
+
+  get maxFechaInicio(): string | null {
+    return this.filtroFechaFin ? this.filtroFechaFin : this.maxDate;
+  }
 
   sizePedidos = 10;
   pagePedidos = 0;
@@ -46,25 +77,29 @@ export class MisPedidosPage implements OnInit {
 
   ngOnInit(): void {
     this.cargarRestaurante();
+    this.searchSubject.pipe(
+      debounceTime(500), // Espera 500ms después de que el usuario deje de escribir
+      distinctUntilChanged() // Solo emite si el valor cambió
+    ).subscribe(() => {
+        this.pagePedidos = 0; // Resetear a la primera página
+        this.buscar();
+    });  
   }
 
   private cargarRestaurante(): void {
-    const userId = this.auS.getCurrentUser()?.userId;
+    this.idUsuario = this.auS.getCurrentUser()?.userId;
 
-    if (!userId) {
-      this._snackBar.open('Error: Usuario no autenticado', 'Cerrar', { duration: 3000 });
+    if (!this.idUsuario) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.rService.getByUsuario(userId).subscribe({
+    this.rService.getByUsuario(this.idUsuario).subscribe({
       next: (data) => {
         this.restaurante = data;
         this.cargarPedidos();
       },
-      error: (e) => {
-        console.error('Error al cargar restaurante:', e);
-        this._snackBar.open('Error al cargar el restaurante', 'Cerrar', { duration: 3000 });
+      error: () => {
         this.isLoadingPedidos = false;
       }
     });
@@ -87,7 +122,6 @@ export class MisPedidosPage implements OnInit {
           this.isLoadingPedidos = false;
         },
         error: () => {
-          this._snackBar.open('Error al cargar pedidos', 'Cerrar', { duration: 3000 });
           this.isLoadingPedidos = false;
         }
       });
@@ -104,7 +138,6 @@ export class MisPedidosPage implements OnInit {
           this.isLoadingPedidos = false;
         },
         error: () => {
-          this._snackBar.open('Error al cargar pedidos', 'Cerrar', { duration: 3000 });
           this.isLoadingPedidos = false;
         }
       });
@@ -115,77 +148,186 @@ export class MisPedidosPage implements OnInit {
     const estados: (EstadoPedido | 'TODOS')[] = [
       'TODOS',
       EstadoPedido.PENDIENTE,
-      EstadoPedido.EN_PROCESO,
+      EstadoPedido.EN_PREPARACION,
+      EstadoPedido.LISTO_PARA_RETIRAR,
+      EstadoPedido.LISTO_PARA_ENTREGAR,
+      EstadoPedido.ASIGNADO_A_REPARTIDOR,
       EstadoPedido.EN_CAMINO,
-      EstadoPedido.RECIBIDO,
+      EstadoPedido.COMPLETADO,
       EstadoPedido.CANCELADO
     ];
 
     this.estadoActual = estados[index];
     this.pagePedidos = 0;
-    this.cargarPedidos();
+
+    if (this.searchValue.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.buscar();
+    } else {
+      this.cargarPedidos();
+    }  
   }
 
   onPageChangePedidos(event: PageEvent): void {
     this.pagePedidos = event.pageIndex;
     this.sizePedidos = event.pageSize;
-    this.cargarPedidos();
+    if (this.searchValue.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.buscar();
+    } else {
+      this.cargarPedidos();
+    }
   }
 
   aceptarPedido(pedidoId: number): void {
-    if (!confirm('¿Aceptar este pedido?')) return;
+    this.confirmationService.confirm({
+      title: 'Aceptar Pedido',
+      message: '¿Estás seguro de aceptar este pedido?',
+      confirmText: 'Aceptar',
+      type: 'info'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pService.changeState(pedidoId, EstadoPedido.EN_PROCESO).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido aceptado', 'Cerrar', { duration: 3000 });
-        this.cargarPedidos();
-      },
-      error: (error) => {
-        console.error('Error al aceptar pedido:', error);
-        this._snackBar.open(
-          error.error?.message || 'No se pudo aceptar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        );
-      }
+      this.pService.changeState(pedidoId, EstadoPedido.EN_PREPARACION).subscribe({
+        next: () => {
+          this.toastService.success('✅ Pedido aceptado');
+          this.cargarPedidos();
+        }
+      });
     });
   }
 
   rechazarPedido(pedidoId: number): void {
-    if (!confirm('¿Rechazar/Cancelar este pedido?')) return;
+    this.confirmationService.confirm({
+      title: 'Rechazar Pedido',
+      message: '¿Estás seguro de rechazar/cancelar este pedido? Esta acción no se puede deshacer.',
+      confirmText: 'Rechazar',
+      type: 'danger'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pService.cancel(pedidoId).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido cancelado', 'Cerrar', { duration: 3000 });
-        this.cargarPedidos();
-      },
-      error: (error) => {
-        console.error('Error al cancelar pedido:', error);
-        this._snackBar.open(
-          error.error?.message || 'No se pudo cancelar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        );
-      }
+      this.pService.cancel(pedidoId).subscribe({
+        next: () => {
+          this.toastService.success('✅ Pedido rechazado');
+          this.cargarPedidos();
+        }
+      });
     });
   }
 
-  marcarEnCamino(pedidoId: number): void {
-    if (!confirm('¿Marcar pedido como "En Camino"?')) return;
+  cambiarEstado(event: { pedidoId: number, nuevoEstado: EstadoPedido }): void {
+    const estadoLabel = event.nuevoEstado.replace(/_/g, ' ').toLowerCase();
+    
+    this.confirmationService.confirm({
+      title: 'Cambiar Estado',
+      message: `¿Cambiar estado del pedido a "${estadoLabel}"?`,
+      confirmText: 'Cambiar',
+      type: 'warning'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.pService.changeState(pedidoId, EstadoPedido.EN_CAMINO).subscribe({
-      next: () => {
-        this._snackBar.open('✅ Pedido marcado como "En Camino"', 'Cerrar', { duration: 3000 });
-        this.cargarPedidos();
-      },
-      error: (error) => {
-        console.error('Error al actualizar pedido:', error);
-        this._snackBar.open(
-          error.error?.message || 'No se pudo actualizar el pedido',
-          'Cerrar',
-          { duration: 4000 }
-        );
-      }
+      this.pService.changeState(event.pedidoId, event.nuevoEstado).subscribe({
+        next: () => {
+          this.toastService.success(`✅ Estado actualizado a "${estadoLabel}"`);
+          this.cargarPedidos();
+        }
+      });
     });
+  }
+
+  marcarEntregado(pedido: PedidoResponse){
+    this.promptService.show({
+      title: 'Marcar como entregado',
+      message: 'Indica el PIN del pedido proporcionado por el cliente',
+      placeholder: 'Ej: XXXXX',
+      required: true,
+      confirmText: 'Entregado',
+      type: 'danger'
+    }).subscribe(result => {
+      if (!result.confirmed) return;
+      const PIN : string = result.value?.toUpperCase() ?? ""
+      if(PIN === pedido.pin?.toUpperCase()){
+        this.pService.marcarComoEntregado(pedido.id).subscribe({
+          next: () => {
+            this.toastService.success('✅ Pedido marcado como "Completado"');
+            this.cargarPedidos();
+          }
+        });
+      }else{
+          this.promptService.updateValue(""); // limpia el valor
+          this.promptService.shakeInput();    // vibra el input
+          this.toastService.error("PIN incorrecto");
+      }});      
+  }
+
+  onSearchChanged(text: string) {
+    this.searchValue = text;
+    
+    // Si hay texto o hay filtros aplicados, buscar
+    if (text.trim() !== '' || this.tieneFiltrosAplicados()) {
+      this.searchSubject.next(text);
+    } else if (text.trim() === '' && !this.tieneFiltrosAplicados()) {
+      // Si borraron todo y no hay filtros, cargar todos
+      this.pagePedidos = 0;
+      this.cargarPedidos();
+    }
+  } 
+ 
+  private tieneFiltrosAplicados(): boolean {
+    return this.filtroTipoEntrega !== '' ||
+           this.filtroFechaInicio !== '' ||
+           this.filtroFechaFin !== '';
+  }  
+
+  onClearFilters(): void {
+    this.searchValue = '';
+    this.filtroTipoEntrega = '';
+    this.filtroFechaInicio = '';
+    this.filtroFechaFin = '';
+    this.pagePedidos = 0;
+    
+    // Limpiar la barra buscadora visualmente
+    if (this.barraBuscadora) {
+      this.barraBuscadora.onSearchClear();
+    }
+    
+    this.cargarPedidos();
+  }  
+
+  buscar() {
+    // Convertir fechas de tipo date a LocalDateTime con hora 00:00:00
+    const fechaInicioFormatted = this.filtroFechaInicio 
+      ? `${this.filtroFechaInicio}T00:00:00` 
+      : '';
+    
+    const fechaFinFormatted = this.filtroFechaFin 
+      ? `${this.filtroFechaFin}T23:59:59` 
+      : '';
+    
+    const estadoParaBuscar = this.estadoActual === 'TODOS' 
+      ? '' 
+      : this.estadoActual;  
+
+    this.pService.filtrarPedidosRestaurante(
+      this.restaurante?.id!,
+      this.searchValue,
+      estadoParaBuscar,
+      this.filtroTipoEntrega,
+      fechaInicioFormatted,
+      fechaFinFormatted,
+      this.pagePedidos, 
+      this.sizePedidos
+    ).subscribe(resp => {
+      this.arrPedidos = resp.content;
+      this.lengthPedidos = resp.totalElements;
+    });
+  }
+
+
+  aplicarFiltros(): void {
+    this.pagePedidos = 0;
+    this.buscar();
+  }
+
+  verDetalles(pedidoId: number): void {
+    this.router.navigate(['/restaurante/pedidos/detalle', pedidoId]);
   }
 }

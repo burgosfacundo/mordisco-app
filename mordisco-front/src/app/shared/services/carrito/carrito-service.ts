@@ -5,7 +5,6 @@ import { CarritoResumen } from '../../models/carrito/carrito-resumen';
 @Injectable({ providedIn: 'root' })
 export class CarritoService {
   private readonly STORAGE_KEY = 'mordisco_carrito'
-  private readonly COSTO_ENVIO_BASE = 2000;
   
   // Estado reactivo
   private _items = signal<ItemCarrito[]>([])
@@ -22,12 +21,8 @@ export class CarritoService {
     this._items().reduce((sum, item) => sum + (item.precio * item.cantidad), 0)
   )
   
-  costoEnvio = computed(() => 
-    this._items().length > 0 ? this.COSTO_ENVIO_BASE : 0
-  )
-  
   total = computed(() => 
-    this.subtotal() + this.costoEnvio()
+    this.subtotal()
   )
   
   restauranteActual = computed(() => {
@@ -42,15 +37,33 @@ export class CarritoService {
   
   tieneItems = computed(() => this._items().length > 0)
   
-  resumen = computed((): CarritoResumen => ({
-    items: this._items(),
-    subtotal: this.subtotal(),
-    costoEnvio: this.costoEnvio(),
-    total: this.total(),
-    cantidadItems: this.cantidadTotal(),
-    restauranteId: this.restauranteActual()?.id ?? null,
-    restauranteNombre: this.restauranteActual()?.nombre ?? null
-  }))
+  resumen = computed((): CarritoResumen => {
+    const items = this._items();
+    const subtotal = this.subtotal();
+    
+    // Calcular descuentos totales
+    const descuentoTotal = items.reduce((sum, item) => {
+      if (item.precioConDescuento && item.precioConDescuento < item.precio) {
+        const descuentoPorUnidad = item.precio - item.precioConDescuento;
+        return sum + (descuentoPorUnidad * item.cantidad);
+      }
+      return sum;
+    }, 0);
+    
+    const subtotalConDescuento = subtotal - descuentoTotal;
+    
+    return {
+      items: items,
+      subtotal: subtotal,
+      descuentoTotal: descuentoTotal,
+      subtotalConDescuento: subtotalConDescuento,
+      costoEnvio: 0,
+      total: subtotalConDescuento, // Total con descuentos aplicados
+      cantidadItems: this.cantidadTotal(),
+      restauranteId: this.restauranteActual()?.id ?? null,
+      restauranteNombre: this.restauranteActual()?.nombre ?? null
+    };
+  })
 
   constructor() {
     this.cargarDesdeStorage()
@@ -66,8 +79,9 @@ export class CarritoService {
     // Validar que sea del mismo restaurante
     if (items.length > 0 && items[0].restauranteId !== item.restauranteId) {
       throw new Error(
-        `Solo puedes agregar productos de ${items[0].restauranteNombre}. ` +
-        `Vacía el carrito primero para pedir de otro restaurante.`
+        `🏪 Solo puedes pedir de un restaurante a la vez.\n\n` +
+        `Tu carrito tiene productos de "${items[0].restauranteNombre}".\n` +
+        `Vacía el carrito para pedir de "${item.restauranteNombre}".`
       )
     }
     

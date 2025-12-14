@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.mapper.ImagenMapper;
+import utn.back.mordiscoapi.mapper.PedidoMapper;
 import utn.back.mordiscoapi.mapper.RestauranteMapper;
+import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteCreateDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseCardDTO;
 import utn.back.mordiscoapi.model.dto.restaurante.RestauranteResponseDTO;
@@ -37,16 +39,19 @@ public class RestauranteServiceImpl implements IRestauranteService {
      */
     @Transactional
     @Override
-    public void save(RestauranteCreateDTO restauranteCreateDTO) {
+    public void save(RestauranteCreateDTO restauranteCreateDTO) throws BadRequestException {
         Restaurante restaurante = RestauranteMapper.toEntity(restauranteCreateDTO);
-        restaurante.setActivo(false);
         var d = restaurante.getDireccion();
 
-        geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal())
-                .ifPresent(latLng -> {
-                    d.setLatitud(latLng.lat());
-                    d.setLongitud(latLng.lng());
-                });
+        // Geocodificar la dirección del restaurante
+        var coordenadas = geocodingService.geocode(d.getCalle(), d.getNumero(), d.getCiudad(), d.getCodigoPostal());
+
+        if (coordenadas.isEmpty()) {
+            throw new BadRequestException("No se pudo encontrar la dirección del restaurante. Por favor, verifique que la calle, número, ciudad y código postal sean correctos.");
+        }
+
+        d.setLatitud(coordenadas.get().lat());
+        d.setLongitud(coordenadas.get().lng());
 
         restauranteRepository.save(restaurante);
     }
@@ -64,8 +69,6 @@ public class RestauranteServiceImpl implements IRestauranteService {
                 () -> new NotFoundException("Restaurante no encontrado"));
 
         return RestauranteMapper.toDTO(rest);
-
-
     }
 
     /**
@@ -178,17 +181,134 @@ public class RestauranteServiceImpl implements IRestauranteService {
     }
 
     /**
-     * Elimina un restaurante por su ID.
+     * Elimina un restaurante validando que no tenga pedidos activos
      *
-     * @param id del restaurante a eliminar.
-     * @throws NotFoundException si no se encuentra el restaurante con el ID proporcionado.
+     * @param id del restaurante a eliminar
+     * @throws NotFoundException si no se encuentra el restaurante
      */
     @Transactional
     @Override
-    public void delete(Long id) throws NotFoundException {
-        if(!restauranteRepository.existsById(id)){
-            throw new NotFoundException("El restaurante a borrar no fue encontrado");
+    public void delete(Long id) throws NotFoundException, BadRequestException {
+        if (!restauranteRepository.existsById(id)) {
+            throw new NotFoundException("El restaurante no existe");
         }
+
+        long pedidosActivos = restauranteRepository.countPedidosActivos(id);
+
+        if (pedidosActivos > 0) {
+            String mensaje = String.format(
+                    "No se puede eliminar el restaurante. Tiene %d pedido%s activo%s. " +
+                            "Debe esperar a que se completen o cancelarlos antes de eliminarlo.",
+                    pedidosActivos,
+                    pedidosActivos == 1 ? "" : "s",
+                    pedidosActivos == 1 ? "" : "s"
+            );
+
+            throw new BadRequestException(mensaje);
+        }
+
         restauranteRepository.deleteById(id);
+    }
+
+    /**
+     *  Obtiene los pedidos activos de un restaurante (para mostrar al usuario por qué no puede eliminar)
+     */
+    @Override
+    public Page<PedidoResponseDTO> getPedidosActivos(Long restauranteId, int page, int size)
+            throws NotFoundException {
+
+        if (!restauranteRepository.existsById(restauranteId)) {
+            throw new NotFoundException("El restaurante no existe");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        return restauranteRepository.findPedidosActivosByRestaurante(restauranteId, pageable)
+                .map(PedidoMapper::toDTO);
+    }
+
+    @Override
+    public Page<RestauranteResponseDTO> filtrarRestaurantes(
+            int pageNo, int pageSize,
+            String search,
+            String activo) {
+
+        // Convertir String a Boolean para activo
+        Boolean activoBoolean = null;
+        if (activo != null && !activo.isBlank()) {
+            activoBoolean = activo.equals("1"); // "1" = true (activo), "0" = false (inactivo)
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return restauranteRepository.filtrarRestaurantes(
+                search,
+                activoBoolean,
+                pageable
+        ).map(RestauranteMapper::toDTO);
+    }
+
+    /**
+     * Busca restaurantes dentro de un radio desde una ubicación específica
+     *
+     * @param latitud Latitud del punto de referencia
+     * @param longitud Longitud del punto de referencia
+     * @param radioKm Radio de búsqueda en kilómetros
+     * @param searchTerm Término de búsqueda opcional (null o vacío para todos)
+     * @param pageNo Número de página
+     * @param pageSize Tamaño de página
+     * @return Página de restaurantes ordenados por estado abierto y distancia
+     */
+    @Override
+    public Page<RestauranteResponseCardDTO> findByLocationWithinRadius(
+            Double latitud,
+            Double longitud,
+            Double radioKm,
+            String searchTerm,
+            int pageNo,
+            int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        
+        // Si no hay término de búsqueda, buscar todos (%)
+        String search = (searchTerm == null || searchTerm.trim().isEmpty()) 
+                ? "%" 
+                : "%" + searchTerm.trim() + "%";
+        
+        return restauranteRepository.findByLocationWithinRadius(
+                latitud, 
+                longitud, 
+                radioKm, 
+                search, 
+                pageable
+        ).map(RestauranteMapper::toCardDTO);
+    }
+
+    /**
+     * Busca restaurantes con promociones activas dentro de un radio desde una ubicación específica
+     *
+     * @param latitud Latitud del punto de referencia
+     * @param longitud Longitud del punto de referencia
+     * @param radioKm Radio de búsqueda en kilómetros
+     * @param pageNo Número de página
+     * @param pageSize Tamaño de página
+     * @return Página de restaurantes con promociones ordenados por estado abierto y distancia
+     */
+    @Override
+    public Page<RestauranteResponseCardDTO> findWithPromocionByLocationWithinRadius(
+            Double latitud,
+            Double longitud,
+            Double radioKm,
+            int pageNo,
+            int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        
+        return restauranteRepository.findWithPromocionByLocationWithinRadius(
+                latitud, 
+                longitud, 
+                radioKm, 
+                pageable
+        ).map(RestauranteMapper::toCardDTO);
+
     }
 }

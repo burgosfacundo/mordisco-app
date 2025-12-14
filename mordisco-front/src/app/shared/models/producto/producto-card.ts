@@ -5,5 +5,9 @@ export default interface ProductoCard {
     nombre: string,
     disponible : boolean
     imagen: ImagenResponse,
-    precio: number
+    precio: number,
+    precioConDescuento?: number,
+    porcentajeDescuento?: number,
+    tienePromocion?: boolean,
+    descripcionPromocion?: string
 }
