@@ -244,6 +244,27 @@ export class DetallePedidoPage implements OnInit {
     });
   }
 
+  aceptarPedidoRepartidor(): void {
+    if (!this.pedido?.id) return;
+
+    this.confirmationService.confirm({
+      title: 'Aceptar Pedido',
+      message: '¿Deseas aceptar este pedido para entregarlo?',
+      confirmText: 'Sí, aceptar',
+      cancelText: 'Cancelar',
+      type: 'info'
+    }).subscribe(confirmed => {
+      if (!confirmed || !this.pedido?.id) return;
+
+      this.pedidoService.aceptarPedido(this.pedido.id).subscribe({
+        next: () => {
+          this.toastService.success(`✅ Pedido #${this.pedido!.id} aceptado exitosamente`);
+          this.router.navigate(['/']);
+        }
+      });
+    });
+  }
+
   volver(): void {
     if(this.isUsuario === 'ROLE_CLIENTE')
       this.router.navigate(['/cliente/pedidos']);
@@ -251,7 +272,7 @@ export class DetallePedidoPage implements OnInit {
       this.router.navigate(['/restaurante/pedidos']);
     else if(this.isUsuario === 'ROLE_REPARTIDOR')
       this.router.navigate(['/']);
-    else 
+    else
       this.router.navigate(['/admin/pedidos']);
   }
 
