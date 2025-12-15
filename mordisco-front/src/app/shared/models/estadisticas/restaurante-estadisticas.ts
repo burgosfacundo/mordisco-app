@@ -4,7 +4,7 @@ export interface IngresosPorPeriodo {
 }
 
 export interface ProductoMasVendido {
-  productoId: number;
+  productoId: number | null;  // null si el producto fue eliminado
   nombre: string;
   cantidadVendida: number;
   ingresoGenerado: number;

@@ -82,7 +82,7 @@ public class EstadisticasRestauranteServiceImpl implements IEstadisticasRestaura
 
         return results.stream()
                 .map(row -> new ProductoMasVendidoDTO(
-                        ((Number) row[0]).longValue(),    // productoId
+                        row[0] != null ? ((Number) row[0]).longValue() : null,  // productoId (null si producto eliminado)
                         (String) row[1],                   // nombre
                         ((Number) row[2]).intValue(),      // cantidadVendida
                         (BigDecimal) row[3]                // ingresoGenerado

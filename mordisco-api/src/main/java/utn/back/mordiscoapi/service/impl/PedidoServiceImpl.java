@@ -14,6 +14,7 @@ import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.event.order.*;
 import utn.back.mordiscoapi.mapper.PedidoMapper;
+import utn.back.mordiscoapi.mapper.ProductoPedidoMapper;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoRequestDTO;
 import utn.back.mordiscoapi.model.dto.pedido.PedidoResponseDTO;
@@ -429,6 +430,10 @@ public class PedidoServiceImpl implements IPedidoService {
                         "El producto '" + producto.getNombre() + "' no está disponible"
                 );
             }
+
+            // Asignar producto completo y crear snapshot para preservar datos históricos
+            item.setProducto(producto);
+            ProductoPedidoMapper.crearSnapshotProducto(item, producto);
 
             // Calcular subtotal
             BigDecimal subtotal = item.getPrecioUnitario()

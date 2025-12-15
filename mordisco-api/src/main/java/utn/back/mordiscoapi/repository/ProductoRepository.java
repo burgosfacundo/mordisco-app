@@ -36,11 +36,13 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     /**
      * Encuentra los productos más vendidos de un restaurante (ingresos después de descontar comisión de la plataforma)
+     * Usa datos desnormalizados de productos_pedidos para incluir productos eliminados en estadísticas históricas.
+     * NOTA: producto_id puede ser NULL para productos que fueron eliminados.
      * @param restauranteId ID del restaurante
-     * @return Lista de productos más vendidos
+     * @return Lista de productos más vendidos (producto_id puede ser NULL si el producto fue eliminado)
      */
     @Query(value = """
-            SELECT pr.id, pr.nombre,
+            SELECT pp.producto_id, pp.nombre_producto,
                    SUM(pp.cantidad) as cantidad_vendida,
                    SUM(
                        pp.precio_unitario * pp.cantidad *
@@ -49,14 +51,11 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
                         ORDER BY cs.fecha_actualizacion DESC
                         LIMIT 1) / 100
                    ) as ingreso_generado
-            FROM productos pr
-            JOIN menus m ON pr.menu_id = m.id
-            JOIN restaurantes r ON r.menu_id = m.id
-            JOIN productos_pedidos pp ON pp.producto_id = pr.id
+            FROM productos_pedidos pp
             JOIN pedidos p ON pp.pedido_id = p.id
-            WHERE r.id = :restauranteId
+            WHERE p.restaurante_id = :restauranteId
             AND p.estado = 'COMPLETADO'
-            GROUP BY pr.id, pr.nombre
+            GROUP BY pp.producto_id, pp.nombre_producto
             ORDER BY cantidad_vendida DESC
             LIMIT 10
             """, nativeQuery = true)

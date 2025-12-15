@@ -37,7 +37,7 @@ public class Producto {
     @JoinColumn(name = "imagen_id", referencedColumnName = "id", unique = true)
     private Imagen imagen;
 
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "producto")
     private List<ProductoPedido> productoPedido;
 
     @ManyToOne(fetch = FetchType.LAZY)

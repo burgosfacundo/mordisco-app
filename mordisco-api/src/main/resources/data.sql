@@ -113,8 +113,8 @@ INSERT INTO `direcciones` VALUES
 -- Estados: PENDIENTE, EN_PREPARACION, LISTO_PARA_RETIRAR, LISTO_PARA_ENTREGAR, ASIGNADO_A_REPARTIDOR, EN_CAMINO, COMPLETADO, CANCELADO
 -- Tipos: DELIVERY, RETIRO_POR_LOCAL
 
-INSERT INTO `pedidos` (id, tipo_entrega, fecha_hora, estado, total, subtotal_productos, costo_delivery, distancia_km, baja_logica, motivo_baja, fecha_baja, estado_antes_de_cancelado, usuario_id, restaurante_id, repartidor_id, fecha_aceptacion_repartidor, pin, fecha_entrega, direccion_id, direccion_snapshot) VALUES
 -- JUNIO 2025 - Pedidos completados
+INSERT INTO `pedidos` (id, tipo_entrega, fecha_hora, estado, total, subtotal_productos, costo_delivery, distancia_km, baja_logica, motivo_baja, fecha_baja, estado_antes_de_cancelado, usuario_id, restaurante_id, repartidor_id, fecha_aceptacion_repartidor, pin, fecha_entrega, direccion_id, direccion_snapshot) VALUES
 (1,'DELIVERY','2025-06-15 12:30:00','COMPLETADO',24200.00,19200.00,5000.00,3.2,false,NULL,NULL,NULL,2,1,32,'2025-06-15 12:45:00','1234','2025-06-15 13:15:00',16,'San Martin 2150, Mar del Plata (7600)'),
 (2,'DELIVERY','2025-06-16 19:45:00','COMPLETADO',27400.00,20900.00,6500.00,4.5,false,NULL,NULL,NULL,3,1,33,'2025-06-16 20:00:00','5678','2025-06-16 20:35:00',17,'Luro 3200, Piso 2 B, Mar del Plata (7600)'),
 (3,'RETIRO_POR_LOCAL','2025-06-18 13:00:00','COMPLETADO',25900.00,25900.00,NULL,NULL,false,NULL,NULL,NULL,4,3,NULL,NULL,NULL,'2025-06-18 13:30:00',NULL,NULL),
@@ -218,178 +218,95 @@ INSERT INTO `pedidos` (id, tipo_entrega, fecha_hora, estado, total, subtotal_pro
 (85,'RETIRO_POR_LOCAL','2025-12-12 13:30:00','PENDIENTE',18000.00,18000.00,NULL,NULL,false,NULL,NULL,NULL,11,5,NULL,NULL,NULL,NULL,NULL,NULL);
 
 -- 12) Productos de cada pedido (productos_pedidos)
--- formato: (id, cantidad, precio_unitario, producto_id, pedido_id)
-INSERT INTO `productos_pedidos` (id, cantidad, precio_unitario, producto_id, pedido_id) VALUES
--- Pedido 1 - McDonalds
-(1,1,19200.00,1,1),
--- Pedido 2 - McDonalds
-(2,1,20900.00,2,2),
--- Pedido 3 - El Club de la Milanesa
-(3,1,25900.00,13,3),
--- Pedido 4 - Estilo Sushi
-(4,1,23560.00,17,4),
--- Pedido 5 - Hells Pizza
-(5,1,21700.00,32,5),
--- Pedido 6 - Lebron
-(6,1,18000.00,24,6),
--- Pedido 7 - Burger King
-(7,1,15831.00,38,7),
--- Pedido 8 - McDonalds
-(8,1,15600.00,3,8),
--- Pedido 9 - Mostaza
-(9,1,20500.00,7,9),
--- Pedido 10 - El Club de la Milanesa
-(10,1,25900.00,13,10),
-(11,1,21500.00,14,10),
--- Pedido 11 - Estilo Sushi
-(12,1,32520.00,19,11),
--- Pedido 12 - Lebron
-(13,1,30000.00,25,12),
--- Pedido 13 - Hells Pizza
-(14,1,25100.00,33,13),
--- Pedido 14 - Burger King
-(15,1,24700.00,39,14),
--- Pedido 15 - La Reina del Parque
-(16,1,9500.00,48,15),
--- Pedido 16 - Coco Cafe
-(17,1,8000.00,55,16),
--- Pedido 17 - Che Sushi
-(18,1,12940.00,61,17),
--- Pedido 18 - Dean & Dennys
-(19,1,18800.00,66,18),
--- Pedido 19 - McDonalds
-(20,1,19200.00,1,19),
--- Pedido 20 - Mostaza
-(21,1,20900.00,8,20),
--- Pedido 21 - El Club de la Milanesa
-(22,1,25900.00,15,21),
--- Pedido 22 - Estilo Sushi
-(23,1,23560.00,17,22),
--- Pedido 23 - Lebron
-(24,1,18000.00,24,23),
--- Pedido 24 - Hells Pizza
-(25,1,43200.00,34,24),
--- Pedido 25 - Burger King
-(26,1,21000.00,40,25),
--- Pedido 26 - La Reina del Parque
-(27,1,3400.00,50,26),
--- Pedido 27 - Coco Cafe
-(28,1,8000.00,55,27),
--- Pedido 28 - Che Sushi
-(29,1,12940.00,62,28),
--- Pedido 29 - Dean & Dennys
-(30,1,13200.00,67,29),
--- Pedido 30 - Chiqui Empanadas
-(31,2,2600.00,70,30),
--- Pedido 31 - Sao Medialunas
-(32,1,28000.00,75,31),
--- Pedido 32 - Poke Pop
-(33,1,12999.00,87,32),
--- Pedido 33 - Los Toldos Viejos
-(34,1,52500.00,90,33),
--- Pedido 34 - McDonalds
-(35,1,19200.00,1,34),
--- Pedido 35 - Mostaza
-(36,1,20500.00,9,35),
--- Pedido 36 - El Club de la Milanesa
-(37,1,25900.00,16,36),
--- Pedido 37 - Estilo Sushi
-(38,1,23560.00,17,37),
--- Pedido 38 - Lebron
-(39,1,14800.00,26,38),
-(40,1,17900.00,27,38),
--- Pedido 39 - Hells Pizza
-(41,1,21700.00,32,39),
--- Pedido 40 - Burger King
-(42,1,24700.00,39,40),
--- Pedido 41 - La Reina del Parque
-(43,1,9500.00,48,41),
--- Pedido 42 - Coco Cafe
-(44,1,16000.00,57,42),
--- Pedido 43 - Che Sushi
-(45,1,12940.00,61,43),
--- Pedido 44 - Dean & Dennys
-(46,1,21999.00,69,44),
--- Pedido 45 - Chiqui Empanadas
-(47,2,2600.00,71,45),
--- Pedido 46 - Sao Medialunas
-(48,1,23200.00,84,46),
--- Pedido 47 - Poke Pop
-(49,1,14999.00,88,47),
--- Pedido 48 - Los Toldos Viejos
-(50,1,45800.00,91,48),
--- Pedido 49 - McDonalds
-(51,1,19200.00,1,49),
--- Pedido 50 - Mostaza
-(52,1,20900.00,8,50),
--- Pedido 51 - El Club de la Milanesa
-(53,1,25900.00,13,51),
--- Pedido 52 - Estilo Sushi
-(54,1,23560.00,17,52),
--- Pedido 53 - Lebron
-(55,1,30000.00,25,53),
--- Pedido 54 - Hells Pizza
-(56,1,25100.00,33,54),
--- Pedido 55 - Burger King
-(57,1,22000.00,42,55),
--- Pedido 56 - La Reina del Parque
-(58,2,3500.00,52,56),
--- Pedido 57 - Coco Cafe
-(59,1,13000.00,60,57),
--- Pedido 58 - Che Sushi
-(60,1,12940.00,62,58),
--- Pedido 59 - Dean & Dennys
-(61,1,18800.00,66,59),
--- Pedido 60 - Chiqui Empanadas
-(62,3,2600.00,72,60),
--- Pedido 61 - Sao Medialunas
-(63,1,28000.00,75,61),
--- Pedido 62 - Poke Pop
-(64,1,14284.50,89,62),
--- Pedido 63 - Los Toldos Viejos
-(65,1,52500.00,90,63),
--- Pedido 64 - McDonalds
-(66,1,19700.00,5,64),
--- Pedido 65 - Mostaza
-(67,1,16900.00,11,65),
--- Pedido 66 - El Club de la Milanesa
-(68,1,25900.00,15,66),
--- Pedido 67 - Estilo Sushi
-(69,1,23560.00,17,67),
--- Pedido 68 - Lebron
-(70,1,14800.00,26,68),
-(71,1,12000.00,28,68),
--- Pedido 69 - Hells Pizza
-(72,1,25100.00,33,69),
--- Pedido 70 - Burger King
-(73,1,22500.00,46,70),
--- Pedidos cancelados (71-75)
-(74,1,19200.00,1,71),
-(75,1,25900.00,13,72),
-(76,1,32520.00,19,73),
-(77,1,21700.00,32,74),
-(78,1,18000.00,24,75),
--- Pedido 76 - McDonalds
-(79,1,15600.00,3,76),
--- Pedido 77 - Mostaza
-(80,1,20900.00,8,77),
--- Pedido 78 - El Club de la Milanesa
-(81,1,23700.00,14,78),
--- Pedido 79 - Estilo Sushi
-(82,1,23560.00,17,79),
--- Pedido 80 - Lebron
-(83,1,30000.00,25,80),
--- Pedido 81 - Hells Pizza
-(84,1,21700.00,32,81),
--- Pedido 82 - McDonalds
-(85,1,19200.00,1,82),
--- Pedido 83 - El Club de la Milanesa
-(86,1,25900.00,13,83),
--- Pedido 84 - Estilo Sushi
-(87,1,23560.00,17,84),
--- Pedido 85 - Lebron
-(88,1,18000.00,24,85);
-
+INSERT INTO `productos_pedidos` (id, cantidad, precio_unitario, pedido_id, producto_id, nombre_producto, descripcion_producto, imagen_url) VALUES
+(1,1,19200.00,1,1,'Doble Cuarto de Libra','Hamburguesa doble carne 100% vacuna, dos fetas de queso cheddar, kétchup, mostaza y cebolla. Acompañamiento y bebida mediana a elección.','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcnc0IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--554055bbfd01767f6ef5c8262e2c1e41d26aa621/Banner%201000x1000%20-%20McCombo%20Doble%20Cuarto%20de%20Libra%20-%20Imagen%20de%20producto.png'),
+(2,1,20900.00,2,2,'Grand Doble Tasty','Hamburguesa con doble carne 100% vacuna, salsa tasty, 3 fetas de queso cheddar, lechuga, tomate, cebolla, en un pan con semillas de sésamo. Acompañamiento y bebida a elección.','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcjA0IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--bdbfbedaa1c8f818a6ff658255d54511f668bac5/Banner%201000x1000%20-%20McCombo%20Doble%20Premium%20Tasty%20-%20Imagen%20de%20producto.png'),
+(3,1,25900.00,3,13,'Suprema del Club','Pechuga de pollo rebozada (280 g) con muzzarella, jamón, tomate y huevo frito. Incluye guarnición a elección.','https://scontent.fmdq7-1.fna.fbcdn.net/v/t51.82787-15/583040046_18563363824032649_472755857585726408_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=9_rAI6YL7mcQ7kNvwGfcmcA&_nc_oc=AdlQJK5kkNXNs3vduOAc9bD7Akc4QREGAVqNg5vnIA4s63UpIqzRuxClreunotVhMsg&_nc_zt=23&_nc_ht=scontent.fmdq7-1.fna&_nc_gid=NND3PbjwjXnz1MucWrsiWg&oh=00_AfmaTVamzeJ-144Y49Z3cQK3-qa_c1sJjvR9x6yfHuXi3w&oe=69412355'),
+(4,1,23560.00,4,17,'Combinado N1 - 12 Piezas Mixto','Rolls: california roll, drago roll, fresh roll, chicken roll, futurama roll,soul roll, vegetariano roll, gunkans de tamago, makis de atún.','https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400'),
+(5,1,21700.00,5,32,'Lincoln grande','Pizza grande tradicional de 33cm de diámetro de mozzarella.','https://images.rappi.com.ar/products/421a8818-423c-4e53-94a0-baf633f465e3-1603204158245_hq.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/421a8818-423c-4e53-94a0-baf633f465e3-1603204158245_hq.jpeg?e=webp&q=50&d=400x400'),
+(6,1,18000.00,6,24,'2 Cheese burger + papas','2 Hamburguesas simples con queso cheddar + papas','https://images.rappi.com.ar/products/960e6e22-34b6-4250-9fa2-7c057240d604.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/960e6e22-34b6-4250-9fa2-7c057240d604.png?e=webp&q=50&d=400x400'),
+(7,1,15831.00,7,38,'Doble Carne Doble Queso + Papas Regular','Doble carne a la parrilla, queso, ketchup, mostaza y pan. Acompañado con papas fritas regulares.','https://images.rappi.com.ar/products/6679435e-3ea0-4a5f-8098-0cbdfaa89a53.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/6679435e-3ea0-4a5f-8098-0cbdfaa89a53.jpeg?e=webp&q=50&d=400x400'),
+(8,1,15600.00,8,3,'Big Mac','Hamburguesa con doble carne 100% vacuna, salsa Big Mac, queso derretido, cebolla, lechuga y pepino. Acompañamiento y bebida a elección.','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcm80IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--807707b94ce5ea235a775342af84a95985353fd6/Banner%201000x1000%20-%20McCombo%20Big%20Mac%20-%20Imagen%20de%20producto.png'),
+(9,1,20500.00,9,7,'Homo Argentum','Mega Hamburguesa de carne con queso provolone, bacon, papitas, cebolla morada y salsa chiminesa, acompañada de papas coated regulares y bebida a elección.','https://www.mostazaweb.com.ar/wp-content/uploads/2025/08/20-7-copia.png'),
+(10,1,25900.00,10,13,'Suprema del Club','Pechuga de pollo rebozada (280 g) con muzzarella, jamón, tomate y huevo frito. Incluye guarnición a elección.','https://scontent.fmdq7-1.fna.fbcdn.net/v/t51.82787-15/583040046_18563363824032649_472755857585726408_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=9_rAI6YL7mcQ7kNvwGfcmcA&_nc_oc=AdlQJK5kkNXNs3vduOAc9bD7Akc4QREGAVqNg5vnIA4s63UpIqzRuxClreunotVhMsg&_nc_zt=23&_nc_ht=scontent.fmdq7-1.fna&_nc_gid=NND3PbjwjXnz1MucWrsiWg&oh=00_AfmaTVamzeJ-144Y49Z3cQK3-qa_c1sJjvR9x6yfHuXi3w&oe=69412355'),
+(11,1,21500.00,10,14,'Milanesa a caballo','Milanesa de ternera Angus con huevo frito y un toque de perejil fresco. Incluye guarnición a elección.','https://scontent.fmdq7-1.fna.fbcdn.net/v/t51.75761-15/511431949_18531779632032649_7417832614516008872_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_ohc=8yDbEVI7WvMQ7kNvwHoaD_f&_nc_oc=Admt3xjBfLkO1pS-h3QKzV0MCKbe1oV1WLlJWEjGI1kOiHodtjomdnO9Jn8ROZey2l8&_nc_zt=23&_nc_ht=scontent.fmdq7-1.fna&_nc_gid=cRx9p9ssWPQjaAvzMV-77A&oh=00_Afmr7irriRz3_C3VCgXVPQQJMeVFIyZ-Qi-8prr32F9PcA&oe=694129AC'),
+(12,1,32520.00,11,19,'Combinado N2 - 12 Piezas Salmon','Rolls: bs as roll, fresh roll ,bremen roll , mdp roll, guncans de tamago, maracuyá y munich, niguiris y geishas y maki de salmon.','https://images.rappi.com.ar/products/tmp911394914825836158351684845.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmp911394914825836158351684845.png?e=webp&q=50&d=400x400'),
+(13,1,30000.00,12,25,'Combo 2 classic bacon 1 lt cerveza','2 Hamburguesas de 120 gr de carne, queso cheddar, sweet bacón, salsa bbq con guarnición de papas fritas y 1 lt de cerveza artesanal.','https://images.rappi.com.ar/products/1adcf3a6-a365-46af-bd6e-a98ca8d89aed.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/1adcf3a6-a365-46af-bd6e-a98ca8d89aed.png?e=webp&q=50&d=400x400'),
+(14,1,25100.00,13,33,'Obama grande','Pizza grande tradicional de 33cm de diámetro de pepperoni y mozzarella.','https://images.rappi.com.ar/products/aefcb159-6a69-4f0d-9f1b-3529ec2c2bac-1603204256098_hq.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/aefcb159-6a69-4f0d-9f1b-3529ec2c2bac-1603204256098_hq.jpeg?e=webp&q=50&d=400x400'),
+(15,1,24700.00,14,39,'Combo Stacker Doble XL Muzarella','Doble carne XL a la parrilla, pan, Muzarellitas salsa stacker, panceta, queso cheddar, bebida y papas regulares','https://images.rappi.com.ar/products/30b8a2c2-f4db-4baf-953a-bd72ec7ba424.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/30b8a2c2-f4db-4baf-953a-bd72ec7ba424.png?e=webp&q=50&d=400x400'),
+(16,1,9500.00,15,48,'Budín de limón','Budín con ralladura de limón y cobertura de glasé','https://images.rappi.com.ar/products/38e6d898-39e2-4f54-aeb9-e7d0e12044be.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/38e6d898-39e2-4f54-aeb9-e7d0e12044be.jpeg?e=webp&q=50&d=400x400'),
+(17,1,8000.00,16,55,'Desayuno Tradicional','Desayuno con café con leche, 3 medialunas.','https://images.rappi.com.ar/products/1145340-1756592038482.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/1145340-1756592038482.png?e=webp&q=50&d=400x400'),
+(18,1,12940.00,17,61,'Poke Langostinos','Fresca ensalada de langostinos rebozados, palta, queso phila, repollo y zanahoria sobre arroz.','https://images.rappi.com.ar/products/535ac6fd-3434-403d-b5b6-b6a75eee5356.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/535ac6fd-3434-403d-b5b6-b6a75eee5356.png?e=webp&q=50&d=400x400'),
+(19,1,18800.00,18,66,'Super Bacon Burger Doble & Papas Grandes','Hamburguesa doble de carne vacuna de 120g, cheddar, lechuga, tomate, panceta, barbacoa y salsa dennys con papas grandes.','https://images.rappi.com.ar/products/d3f4e2bb-c1b8-42f5-b032-24dcd0fa35e4-1728060959977.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/d3f4e2bb-c1b8-42f5-b032-24dcd0fa35e4-1728060959977.png?e=webp&q=50&d=400x400'),
+(20,1,19200.00,19,1,'Doble Cuarto de Libra','Hamburguesa doble carne 100% vacuna, dos fetas de queso cheddar, kétchup, mostaza y cebolla. Acompañamiento y bebida mediana a elección.','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcnc0IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--554055bbfd01767f6ef5c8262e2c1e41d26aa621/Banner%201000x1000%20-%20McCombo%20Doble%20Cuarto%20de%20Libra%20-%20Imagen%20de%20producto.png'),
+(21,1,20900.00,20,8,'TR1 X Trueno','Mega Hamburguesa de carne con queso cheddar, bacon, pepino, cebolla crispy y barbacoa, acompañada de papas Coated regulares y bebida a elección.','https://www.mostazaweb.com.ar/wp-content/uploads/2025/05/20-7-copia-2.png'),
+(22,1,25900.00,21,15,'Milanesa Sweet Spicy','Milanesa de ternera Angus, con muzza, morrón asado, nachos, salsa criolla, sriracha y verdeo. Viene con guarnición.','https://scontent.fmdq6-1.fna.fbcdn.net/v/t51.82787-15/514831863_18533438923032649_8687170621484706710_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=UbPBttE4UCwQ7kNvwGI4CC6&_nc_oc=AdnH0QfmKCmYuDsyYqOuuGP0yQSulCGN6BozaS4GqRFQ6dO9-7VU6o_lRUyxcdjZie4&_nc_zt=23&_nc_ht=scontent.fmdq6-1.fna&_nc_gid=A2QYy7rFKbogLEl5MGtKIQ&oh=00_Afm7HqNI8WMv_Y1ji7pCTHUc-4UpPcdmDy3WI_Gk8wcKnQ&oe=69410A5A'),
+(23,1,23560.00,22,17,'Combinado N1 - 12 Piezas Mixto','Rolls: california roll, drago roll, fresh roll, chicken roll, futurama roll,soul roll, vegetariano roll, gunkans de tamago, makis de atún.','https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400'),
+(24,1,18000.00,23,24,'2 Cheese burger + papas','2 Hamburguesas simples con queso cheddar + papas','https://images.rappi.com.ar/products/960e6e22-34b6-4250-9fa2-7c057240d604.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/960e6e22-34b6-4250-9fa2-7c057240d604.png?e=webp&q=50&d=400x400'),
+(25,1,43200.00,24,34,'Chick norris xxl','Pizza xxl de pollo, cheddar, bbq, cebolla morada. p/4.','https://images.rappi.com.ar/products/570004-1567613744.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/570004-1567613744.png?e=webp&q=50&d=400x400'),
+(26,1,21000.00,25,40,'Combo BBQ Bacon','Carne a la parrilla, pan, queso cheddar, barbacoa y panceta. Acompañado con papas regulares y gaseosa 500ml.','https://images.rappi.com.ar/products/cc474b39-e4a8-45f8-8bc0-197669dd98a4.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/cc474b39-e4a8-45f8-8bc0-197669dd98a4.png?e=webp&q=50&d=400x400'),
+(27,1,3400.00,26,50,'Tarteleta picos blancos','Tarteleta de dulce de leche bañada en chocolate blanco.','https://images.rappi.com.ar/products/1dadc8a5-8524-407d-9bb2-50511b4f7cd4.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/1dadc8a5-8524-407d-9bb2-50511b4f7cd4.jpeg?e=webp&q=50&d=400x400'),
+(28,1,8000.00,27,55,'Desayuno Tradicional','Desayuno con café con leche, 3 medialunas.','https://images.rappi.com.ar/products/1145340-1756592038482.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/1145340-1756592038482.png?e=webp&q=50&d=400x400'),
+(29,1,12940.00,28,62,'Poke Salad Mex','Fresca ensalada de pollo rebozado, salsa teriyaki, guacamole y queso phila, sobre arroz gohan Incluye 1 Salsa Soja','https://images.rappi.com.ar/products/e5710c92-0580-4edf-a691-5ae8c4ef978b.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/e5710c92-0580-4edf-a691-5ae8c4ef978b.png?e=webp&q=50&d=400x400'),
+(30,1,13200.00,29,67,'Combo Cheeseburger Simple (120g) & Papas','Hamburguesa de carne vacuna de 120g, queso cheddar, salsa dennys o magic y porción de papas fritas grandes.','https://images.rappi.com.ar/products/c80d6c9e-3de3-4e0c-9749-88f6680a0cd5-1728060868655.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/c80d6c9e-3de3-4e0c-9749-88f6680a0cd5-1728060868655.png?e=webp&q=50&d=400x400'),
+(31,2,2600.00,30,70,'Carne Cortada a Cuchillo','Carne secreta cocida al horno de barro, cebolla salteada, tomate y verdeo. Cocido en fondo de cocción durante 2hs','https://images.rappi.com.ar/products/1521524-1657656344111.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/1521524-1657656344111.png?e=webp&q=50&d=400x400'),
+(32,1,28000.00,31,75,'Docena De Medialunas Mixtas','6 Medialunas clásicas más 3 medialunas rellenas de crema pastelera y 3 medialunas rellenas de dulce de leche.','https://images.rappi.com.ar/products/tmpImg4b0c4363-9685-40c2-9612-cd41af5bc8bd.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmpImg4b0c4363-9685-40c2-9612-cd41af5bc8bd.png?e=webp&q=50&d=400x400'),
+(33,1,12999.00,32,87,'Poke Salmón','425 gr - Fresca ensalada de salmón palta, queso phila, repollo y zanahoria sobre arroz. + 1 soja','https://images.rappi.com.ar/products/c85045dd-253f-4279-a95d-04615fbe1d7f.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/c85045dd-253f-4279-a95d-04615fbe1d7f.png?e=webp&q=50&d=400x400'),
+(34,1,52500.00,33,90,'Bife de chorizo mariposa','Bife de chorizo corte mariposa, 900gr para compartir .','https://images.rappi.com.ar/products/bfe9bfc0-abfd-4108-82c5-426667eba424.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/bfe9bfc0-abfd-4108-82c5-426667eba424.jpeg?e=webp&q=50&d=400x400'),
+(35,1,19200.00,34,1,'Doble Cuarto de Libra','Hamburguesa doble carne 100% vacuna, dos fetas de queso cheddar, kétchup, mostaza y cebolla. Acompañamiento y bebida mediana a elección.','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcnc0IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--554055bbfd01767f6ef5c8262e2c1e41d26aa621/Banner%201000x1000%20-%20McCombo%20Doble%20Cuarto%20de%20Libra%20-%20Imagen%20de%20producto.png'),
+(36,1,20500.00,35,9,'Doble Cuarto','Mega Hamburguesa con doble carne, queso cheddar, kétchup, mostaza y cebollita, acompañada de papas coated regulares y bebida a elección.','https://www.mostazaweb.com.ar/wp-content/uploads/2025/05/00-4.png'),
+(37,1,25900.00,36,16,'Milanesa Gringa','Milanesa de ternera Angus, con salsa barbacoa, queso cheddar, panceta y huevo frito. Viene con guarnición.','https://scontent.fmdq6-1.fna.fbcdn.net/v/t51.75761-15/491440793_18517281253032649_5281516675184626462_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=87mNkWxmYzcQ7kNvwGZc_Sf&_nc_oc=Adl7eGDnz8HPfBwnbU1mEofV6u_O9-X0fAFdP5-YKJKPRy-Xh243EDc7ukkc5icVCPU&_nc_zt=23&_nc_ht=scontent.fmdq6-1.fna&_nc_gid=-uh9z-an9t1WM7dEsFhiRg&oh=00_AfkCwat82j-NDqWkjtuLilK-uslQXERv7fOT3fasIFKq2w&oe=694118F9'),
+(38,1,23560.00,37,17,'Combinado N1 - 12 Piezas Mixto','Rolls: california roll, drago roll, fresh roll, chicken roll, futurama roll,soul roll, vegetariano roll, gunkans de tamago, makis de atún.','https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400'),
+(39,1,14800.00,38,26,'Papas con cheddar','Papas con cheddar y verdeo.','https://images.rappi.com.ar/products/f7b5181a-d06f-413f-86d2-b5b7561ea627.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/f7b5181a-d06f-413f-86d2-b5b7561ea627.png?e=webp&q=50&d=400x400'),
+(40,1,17900.00,38,27,'Papas pork','Papas fritas cubiertas con bondiola desmenuzada en salsa bbq.','https://images.rappi.com.ar/products/046ede90-6b1d-4b45-8bd4-542b50fa7981.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/046ede90-6b1d-4b45-8bd4-542b50fa7981.png?e=webp&q=50&d=400x400'),
+(41,1,21700.00,39,32,'Lincoln grande','Pizza grande tradicional de 33cm de diámetro de mozzarella.','https://images.rappi.com.ar/products/421a8818-423c-4e53-94a0-baf633f465e3-1603204158245_hq.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/421a8818-423c-4e53-94a0-baf633f465e3-1603204158245_hq.jpeg?e=webp&q=50&d=400x400'),
+(42,1,24700.00,40,39,'Combo Stacker Doble XL Muzarella','Doble carne XL a la parrilla, pan, Muzarellitas salsa stacker, panceta, queso cheddar, bebida y papas regulares','https://images.rappi.com.ar/products/30b8a2c2-f4db-4baf-953a-bd72ec7ba424.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/30b8a2c2-f4db-4baf-953a-bd72ec7ba424.png?e=webp&q=50&d=400x400'),
+(43,1,9500.00,41,48,'Budín de limón','Budín con ralladura de limón y cobertura de glasé','https://images.rappi.com.ar/products/38e6d898-39e2-4f54-aeb9-e7d0e12044be.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/38e6d898-39e2-4f54-aeb9-e7d0e12044be.jpeg?e=webp&q=50&d=400x400'),
+(44,1,16000.00,42,57,'Desayuno Continental','Desayuno con café con leche, jugo de naranja, medialunas, tostadas, manteca, mermelada.','https://images.rappi.com.ar/products/884e5fb0-d952-4e9d-926b-a1095656352c-1749990369373.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/884e5fb0-d952-4e9d-926b-a1095656352c-1749990369373.png?e=webp&q=50&d=400x400'),
+(45,1,12940.00,43,61,'Poke Langostinos','Fresca ensalada de langostinos rebozados, palta, queso phila, repollo y zanahoria sobre arroz.','https://images.rappi.com.ar/products/535ac6fd-3434-403d-b5b6-b6a75eee5356.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/535ac6fd-3434-403d-b5b6-b6a75eee5356.png?e=webp&q=50&d=400x400'),
+(46,1,21999.00,44,69,'2 Cheeseburger Clásicas Dobles & 1 Papas','2 Hamburguesas dobles de carne vacuna de 120g c/u, queso cheddar, salsa a elección y una porción de papas fritas grandes','https://images.rappi.com.ar/products/f94c0973-d67f-4d5b-9e58-b1ee991f1325-1728060630821.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/f94c0973-d67f-4d5b-9e58-b1ee991f1325-1728060630821.png?e=webp&q=50&d=400x400'),
+(47,2,2600.00,45,71,'Jamón y Mozarella','Jamón natural y queso mozzarella.','https://images.rappi.com.ar/products/1521526-1630509868622.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/1521526-1630509868622.png?e=webp&q=50&d=400x400'),
+(48,1,23200.00,46,84,'Docena De Medialunas','12 Medialunas clásicas','https://images.rappi.com.ar/products/tmpImgf8d3919c-4121-46b1-8533-2aa93b509ffd.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmpImgf8d3919c-4121-46b1-8533-2aa93b509ffd.png?e=webp&q=50&d=400x400'),
+(49,1,14999.00,47,88,'Salmon power Poke Bowl','Ensalada de arroz, salmón, palta, repollo curado, pickle de pepino, tomates cherry, batata crispy, mayonesa de wasabi y salsa nikkei.','https://images.rappi.com.ar/products/230b2df3-6dd5-42de-a72b-bab4c0dbb6bd.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/230b2df3-6dd5-42de-a72b-bab4c0dbb6bd.png?e=webp&q=50&d=400x400'),
+(50,1,45800.00,48,91,'Vacío','Porción de vacio de ternero.','https://images.rappi.com.ar/products/ae4cea60-8536-472f-ace2-a1b4864ed407.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/ae4cea60-8536-472f-ace2-a1b4864ed407.jpeg?e=webp&q=50&d=400x400'),
+(51,1,19200.00,49,1,'Doble Cuarto de Libra','Hamburguesa doble carne 100% vacuna, dos fetas de queso cheddar, kétchup, mostaza y cebolla. Acompañamiento y bebida mediana a elección.','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcnc0IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--554055bbfd01767f6ef5c8262e2c1e41d26aa621/Banner%201000x1000%20-%20McCombo%20Doble%20Cuarto%20de%20Libra%20-%20Imagen%20de%20producto.png'),
+(52,1,20900.00,50,8,'TR1 X Trueno','Mega Hamburguesa de carne con queso cheddar, bacon, pepino, cebolla crispy y barbacoa, acompañada de papas Coated regulares y bebida a elección.','https://www.mostazaweb.com.ar/wp-content/uploads/2025/05/20-7-copia-2.png'),
+(53,1,25900.00,51,13,'Suprema del Club','Pechuga de pollo rebozada (280 g) con muzzarella, jamón, tomate y huevo frito. Incluye guarnición a elección.','https://scontent.fmdq7-1.fna.fbcdn.net/v/t51.82787-15/583040046_18563363824032649_472755857585726408_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=9_rAI6YL7mcQ7kNvwGfcmcA&_nc_oc=AdlQJK5kkNXNs3vduOAc9bD7Akc4QREGAVqNg5vnIA4s63UpIqzRuxClreunotVhMsg&_nc_zt=23&_nc_ht=scontent.fmdq7-1.fna&_nc_gid=NND3PbjwjXnz1MucWrsiWg&oh=00_AfmaTVamzeJ-144Y49Z3cQK3-qa_c1sJjvR9x6yfHuXi3w&oe=69412355'),
+(54,1,23560.00,52,17,'Combinado N1 - 12 Piezas Mixto','Rolls: california roll, drago roll, fresh roll, chicken roll, futurama roll,soul roll, vegetariano roll, gunkans de tamago, makis de atún.','https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400'),
+(55,1,30000.00,53,25,'Combo 2 classic bacon 1 lt cerveza','2 Hamburguesas de 120 gr de carne, queso cheddar, sweet bacón, salsa bbq con guarnición de papas fritas y 1 lt de cerveza artesanal.','https://images.rappi.com.ar/products/1adcf3a6-a365-46af-bd6e-a98ca8d89aed.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/1adcf3a6-a365-46af-bd6e-a98ca8d89aed.png?e=webp&q=50&d=400x400'),
+(56,1,25100.00,54,33,'Obama grande','Pizza grande tradicional de 33cm de diámetro de pepperoni y mozzarella.','https://images.rappi.com.ar/products/aefcb159-6a69-4f0d-9f1b-3529ec2c2bac-1603204256098_hq.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/aefcb159-6a69-4f0d-9f1b-3529ec2c2bac-1603204256098_hq.jpeg?e=webp&q=50&d=400x400'),
+(57,1,22000.00,55,42,'Combo Guacamole King Simple','Hamburguesa a la parrilla con alioli, guacamole, queso cheddar, lechuga y cebolla, servida en pan de papa. Acompañada con papas regulares y bebida de 500ml','https://images.rappi.com.ar/products/cace6f76-fb27-4b41-8d92-499513cd5d96.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/cace6f76-fb27-4b41-8d92-499513cd5d96.png?e=webp&q=50&d=400x400'),
+(58,2,3500.00,56,52,'1/4 Kilo de bizcochitos de grasa','Un cuarto kilo de bizcochitos de grasa.','https://images.rappi.com.ar/products/9f7ed4dc-e98a-404c-92a6-027d4f88547e.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/9f7ed4dc-e98a-404c-92a6-027d4f88547e.jpeg?e=webp&q=50&d=400x400'),
+(59,1,13000.00,57,60,'Granola Bowl con Cafe con Leche','Café con leche, granola casera, yogurt, frutas de estación.','https://images.rappi.com.ar/products/ee7bb25e-e82e-4d2e-bf37-8711009175fa-1749990226376.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/ee7bb25e-e82e-4d2e-bf37-8711009175fa-1749990226376.png?e=webp&q=50&d=400x400'),
+(60,1,12940.00,58,62,'Poke Salad Mex','Fresca ensalada de pollo rebozado, salsa teriyaki, guacamole y queso phila, sobre arroz gohan Incluye 1 Salsa Soja','https://images.rappi.com.ar/products/e5710c92-0580-4edf-a691-5ae8c4ef978b.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/e5710c92-0580-4edf-a691-5ae8c4ef978b.png?e=webp&q=50&d=400x400'),
+(61,1,18800.00,59,66,'Super Bacon Burger Doble & Papas Grandes','Hamburguesa doble de carne vacuna de 120g, cheddar, lechuga, tomate, panceta, barbacoa y salsa dennys con papas grandes.','https://images.rappi.com.ar/products/d3f4e2bb-c1b8-42f5-b032-24dcd0fa35e4-1728060959977.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/d3f4e2bb-c1b8-42f5-b032-24dcd0fa35e4-1728060959977.png?e=webp&q=50&d=400x400'),
+(62,3,2600.00,60,72,'Empanada de Humita','Choclo natural, salsa blanca, cebolla salteada, queso sardo y queso cremoso.','https://images.rappi.com.ar/products/1521530-1630509652795.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/1521530-1630509652795.png?e=webp&q=50&d=400x400'),
+(63,1,28000.00,61,75,'Docena De Medialunas Mixtas','6 Medialunas clásicas más 3 medialunas rellenas de crema pastelera y 3 medialunas rellenas de dulce de leche.','https://images.rappi.com.ar/products/tmpImg4b0c4363-9685-40c2-9612-cd41af5bc8bd.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmpImg4b0c4363-9685-40c2-9612-cd41af5bc8bd.png?e=webp&q=50&d=400x400'),
+(64,1,14284.50,62,89,'Alaska 12','12 piezas de sushi con 3 NY Phila (salmón, phila, palta), 3 Hot NY Phila con guacamole (salmón, rebozado), 3 Paris (salmón, phila), 3 Clerc (salmón cocido, phila). Incluye 1 soja, 1 wasabi y 1 palito.','https://images.rappi.com.ar/products/03c13027-a5e5-4ed2-b1bf-dafc70bc631c.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/03c13027-a5e5-4ed2-b1bf-dafc70bc631c.jpeg?e=webp&q=50&d=400x400'),
+(65,1,52500.00,63,90,'Bife de chorizo mariposa','Bife de chorizo corte mariposa, 900gr para compartir .','https://images.rappi.com.ar/products/bfe9bfc0-abfd-4108-82c5-426667eba424.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/bfe9bfc0-abfd-4108-82c5-426667eba424.jpeg?e=webp&q=50&d=400x400'),
+(66,1,19700.00,64,5,'McNuggets X10','10 McNuggets de pollo. Acompañamiento y bebida a elección','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcUlCIiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--628560b4e2b8d44afc35fa882c97f24cb641965d/Mcnuggets-Imagen%20Productos%20varios%201000x10000.png'),
+(67,1,16900.00,65,11,'Cero Carne Veggie','Hamburguesa 100% a base de vegetales, con lechuga, tomate, pepino, mostaza, kétchup y cebollita, acompañada de papas coated regulares y bebida a elección.','https://www.mostazaweb.com.ar/wp-content/uploads/2025/05/0-1-1.png'),
+(68,1,25900.00,66,15,'Milanesa Sweet Spicy','Milanesa de ternera Angus, con muzza, morrón asado, nachos, salsa criolla, sriracha y verdeo. Viene con guarnición.','https://scontent.fmdq6-1.fna.fbcdn.net/v/t51.82787-15/514831863_18533438923032649_8687170621484706710_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=UbPBttE4UCwQ7kNvwGI4CC6&_nc_oc=AdnH0QfmKCmYuDsyYqOuuGP0yQSulCGN6BozaS4GqRFQ6dO9-7VU6o_lRUyxcdjZie4&_nc_zt=23&_nc_ht=scontent.fmdq6-1.fna&_nc_gid=A2QYy7rFKbogLEl5MGtKIQ&oh=00_Afm7HqNI8WMv_Y1ji7pCTHUc-4UpPcdmDy3WI_Gk8wcKnQ&oe=69410A5A'),
+(69,1,23560.00,67,17,'Combinado N1 - 12 Piezas Mixto','Rolls: california roll, drago roll, fresh roll, chicken roll, futurama roll,soul roll, vegetariano roll, gunkans de tamago, makis de atún.','https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400'),
+(70,1,14800.00,68,26,'Papas con cheddar','Papas con cheddar y verdeo.','https://images.rappi.com.ar/products/f7b5181a-d06f-413f-86d2-b5b7561ea627.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/f7b5181a-d06f-413f-86d2-b5b7561ea627.png?e=webp&q=50&d=400x400'),
+(71,1,12000.00,68,28,'Chicken fingers','Pechuguitas de pollo rebozadas en cereales con dip de mostaza honey.','https://images.rappi.com.ar/products/675f7efe-f46a-4ba7-a981-828237e33129.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/675f7efe-f46a-4ba7-a981-828237e33129.png?e=webp&q=50&d=400x400'),
+(72,1,25100.00,69,33,'Obama grande','Pizza grande tradicional de 33cm de diámetro de pepperoni y mozzarella.','https://images.rappi.com.ar/products/aefcb159-6a69-4f0d-9f1b-3529ec2c2bac-1603204256098_hq.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/aefcb159-6a69-4f0d-9f1b-3529ec2c2bac-1603204256098_hq.jpeg?e=webp&q=50&d=400x400'),
+(73,1,22500.00,70,46,'Combo Whopper + Franui','Carne a la parrilla, pan, mayonesa, ketchup, cebolla, tomate, pepinos y lechuga, papas regulares y gaseosa 500ml.','https://images.rappi.com.ar/products/29d9ae28-9be2-4a50-a6aa-0c5c983f0902.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/29d9ae28-9be2-4a50-a6aa-0c5c983f0902.png?e=webp&q=50&d=400x400'),
+(74,1,19200.00,71,1,'Doble Cuarto de Libra','Hamburguesa doble carne 100% vacuna, dos fetas de queso cheddar, kétchup, mostaza y cebolla. Acompañamiento y bebida mediana a elección.','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcnc0IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--554055bbfd01767f6ef5c8262e2c1e41d26aa621/Banner%201000x1000%20-%20McCombo%20Doble%20Cuarto%20de%20Libra%20-%20Imagen%20de%20producto.png'),
+(75,1,25900.00,72,13,'Suprema del Club','Pechuga de pollo rebozada (280 g) con muzzarella, jamón, tomate y huevo frito. Incluye guarnición a elección.','https://scontent.fmdq7-1.fna.fbcdn.net/v/t51.82787-15/583040046_18563363824032649_472755857585726408_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=9_rAI6YL7mcQ7kNvwGfcmcA&_nc_oc=AdlQJK5kkNXNs3vduOAc9bD7Akc4QREGAVqNg5vnIA4s63UpIqzRuxClreunotVhMsg&_nc_zt=23&_nc_ht=scontent.fmdq7-1.fna&_nc_gid=NND3PbjwjXnz1MucWrsiWg&oh=00_AfmaTVamzeJ-144Y49Z3cQK3-qa_c1sJjvR9x6yfHuXi3w&oe=69412355'),
+(76,1,32520.00,73,19,'Combinado N2 - 12 Piezas Salmon','Rolls: bs as roll, fresh roll ,bremen roll , mdp roll, guncans de tamago, maracuyá y munich, niguiris y geishas y maki de salmon.','https://images.rappi.com.ar/products/tmp911394914825836158351684845.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmp911394914825836158351684845.png?e=webp&q=50&d=400x400'),
+(77,1,21700.00,74,32,'Lincoln grande','Pizza grande tradicional de 33cm de diámetro de mozzarella.','https://images.rappi.com.ar/products/421a8818-423c-4e53-94a0-baf633f465e3-1603204158245_hq.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/421a8818-423c-4e53-94a0-baf633f465e3-1603204158245_hq.jpeg?e=webp&q=50&d=400x400'),
+(78,1,18000.00,75,24,'2 Cheese burger + papas','2 Hamburguesas simples con queso cheddar + papas','https://images.rappi.com.ar/products/960e6e22-34b6-4250-9fa2-7c057240d604.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/960e6e22-34b6-4250-9fa2-7c057240d604.png?e=webp&q=50&d=400x400'),
+(79,1,15600.00,76,3,'Big Mac','Hamburguesa con doble carne 100% vacuna, salsa Big Mac, queso derretido, cebolla, lechuga y pepino. Acompañamiento y bebida a elección.','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcm80IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--807707b94ce5ea235a775342af84a95985353fd6/Banner%201000x1000%20-%20McCombo%20Big%20Mac%20-%20Imagen%20de%20producto.png'),
+(80,1,20900.00,77,8,'TR1 X Trueno','Mega Hamburguesa de carne con queso cheddar, bacon, pepino, cebolla crispy y barbacoa, acompañada de papas Coated regulares y bebida a elección.','https://www.mostazaweb.com.ar/wp-content/uploads/2025/05/20-7-copia-2.png'),
+(81,1,23700.00,78,14,'Milanesa a caballo','Milanesa de ternera Angus con huevo frito y un toque de perejil fresco. Incluye guarnición a elección.','https://scontent.fmdq7-1.fna.fbcdn.net/v/t51.75761-15/511431949_18531779632032649_7417832614516008872_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_ohc=8yDbEVI7WvMQ7kNvwHoaD_f&_nc_oc=Admt3xjBfLkO1pS-h3QKzV0MCKbe1oV1WLlJWEjGI1kOiHodtjomdnO9Jn8ROZey2l8&_nc_zt=23&_nc_ht=scontent.fmdq7-1.fna&_nc_gid=cRx9p9ssWPQjaAvzMV-77A&oh=00_Afmr7irriRz3_C3VCgXVPQQJMeVFIyZ-Qi-8prr32F9PcA&oe=694129AC'),
+(82,1,23560.00,79,17,'Combinado N1 - 12 Piezas Mixto','Rolls: california roll, drago roll, fresh roll, chicken roll, futurama roll,soul roll, vegetariano roll, gunkans de tamago, makis de atún.','https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400'),
+(83,1,30000.00,80,25,'Combo 2 classic bacon 1 lt cerveza','2 Hamburguesas de 120 gr de carne, queso cheddar, sweet bacón, salsa bbq con guarnición de papas fritas y 1 lt de cerveza artesanal.','https://images.rappi.com.ar/products/1adcf3a6-a365-46af-bd6e-a98ca8d89aed.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/1adcf3a6-a365-46af-bd6e-a98ca8d89aed.png?e=webp&q=50&d=400x400'),
+(84,1,21700.00,81,32,'Lincoln grande','Pizza grande tradicional de 33cm de diámetro de mozzarella.','https://images.rappi.com.ar/products/421a8818-423c-4e53-94a0-baf633f465e3-1603204158245_hq.jpeg?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/421a8818-423c-4e53-94a0-baf633f465e3-1603204158245_hq.jpeg?e=webp&q=50&d=400x400'),
+(85,1,19200.00,82,1,'Doble Cuarto de Libra','Hamburguesa doble carne 100% vacuna, dos fetas de queso cheddar, kétchup, mostaza y cebolla. Acompañamiento y bebida mediana a elección.','https://www.mcdonalds.com.py/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBcnc0IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--554055bbfd01767f6ef5c8262e2c1e41d26aa621/Banner%201000x1000%20-%20McCombo%20Doble%20Cuarto%20de%20Libra%20-%20Imagen%20de%20producto.png'),
+(86,1,25900.00,83,13,'Suprema del Club','Pechuga de pollo rebozada (280 g) con muzzarella, jamón, tomate y huevo frito. Incluye guarnición a elección.','https://scontent.fmdq7-1.fna.fbcdn.net/v/t51.82787-15/583040046_18563363824032649_472755857585726408_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=9_rAI6YL7mcQ7kNvwGfcmcA&_nc_oc=AdlQJK5kkNXNs3vduOAc9bD7Akc4QREGAVqNg5vnIA4s63UpIqzRuxClreunotVhMsg&_nc_zt=23&_nc_ht=scontent.fmdq7-1.fna&_nc_gid=NND3PbjwjXnz1MucWrsiWg&oh=00_AfmaTVamzeJ-144Y49Z3cQK3-qa_c1sJjvR9x6yfHuXi3w&oe=69412355'),
+(87,1,23560.00,84,17,'Combinado N1 - 12 Piezas Mixto','Rolls: california roll, drago roll, fresh roll, chicken roll, futurama roll,soul roll, vegetariano roll, gunkans de tamago, makis de atún.','https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/tmp911394311232801324695338325.png?e=webp&q=50&d=400x400'),
+(88,1,18000.00,85,24,'2 Cheese burger + papas','2 Hamburguesas simples con queso cheddar + papas','https://images.rappi.com.ar/products/960e6e22-34b6-4250-9fa2-7c057240d604.png?e=webp&q=50&d=400x400.com/https://images.rappi.com.ar/products/960e6e22-34b6-4250-9fa2-7c057240d604.png?e=webp&q=50&d=400x400');
 -- 13) Pagos para cada pedido
 -- formato: (id, pedido_id, metodo_pago, monto, estado, mercadopago_payment_id, mercadopago_preference_id, mercadopago_status, mercadopago_status_detail, mercadopago_payment_type, fecha_creacion, fecha_actualizacion)
 INSERT INTO `pagos` (id, pedido_id, metodo_pago, monto, estado, mercadopago_payment_id, mercadopago_preference_id, mercadopago_status, mercadopago_status_detail, mercadopago_payment_type, fecha_creacion, fecha_actualizacion) VALUES
