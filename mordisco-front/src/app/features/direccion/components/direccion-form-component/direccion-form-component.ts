@@ -95,7 +95,10 @@ export class DireccionFormComponent implements OnInit , OnChanges{
     this.isSubmitting.set(true);
 
     const dir = this.direccion()
-    const direccionData: DireccionRequest = this.formDirecciones.value;
+    const direccionData: DireccionRequest = {
+      ...this.formDirecciones.value,
+      codigoPostal: this.formDirecciones.value.codigoPostal?.toUpperCase() || ''
+    };
 
     if (this.isEditMode() && dir?.id) {
       // Modo edición

@@ -152,7 +152,7 @@ export class RestauranteFormComponent implements OnInit {
           numero: formValue.numero,
           piso: formValue.piso || undefined,
           depto: formValue.depto || undefined,
-          codigoPostal: formValue.codigoPostal,
+          codigoPostal: formValue.codigoPostal?.toUpperCase() || '',
           referencias: formValue.referencias || undefined,
           ciudad: formValue.ciudad
         }
