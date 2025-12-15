@@ -123,7 +123,7 @@ export class EstadisticasRestauranteComponent implements OnInit {
 
   private configurarGraficoBarras(data: RestauranteEstadisticas): void {
     this.barChartData = {
-      labels: data.productosMasVendidos.map(p => p.nombre),
+      labels: data.productosMasVendidos.map(p => this.formatProductName(p.nombre, p.productoId)),
       datasets: [{
         data: data.productosMasVendidos.map(p => p.cantidadVendida),
         label: 'Cantidad Vendida',
@@ -139,6 +139,10 @@ export class EstadisticasRestauranteComponent implements OnInit {
       style: 'currency',
       currency: 'ARS'
     }).format(value);
+  }
+
+  formatProductName(nombre: string, productoId: number | null): string {
+    return productoId === null ? `${nombre} (Eliminado)` : nombre;
   }
 
   // Helper methods para detectar datos vacíos
