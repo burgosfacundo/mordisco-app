@@ -1,6 +1,5 @@
 import { Component, inject, input, OnInit, output } from '@angular/core';
 import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
-import HorarioAtencion from '../../models/horario/horario-atencion-request';
 import { HorarioService } from '../../services/horario/horario-service';
 import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
 
@@ -25,19 +24,20 @@ export class RestauranteCardComponent implements OnInit {
   }
 
   isAbierto(): boolean {
-    const h = this.getHorarioDeHoy();
-    if (!h) return false;
-    return this.isOpenNow(h);
+    const horarios = this.getHorariosDeHoy();
+    if (horarios.length === 0) return false;
+    return horarios.some(h => this.isOpenNow(h));
   }
 
   getHorarios(): string {
-    const h = this.getHorarioDeHoy();
+    const horarios = this.getHorariosDeHoy();
+    if (horarios.length === 0) return 'Cerrado';
 
-    if (!h) return 'Cerrado';
+    // Buscar el horario que está activo ahora
+    const horarioActivo = horarios.find(h => this.isOpenNow(h));
+    if (!horarioActivo) return 'Cerrado';
 
-    if (!this.isOpenNow(h)) return 'Cerrado';
-
-    return `${this.formatHHmm(h.horaApertura)} - ${this.formatHHmm(h.horaCierre)}`;
+    return `${this.formatHHmm(horarioActivo.horaApertura)} - ${this.formatHHmm(horarioActivo.horaCierre)}`;
   }
 
   getHorariosByRestaurante(){
@@ -51,10 +51,10 @@ export class RestauranteCardComponent implements OnInit {
     }
   }
 
-  private getHorarioDeHoy(): HorarioAtencion | undefined {
+  private getHorariosDeHoy(): HorarioAtencionResponse[] {
     const dias = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     const dia = dias[new Date().getDay()];
-    return this.listaHorarios.find(h => h.dia === dia);
+    return this.listaHorarios.filter(h => h.dia === dia);
   }
 
   private nowInMinutes(): number {
@@ -67,7 +67,7 @@ export class RestauranteCardComponent implements OnInit {
     return (h || 0) * 60 + (m || 0) + Math.floor((s || 0) / 60);
   }
 
-  private isOpenNow(h: HorarioAtencion): boolean {
+  private isOpenNow(h: HorarioAtencionResponse): boolean {
     const open = this.toMinutes(h.horaApertura);
     const close = this.toMinutes(h.horaCierre);
     const now = this.nowInMinutes();
