@@ -109,11 +109,21 @@ public class RestauranteMapper {
         var currentTime = now.toLocalTime();
 
         return r.getHorariosAtencion().stream()
-                .anyMatch(horario -> 
-                    horario.getDia().equals(currentDay) &&
-                    !currentTime.isBefore(horario.getHoraApertura()) &&
-                    !currentTime.isAfter(horario.getHoraCierre())
-                );
+                .anyMatch(horario -> {
+                    if (!horario.getDia().equals(currentDay)) {
+                        return false;
+                    }
+
+                    if (horario.getCruzaMedianoche() != null && horario.getCruzaMedianoche()) {
+                        // Si cruza medianoche: abierto si ahora >= apertura O ahora < cierre
+                        return !currentTime.isBefore(horario.getHoraApertura()) ||
+                               currentTime.isBefore(horario.getHoraCierre());
+                    }
+
+                    // Horario normal
+                    return !currentTime.isBefore(horario.getHoraApertura()) &&
+                           !currentTime.isAfter(horario.getHoraCierre());
+                });
     }
 
 
