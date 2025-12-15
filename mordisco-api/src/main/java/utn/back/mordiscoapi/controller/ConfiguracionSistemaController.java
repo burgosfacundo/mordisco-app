@@ -124,20 +124,4 @@ public class ConfiguracionSistemaController {
         BigDecimal costo = configuracionService.calcularCostoDelivery(distanciaKm);
         return ResponseEntity.ok(costo);
     }
-
-
-
-    /**
-     * Verifica si el sistema está en mantenimiento
-     */
-    @Operation(
-            summary = "Verificar estado de mantenimiento",
-            description = "Retorna true si el sistema está en modo mantenimiento")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Estado obtenido exitosamente")
-    })
-    @GetMapping("/mantenimiento")
-    public ResponseEntity<Boolean> isEnMantenimiento() {
-        return ResponseEntity.ok(configuracionService.isEnMantenimiento());
-    }
 }
