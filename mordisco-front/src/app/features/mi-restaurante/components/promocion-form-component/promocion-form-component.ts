@@ -133,7 +133,7 @@ export class PromocionFormComponent implements OnInit {
     
     this.promocionForm = this.fb.group({
       tipoDescuento: ['', Validators.required],
-      descripcion: ['', [Validators.required, Validators.maxLength(20)]],
+      descripcion: ['', [Validators.required, Validators.maxLength(255)]],
       descuento: ['', [Validators.required, Validators.min(1)]],
       alcance: ['', Validators.required],
       fechaInicio: ['', [Validators.required]],
