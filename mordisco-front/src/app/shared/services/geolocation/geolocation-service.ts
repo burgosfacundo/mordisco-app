@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable, from, catchError } from 'rxjs';
 import { Ubicacion } from '../../models/ubicacion/ubicacion.model';
 
 @Injectable({
@@ -8,10 +8,24 @@ import { Ubicacion } from '../../models/ubicacion/ubicacion.model';
 export class GeolocationService {
 
   /**
-   * Obtiene la ubicación actual del dispositivo
+   * Obtiene la ubicación actual del dispositivo con retry automático.
+   * Primero intenta con alta precisión, si falla intenta con baja precisión.
    * @returns Observable con las coordenadas actuales
    */
   obtenerUbicacionActual(): Observable<Ubicacion> {
+    return this.obtenerUbicacionConOpciones(true, 15000, 60000).pipe(
+      catchError(() => this.obtenerUbicacionConOpciones(false, 20000, 300000))
+    );
+  }
+
+  /**
+   * Obtiene la ubicación con opciones específicas
+   */
+  private obtenerUbicacionConOpciones(
+    highAccuracy: boolean,
+    timeout: number,
+    maxAge: number
+  ): Observable<Ubicacion> {
     return from(
       new Promise<Ubicacion>((resolve, reject) => {
         if (!navigator.geolocation) {
@@ -28,25 +42,25 @@ export class GeolocationService {
           },
           (error) => {
             let errorMessage = 'Error al obtener la ubicación';
-            
+
             switch (error.code) {
               case error.PERMISSION_DENIED:
-                errorMessage = 'Permiso de ubicación denegado. Por favor, habilita los permisos de ubicación.';
+                errorMessage = 'Permiso de ubicación denegado. Por favor, habilita los permisos de ubicación en tu navegador.';
                 break;
               case error.POSITION_UNAVAILABLE:
-                errorMessage = 'Información de ubicación no disponible.';
+                errorMessage = 'Información de ubicación no disponible. Verifica que los servicios de ubicación estén habilitados en tu sistema.';
                 break;
               case error.TIMEOUT:
-                errorMessage = 'Tiempo de espera agotado al obtener la ubicación.';
+                errorMessage = 'Tiempo de espera agotado al obtener la ubicación. Verifica tu conexión a internet.';
                 break;
             }
-            
+
             reject(new Error(errorMessage));
           },
           {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
+            enableHighAccuracy: highAccuracy,
+            timeout: timeout,
+            maximumAge: maxAge
           }
         );
       })
