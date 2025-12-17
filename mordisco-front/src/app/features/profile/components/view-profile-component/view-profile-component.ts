@@ -6,6 +6,7 @@ import UserProfile from '../../../../shared/models/user/user-profile';
 import { AuthService } from '../../../../shared/services/auth-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
 import { ToastService } from '../../../../core/services/toast-service';
+import UserCard from '../../../../shared/models/user/user-card';
 
 @Component({
   selector: 'app-view-profile',
@@ -19,7 +20,7 @@ export class ViewProfileComponent {
   private toastService = inject(ToastService)
   private dialog = inject(MatDialog)
   usuario? : UserProfile
-
+  
 
   ngOnInit(): void {
     this.userService.getMe().subscribe({
@@ -28,6 +29,10 @@ export class ViewProfileComponent {
         this.router.navigate(['/'])
       }
     })
+  }
+
+  obtenerUserProfile(){
+
   }
 
  confirmarEliminacion(): void {

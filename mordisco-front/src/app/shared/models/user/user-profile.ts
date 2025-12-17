@@ -4,7 +4,13 @@ export default interface UserProfile{
     apellido : string,
     telefono : string,
     email : string,
+    rol : RolDTO
     bajaLogica : boolean,
     motivoBaja : string,
     fechaBaja : string
+}
+
+interface RolDTO {
+  id: number;
+  nombre: string;
 }

@@ -120,6 +120,7 @@ export class CalificacionesRestaurante {
       : '';
     this.isLoading = true;
     this.cService.filtrarCalificacion(
+      this.restaurante?.id!,
       this.searchValue,
       this.filtroEstrellas,
       fechaInicioFormatted,

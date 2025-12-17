@@ -70,6 +70,7 @@ export class CalificacionService {
 
 
     filtrarCalificacion(
+        idRest : number,
         search: string,
         estrellas: string,
         fechaInicio: string,
@@ -94,7 +95,7 @@ export class CalificacionService {
         if (fechaFin && fechaFin !== '') {
         params = params.set('fechaFin', fechaFin);
         }
-        return this.http.get<PaginationResponse<CalificacionPedidoResponseDTO>>(`${environment.apiUrl}/calificaciones/buscar`, { params });
+        return this.http.get<PaginationResponse<CalificacionPedidoResponseDTO>>(`${environment.apiUrl}/calificaciones/buscar/${idRest}`, { params });
     }    
 
 }

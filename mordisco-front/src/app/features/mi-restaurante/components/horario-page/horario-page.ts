@@ -10,10 +10,11 @@ import { HorarioService } from '../../../../shared/services/horario/horario-serv
 import HorarioAtencionResponse from '../../../../shared/models/horario/horario-atencion-response';
 import { ToastService } from '../../../../core/services/toast-service';
 import { ConfirmDialogComponent } from '../../../../shared/store/confirm-dialog-component';
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-horario-page',
-  imports: [HorarioCardComponent, MatPaginator],
+  imports: [HorarioCardComponent, MatPaginator, MatIcon],
   templateUrl: './horario-page.html',
 })
 export class HorarioPage implements OnInit, OnDestroy {
@@ -158,5 +159,9 @@ export class HorarioPage implements OnInit, OnDestroy {
         this.router.navigate(['/'])
       }
     })
+  }
+  
+  volver(): void {
+    this.router.navigate(['/restaurante']);
   }
 }

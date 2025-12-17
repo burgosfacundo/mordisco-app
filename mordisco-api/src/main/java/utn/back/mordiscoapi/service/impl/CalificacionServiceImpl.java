@@ -306,7 +306,7 @@ public class CalificacionServiceImpl {
     /**
      * Busca los pedidos por filtro especifico
      */
-    public Page<CalificacionPedidoResponseDTO> filtrarCalificaciones(int pageNo, int pageSize, String estrellas, String fechaInicio, String fechaFin, String variable){
+    public Page<CalificacionPedidoResponseDTO> filtrarCalificaciones(int pageNo, int pageSize, String estrellas, String fechaInicio, String fechaFin, String variable, Long idRest){
         LocalDateTime ini = (fechaInicio == null || fechaInicio.isBlank())
                 ? null
                 : LocalDateTime.parse(fechaInicio);
@@ -315,6 +315,6 @@ public class CalificacionServiceImpl {
                 ? null
                 : LocalDateTime.parse(fechaFin);
         Pageable pageable = PageRequest.of(pageNo,pageSize);
-        return calificacionPedidoRepository.filtrarCalificaciones(variable,estrellas, ini, fin, pageable).map(CalificacionMapper::toDTO);
+        return calificacionPedidoRepository.filtrarCalificaciones(idRest, variable,estrellas, ini, fin, pageable).map(CalificacionMapper::toDTO);
     }
 }

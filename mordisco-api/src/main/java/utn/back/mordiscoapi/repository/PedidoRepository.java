@@ -259,43 +259,51 @@ WHERE
 
     // Para REPARTIDOR - solo ve sus propios pedidos
     @Query(value = """
-    SELECT p.*
-    FROM pedidos p
-    INNER JOIN usuarios u ON p.usuario_id = u.id
-    INNER JOIN restaurantes r ON p.restaurante_id = r.id
-    LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-    WHERE
-        p.repartidor_id = :repartidorId
-        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
-        AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
-        AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
-        AND (
-            :search IS NULL OR :search = ''
-            OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
-            OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
-            OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
-            OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
-        )
-    """,
+SELECT p.*
+FROM pedidos p
+INNER JOIN usuarios u ON p.usuario_id = u.id
+INNER JOIN restaurantes r ON p.restaurante_id = r.id
+LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+WHERE
+    p.repartidor_id = :repartidorId
+    AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
+    AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+    AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+    AND (
+        :search IS NULL OR :search = ''
+        OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+        OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.telefono) LIKE LOWER(CONCAT('%', :search, '%'))
+    )
+""",
             countQuery = """
-    SELECT COUNT(*)
-    FROM pedidos p
-    INNER JOIN usuarios u ON p.usuario_id = u.id
-    INNER JOIN restaurantes r ON p.restaurante_id = r.id
-    LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
-    WHERE
-        p.repartidor_id = :repartidorId
-        AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
-        AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
-        AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
-        AND (
-            :search IS NULL OR :search = ''
-            OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
-            OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
-            OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
-            OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
-        )
-    """,
+SELECT COUNT(*)
+FROM pedidos p
+INNER JOIN usuarios u ON p.usuario_id = u.id
+INNER JOIN restaurantes r ON p.restaurante_id = r.id
+LEFT JOIN usuarios rep ON p.repartidor_id = rep.id
+WHERE
+    p.repartidor_id = :repartidorId
+    AND (:estado IS NULL OR :estado = '' OR p.estado = :estado)
+    AND (:fechaInicio IS NULL OR p.fecha_hora >= :fechaInicio)
+    AND (:fechaFin IS NULL OR p.fecha_hora <= :fechaFin)
+    AND (
+        :search IS NULL OR :search = ''
+        OR LOWER(p.direccion_snapshot) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(p.estado) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR CAST(p.id AS CHAR) LIKE CONCAT('%', :search, '%')
+        OR LOWER(r.razon_social) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.apellido) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(u.telefono) LIKE LOWER(CONCAT('%', :search, '%'))
+    )
+""",
             nativeQuery = true)
     Page<Pedido> filtrarPedidosRepartidores(
             @Param("repartidorId") Long repartidorId,

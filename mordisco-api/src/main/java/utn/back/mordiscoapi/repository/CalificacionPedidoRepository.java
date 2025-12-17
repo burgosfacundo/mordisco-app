@@ -100,16 +100,19 @@ public interface CalificacionPedidoRepository extends JpaRepository<Calificacion
             Pageable pageable
     );
 
-    @Query(value = """
+        @Query(value = """
     SELECT cp.*
     FROM calificaciones_pedido cp
     INNER JOIN usuarios u ON cp.usuario_id = u.id
     INNER JOIN pedidos p ON cp.pedido_id = p.id
     INNER JOIN restaurantes r ON p.restaurante_id = r.id
     WHERE 
-        -- FILTRO PROMEDIO DE ESTRELLAS
-        (:estrellas IS NULL OR :estrellas = '' 
-         OR ROUND((cp.puntaje_comida + cp.puntaje_packaging + cp.puntaje_tiempo) / 3.0, 1) = :estrellas)
+        -- FILTRO RESTAURANTE
+        r.id = :restauranteId
+        
+        -- FILTRO PROMEDIO DE ESTRELLAS (rango: 4 incluye 4.0-4.9)
+        AND (:estrellas IS NULL OR :estrellas = '' 
+         OR FLOOR((cp.puntaje_comida + cp.puntaje_packaging + cp.puntaje_tiempo) / 3.0) = :estrellas)
     
         -- FILTRO FECHA INICIO
         AND (:fechaInicio IS NULL OR cp.fecha_hora >= :fechaInicio)
@@ -136,8 +139,9 @@ public interface CalificacionPedidoRepository extends JpaRepository<Calificacion
     INNER JOIN pedidos p ON cp.pedido_id = p.id
     INNER JOIN restaurantes r ON p.restaurante_id = r.id
     WHERE 
-        (:estrellas IS NULL OR :estrellas = '' 
-         OR ROUND((cp.puntaje_comida + cp.puntaje_packaging + cp.puntaje_tiempo) / 3.0, 1) = :estrellas)
+        r.id = :restauranteId
+        AND (:estrellas IS NULL OR :estrellas = '' 
+         OR FLOOR((cp.puntaje_comida + cp.puntaje_packaging + cp.puntaje_tiempo) / 3.0) = :estrellas)
         AND (:fechaInicio IS NULL OR cp.fecha_hora >= :fechaInicio)
         AND (:fechaFin IS NULL OR cp.fecha_hora <= :fechaFin)
         AND (
@@ -150,12 +154,13 @@ public interface CalificacionPedidoRepository extends JpaRepository<Calificacion
             OR CAST(cp.id AS CHAR) LIKE CONCAT('%', :search, '%')
         )
     """,
-            nativeQuery = true)
-    Page<CalificacionPedido> filtrarCalificaciones(
-            @Param("search") String search,
-            @Param("estrellas") String estrellas,
-            @Param("fechaInicio") LocalDateTime fechaInicio,
-            @Param("fechaFin") LocalDateTime fechaFin,
-            Pageable pageable
-    );
+                nativeQuery = true)
+        Page<CalificacionPedido> filtrarCalificaciones(
+                @Param("restauranteId") Long restauranteId,
+                @Param("search") String search,
+                @Param("estrellas") String estrellas,
+                @Param("fechaInicio") LocalDateTime fechaInicio,
+                @Param("fechaFin") LocalDateTime fechaFin,
+                Pageable pageable
+        );
 }

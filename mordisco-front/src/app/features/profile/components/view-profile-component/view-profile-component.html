@@ -85,7 +85,7 @@
           </svg>
           Editar Perfil
         </button>
-        
+        @if(usuario.rol.nombre !== 'ROLE_ADMIN'){
         <button 
           (click)="confirmarEliminacion()" 
           class="btn-outline text-red-600! border-red-600! hover:bg-red-600! hover:text-white! flex-1">
@@ -95,6 +95,7 @@
           </svg>
           Eliminar Cuenta
         </button>
+        }
       </div>
     </div>
   </div>

@@ -241,13 +241,14 @@ public class CalificacionController {
     })
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/buscar")
-    public ResponseEntity<Page<CalificacionPedidoResponseDTO>> searchCalificaciones(@RequestParam(required = false) String search,
+    @GetMapping("/buscar/{idRest}")
+    public ResponseEntity<Page<CalificacionPedidoResponseDTO>> searchCalificacionesByRestaurante(@PathVariable Long idRest,
+                                                                    @RequestParam(required = false) String search,
                                                                  @RequestParam(required = false) String estrellas,
                                                                  @RequestParam(required = false) String fechaInicio,
                                                                  @RequestParam(required = false) String fechaFin,
                                                                  @RequestParam int page,
                                                                  @RequestParam int size) throws NotFoundException {
-        return ResponseEntity.ok(calificacionService.filtrarCalificaciones(page,size,estrellas, fechaInicio, fechaFin,search));
+        return ResponseEntity.ok(calificacionService.filtrarCalificaciones(page,size,estrellas, fechaInicio, fechaFin,search, idRest));
     }
 }
