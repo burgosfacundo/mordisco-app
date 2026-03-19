@@ -2,12 +2,13 @@ import { Component, inject, input, OnInit, output } from '@angular/core';
 import RestauranteForCard from '../../models/restaurante/restaurante-for-card';
 import { HorarioService } from '../../services/horario/horario-service';
 import HorarioAtencionResponse from '../../models/horario/horario-atencion-response';
+import { ImageFallbackDirective } from '../../directives/image-fallback.directive';
 
 
 @Component({
   selector: 'app-restaurante-card-component',
 
-  imports: [],
+  imports: [ImageFallbackDirective],
   templateUrl: './restaurante-card-component.html'
 })
 export class RestauranteCardComponent implements OnInit {

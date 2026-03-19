@@ -4,9 +4,10 @@
   
   <!-- Imagen del producto -->
   <div class="relative aspect-square overflow-hidden bg-gray-200">
-    <img 
-      [src]="producto()!.imagen.url" 
+    <img
+      [src]="producto()!.imagen.url"
       [alt]="producto()!.nombre"
+      appImageFallback
       class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
     
     <!-- Badge de descuento -->
