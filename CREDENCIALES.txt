@@ -1,0 +1,47 @@
+═══════════════════════════════════════════════════════════
+            CREDENCIALES DE USUARIO - MORDISCO APP
+═══════════════════════════════════════════════════════════
+
+URL: http://localhost:4200
+
+───────────────────────────────────────────────────────────
+👑 ADMINISTRADOR
+───────────────────────────────────────────────────────────
+Email:    mordiscoapp@gmail.com
+Password: Admin123!
+
+───────────────────────────────────────────────────────────
+🍽️  RESTAURANTE
+───────────────────────────────────────────────────────────
+Email:    restaurante1@gmail.com
+Password: Mordisco123!
+
+───────────────────────────────────────────────────────────
+👤 CLIENTE
+───────────────────────────────────────────────────────────
+Email:    usuario1@gmail.com
+Password: Mordisco123!
+
+───────────────────────────────────────────────────────────
+🚗 REPARTIDOR
+───────────────────────────────────────────────────────────
+Email:    repartidor1@gmail.com
+Password: Mordisco123!
+
+═══════════════════════════════════════════════════════════
+
+OTROS USUARIOS DISPONIBLES:
+
+Clientes adicionales:
+  - usuario2@gmail.com hasta usuario15@gmail.com
+  (Todos con password: Mordisco123!)
+
+Restaurantes adicionales:
+  - restaurante2@gmail.com hasta restaurante13@gmail.com
+  (Todos con password: Mordisco123!)
+
+Repartidores adicionales:
+  - repartidor2@gmail.com hasta repartidor15@gmail.com
+  (Todos con password: Mordisco123!)
+
+═══════════════════════════════════════════════════════════

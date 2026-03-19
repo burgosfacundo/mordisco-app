@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot"/>
   <img src="https://img.shields.io/badge/Angular-20-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular"/>
   <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL"/>
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
   <img src="https://img.shields.io/badge/Tailwind%20CSS-4.0-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS"/>
   <img src="https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21"/>
 </div>
@@ -17,6 +18,26 @@
 <br/>
 
 > **Proyecto de Tesis** - Universidad Tecnologica Nacional (UTN) - 2025
+
+---
+
+## 🚀 Inicio Rápido con Docker
+
+```bash
+git clone https://github.com/burgosfacundo/mordisco-app.git
+cd mordisco-app
+./start.sh
+```
+
+Esto levanta MySQL, Backend y Frontend con datos de prueba. Accede en: **http://localhost:4200**
+
+**Usuarios de prueba:**
+- Admin: `mordiscoapp@gmail.com` / `Admin123!`
+- Restaurante: `restaurante1@gmail.com` / `Mordisco123!`
+- Cliente: `usuario1@gmail.com` / `Mordisco123!`
+- Repartidor: `repartidor1@gmail.com` / `Mordisco123!`
+
+**Detener:** `./stop.sh`
 
 ---
 
@@ -300,9 +321,9 @@ Cualquier estado (excepto Completado) → Cancelado
 ### Requisitos Previos
 
 - Java 21+
-- Node.js (LTS)
-- Docker y Docker Compose
+- Node.js 18+ (LTS)
 - Maven 3.8+
+- MySQL 8.0
 
 ### Backend
 
@@ -314,7 +335,7 @@ docker-compose up -d
 # 2. Ejecutar la API (perfil dev)
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
-# La API estara disponible en http://localhost:8080
+# La API estará disponible en http://localhost:8080
 # Swagger UI: http://localhost:8080/swagger-ui.html
 ```
 
@@ -328,19 +349,8 @@ npm install
 # 2. Iniciar servidor de desarrollo
 npm start
 
-# La aplicacion estara disponible en http://localhost:4200
+# La aplicación estará disponible en http://localhost:4200
 ```
-
-### Configuracion
-
-**Backend** (`application-dev.properties`):
-- Base de datos: `mordisco` (creada automaticamente)
-- Puerto: 8080
-- CORS habilitado para localhost:4200
-
-**Frontend**:
-- Proxy configurado para redirigir `/api` al backend
-- Environment files en `src/environments/`
 
 ---
 
