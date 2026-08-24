@@ -9,10 +9,10 @@ services:
     container_name: mordisco-db
     command: --default-time-zone='-03:00' --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: mordisco
       MYSQL_USER: mordisco_user
-      MYSQL_PASSWORD: mordisco_pass
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       TZ: America/Argentina/Buenos_Aires
     ports:
       - "3306:3306"
@@ -43,7 +43,7 @@ services:
       # Base de datos
       - DATABASE_URL=jdbc:mysql://mysql:3306/mordisco?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=America/Argentina/Buenos_Aires&characterEncoding=UTF-8&useUnicode=true
       - DATABASE_USERNAME=mordisco_user
-      - DATABASE_PASSWORD=mordisco_pass
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
       # Servidor
       - SERVER_PORT=8080
       - FRONTEND_URL=http://localhost:4200
@@ -54,16 +54,16 @@ services:
       - spring.http.encoding.charset=UTF-8
       - spring.http.encoding.enabled=true
       # Seguridad JWT
-      - JWT_SECRET=clave-super-secreta-y-larga-de-al-menos-32-bytes
+      - JWT_SECRET=${JWT_SECRET}
       # Email (SMTP Gmail - Para testing)
       - SPRING_MAIL_HOST=smtp.gmail.com
       - SPRING_MAIL_PORT=587
-      - SPRING_MAIL_USERNAME=mordiscoApp@gmail.com
-      - SPRING_MAIL_PASSWORD=hkgs wwmx buxl wvno
+      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
       # API Keys externas (Demo keys - reemplazar con las tuyas)
-      - OPENWEATHERMAP_API_KEY=2a1f8bc52e0a392d7fa265631cd1e108
-      - MERCADOPAGO.ACCESS-TOKEN=APP_USR-6424732302605251-110709-b440718c241e05f5474b397d262177ab-2972977634
-      - MERCADOPAGO.PUBLIC-KEY=APP_USR-d4501927-9d1a-45a2-b39c-2d6c1ffcc17b
+      - OPENWEATHERMAP_API_KEY=${OPENWEATHERMAP_API_KEY}
+      - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
+      - MERCADOPAGO_PUBLIC_KEY=${MERCADOPAGO_PUBLIC_KEY}
     ports:
       - "8080:8080"
     depends_on:

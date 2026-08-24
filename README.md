@@ -39,6 +39,10 @@ Esto levanta MySQL, Backend y Frontend con datos de prueba. Accede en: **http://
 
 **Detener:** `./stop.sh`
 
+### Configuracion local
+
+Antes de iniciar, copia `.env.example` a `.env`. Completa las credenciales locales cuando sea necesario, nunca confirmes `.env` y genera localmente un secreto JWT fuerte.
+
 ---
 
 ## Tabla de Contenidos
