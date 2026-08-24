@@ -3,10 +3,10 @@ services:
     image: mysql:8.0
     command: --default-time-zone='-03:00'
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: mordisco
-      MYSQL_USER: mordisco_user
-      MYSQL_PASSWORD: mordisco_pass
+      MYSQL_USER: ${MYSQL_USER:-mordisco_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       TZ: America/Argentina/Buenos_Aires
     ports:
       - "3306:3306"

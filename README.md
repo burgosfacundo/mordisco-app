@@ -39,20 +39,24 @@ Esto levanta MySQL, Backend y Frontend con datos de prueba. Accede en: **http://
 
 **Detener:** `./stop.sh`
 
+### Configuracion local
+
+Antes de iniciar, copia `.env.example` a `.env`. Completa las credenciales locales cuando sea necesario, nunca confirmes `.env` y genera localmente un secreto JWT fuerte.
+
 ---
 
 ## Tabla de Contenidos
 
-- [Descripcion del Proyecto](#descripcion-del-proyecto)
+- [Descripción del Proyecto](#descripcion-del-proyecto)
 - [Arquitectura del Sistema](#arquitectura-del-sistema)
 - [Funcionalidades por Rol](#funcionalidades-por-rol)
-  - [Cliente](#-cliente)
-  - [Restaurante](#-restaurante)
-  - [Repartidor](#-repartidor)
-  - [Administrador](#-administrador)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+  - [Cliente](#cliente)
+  - [Restaurante](#restaurante)
+  - [Repartidor](#repartidor)
+  - [Administrador](#administrador)
+- [Tecnologías Utilizadas](#tecnologias-utilizadas)
 - [Modelo de Datos](#modelo-de-datos)
-- [Instalacion y Ejecucion](#instalacion-y-ejecucion)
+- [Instalación y Ejecución](#instalacion-y-ejecucion)
 - [Estructura del Proyecto](#estructura-del-proyecto)
 - [API Documentation](#api-documentation)
 - [Seguridad](#seguridad)
