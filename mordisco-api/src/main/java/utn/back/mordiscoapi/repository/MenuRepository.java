@@ -7,4 +7,5 @@ import utn.back.mordiscoapi.model.entity.Menu;
 
 @Repository
 public interface MenuRepository extends JpaRepository<Menu,Long> {
+    boolean existsByIdAndRestaurante_Usuario_Id(Long id, Long usuarioId);
 }

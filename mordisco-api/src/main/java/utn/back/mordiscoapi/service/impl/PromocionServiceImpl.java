@@ -40,7 +40,7 @@ public class PromocionServiceImpl implements IPromocionService {
      * @param dto DTO de la promoción a validar
      * @throws BadRequestException si el descuento es inválido
      */
-    private void validarMontoFijo(PromocionRequestDTO dto) throws BadRequestException {
+    private void validarMontoFijo(PromocionRequestDTO dto, List<Producto> productosEspecificos) throws BadRequestException {
         // Solo validar para MONTO_FIJO
         if (dto.tipoDescuento() != TipoDescuento.MONTO_FIJO) {
             return;
@@ -54,11 +54,7 @@ public class PromocionServiceImpl implements IPromocionService {
                 throw new BadRequestException("Debe seleccionar al menos un producto para promoción específica");
             }
 
-            productosAplicables = productoRepository.findAllById(dto.productosIds());
-
-            if (productosAplicables.size() != dto.productosIds().size()) {
-                throw new BadRequestException("Algunos productos especificados no existen");
-            }
+            productosAplicables = productosEspecificos;
         } else {
             // Validar contra todos los productos del menú
             var restaurante = restauranteRepository.findById(dto.restauranteId())
@@ -96,6 +92,20 @@ public class PromocionServiceImpl implements IPromocionService {
         }
     }
 
+    private List<Producto> resolverProductosEspecificos(PromocionRequestDTO dto) throws BadRequestException {
+        if (dto.alcance() != AlcancePromocion.PRODUCTOS_ESPECIFICOS
+                || dto.productosIds() == null || dto.productosIds().isEmpty()) {
+            return List.of();
+        }
+
+        List<Producto> productos = productoRepository.findAllByIdInAndMenuRestauranteId(
+                dto.productosIds(), dto.restauranteId());
+        if (productos.size() != dto.productosIds().size()) {
+            throw new BadRequestException("Los productos especificados no son válidos para el restaurante");
+        }
+        return productos;
+    }
+
     /**
      * Guarda una promoción.
      * @param dto DTO de la promoción a guardar.
@@ -111,20 +121,18 @@ public class PromocionServiceImpl implements IPromocionService {
             throw new BadRequestException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
 
+        List<Producto> productosEspecificos = resolverProductosEspecificos(dto);
+
         // Validar descuento MONTO_FIJO
-        validarMontoFijo(dto);
+        validarMontoFijo(dto, productosEspecificos);
 
         // Mapeo la DTO a la entidad
         Promocion promocion = PromocionMapper.toEntity(dto);
         
         // Si es promoción específica por productos, cargar los productos
-        if (dto.alcance() == utn.back.mordiscoapi.model.enums.AlcancePromocion.PRODUCTOS_ESPECIFICOS 
-            && dto.productosIds() != null && !dto.productosIds().isEmpty()) {
-            var productos = productoRepository.findAllById(dto.productosIds());
-            if (productos.size() != dto.productosIds().size()) {
-                throw new BadRequestException("Algunos productos especificados no existen");
-            }
-            promocion.setProductosAplicables(productos);
+        if (dto.alcance() == AlcancePromocion.PRODUCTOS_ESPECIFICOS
+            && !productosEspecificos.isEmpty()) {
+            promocion.setProductosAplicables(productosEspecificos);
         }
         
         // Guardar la entidad en la base de datos
@@ -186,9 +194,6 @@ public class PromocionServiceImpl implements IPromocionService {
             throw new BadRequestException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
 
-        // Validar descuento MONTO_FIJO
-        validarMontoFijo(dto);
-
         // Verificamos si el restaurante existe usando el findById por defecto
         // Si no existe, lanzamos una excepción BadRequestException
         var restaurante = restauranteRepository.findById(dto.restauranteId())
@@ -198,6 +203,11 @@ public class PromocionServiceImpl implements IPromocionService {
         if (!promocion.getRestaurante().getId().equals(dto.restauranteId())) {
             throw new BadRequestException("No se puede actualizar la promoción a un restaurante diferente");
         }
+
+        List<Producto> productosEspecificos = resolverProductosEspecificos(dto);
+
+        // Validar descuento MONTO_FIJO
+        validarMontoFijo(dto, productosEspecificos);
 
         // Actualizar los campos de la promoción
         promocion.setDescripcion(dto.descripcion());
@@ -211,12 +221,8 @@ public class PromocionServiceImpl implements IPromocionService {
         
         // Actualizar productos si es promoción específica
         if (dto.alcance() == utn.back.mordiscoapi.model.enums.AlcancePromocion.PRODUCTOS_ESPECIFICOS) {
-            if (dto.productosIds() != null && !dto.productosIds().isEmpty()) {
-                var productos = productoRepository.findAllById(dto.productosIds());
-                if (productos.size() != dto.productosIds().size()) {
-                    throw new BadRequestException("Algunos productos especificados no existen");
-                }
-                promocion.setProductosAplicables(productos);
+            if (!productosEspecificos.isEmpty()) {
+                promocion.setProductosAplicables(productosEspecificos);
             } else {
                 promocion.getProductosAplicables().clear();
             }
