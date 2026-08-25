@@ -37,6 +37,7 @@ public class UsuarioController {
      * @param dto Objeto DTO que contiene los datos del usuario a crear.
      * @return Respuesta HTTP con un mensaje de éxito.
      * @throws NotFoundException Si no se encuentra el rol del usuario.
+     * @throws BadRequestException Si el rol no está permitido para el registro público.
      */
     @Operation(summary = "Crear un usuario nuevo",
             description = "Recibe un usuario y lo guarda en la base de datos.")
@@ -48,7 +49,7 @@ public class UsuarioController {
     @PostMapping("/save")
     public ResponseEntity<Void> save(@RequestBody
                                        @Valid
-                                       UsuarioCreateDTO dto) throws NotFoundException {
+                                        UsuarioCreateDTO dto) throws NotFoundException, BadRequestException {
         service.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

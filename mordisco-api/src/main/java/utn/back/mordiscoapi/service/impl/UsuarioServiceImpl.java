@@ -35,11 +35,18 @@ import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 import utn.back.mordiscoapi.common.util.Sanitize;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
+    private static final Set<String> PUBLIC_REGISTRATION_ROLE_NAMES = Set.of(
+            "ROLE_CLIENTE",
+            "ROLE_RESTAURANTE",
+            "ROLE_REPARTIDOR"
+    );
+
     private final JwtUtil jwtUtil;
     private final UsuarioRepository repository;
     private final RolRepository rolRepository;
@@ -53,13 +60,18 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
      * Guarda un usuario.
      * @param dto DTO del usuario a guardar.
      * @throws NotFoundException si el rol no se encuentra.
+     * @throws BadRequestException si el rol no está permitido para el registro público.
      */
     @Override
-    public void save(UsuarioCreateDTO dto) throws NotFoundException {
-        if (!rolRepository.existsById(dto.rolId())){
-            throw new NotFoundException("Rol no encontrado");
+    public void save(UsuarioCreateDTO dto) throws NotFoundException, BadRequestException {
+        var rol = rolRepository.findById(dto.rolId())
+                .orElseThrow(() -> new NotFoundException("Rol no encontrado"));
+        if (!PUBLIC_REGISTRATION_ROLE_NAMES.contains(rol.getNombre())) {
+            throw new BadRequestException("Rol no permitido para registro público");
         }
+
         var user = UsuarioMapper.toUsuario(dto);
+        user.setRol(rol);
         user.setBajaLogica(false);
         repository.save(user);
     }
