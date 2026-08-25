@@ -92,7 +92,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REPARTIDOR') or @pedidoSecurity.esPropietarioPedido(#id) or @pedidoSecurity.esPropietarioRestaurantePedido(#id)")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('CLIENTE')) and (@pedidoSecurity.esPropietarioPedido(#id))) or ((hasRole('RESTAURANTE')) and (@pedidoSecurity.esPropietarioRestaurantePedido(#id))) or ((hasRole('REPARTIDOR')) and (@pedidoSecurity.esRepartidorAsignadoPedidoDelivery(#id)))")
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> findById(@PathVariable
                                                       Long id) throws NotFoundException {
@@ -163,7 +163,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE')")
+    @PreAuthorize("(hasRole('RESTAURANTE')) and (@pedidoSecurity.esPropietarioRestaurantePedido(#id))")
     @PutMapping("/state/{id}")
     public ResponseEntity<Void> changeState(
             @PathVariable
@@ -190,7 +190,8 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('CLIENTE') or hasRole('RESTAURANTE')")    @PutMapping("/cancelar/{id}")
+    @PreAuthorize("((hasRole('CLIENTE')) and (@pedidoSecurity.esPropietarioPedido(#id))) or ((hasRole('RESTAURANTE')) and (@pedidoSecurity.esPropietarioRestaurantePedido(#id)))")
+    @PutMapping("/cancelar/{id}")
     public ResponseEntity<Void> cancelarPedido(
             @PathVariable
             Long id) throws NotFoundException, BadRequestException {
@@ -336,7 +337,7 @@ public class PedidoController {
     """
     )
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('REPARTIDOR') or hasRole('RESTAURANTE')")
+    @PreAuthorize("((hasRole('REPARTIDOR')) and (@pedidoSecurity.esRepartidorAsignadoPedidoDelivery(#pedidoId))) or ((hasRole('RESTAURANTE')) and (@pedidoSecurity.esPropietarioRestaurantePedidoRetiro(#pedidoId)))")
     @PutMapping("/{pedidoId}/entregar")
     public ResponseEntity<Void> marcarComoEntregado(
             @PathVariable Long pedidoId,
@@ -458,7 +459,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('RESTAURANTE')) and (@restauranteSecurity.puedeAccederAPropioRestaurante(#idRest)))")
     @GetMapping("/buscar-by-restaurante/{idRest}")
     public ResponseEntity<Page<PedidoResponseDTO>> searchPedidosRestaurante(
             @PathVariable Long idRest,
@@ -491,7 +492,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('CLIENTE') or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('CLIENTE')) and (@usuarioSecurity.puedeAccederAUsuario(#idCli)))")
     @GetMapping("/buscar-by-cliente/{idCli}")
     public ResponseEntity<Page<PedidoResponseDTO>> searchPedidosCliente(@PathVariable Long idCli,
                                                                  @RequestParam(required = false) String search,
@@ -518,7 +519,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('REPARTIDOR') or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('REPARTIDOR')) and (@usuarioSecurity.puedeAccederAUsuario(#idRep)))")
     @GetMapping("/buscar-by-repartidor/{idRep}")
     public ResponseEntity<Page<PedidoResponseDTO>> searchPedidosRepartidor(@PathVariable Long idRep,
                                                                  @RequestParam(required = false) String search,
