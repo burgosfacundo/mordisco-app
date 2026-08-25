@@ -30,7 +30,7 @@ public class ProductoController {
     private final IProductoService service;
 
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('RESTAURANTE')) and (@productoSecurity.puedeCrearProductoEnMenu(#dto.idMenu())))")
     @PostMapping("/save")
     public ResponseEntity<Void> save(@RequestBody
                                      @Valid
@@ -70,7 +70,7 @@ public class ProductoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('RESTAURANTE')) and (@productoSecurity.puedeAccederAProducto(#id)))")
     @GetMapping("/{id}/pedidos-activos")
     public ResponseEntity<Page<PedidoResponseDTO>> getPedidosActivos(
             @PathVariable @Valid @Positive Long id,
@@ -101,7 +101,7 @@ public class ProductoController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('RESTAURANTE')) and (@productoSecurity.puedeAccederAProducto(#id)))")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@Valid @Positive @PathVariable Long id)
             throws NotFoundException, BadRequestException {
@@ -112,7 +112,7 @@ public class ProductoController {
 
 
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('RESTAURANTE')) and (@productoSecurity.puedeAccederAProducto(#id)))")
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @Valid @Positive @PathVariable Long id,

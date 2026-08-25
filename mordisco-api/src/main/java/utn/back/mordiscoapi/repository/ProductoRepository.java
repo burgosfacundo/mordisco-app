@@ -34,6 +34,12 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
             Pageable pageable
     );
 
+    boolean existsByIdAndMenu_Restaurante_Usuario_Id(Long id, Long usuarioId);
+
+    @Query("SELECT p FROM Producto p WHERE p.id IN :productosIds AND p.menu.restaurante.id = :restauranteId")
+    List<Producto> findAllByIdInAndMenuRestauranteId(@Param("productosIds") List<Long> productosIds,
+                                                      @Param("restauranteId") Long restauranteId);
+
     /**
      * Encuentra los productos más vendidos de un restaurante (ingresos después de descontar comisión de la plataforma)
      * Usa datos desnormalizados de productos_pedidos para incluir productos eliminados en estadísticas históricas.

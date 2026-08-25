@@ -45,7 +45,7 @@ public class HorarioController {
 
 
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('RESTAURANTE') or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('RESTAURANTE')) and (@horarioSecurity.puedeAccederAHorario(#idHorario)))")
     @PutMapping("/{idHorario}")
     public ResponseEntity<Void> update(
             @Valid @Positive @PathVariable Long idHorario,
@@ -56,7 +56,7 @@ public class HorarioController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('RESTAURANTE')")
+    @PreAuthorize("(hasRole('ADMIN')) or ((hasRole('RESTAURANTE')) and (@horarioSecurity.puedeAccederAHorario(#idHorario)))")
     @DeleteMapping("/{idHorario}")
     public ResponseEntity<Void> delete(
             @Valid @Positive @PathVariable Long idHorario

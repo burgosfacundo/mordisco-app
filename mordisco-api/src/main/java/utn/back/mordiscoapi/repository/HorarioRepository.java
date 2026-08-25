@@ -11,4 +11,6 @@ public interface HorarioRepository extends JpaRepository<HorarioAtencion,Long> {
     Page<HorarioAtencion>findAllByRestauranteId(Long restauranteId, Pageable pageable);
 
     List<HorarioAtencion> findAllByRestauranteId(Long restauranteId);
+
+    boolean existsByIdAndRestaurante_Usuario_Id(Long id, Long usuarioId);
 }
