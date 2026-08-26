@@ -23,7 +23,7 @@ public class PagoController {
     private final PagoService pagoService;
 
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REPARTIDOR') or @pedidoSecurity.esPropietarioPedido(#idPedido) or @pedidoSecurity.esPropietarioRestaurantePedido(#idPedido)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('CLIENTE') and @pedidoSecurity.esPropietarioPedido(#idPedido)) or (hasRole('RESTAURANTE') and @pedidoSecurity.esPropietarioRestaurantePedido(#idPedido)) or (hasRole('REPARTIDOR') and @pedidoSecurity.esRepartidorAsignadoPedidoDelivery(#idPedido))")
     @GetMapping("/{idPedido}")
     public ResponseEntity<PagoResponse> getPagoByPedidoId(@PathVariable Long idPedido)
             throws NotFoundException {
