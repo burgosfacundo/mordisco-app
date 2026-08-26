@@ -74,7 +74,7 @@ public class RepartidorController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REPARTIDOR')")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('REPARTIDOR') and @usuarioSecurity.puedeAccederAUsuario(#id))")
     @GetMapping("/pedidos/{id}")
     public ResponseEntity<Page<PedidoResponseDTO>> getAllPedidosRepartidor(
             @RequestParam int page,
@@ -100,7 +100,7 @@ public class RepartidorController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REPARTIDOR')")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('REPARTIDOR') and @usuarioSecurity.puedeAccederAUsuario(#id))")
     @GetMapping("/a-entregar/{id}")
     public ResponseEntity<Page<PedidoResponseDTO>> getPedidosAEntregarRepartidor(
             @RequestParam int page,
