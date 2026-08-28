@@ -43,9 +43,7 @@ export class App implements OnDestroy {
       const isAuth = this.authService.isAuthenticated();
       
       if (user && isAuth) {
-        setTimeout(() => {
-          this.notifService.conectar(user.userId, user.role);
-        }, 1000);
+        this.notifService.conectar(user.userId, user.role);
       } else {
         this.notifService.desconectar();
       }

@@ -4,12 +4,14 @@ import { Client, StompSubscription } from '@stomp/stompjs';
 import { Notificacion } from '../../models/notificacion/notificacion-dto';
 import { TipoNotificacion } from '../../models/notificacion/tipo-notificacion';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from '../auth-service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionService {
   private client?: Client;
   private subscriptions: StompSubscription[] = [];
   private snackBar = inject(MatSnackBar);
+  private authService = inject(AuthService);
   
   private readonly STORAGE_KEY = 'mordisco_notificaciones';
   private readonly MAX_NOTIFICACIONES = 50;
@@ -36,82 +38,94 @@ export class NotificacionService {
   }
 
 
-  conectar(userId: number, role: string): void {
-    if (this.client?.connected) {
+  conectar(_userId: number, role: string): void {
+    if (this.client?.active) {
+      return;
+    }
+
+    if (!this.authService.getAccessToken()) {
+      this.desconectar();
       return;
     }
 
     const wsUrl = environment.apiUrl.replace(/^http/, 'ws') + '/ws';
-
-    this.client = new Client({
+    const client = new Client({
       webSocketFactory: () => new WebSocket(wsUrl),
-      
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
-      
-      onConnect: () => {
-        this._conectado.set(true);
-
-        const topicUsuario = `/topic/usuario/${userId}`;
-        
-        const sub = this.client?.subscribe(topicUsuario, (message) => {
-          try {
-            const notif = JSON.parse(message.body);
-            this.procesarNotificacion(notif);
-          } catch (error) {
-            console.error('❌ Error al parsear notificación:', error);
-          }
-        });
-        
-        if (sub) {
-          this.subscriptions.push(sub);
+      beforeConnect: () => {
+        const token = this.authService.getAccessToken();
+        if (!token) {
+          client.reconnectDelay = 0;
+          this.desconectar();
+          return;
         }
 
-        // Si es repartidor, también suscribirse al broadcast
+        client.connectHeaders = { Authorization: `Bearer ${token}` };
+      },
+      onConnect: () => {
+        if (this.client !== client) {
+          return;
+        }
+
+        this._conectado.set(true);
+        this.desuscribirseDeTodo();
+        this.suscribirse(client, '/user/queue/notificaciones');
+
         const roleNormalizado = role.toUpperCase().replace('ROLE_', '');
         if (roleNormalizado === 'REPARTIDOR') {
-          const topicRepartidores = '/topic/repartidores';
-          
-          const subRepartidores = this.client?.subscribe(topicRepartidores, (message) => {
-            try {
-              const notif = JSON.parse(message.body);
-              this.procesarNotificacion(notif);
-            } catch (error) {
-              console.error('❌ Error al parsear notificación:', error);
-            }
-          });
-          
-          if (subRepartidores) {
-            this.subscriptions.push(subRepartidores);
-          }
+          this.suscribirse(client, '/topic/repartidores');
         }
       },
-      
       onDisconnect: () => {
         this._conectado.set(false);
       },
-      
       onStompError: (frame) => {
         console.error('❌ Error STOMP:', frame);
-        this._conectado.set(false);
+        this.detenerPorFalloDeAutenticacion(client);
       },
-      
       onWebSocketError: (event) => {
         console.error('❌ Error WebSocket:', event);
         this._conectado.set(false);
       },
-
       onWebSocketClose: (event) => {
         this._conectado.set(false);
+        if (event.code === 1008) {
+          this.detenerPorFalloDeAutenticacion(client);
+        }
       }
     });
 
-    this.client.activate();
+    this.client = client;
+    client.activate();
   }
 
   desconectar(): void {
-    // Desuscribirse de todos los topics
+    this.desuscribirseDeTodo();
+
+    if (this.client) {
+      this.client.deactivate();
+      this.client = undefined;
+    }
+
+    this._conectado.set(false);
+  }
+
+  private suscribirse(client: Client, topic: string): void {
+    const sub = client.subscribe(topic, (message) => {
+      try {
+        const notif = JSON.parse(message.body);
+        this.procesarNotificacion(notif);
+      } catch (error) {
+        console.error('❌ Error al parsear notificación:', error);
+      }
+    });
+
+    this.subscriptions.push(sub);
+  }
+
+  private desuscribirseDeTodo(): void {
     this.subscriptions.forEach(sub => {
       try {
         sub.unsubscribe();
@@ -120,13 +134,13 @@ export class NotificacionService {
       }
     });
     this.subscriptions = [];
-    
-    if (this.client) {
-      this.client.deactivate();
-      this.client = undefined;
+  }
+
+  private detenerPorFalloDeAutenticacion(client: Client): void {
+    client.reconnectDelay = 0;
+    if (this.client === client) {
+      this.desconectar();
     }
-    
-    this._conectado.set(false);
   }
 
   private procesarNotificacion(data: any): void {
