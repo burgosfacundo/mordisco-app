@@ -89,7 +89,7 @@ public class SecurityConfiguration {
             http
                     .csrf(csrf -> csrf
                             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                            .ignoringRequestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/logout")
+                            .ignoringRequestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/logout", "/api/ws/**")
                     )
                     .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
         } else {

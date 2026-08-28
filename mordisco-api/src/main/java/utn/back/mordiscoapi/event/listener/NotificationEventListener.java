@@ -21,6 +21,8 @@ import utn.back.mordiscoapi.model.entity.Pedido;
 @RequiredArgsConstructor
 public class NotificationEventListener {
 
+    private static final String PRIVATE_NOTIFICATION_DESTINATION = "/queue/notificaciones";
+
     private final SimpMessagingTemplate messagingTemplate;
 
     /**
@@ -31,8 +33,7 @@ public class NotificationEventListener {
     public void handlePedidoCreated(PedidoCreatedEvent event) {
         Pedido pedido = event.getPedido();
 
-        Long usuarioRestauranteId = pedido.getRestaurante().getUsuario().getId();
-        String topic = "/topic/usuario/" + usuarioRestauranteId;
+        String recipient = pedido.getRestaurante().getUsuario().getUsername();
 
         NotificacionDTO notif = new NotificacionDTO(
                 TipoNotificacion.NUEVO_PEDIDO,
@@ -41,7 +42,7 @@ public class NotificationEventListener {
                 pedido.getEstado().toString()
         );
 
-        messagingTemplate.convertAndSend(topic, notif);
+        sendToUser(recipient, notif);
     }
 
     /**
@@ -52,8 +53,6 @@ public class NotificationEventListener {
     public void handlePedidoEnPreparacion(PedidoEnPreparacionEvent event) {
         Pedido pedido = event.getPedido();
 
-        String topic = "/topic/usuario/" + pedido.getCliente().getId();
-
         NotificacionDTO notif = new NotificacionDTO(
                 TipoNotificacion.PEDIDO_EN_PREPARACION,
                 "Tu pedido #" + pedido.getId() + " está en preparación",
@@ -61,7 +60,7 @@ public class NotificationEventListener {
                 pedido.getEstado().toString()
         );
 
-        messagingTemplate.convertAndSend(topic, notif);
+        sendToUser(pedido.getCliente().getUsername(), notif);
     }
 
     /**
@@ -92,7 +91,6 @@ public class NotificationEventListener {
     @EventListener
     public void handlePedidoListoParaRetirar(PedidoListoParaRetirarEvent event) {
         Pedido pedido = event.getPedido();
-        String topic = "/topic/usuario/" + pedido.getCliente().getId();
 
         NotificacionDTO notif = new NotificacionDTO(
                 TipoNotificacion.PEDIDO_LISTO_PARA_RETIRAR,
@@ -101,7 +99,7 @@ public class NotificationEventListener {
                 pedido.getEstado().toString()
         );
 
-        messagingTemplate.convertAndSend(topic, notif);
+        sendToUser(pedido.getCliente().getUsername(), notif);
     }
 
     /**
@@ -111,7 +109,6 @@ public class NotificationEventListener {
     @EventListener
     public void handlePedidoEnCamino(PedidoEnCaminoEvent event) {
         Pedido pedido = event.getPedido();
-        String topic = "/topic/usuario/" + pedido.getCliente().getId();
 
         NotificacionDTO notif = new NotificacionDTO(
                 TipoNotificacion.PEDIDO_EN_CAMINO,
@@ -120,7 +117,7 @@ public class NotificationEventListener {
                 pedido.getEstado().toString()
         );
 
-        messagingTemplate.convertAndSend(topic, notif);
+        sendToUser(pedido.getCliente().getUsername(), notif);
     }
 
     /**
@@ -132,25 +129,22 @@ public class NotificationEventListener {
         Pedido pedido = event.getPedido();
 
         // Notificar al cliente
-        String topicCliente = "/topic/usuario/" + pedido.getCliente().getId();
         NotificacionDTO notifCliente = new NotificacionDTO(
                 TipoNotificacion.PEDIDO_COMPLETADO,
                 "Tu pedido #" + pedido.getId() + " ha sido completado",
                 pedido.getId(),
                 pedido.getEstado().toString()
         );
-        messagingTemplate.convertAndSend(topicCliente, notifCliente);
+        sendToUser(pedido.getCliente().getUsername(), notifCliente);
 
         // Notificar al restaurante
-        Long usuarioRestauranteId = pedido.getRestaurante().getUsuario().getId();
-        String topicRestaurante = "/topic/usuario/" + usuarioRestauranteId;
         NotificacionDTO notifRestaurante = new NotificacionDTO(
                 TipoNotificacion.PEDIDO_COMPLETADO,
                 "Pedido #" + pedido.getId() + " completado exitosamente",
                 pedido.getId(),
                 pedido.getEstado().toString()
         );
-        messagingTemplate.convertAndSend(topicRestaurante, notifRestaurante);
+        sendToUser(pedido.getRestaurante().getUsuario().getUsername(), notifRestaurante);
 
     }
 
@@ -163,25 +157,22 @@ public class NotificationEventListener {
         Pedido pedido = event.getPedido();
 
         // Notificar al cliente
-        String topicCliente = "/topic/usuario/" + pedido.getCliente().getId();
         NotificacionDTO notifCliente = new NotificacionDTO(
                 TipoNotificacion.PEDIDO_CANCELADO,
                 "Tu pedido #" + pedido.getId() + " ha sido cancelado. Motivo: " + event.getMotivo(),
                 pedido.getId(),
                 pedido.getEstado().toString()
         );
-        messagingTemplate.convertAndSend(topicCliente, notifCliente);
+        sendToUser(pedido.getCliente().getUsername(), notifCliente);
 
         // Notificar al restaurante
-        Long usuarioRestauranteId = pedido.getRestaurante().getUsuario().getId();
-        String topicRestaurante = "/topic/usuario/" + usuarioRestauranteId;
         NotificacionDTO notifRestaurante = new NotificacionDTO(
                 TipoNotificacion.PEDIDO_CANCELADO,
                 "El pedido #" + pedido.getId() + " ha sido cancelado",
                 pedido.getId(),
                 pedido.getEstado().toString()
         );
-        messagingTemplate.convertAndSend(topicRestaurante, notifRestaurante);
+        sendToUser(pedido.getRestaurante().getUsuario().getUsername(), notifRestaurante);
     }
 
     /**
@@ -193,25 +184,22 @@ public class NotificationEventListener {
         Pedido pedido = event.getPedido();
 
         // Notificar al cliente
-        String topicCliente = "/topic/usuario/" + pedido.getCliente().getId();
         NotificacionDTO notifCliente = new NotificacionDTO(
                 TipoNotificacion.PAGO_CONFIRMADO,
                 "El pago de tu pedido #" + pedido.getId() + " ha sido aprobado",
                 pedido.getId(),
                 pedido.getEstado().toString()
         );
-        messagingTemplate.convertAndSend(topicCliente, notifCliente);
+        sendToUser(pedido.getCliente().getUsername(), notifCliente);
 
         // Notificar al restaurante
-        Long usuarioRestauranteId = pedido.getRestaurante().getUsuario().getId();
-        String topicRestaurante = "/topic/usuario/" + usuarioRestauranteId;
         NotificacionDTO notifRestaurante = new NotificacionDTO(
                 TipoNotificacion.PAGO_CONFIRMADO,
                 "Pago confirmado para pedido #" + pedido.getId(),
                 pedido.getId(),
                 pedido.getEstado().toString()
         );
-        messagingTemplate.convertAndSend(topicRestaurante, notifRestaurante);
+        sendToUser(pedido.getRestaurante().getUsuario().getUsername(), notifRestaurante);
 
     }
 
@@ -224,24 +212,28 @@ public class NotificationEventListener {
         Pedido pedido = event.getPedido();
 
         // Notificar al cliente
-        String topicCliente = "/topic/usuario/" + pedido.getCliente().getId();
         NotificacionDTO notifCliente = new NotificacionDTO(
                 TipoNotificacion.PAGO_RECHAZADO,
                 "El pago de tu pedido #" + pedido.getId() + " ha sido rechazado. " + event.getMotivo(),
                 pedido.getId(),
                 pedido.getEstado().toString()
         );
-        messagingTemplate.convertAndSend(topicCliente, notifCliente);
+        sendToUser(pedido.getCliente().getUsername(), notifCliente);
 
         // Notificar al restaurante
-        Long usuarioRestauranteId = pedido.getRestaurante().getUsuario().getId();
-        String topicRestaurante = "/topic/usuario/" + usuarioRestauranteId;
         NotificacionDTO notifRestaurante = new NotificacionDTO(
                 TipoNotificacion.PAGO_RECHAZADO,
                 "Pago rechazado para pedido #" + pedido.getId(),
                 pedido.getId(),
                 pedido.getEstado().toString()
         );
-        messagingTemplate.convertAndSend(topicRestaurante, notifRestaurante);
+        sendToUser(pedido.getRestaurante().getUsuario().getUsername(), notifRestaurante);
+    }
+
+    private void sendToUser(String canonicalEmail, NotificacionDTO notification) {
+        messagingTemplate.convertAndSendToUser(
+                canonicalEmail,
+                PRIVATE_NOTIFICATION_DESTINATION,
+                notification);
     }
 }
