@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+
 import { CalificacionFormRepartidorComponent } from './calificacion-form-repartidor-component';
 
 describe('CalificacionFormRepartidorComponent', () => {
@@ -8,7 +11,8 @@ describe('CalificacionFormRepartidorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CalificacionFormRepartidorComponent]
+      imports: [CalificacionFormRepartidorComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     })
     .compileComponents();
 

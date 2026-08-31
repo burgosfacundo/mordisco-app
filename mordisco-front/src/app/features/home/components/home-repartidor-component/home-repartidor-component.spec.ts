@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+
 import { HomeRepartidorComponent } from './home-repartidor-component';
 
 describe('HomeRepartidorComponent', () => {
@@ -8,7 +11,8 @@ describe('HomeRepartidorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HomeRepartidorComponent]
+      imports: [HomeRepartidorComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     })
     .compileComponents();
 

@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+
 import { HorarioFormPage } from './horario-form-page';
 
 describe('HorarioFormPage', () => {
@@ -8,7 +11,8 @@ describe('HorarioFormPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HorarioFormPage]
+      imports: [HorarioFormPage],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     })
     .compileComponents();
 

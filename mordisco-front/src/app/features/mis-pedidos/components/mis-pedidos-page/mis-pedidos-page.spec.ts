@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+
 import { MisPedidosPage } from './mis-pedidos-page';
 
 describe('MisPedidosPage', () => {
@@ -8,7 +11,8 @@ describe('MisPedidosPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MisPedidosPage]
+      imports: [MisPedidosPage],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     })
     .compileComponents();
 

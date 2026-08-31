@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+
 import { CalificacionPage } from './calificacion-page';
 
 describe('CalificacionPage', () => {
@@ -8,7 +11,8 @@ describe('CalificacionPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CalificacionPage]
+      imports: [CalificacionPage],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     })
     .compileComponents();
 

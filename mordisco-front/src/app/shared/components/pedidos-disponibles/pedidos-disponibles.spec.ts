@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+
 import { PedidosDisponiblesComponent } from './pedidos-disponibles';
 
 describe('PedidosDisponiblesComponent', () => {
@@ -8,7 +11,8 @@ describe('PedidosDisponiblesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PedidosDisponiblesComponent]
+      imports: [PedidosDisponiblesComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     })
     .compileComponents();
 
