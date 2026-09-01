@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.stereotype.Component;
 import utn.back.mordiscoapi.config.AppProperties;
 import utn.back.mordiscoapi.event.auth.CuentaBloqueadaEvent;
@@ -222,8 +224,8 @@ public class EmailEventListener {
         }
     }
 
-    @Async
-    @EventListener
+    @Async("passwordRecoveryEmailExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePasswordResetRequested(PasswordResetRequestedEvent event) {
         if (!event.shouldSendEmail()) return;
 
@@ -233,13 +235,13 @@ public class EmailEventListener {
                     event.getNombre(),
                     event.getResetLink()
             );
-        } catch (Exception e) {
-            log.error("Error sending password reset email: {}", e.getMessage(), e);
+        } catch (Exception ignored) {
+            log.error("Password recovery email delivery failed");
         }
     }
 
-    @Async
-    @EventListener
+    @Async("passwordRecoveryEmailExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePasswordChanged(PasswordChangedEvent event) {
         if (!event.shouldSendEmail()) return;
 
@@ -249,9 +251,8 @@ public class EmailEventListener {
                     event.getNombre(),
                     event.getLoginLink()
             );
-            
-        } catch (Exception e) {
-            log.error("Error sending password change alert email: {}", e.getMessage(), e);
+        } catch (Exception ignored) {
+            log.error("Password recovery email delivery failed");
         }
     }
 

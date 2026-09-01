@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import utn.back.mordiscoapi.common.validation.ValidationConstants;
 
 public record ResetPasswordDTO(
-        @NotBlank(message = "El token es obligatorio")
         String token,
 
         @NotBlank(message = "La contraseña es obligatoria")
