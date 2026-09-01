@@ -28,7 +28,6 @@ import utn.back.mordiscoapi.model.dto.usuario.*;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.RolRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
-import utn.back.mordiscoapi.security.jwt.utils.JwtUtil;
 import utn.back.mordiscoapi.service.interf.IEmailService;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
@@ -47,7 +46,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
             "ROLE_REPARTIDOR"
     );
 
-    private final JwtUtil jwtUtil;
+    private final PasswordRecoveryService passwordRecoveryService;
     private final UsuarioRepository repository;
     private final RolRepository rolRepository;
     private final AuthUtils authUtils;
@@ -326,54 +325,14 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     }
 
 
-    @Transactional
-    public void requestPasswordRecovery(RecoverPasswordDTO dto)
-            throws NotFoundException, InternalServerErrorException {
-
-        Usuario usuario = repository.findByEmail(dto.email())
-                .orElseThrow(() -> new NotFoundException("No existe una cuenta con ese email"));
-
-        // Generar token JWT especial para recuperación (válido por 1 hora)
-        String recoveryToken = jwtUtil.generateRecoveryPasswordToken(usuario);
-
-        // Construir URL de recuperación
-        String resetUrl = appProperties.getFrontendUrl() + "/reset-password?token=" + recoveryToken;
-
-        // Publicar evento de solicitud de reset de contraseña
-        eventPublisher.publishEvent(new PasswordResetRequestedEvent(
-                usuario.getId(), usuario.getEmail(), usuario.getNombre(), resetUrl));
-
-        log.info("📧 Evento de recuperación publicado para: {}", usuario.getEmail());
+    @Override
+    public void requestPasswordRecovery(RecoverPasswordDTO dto) {
+        passwordRecoveryService.requestPasswordRecovery(dto);
     }
 
-    /**
-     * Restablece la contraseña usando el token
-     */
-    @Transactional
-    public void resetPassword(ResetPasswordDTO dto)
-            throws BadRequestException, NotFoundException {
-
-        // Validar token
-        if (!jwtUtil.isTokenValid(dto.token())) {
-            throw new BadRequestException("El token es inválido o ha expirado");
-        }
-
-        // Extraer email del token
-        String email = jwtUtil.extractUserName(dto.token());
-
-        Usuario usuario = repository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
-
-        // Cambiar contraseña
-        usuario.setPassword(passwordEncoder.encode(dto.newPassword()));
-        repository.save(usuario);
-
-        // Publicar evento de cambio de contraseña
-        String loginLink = appProperties.getFrontendUrl() + "/login";
-        eventPublisher.publishEvent(new PasswordChangedEvent(
-                usuario.getId(), usuario.getEmail(), usuario.getNombre(), loginLink));
-
-        log.info("✅ Contraseña restablecida para: {}", email);
+    @Override
+    public void resetPassword(ResetPasswordDTO dto) throws BadRequestException {
+        passwordRecoveryService.resetPassword(dto);
     }
 
     /**

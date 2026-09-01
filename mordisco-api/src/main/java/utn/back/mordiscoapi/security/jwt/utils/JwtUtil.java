@@ -80,21 +80,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String generateRecoveryPasswordToken(Usuario usuario) {
-        Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("type", "password_recovery");
-        extraClaims.put("userId", usuario.getId());
-        extraClaims.put("username", usuario.getEmail());
-
-        return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(usuario.getEmail())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration * 4)) // 1 hora
-                .signWith(this.secretKey)
-                .compact();
-    }
-
     public Boolean isAccessTokenValid(String token, UserDetails userDetails) {
         try {
             final String username = extractUserName(token);
@@ -108,15 +93,6 @@ public class JwtUtil {
             return false;
         }
     }
-    public boolean isTokenValid(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            return !claims.getExpiration().before(new Date());
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     public boolean isAccessToken(String token) {
         try {
             return "access".equals(extractClaim(token, claims -> claims.get("type")));

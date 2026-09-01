@@ -98,7 +98,11 @@ public class RefreshTokenService {
 
     @Transactional
     public void revokeAllUserSessions(Long userId) {
-        refreshTokenRepository.revokeAllUserTokens(userId, LocalDateTime.now());
+        revokeAllUserSessions(userId, LocalDateTime.now());
+    }
+
+    public void revokeAllUserSessions(Long userId, LocalDateTime now) {
+        refreshTokenRepository.revokeAllUserTokens(userId, now);
         log.info("Todas las sesiones del usuario {} han sido revocadas", userId);
     }
 

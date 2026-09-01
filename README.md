@@ -429,6 +429,60 @@ http://localhost:8080/swagger-ui.html
 - **Refresh Token**: Cookie httpOnly, 7 dias de duracion
 - Renovacion automatica en frontend
 
+### Password recovery operations
+
+Password recovery uses opaque, single-use credentials. This is a backend security change; Angular production files and the existing user journey remain unchanged.
+
+#### Public compatibility contract
+
+- The existing frontend public routes remain `/recover-password` and `/reset-password`.
+- The reset page continues to read the `token` query parameter and sends the unchanged `{ token, newPassword }` payload to `POST /api/usuarios/reset-password`; recovery continues through `POST /api/usuarios/recover-password`.
+- A syntactically valid recovery request always receives `200 OK` with an empty body. The response does not reveal account existence, activation, cooldown, token state, or mail delivery outcome.
+- Reset does not auto-login the user. A successful reset revokes every refresh session for the affected user only; existing access JWT authentication, claims, and expiry behavior are unchanged, so an already-issued access JWT remains valid until its normal expiry.
+
+#### Credential storage and lifecycle
+
+The dedicated `password_recovery_credentials` table stores the current recovery state. It is intentionally one row per user: `usuario_id` is a unique foreign key to `usuarios(id)`, and `token_digest` is unique. `issued_at`, `expires_at`, `cooldown_until`, and nullable `consumed_at` use MySQL `DATETIME(6)` with UTC semantics.
+
+Only a lowercase SHA-256 digest is stored. The raw opaque token exists only in memory while building the email reset link and while processing the submitted reset request. Never persist, log, trace, or include a raw token, reset URL, password, digest, or full recovery email address in operational output.
+
+| Setting | Environment variable | Unit | Default | Allowed range | Safe behavior |
+|---|---|---:|---:|---:|---|
+| `app.password-recovery.expiration-seconds` | `PASSWORD_RECOVERY_EXPIRATION_SECONDS` | seconds | 3600 | 300–86400 | Missing values use the default; non-numeric or out-of-range values fail application startup. |
+| `app.password-recovery.cooldown-seconds` | `PASSWORD_RECOVERY_COOLDOWN_SECONDS` | seconds | 300 | 60–86400 | Missing values use the default; non-numeric or out-of-range values fail application startup. |
+
+Expiration and cooldown are independent. Expiry is exclusive (`now >= expires_at` is invalid); cooldown is inclusive of suppression (`now < cooldown_until` is suppressed). A permitted resend replaces the prior digest; a cooldown-suppressed request changes nothing.
+
+A UTC cleanup runs daily and deletes only records for which `cooldown_until <= now` and either `consumed_at` is set or `expires_at <= now`. This retains a consumed record until cooldown ends and an expired record while needed to enforce a longer cooldown; rows are otherwise bounded by the lifecycle rather than kept as history.
+
+#### Delivery, privacy, and failure semantics
+
+Recovery and password-change email handlers run asynchronously only after the database transaction commits (`AFTER_COMMIT`). Delivery is best effort: an SMTP, template, or executor failure does not roll back a committed credential or password reset, does not retry automatically, and does not change the generic public response. A process failure between commit and dispatch can lose an email; this implementation is not a durable outbox.
+
+Operational logs for these handlers use fixed aggregate failure text only. Do not add request-level success, suppression, account-state, recipient, exception-detail, credential, or link logging. Mail delivery is the sole boundary where the raw token and recipient address are used.
+
+#### MySQL deployment verification
+
+Hibernate additive DDL (`spring.jpa.hibernate.ddl-auto=update`) creates the table under the repository's no-migration-framework convention. Before deployment, confirm that the production database principal is permitted to apply this additive DDL. If runtime DDL is restricted, have an operator create the equivalent additive table and constraints before starting the backend; do not introduce a migration framework solely for this change.
+
+Before enabling recovery traffic, inspect the deployed MySQL schema and confirm:
+
+1. `password_recovery_credentials` exists with the expected primary key.
+2. The `usuario_id` unique constraint and foreign key to `usuarios(id)` exist.
+3. The `token_digest` uniqueness constraint exists.
+4. The four lifecycle columns use `DATETIME(6)` and the application is configured with valid duration settings.
+5. A successful reset revokes only the affected user's refresh sessions, while access JWT behavior remains unchanged.
+
+Use only redacted aggregate mail and application-health signals during rollout. Do not place secrets, passwords, reset URLs, raw tokens, or token digests in deployment notes, commands, dashboards, or support tickets.
+
+#### Rollout and rollback
+
+1. Back up or inspect the schema, verify the DDL capability above, and deploy the backend as one opaque-credential behavior switch.
+2. Existing recovery JWTs are not accepted after the switch; users request a new recovery email. Never restore mixed JWT/opaque acceptance.
+3. Keep the frontend routes and access-JWT deployment unchanged, then validate only generic responses and redacted aggregate mail health.
+4. For an emergency rollback, the additive table may remain. Clear its rows before a corrected forward deployment so issued opaque links are invalidated. Do not drop the table during the emergency action.
+5. Do not re-enable recovery JWT handling as a normal rollback. If the backend must be reverted, disable both recovery endpoints until a fixed forward deployment is available rather than accepting either a mixed JWT/opaque path or previously issued JWT recovery credentials.
+
 ### Autorizacion
 
 - **RBAC** (Role-Based Access Control)
