@@ -47,6 +47,61 @@ class ProductionConfigurationValidatorTest {
                 });
     }
 
+    @Test
+    void combinedProductionProfilesRequireExactWebSocketOrigins() {
+        appPropertiesRunner("prod", "schema-bootstrap", "demo-seed")
+                .withPropertyValues(
+                        "app.maintenance-secret=synthetic-maintenance-secret",
+                        "app.mercado-pago.environment=sandbox",
+                        "app.mercado-pago.webhook-secret=synthetic-webhook-secret",
+                        "app.mercado-pago.notification-url=https://payments.example/api/pagos/webhook")
+                .run(context -> assertStartupFailureContains(
+                        context.getStartupFailure(), "Exact WebSocket allowed origins are required"));
+    }
+
+    @Test
+    void combinedProductionProfilesRequireMaintenanceSecret() {
+        appPropertiesRunner("prod", "schema-bootstrap", "demo-seed")
+                .withPropertyValues(
+                        "app.websocket-allowed-origins=https://frontend.example",
+                        "app.mercado-pago.environment=sandbox",
+                        "app.mercado-pago.webhook-secret=synthetic-webhook-secret",
+                        "app.mercado-pago.notification-url=https://payments.example/api/pagos/webhook")
+                .run(context -> assertStartupFailureContains(
+                        context.getStartupFailure(), "MAINTENANCE_SECRET must be provided for the prod profile"));
+    }
+
+    @Test
+    void combinedProductionProfilesRequireMercadoPagoWebhookConfiguration() {
+        appPropertiesRunner("prod", "schema-bootstrap", "demo-seed")
+                .withPropertyValues(
+                        "app.websocket-allowed-origins=https://frontend.example",
+                        "app.maintenance-secret=synthetic-maintenance-secret",
+                        "app.mercado-pago.environment=sandbox",
+                        "app.mercado-pago.notification-url=https://payments.example/api/pagos/webhook")
+                .run(context -> assertStartupFailureContains(
+                        context.getStartupFailure(), "Mercado Pago webhook secret is required in production"));
+    }
+
+    @Test
+    void developmentProfileDoesNotRequireProductionOnlyAppProperties() {
+        appPropertiesRunner("dev")
+                .run(context -> assertNull(context.getStartupFailure(),
+                        () -> failureText(context.getStartupFailure())));
+    }
+
+    private void assertStartupFailureContains(Throwable failure, String expectedMessage) {
+        assertNotNull(failure, "Expected startup failure containing: " + expectedMessage);
+        String diagnostics = failureText(failure);
+        assertTrue(diagnostics.contains(expectedMessage), diagnostics);
+    }
+
+    private ApplicationContextRunner appPropertiesRunner(String... activeProfiles) {
+        return new ApplicationContextRunner()
+                .withInitializer(context -> context.getEnvironment().setActiveProfiles(activeProfiles))
+                .withUserConfiguration(AppPropertiesOnlyConfiguration.class);
+    }
+
     private void assertEqualsSecret(ProductionConfigurationValidator validator) {
         assertTrue("synthetic-maintenance-secret".equals(validator.getMaintenanceSecret()));
     }
@@ -74,5 +129,10 @@ class ProductionConfigurationValidatorTest {
     @Profile("prod")
     @EnableConfigurationProperties(ProductionConfigurationValidator.class)
     static class ValidationOnlyConfiguration {
+    }
+
+    @TestConfiguration(proxyBeanMethods = false)
+    @EnableConfigurationProperties(AppProperties.class)
+    static class AppPropertiesOnlyConfiguration {
     }
 }

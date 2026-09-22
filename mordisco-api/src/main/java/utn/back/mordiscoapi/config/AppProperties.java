@@ -6,8 +6,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,35 +33,47 @@ public class AppProperties {
     private MercadoPagoProperties mercadoPago = new MercadoPagoProperties();
     private JasyptEncryptorProperties jasypt = new JasyptEncryptorProperties();
 
-    @Value("${spring.profiles.active:dev}")
-    private String activeProfile;
+    @Autowired
+    private Environment environment;
 
     @PostConstruct
     void validateConfiguration() {
-        validateWebSocketOrigins(activeProfile);
-        validateMercadoPagoConfiguration(activeProfile);
-        validateMaintenanceSecret(activeProfile);
+        validateWebSocketOriginsFor(environment);
+        validateMercadoPagoConfigurationFor(environment);
+        validateMaintenanceSecretFor(environment);
     }
 
     void validateWebSocketOrigins(String profile) {
+        validateWebSocketOriginsFor(environmentFor(profile));
+    }
+
+    private void validateWebSocketOriginsFor(Environment activeEnvironment) {
         boolean missing = websocketAllowedOrigins == null
                 || websocketAllowedOrigins.isEmpty()
                 || websocketAllowedOrigins.stream().anyMatch(origin -> origin == null || origin.isBlank());
         boolean wildcard = websocketAllowedOrigins != null
                 && websocketAllowedOrigins.stream().anyMatch(origin -> origin.contains("*"));
-        if (wildcard || (isProductionProfile(profile) && missing)) {
+        if (wildcard || (isProductionProfile(activeEnvironment) && missing)) {
             throw new IllegalStateException("Exact WebSocket allowed origins are required");
         }
     }
 
     void validateMaintenanceSecret(String profile) {
-        if (isProductionProfile(profile)
+        validateMaintenanceSecretFor(environmentFor(profile));
+    }
+
+    private void validateMaintenanceSecretFor(Environment activeEnvironment) {
+        if (isProductionProfile(activeEnvironment)
                 && (maintenanceSecret == null || maintenanceSecret.isBlank())) {
             throw new IllegalStateException("MAINTENANCE_SECRET must be provided for the prod profile");
         }
     }
 
     void validateMercadoPagoConfiguration(String profile) {
+        validateMercadoPagoConfigurationFor(environmentFor(profile));
+    }
+
+    private void validateMercadoPagoConfigurationFor(Environment activeEnvironment) {
         String environment = mercadoPago.getEnvironment();
         if (environment == null
                 || (!"sandbox".equalsIgnoreCase(environment)
@@ -66,7 +81,7 @@ public class AppProperties {
             throw new IllegalStateException("Mercado Pago environment must be sandbox or production");
         }
 
-        if (!isProductionProfile(profile)) {
+        if (!isProductionProfile(activeEnvironment)) {
             return;
         }
 
@@ -94,16 +109,16 @@ public class AppProperties {
         }
     }
 
-    private boolean isProductionProfile(String profile) {
-        if (profile == null) {
-            return false;
+    private boolean isProductionProfile(Environment activeEnvironment) {
+        return activeEnvironment.acceptsProfiles(Profiles.of("prod"));
+    }
+
+    private Environment environmentFor(String profile) {
+        StandardEnvironment isolatedEnvironment = new StandardEnvironment();
+        if (profile != null && !profile.isBlank()) {
+            isolatedEnvironment.setActiveProfiles(profile);
         }
-        for (String configuredProfile : profile.split(",")) {
-            if ("prod".equalsIgnoreCase(configuredProfile.trim())) {
-                return true;
-            }
-        }
-        return false;
+        return isolatedEnvironment;
     }
 
     @Getter

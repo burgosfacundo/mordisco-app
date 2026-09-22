@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -39,6 +41,7 @@ public class SecurityConfiguration {
     static final String MAINTENANCE_ENDPOINT = "/api/internal/maintenance";
 
     private final JwtRequestFilter jwtRequestFilter;
+    private final Environment environment;
 
     private static final String[] AUTH_WHITELIST = {
             // Swagger v3 endpoints
@@ -93,15 +96,12 @@ public class SecurityConfiguration {
             "/api/ws/**"
     };
 
-    @Value("${spring.profiles.active:dev}")
-    private String activeProfile;
-
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        if ("prod".equals(activeProfile)) {
+        if (environment.acceptsProfiles(Profiles.of("prod"))) {
             http
                     .csrf(csrf -> csrf
                             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())

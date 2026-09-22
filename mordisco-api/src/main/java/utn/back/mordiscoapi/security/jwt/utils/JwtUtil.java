@@ -13,6 +13,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -28,10 +30,13 @@ public class JwtUtil {
     @Value("${app.jwt.access.expiration:900000}") // 15 minutos
     private Long accessTokenExpiration;
 
-    @Value("${spring.profiles.active:dev}")
-    private String activeProfile;
+    private final Environment environment;
 
     private Key secretKey;
+
+    public JwtUtil(Environment environment) {
+        this.environment = environment;
+    }
 
     @PostConstruct
     public void init() {
@@ -107,7 +112,7 @@ public class JwtUtil {
 
 
     public void setRefreshTokenCookie(HttpServletResponse response, String token) {
-        boolean isProduction = "prod".equals(activeProfile);
+        boolean isProduction = environment.acceptsProfiles(Profiles.of("prod"));
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
                 .httpOnly(true)              // No accesible desde JavaScript
@@ -121,7 +126,7 @@ public class JwtUtil {
     }
 
     public void clearRefreshTokenCookie(HttpServletResponse response) {
-        boolean isProduction = "prod".equals(activeProfile);
+        boolean isProduction = environment.acceptsProfiles(Profiles.of("prod"));
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)

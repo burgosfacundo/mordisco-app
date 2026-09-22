@@ -38,6 +38,15 @@ class SchedulingConfigurationTest {
     }
 
     @Test
+    void combinedProductionProfilesKeepSchedulingDisabled() {
+        contextRunner
+                .withInitializer(context -> context.getEnvironment().setActiveProfiles(
+                        "prod", "schema-bootstrap", "demo-seed"))
+                .run(context -> assertTrue(
+                        context.getBeansOfType(ScheduledAnnotationBeanPostProcessor.class).isEmpty()));
+    }
+
+    @Test
     void nonProductionContextCreatesScheduledTaskProcessor() {
         contextRunner
                 .withInitializer(context -> context.getEnvironment().setActiveProfiles("dev"))
