@@ -32,16 +32,19 @@ Add an explicit, safe, idempotent recruiter demo-data bootstrap for the isolated
 
 ### SEED-3 — Document, verify, commit, and push
 
-- [ ] Document one-time `prod,schema-bootstrap,demo-seed` activation, demo credentials, immediate return to `prod`, and reset limitations.
-- [ ] Run focused Java 21 tests, full backend tests, package, and `git diff --check`.
-- [ ] Independently verify profile safety, idempotency, and absence of external calls/secrets.
-- [ ] Create reviewable Conventional Commits and push `feat/vercel-portfolio-deployment` without opening a PR or deploying.
+- [x] Document one-time `prod,schema-bootstrap,demo-seed` activation, demo credentials, immediate return to `prod`, and reset limitations.
+- [x] Run focused Java 21 tests, full backend tests, package, Angular production build, and `git diff --check`.
+- [x] Independently verify profile safety, idempotency, and absence of external calls/secrets.
+- [ ] Create the final documentation/evidence commit and push `feat/vercel-portfolio-deployment` without opening a PR or deploying.
 
 ## Evidence
 
 - SEED-1 independent verification: PASS; 24/24 focused Java 21 tests, Maven package, and `git diff --check` passed.
 - Combined profiles preserve production validation, CSRF, secure strict cookies, and disabled scheduling; SQL initialization remains `never`.
-- SEED-2 independent verification: PASS; 33/33 focused tests, Maven package, Angular asset build, and diff check passed. Seven MySQL Testcontainers cases remain skipped because Docker is unavailable; live TiDB remains external proof.
+- SEED-2 independent verification: PASS; 33/33 focused tests, Maven package, Angular asset build, and diff check passed.
+- Final repository verification: PASS; 33/33 focused tests, full backend 196 passed / 11 Testcontainers skipped / 0 failed, Maven package, Angular production build, secret/URL audit, and diff check passed.
+- MySQL Testcontainers and live TiDB execution remain external proof because Docker is unavailable to Testcontainers.
+- Work-unit commits: `fa90b43` (combined-profile production safety) and `4d46371` (idempotent recruiter dataset).
 
 ## Acceptance checks
 
@@ -67,4 +70,4 @@ git diff --check
 
 ## Review workload
 
-Expected 300–450 added lines with medium-high startup/data risk. Keep this as an isolated review slice; do not fold it into unrelated deployment changes.
+Actual candidate is approximately 21 files and 2,120 added lines because schema-backed integration tests and explicit synthetic graph validation are substantial. Review-size risk is high; keep this isolated from unrelated deployment changes and require explicit review slicing or a size exception before PR review.

@@ -140,6 +140,31 @@ El frontend **no tiene variables de entorno de runtime**. `mordisco-front/src/en
 - El perfil normal `prod` usa `spring.jpa.hibernate.ddl-auto=validate`: si hay drift, el backend debe fallar al iniciar para que se corrija el esquema de forma controlada.
 - `spring.sql.init.mode=never` en producción: `data.sql` no se ejecuta automáticamente y no debe usarse para inicializar ni resetear una base real. Un reset implica una operación explícita del proveedor sobre una base descartable o respaldada; nunca borres datos de producción para repetir `data.sql`.
 
+### Demo seed público (SEED-3)
+
+Esta ruta es sólo para un preview verificable y debe ejecutarse una vez sobre una base Preview separada o descartable.
+
+#### Ruta rápida
+
+1. Define temporalmente `SPRING_PROFILES_ACTIVE=prod,schema-bootstrap,demo-seed`.
+2. Inicia o redeploy una sola vez y verifica en los logs que el seed terminó correctamente.
+3. En cuanto termine, restaura `SPRING_PROFILES_ACTIVE=prod` y vuelve a desplegar. No dejes `demo-seed` activo.
+
+**Credenciales públicas del demo**
+
+| Rol | Usuario | Contraseña |
+|---|---|---|
+| Cliente | `preview.client@mordisco.invalid` | `PreviewOnly-Client-2025!` |
+| Restaurante | `preview.owner@mordisco.invalid` | `PreviewOnly-Owner-2025!` |
+| Repartidor | `preview.courier@mordisco.invalid` | `PreviewOnly-Courier-2025!` |
+
+No se crea ningún administrador. El dataset es sintético: `Preview Kitchen`, `Preview Menu`, productos, horarios de apertura, imágenes locales y un pedido de retiro en efectivo.
+
+- **Idempotencia y conflictos:** las ejecuciones posteriores reutilizan o reparan filas propias del seed; nunca reinician datos creados por recruiters. Si una clave natural entra en conflicto con una fila no compatible, el arranque falla de forma visible.
+- **Producción:** el perfil normal `prod` nunca ejecuta el seed. `spring.sql.init.mode=never` permanece activo; `data.sql` no se usa para inicializar ni resetear datos.
+- **Reset:** usa otra base Preview descartable o elimina explícitamente la base a través de TiDB. Nunca ejecutes contra Production ni dejes `demo-seed` habilitado.
+- **Verificación:** la integración live contra TiDB/MySQL se verifica durante el despliegue. Los tests de integración MySQL del repositorio pueden omitirse si no hay Docker; eso no sustituye la verificación live.
+
 ### Mercado Pago Sandbox y SMTP
 
 **Webhook Sandbox**
