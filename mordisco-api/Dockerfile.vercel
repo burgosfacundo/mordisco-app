@@ -1,0 +1,17 @@
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /app
+
+COPY pom.xml .
+COPY src ./src
+RUN mvn -q -DskipTests package
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+ENV SPRING_PROFILES_ACTIVE=prod
+EXPOSE 8080
+
+# Vercel terminates TLS at the edge and supplies PORT to the container.
+CMD ["sh", "-c", "exec java -jar app.jar --server.port=${PORT:-8080}"]
