@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Preview Lemonade</title>
+  <desc id="desc">A synthetic illustrated glass of lemonade for the Preview Kitchen demo.</desc>
+  <rect width="800" height="600" rx="36" fill="#ecfeff"/>
+  <ellipse cx="400" cy="500" rx="155" ry="26" fill="#bae6fd"/>
+  <path d="M292 170h216l-22 306c-2 27-25 48-52 48h-68c-27 0-50-21-52-48z" fill="#bae6fd" stroke="#0369a1" stroke-width="10"/>
+  <path d="M303 280h194l-11 196c-2 18-16 32-34 32h-104c-18 0-32-14-34-32z" fill="#facc15" opacity=".92"/>
+  <ellipse cx="400" cy="170" rx="108" ry="28" fill="#e0f2fe" stroke="#0369a1" stroke-width="10"/>
+  <path d="M430 170 548 72" stroke="#dc2626" stroke-width="12" stroke-linecap="round"/>
+  <path d="M420 154 454 82" stroke="#16a34a" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="350" cy="176" r="34" fill="#fde047" stroke="#ca8a04" stroke-width="8"/>
+  <path d="m331 176 38 0M350 157v38" stroke="#ca8a04" stroke-width="6" stroke-linecap="round"/>
+  <path d="M337 345c30-18 59-18 88 0s58 18 88 0" fill="none" stroke="#fef08a" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="355" cy="400" r="10" fill="#fef08a"/>
+  <circle cx="455" cy="430" r="10" fill="#fef08a"/>
+</svg>

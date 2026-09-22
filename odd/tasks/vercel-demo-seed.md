@@ -24,11 +24,11 @@ Add an explicit, safe, idempotent recruiter demo-data bootstrap for the isolated
 
 ### SEED-2 — Add idempotent synthetic recruiter data
 
-- [ ] Add a profile-gated runner and transactional seed service.
-- [ ] Coordinate concurrent attempts with a unique database seed marker.
-- [ ] Seed the smallest useful synthetic scenario: client, restaurant owner, courier, addresses, restaurant/menu/products, and persisted demo order state without external calls.
-- [ ] Reuse validated natural-key matches, insert missing seed-owned records, and fail on conflicts rather than overwrite data.
-- [ ] Add focused first-run, rerun, partial-repair, conflict, and concurrency-oriented tests.
+- [x] Add a profile-gated runner and transactional seed service.
+- [x] Coordinate concurrent attempts with a unique database seed marker.
+- [x] Seed the smallest useful synthetic scenario: client, restaurant owner, courier, addresses, restaurant/menu/products, opening hours, and persisted demo order state without external calls.
+- [x] Reuse validated natural-key matches, insert missing seed-owned records, and fail on conflicts rather than overwrite data.
+- [x] Add focused first-run, rerun, partial-repair, conflict, and concurrency-oriented tests.
 
 ### SEED-3 — Document, verify, commit, and push
 
@@ -41,6 +41,7 @@ Add an explicit, safe, idempotent recruiter demo-data bootstrap for the isolated
 
 - SEED-1 independent verification: PASS; 24/24 focused Java 21 tests, Maven package, and `git diff --check` passed.
 - Combined profiles preserve production validation, CSRF, secure strict cookies, and disabled scheduling; SQL initialization remains `never`.
+- SEED-2 independent verification: PASS; 33/33 focused tests, Maven package, Angular asset build, and diff check passed. Seven MySQL Testcontainers cases remain skipped because Docker is unavailable; live TiDB remains external proof.
 
 ## Acceptance checks
 

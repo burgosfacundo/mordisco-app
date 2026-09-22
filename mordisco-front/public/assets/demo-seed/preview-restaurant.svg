@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Preview Kitchen</title>
+  <desc id="desc">A warm illustrated storefront for the Preview Kitchen demo.</desc>
+  <rect width="800" height="600" fill="#172554"/>
+  <rect x="74" y="92" width="652" height="430" rx="28" fill="#fef3c7"/>
+  <path d="M74 172h652l-42-80H116z" fill="#ef4444"/>
+  <path d="M116 92h84l-20 80h-84zm168 0h84l-8 80h-84zm168 0h84l8 80h-84zm168 0h22l42 80h-84z" fill="#fca5a5"/>
+  <rect x="132" y="232" width="536" height="216" rx="18" fill="#1e293b"/>
+  <rect x="174" y="274" width="204" height="174" rx="10" fill="#93c5fd"/>
+  <rect x="422" y="274" width="204" height="174" rx="10" fill="#bfdbfe"/>
+  <path d="M188 426h176M436 426h176" stroke="#fef3c7" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="276" cy="344" r="42" fill="#fbbf24"/>
+  <path d="M246 344h60M276 314v60" stroke="#92400e" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="524" cy="344" r="42" fill="#fb7185"/>
+  <path d="M493 344h62" stroke="#881337" stroke-width="10" stroke-linecap="round"/>
+  <text x="400" y="505" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#172554">PREVIEW KITCHEN</text>
+</svg>

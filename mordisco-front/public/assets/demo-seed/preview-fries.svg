@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Preview Fries</title>
+  <desc id="desc">A synthetic illustrated serving of fries for the Preview Kitchen demo.</desc>
+  <rect width="800" height="600" rx="36" fill="#fefce8"/>
+  <ellipse cx="400" cy="500" rx="190" ry="28" fill="#fde68a"/>
+  <g fill="#facc15" stroke="#eab308" stroke-width="8" stroke-linejoin="round">
+    <path d="M278 310 250 116l36-6 27 198z"/>
+    <path d="M330 300 324 78h38l6 228z"/>
+    <path d="M382 304 397 58l37 4-16 248z"/>
+    <path d="M438 306 474 88l36 8-36 222z"/>
+    <path d="M492 316 548 128l35 12-57 190z"/>
+    <path d="M540 325 610 174l31 18-70 150z"/>
+  </g>
+  <path d="M240 270h320l-28 210c-3 22-22 38-44 38H312c-22 0-41-16-44-38z" fill="#dc2626"/>
+  <path d="M250 315c70 34 230 34 300 0" fill="none" stroke="#fca5a5" stroke-width="16"/>
+  <path d="M256 394c66 24 222 24 288 0" fill="none" stroke="#fca5a5" stroke-width="16"/>
+  <path d="M274 478h252" stroke="#991b1b" stroke-width="12" stroke-linecap="round"/>
+</svg>

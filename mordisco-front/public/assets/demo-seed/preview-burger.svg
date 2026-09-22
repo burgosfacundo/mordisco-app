@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Preview Burger</title>
+  <desc id="desc">A synthetic illustrated burger for the Preview Kitchen demo.</desc>
+  <rect width="800" height="600" rx="36" fill="#fff7ed"/>
+  <ellipse cx="400" cy="470" rx="250" ry="32" fill="#fed7aa"/>
+  <path d="M180 270c0-105 98-160 220-160s220 55 220 160z" fill="#d97706"/>
+  <path d="M190 272h420c-10 30-42 47-82 47H272c-40 0-72-17-82-47z" fill="#f59e0b"/>
+  <path d="M190 326c0-22 20-40 45-40h330c25 0 45 18 45 40s-20 40-45 40H235c-25 0-45-18-45-40z" fill="#fde68a"/>
+  <path d="M205 365c0-18 15-32 34-32h322c19 0 34 14 34 32s-15 32-34 32H239c-19 0-34-14-34-32z" fill="#4d7c0f"/>
+  <path d="M205 405c0-25 20-45 45-45h300c25 0 45 20 45 45s-20 45-45 45H250c-25 0-45-20-45-45z" fill="#78350f"/>
+  <path d="M183 458c0-22 18-40 40-40h354c22 0 40 18 40 40s-18 40-40 40H223c-22 0-40-18-40-40z" fill="#d97706"/>
+  <g fill="#fffbeb">
+    <ellipse cx="310" cy="190" rx="8" ry="4" transform="rotate(-20 310 190)"/>
+    <ellipse cx="370" cy="157" rx="8" ry="4" transform="rotate(18 370 157)"/>
+    <ellipse cx="448" cy="188" rx="8" ry="4" transform="rotate(-14 448 188)"/>
+    <ellipse cx="510" cy="160" rx="8" ry="4" transform="rotate(20 510 160)"/>
+  </g>
+</svg>
