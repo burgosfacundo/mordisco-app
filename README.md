@@ -62,6 +62,15 @@ Antes de iniciar, copia `.env.example` a `.env`. Completa las credenciales local
 
 `vercel.json` implementa los rewrites `/api/(.*) → backend` y `/(.*) → frontend`. No despliegues un segundo proyecto para separar el API: esa separación rompería la topología same-origin documentada.
 
+### Startup diagnostics (COLD-1)
+
+Backend runtime logs include fixed `Startup timing:` milestones with elapsed monotonic milliseconds and explicit boundaries. They do not log configuration values, URLs, identities, credentials, or environment contents, and they add no remote calls or SQL.
+
+- `entityManagerFactory initialization started` marks Spring's `BeanPostProcessor.beforeInitialization`; `entityManagerFactory initialization complete` reports the interval through `afterInitialization`. This brackets the factory bean's synchronous initialization callbacks; whether it captures the full Hibernate validation interval in the deployed application must be confirmed from Preview logs. It does not measure prior bean construction or Vercel provisioning. If initialization fails, only the start milestone is emitted and the original startup failure propagates unchanged.
+- `application ready` measures `ApplicationStartingEvent` through `ApplicationReadyEvent`. It describes Spring Boot startup only; it is not a measurement of Vercel container provisioning or proof that the platform accepted connections on `PORT`.
+
+For a separately authorized Preview run, filter the deployment's runtime logs by `Startup timing:` and compare their timestamps and available deployment/instance/request identifiers with the corresponding `FUNCTION_INVOCATION_FAILED` request entries. A JPA start without completion means initialization was still in progress or failed; a completed JPA interval without `application ready` places the remaining delay later in application startup. If `application ready` precedes a failed request, startup timing alone does not explain it; compare Vercel's process/listener and request logs. Keep any excerpts redacted and never export environment dumps or database credentials.
+
 ### Ruta rápida
 
 **Prerrequisitos**
