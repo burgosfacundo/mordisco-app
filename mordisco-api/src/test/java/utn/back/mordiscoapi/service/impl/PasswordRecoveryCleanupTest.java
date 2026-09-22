@@ -31,20 +31,21 @@ class PasswordRecoveryCleanupTest {
     @Mock private AppProperties appProperties;
 
     @Test
-    void cleanupUsesInjectedUtcClockAndDrainsBoundedBatchesUntilEmpty() {
+    void cleanupProcessesAtMostOneCandidateBatchPerInvocation() {
+        java.util.List<Long> batch = java.util.List.of(11L, 12L);
         when(credentialRepository.findCleanupCandidateIds(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
-                .thenReturn(java.util.List.of(11L, 12L), java.util.List.of(13L), java.util.List.of());
+                .thenReturn(batch, java.util.List.of());
         when(credentialRepository.deleteExpiredOrConsumedAfterCooldown(org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any()))
-                .thenReturn(2, 1);
+                .thenReturn(2);
 
         service().cleanupExpiredCredentials();
 
         java.time.LocalDateTime expectedNow = java.time.LocalDateTime.ofInstant(NOW, ZoneOffset.UTC);
         org.springframework.data.domain.PageRequest page = org.springframework.data.domain.PageRequest.of(0, 100);
-        org.mockito.Mockito.verify(credentialRepository, org.mockito.Mockito.times(3))
+        org.mockito.Mockito.verify(credentialRepository, org.mockito.Mockito.times(1))
                 .findCleanupCandidateIds(expectedNow, page);
-        verify(credentialRepository).deleteExpiredOrConsumedAfterCooldown(java.util.List.of(11L, 12L), expectedNow);
-        verify(credentialRepository).deleteExpiredOrConsumedAfterCooldown(java.util.List.of(13L), expectedNow);
+        org.mockito.Mockito.verify(credentialRepository, org.mockito.Mockito.times(1))
+                .deleteExpiredOrConsumedAfterCooldown(batch, expectedNow);
         org.mockito.Mockito.verifyNoMoreInteractions(credentialRepository);
     }
 
@@ -68,7 +69,7 @@ class PasswordRecoveryCleanupTest {
     }
 
     @Test
-    void cleanupDoesNotDeleteWhenTheBoundedCandidateBatchIsEmpty() {
+    void cleanupDoesNotDeleteWhenTheCandidateBatchIsEmpty() {
         when(credentialRepository.findCleanupCandidateIds(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
                 .thenReturn(java.util.List.of());
 
@@ -76,6 +77,44 @@ class PasswordRecoveryCleanupTest {
 
         verify(credentialRepository).findCleanupCandidateIds(
                 java.time.LocalDateTime.ofInstant(NOW, ZoneOffset.UTC), org.springframework.data.domain.PageRequest.of(0, 100));
+        org.mockito.Mockito.verify(credentialRepository, org.mockito.Mockito.never())
+                .deleteExpiredOrConsumedAfterCooldown(org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any());
+        org.mockito.Mockito.verifyNoMoreInteractions(credentialRepository);
+    }
+
+    @Test
+    void cleanupDoesNotRetryWhenConditionalDeleteMakesNoProgress() {
+        java.util.List<Long> batch = java.util.List.of(21L);
+        when(credentialRepository.findCleanupCandidateIds(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(batch, java.util.List.of());
+        when(credentialRepository.deleteExpiredOrConsumedAfterCooldown(org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(0);
+
+        service().cleanupExpiredCredentials();
+
+        java.time.LocalDateTime expectedNow = java.time.LocalDateTime.ofInstant(NOW, ZoneOffset.UTC);
+        org.springframework.data.domain.PageRequest page = org.springframework.data.domain.PageRequest.of(0, 100);
+        org.mockito.Mockito.verify(credentialRepository, org.mockito.Mockito.times(1))
+                .findCleanupCandidateIds(expectedNow, page);
+        org.mockito.Mockito.verify(credentialRepository, org.mockito.Mockito.times(1))
+                .deleteExpiredOrConsumedAfterCooldown(batch, expectedNow);
+        org.mockito.Mockito.verifyNoMoreInteractions(credentialRepository);
+    }
+
+    @Test
+    void cleanupDeletesSuccessfulCandidateBatchOnce() {
+        java.util.List<Long> batch = java.util.List.of(31L, 32L, 33L);
+        when(credentialRepository.findCleanupCandidateIds(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(batch, java.util.List.of());
+        when(credentialRepository.deleteExpiredOrConsumedAfterCooldown(org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(batch.size());
+
+        service().cleanupExpiredCredentials();
+
+        java.time.LocalDateTime expectedNow = java.time.LocalDateTime.ofInstant(NOW, ZoneOffset.UTC);
+        org.mockito.Mockito.verify(credentialRepository).findCleanupCandidateIds(expectedNow,
+                org.springframework.data.domain.PageRequest.of(0, 100));
+        verify(credentialRepository).deleteExpiredOrConsumedAfterCooldown(batch, expectedNow);
         org.mockito.Mockito.verifyNoMoreInteractions(credentialRepository);
     }
 

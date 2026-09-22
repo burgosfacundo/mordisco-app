@@ -1,35 +1,50 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, OnDestroy, signal, computed, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Client, StompSubscription } from '@stomp/stompjs';
+import { EMPTY, Observable, Subscription, interval, merge, of } from 'rxjs';
+import { catchError, exhaustMap, switchMap, tap } from 'rxjs/operators';
 import { Notificacion } from '../../models/notificacion/notificacion-dto';
 import { TipoNotificacion } from '../../models/notificacion/tipo-notificacion';
+import PedidoResponse from '../../models/pedido/pedido-response';
+import PaginationResponse from '../../models/pagination/pagination-response';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../auth-service';
+import { PedidoService } from '../pedido/pedido-service';
+import { RestauranteService } from '../restaurante/restaurante-service';
 
 @Injectable({ providedIn: 'root' })
-export class NotificacionService {
+export class NotificacionService implements OnDestroy {
   private client?: Client;
   private subscriptions: StompSubscription[] = [];
   private snackBar = inject(MatSnackBar);
   private authService = inject(AuthService);
-  
+  private pedidoService = inject(PedidoService);
+  private restauranteService = inject(RestauranteService);
+
   private readonly STORAGE_KEY = 'mordisco_notificaciones';
   private readonly MAX_NOTIFICACIONES = 50;
-  
+  private readonly ORDER_POLL_INTERVAL_MS = 15000;
+  private readonly ORDER_POLL_PAGE_SIZE = 20;
+  private orderPollingSubscription?: Subscription;
+  private orderPollingBaseline?: Map<number, string>;
+  private orderPollingUserId?: number;
+  private orderPollingRole?: string;
+  private pollingRestauranteId?: number;
+
   // Estado reactivo
   private _notificaciones = signal<Notificacion[]>([]);
   private _conectado = signal(false);
-  
+
   // Getters públicos
   notificaciones = this._notificaciones.asReadonly();
   conectado = this._conectado.asReadonly();
-  
+
   // Computed
-  noLeidas = computed(() => 
+  noLeidas = computed(() =>
     this._notificaciones().filter(n => !n.leida).length
   );
-  
-  hayNotificaciones = computed(() => 
+
+  hayNotificaciones = computed(() =>
     this._notificaciones().length > 0
   );
 
@@ -37,8 +52,31 @@ export class NotificacionService {
     this.cargarNotificacionesDesdeStorage();
   }
 
+  conectar(userId: number, role: string): void {
+    const roleNormalizado = this.normalizarRol(role);
 
-  conectar(_userId: number, role: string): void {
+    if (!environment.websocketEnabled) {
+      if (!this.authService.getAccessToken()) {
+        this.desconectar();
+        return;
+      }
+
+      if (
+        this.orderPollingSubscription &&
+        !this.orderPollingSubscription.closed &&
+        this.orderPollingUserId === userId &&
+        this.orderPollingRole === roleNormalizado
+      ) {
+        return;
+      }
+
+      this.desconectar();
+      if (roleNormalizado === 'CLIENTE' || roleNormalizado === 'RESTAURANTE') {
+        this.iniciarPollingPedidos(userId, roleNormalizado);
+      }
+      return;
+    }
+
     if (this.client?.active) {
       return;
     }
@@ -73,7 +111,6 @@ export class NotificacionService {
         this.desuscribirseDeTodo();
         this.suscribirse(client, '/user/queue/notificaciones');
 
-        const roleNormalizado = role.toUpperCase().replace('ROLE_', '');
         if (roleNormalizado === 'REPARTIDOR') {
           this.suscribirse(client, '/topic/repartidores');
         }
@@ -102,6 +139,7 @@ export class NotificacionService {
   }
 
   desconectar(): void {
+    this.detenerPollingPedidos();
     this.desuscribirseDeTodo();
 
     if (this.client) {
@@ -110,6 +148,168 @@ export class NotificacionService {
     }
 
     this._conectado.set(false);
+  }
+
+  ngOnDestroy(): void {
+    this.desconectar();
+  }
+
+  private normalizarRol(role: string): string {
+    return role.toUpperCase().replace(/^ROLE_/, '');
+  }
+
+  private iniciarPollingPedidos(userId: number, role: string): void {
+    this.orderPollingUserId = userId;
+    this.orderPollingRole = role;
+    this.orderPollingBaseline = undefined;
+    this.pollingRestauranteId = undefined;
+
+    this.orderPollingSubscription = merge(of(null), interval(this.ORDER_POLL_INTERVAL_MS))
+      .pipe(
+        exhaustMap(() => this.obtenerPedidosParaPolling(userId, role).pipe(
+          catchError(error => {
+            console.error('Error al consultar pedidos para notificaciones:', error);
+            return EMPTY;
+          })
+        ))
+      )
+      .subscribe({
+        next: response => this.procesarRespuestaPolling(response)
+      });
+  }
+
+  private obtenerPedidosParaPolling(
+    userId: number,
+    role: string
+  ): Observable<PaginationResponse<PedidoResponse>> {
+    if (role === 'CLIENTE') {
+      return this.pedidoService.getAllByCliente(
+        userId,
+        0,
+        this.ORDER_POLL_PAGE_SIZE
+      );
+    }
+
+    if (role === 'RESTAURANTE') {
+      if (this.pollingRestauranteId !== undefined) {
+        return this.pedidoService.findAllByRestaurante_Id(
+          this.pollingRestauranteId,
+          0,
+          this.ORDER_POLL_PAGE_SIZE
+        );
+      }
+
+      return this.restauranteService.getByUsuario(userId).pipe(
+        tap(restaurante => {
+          this.pollingRestauranteId = restaurante.id;
+        }),
+        switchMap(restaurante => this.pedidoService.findAllByRestaurante_Id(
+          restaurante.id,
+          0,
+          this.ORDER_POLL_PAGE_SIZE
+        ))
+      );
+    }
+
+    return EMPTY;
+  }
+
+  private procesarRespuestaPolling(
+    response: PaginationResponse<PedidoResponse>
+  ): void {
+    if (!response || !Array.isArray(response.content)) {
+      return;
+    }
+
+    const estadosActuales = new Map<number, string>();
+    response.content.forEach(pedido => {
+      if (pedido && typeof pedido.id === 'number' && pedido.estado != null) {
+        estadosActuales.set(pedido.id, String(pedido.estado));
+      }
+    });
+
+    const baseline = this.orderPollingBaseline;
+    if (!baseline) {
+      this.orderPollingBaseline = estadosActuales;
+      return;
+    }
+
+    estadosActuales.forEach((estado, pedidoId) => {
+      const estadoAnterior = baseline.get(pedidoId);
+      if (estadoAnterior !== estado) {
+        this.notificarCambioDeEstado(pedidoId, estado);
+      }
+      baseline.set(pedidoId, estado);
+    });
+  }
+
+  private notificarCambioDeEstado(pedidoId: number, estado: string): void {
+    const notificacion = this.obtenerNotificacionDeEstado(pedidoId, estado);
+    if (!notificacion) {
+      return;
+    }
+
+    this.procesarNotificacion({
+      ...notificacion,
+      pedidoId,
+      estado
+    });
+  }
+
+  private obtenerNotificacionDeEstado(
+    pedidoId: number,
+    estado: string
+  ): { tipo: TipoNotificacion; mensaje: string } | undefined {
+    switch (estado) {
+      case 'PENDIENTE':
+        return { tipo: TipoNotificacion.NUEVO_PEDIDO, mensaje: `Nuevo pedido #${pedidoId}` };
+      case 'EN_PREPARACION':
+        return {
+          tipo: TipoNotificacion.PEDIDO_EN_PREPARACION,
+          mensaje: `El pedido #${pedidoId} está en preparación`
+        };
+      case 'LISTO_PARA_RETIRAR':
+        return {
+          tipo: TipoNotificacion.PEDIDO_LISTO_PARA_RETIRAR,
+          mensaje: `¡Tu pedido #${pedidoId} está listo para retirar!`
+        };
+      case 'LISTO_PARA_ENTREGAR':
+        return {
+          tipo: TipoNotificacion.PEDIDO_LISTO_PARA_ENTREGAR,
+          mensaje: `El pedido #${pedidoId} está listo para entregar`
+        };
+      case 'ASIGNADO_A_REPARTIDOR':
+        return {
+          tipo: TipoNotificacion.PEDIDO_EN_CAMINO,
+          mensaje: `El pedido #${pedidoId} fue asignado a un repartidor`
+        };
+      case 'EN_CAMINO':
+        return {
+          tipo: TipoNotificacion.PEDIDO_EN_CAMINO,
+          mensaje: `Tu pedido #${pedidoId} está en camino`
+        };
+      case 'COMPLETADO':
+        return {
+          tipo: TipoNotificacion.PEDIDO_COMPLETADO,
+          mensaje: `El pedido #${pedidoId} ha sido completado`
+        };
+      case 'CANCELADO':
+        return {
+          tipo: TipoNotificacion.PEDIDO_CANCELADO,
+          mensaje: `El pedido #${pedidoId} ha sido cancelado`
+        };
+      default:
+        return undefined;
+    }
+  }
+
+  private detenerPollingPedidos(): void {
+    this.orderPollingSubscription?.unsubscribe();
+    this.orderPollingSubscription = undefined;
+    this.orderPollingBaseline = undefined;
+    this.orderPollingUserId = undefined;
+    this.orderPollingRole = undefined;
+    this.pollingRestauranteId = undefined;
   }
 
   private suscribirse(client: Client, topic: string): void {

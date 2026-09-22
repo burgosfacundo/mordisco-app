@@ -103,16 +103,14 @@ public class PasswordRecoveryService {
     @Transactional
     public void cleanupExpiredCredentials() {
         LocalDateTime now = TimeConfiguration.toUtcMicroseconds(clock.instant());
-        while (true) {
-            List<Long> credentialIds = credentialRepository.findCleanupCandidateIds(now,
-                    org.springframework.data.domain.PageRequest.of(0, CLEANUP_BATCH_SIZE));
-            if (credentialIds.isEmpty()) {
-                return;
-            }
-
-            int deleted = credentialRepository.deleteExpiredOrConsumedAfterCooldown(credentialIds, now);
-            log.info("Password recovery credential cleanup deleted {} records", deleted);
+        List<Long> credentialIds = credentialRepository.findCleanupCandidateIds(now,
+                org.springframework.data.domain.PageRequest.of(0, CLEANUP_BATCH_SIZE));
+        if (credentialIds.isEmpty()) {
+            return;
         }
+
+        int deleted = credentialRepository.deleteExpiredOrConsumedAfterCooldown(credentialIds, now);
+        log.info("Password recovery credential cleanup deleted {} records", deleted);
     }
 
     private BadRequestException invalidToken() {
