@@ -35,7 +35,7 @@ Add an explicit, safe, idempotent recruiter demo-data bootstrap for the isolated
 - [x] Document one-time `prod,schema-bootstrap,demo-seed` activation, demo credentials, immediate return to `prod`, and reset limitations.
 - [x] Run focused Java 21 tests, full backend tests, package, Angular production build, and `git diff --check`.
 - [x] Independently verify profile safety, idempotency, and absence of external calls/secrets.
-- [ ] Create the final documentation/evidence commit and push `feat/vercel-portfolio-deployment` without opening a PR or deploying.
+- [x] Create the final documentation/evidence commit and push `feat/vercel-portfolio-deployment` without opening a PR or deploying.
 
 ## Evidence
 
@@ -44,7 +44,8 @@ Add an explicit, safe, idempotent recruiter demo-data bootstrap for the isolated
 - SEED-2 independent verification: PASS; 33/33 focused tests, Maven package, Angular asset build, and diff check passed.
 - Final repository verification: PASS; 33/33 focused tests, full backend 196 passed / 11 Testcontainers skipped / 0 failed, Maven package, Angular production build, secret/URL audit, and diff check passed.
 - MySQL Testcontainers and live TiDB execution remain external proof because Docker is unavailable to Testcontainers.
-- Work-unit commits: `fa90b43` (combined-profile production safety) and `4d46371` (idempotent recruiter dataset).
+- Work-unit commits: `fa90b43` (combined-profile production safety), `4d46371` (idempotent recruiter dataset), and `2d9fc4a` (Preview seed operations documentation).
+- Pushed `feat/vercel-portfolio-deployment` through `2d9fc4a`; no PR or deployment was created by the agent.
 
 ## Acceptance checks
 
@@ -67,6 +68,10 @@ mvn -q -DskipTests package
 cd ..
 git diff --check
 ```
+
+## Next step
+
+Redeploy the Vercel Preview branch once with `SPRING_PROFILES_ACTIVE=prod,schema-bootstrap,demo-seed`, verify the startup logs and seeded logins against TiDB, then immediately restore `SPRING_PROFILES_ACTIVE=prod` and redeploy. Treat any live TiDB seed failure as a blocker; do not retry destructively or enable legacy `data.sql`.
 
 ## Review workload
 
