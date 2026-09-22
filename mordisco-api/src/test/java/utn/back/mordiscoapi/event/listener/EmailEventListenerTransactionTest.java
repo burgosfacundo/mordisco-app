@@ -18,13 +18,17 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.slf4j.LoggerFactory;
 import utn.back.mordiscoapi.common.email.EmailSender;
 import utn.back.mordiscoapi.common.exception.InternalServerErrorException;
 import utn.back.mordiscoapi.config.AppProperties;
+import utn.back.mordiscoapi.event.auth.CuentaBloqueadaEvent;
 import utn.back.mordiscoapi.event.auth.PasswordChangedEvent;
 import utn.back.mordiscoapi.event.auth.PasswordResetRequestedEvent;
+import utn.back.mordiscoapi.event.payment.PagoAprobadoEvent;
+import utn.back.mordiscoapi.model.entity.Pedido;
+import utn.back.mordiscoapi.model.entity.Restaurante;
+import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.service.interf.IEmailService;
 
 import java.lang.reflect.Method;
@@ -40,13 +44,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 class EmailEventListenerTransactionTest {
     private static final PasswordResetRequestedEvent RESET_EVENT =
             new PasswordResetRequestedEvent(17L, "secret@example.com", "Secret", "https://frontend/reset-password?token=secret-token");
     private static final PasswordChangedEvent CHANGED_EVENT =
             new PasswordChangedEvent(17L, "secret@example.com", "Secret", "https://frontend/login?token=secret-token");
+    private static final CuentaBloqueadaEvent BLOCKED_EVENT =
+            new CuentaBloqueadaEvent(17L, "secret@example.com", "Secret", "Too many failed attempts");
 
     @Test
     void recoveryAndPasswordChangedMailAreDeliveredOnlyOnceAfterCommitAndNeverAfterRollback() {
@@ -71,6 +76,31 @@ class EmailEventListenerTransactionTest {
                 status.setRollbackOnly();
             });
             emailService.assertNoCalls();
+        }
+    }
+
+    @Test
+    void accountBlockedEmailIsDeliveredAfterCommitSkippedOnRollbackAndUsesFallbackWithoutTransaction() {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(EventConfiguration.class)) {
+            ResettableEmailService emailService = context.getBean(ResettableEmailService.class);
+            TransactionTemplate transaction = new TransactionTemplate(context.getBean(PlatformTransactionManager.class));
+            ApplicationEventPublisher publisher = context;
+
+            transaction.executeWithoutResult(status -> {
+                publisher.publishEvent(BLOCKED_EVENT);
+                assertEquals(0, emailService.passwordChangedCalls);
+            });
+            assertEquals(1, emailService.passwordChangedCalls);
+
+            emailService.reset();
+            transaction.executeWithoutResult(status -> {
+                publisher.publishEvent(BLOCKED_EVENT);
+                status.setRollbackOnly();
+            });
+            emailService.assertNoCalls();
+
+            publisher.publishEvent(BLOCKED_EVENT);
+            assertEquals(1, emailService.passwordChangedCalls);
         }
     }
 
@@ -108,17 +138,56 @@ class EmailEventListenerTransactionTest {
     }
 
     @Test
-    void recoveryHandlersUseAfterCommitAsyncDeliveryAndEmailSenderIsSynchronous() throws Exception {
+    void recoveryHandlersUseAfterCommitSynchronousDeliveryAndEmailSenderIsSynchronous() throws Exception {
         for (String name : List.of("handlePasswordResetRequested", "handlePasswordChanged")) {
             Method method = EmailEventListener.class.getDeclaredMethod(name,
                     name.equals("handlePasswordResetRequested") ? PasswordResetRequestedEvent.class : PasswordChangedEvent.class);
             TransactionalEventListener transactional = method.getAnnotation(TransactionalEventListener.class);
             assertNotNull(transactional);
             assertEquals(TransactionPhase.AFTER_COMMIT, transactional.phase());
-            assertNotNull(method.getAnnotation(Async.class));
+            assertNull(method.getAnnotation(Async.class));
         }
+        for (String name : List.of("handlePagoAprobado", "handlePagoRechazado")) {
+            Method method = EmailEventListener.class.getDeclaredMethod(name,
+                    name.equals("handlePagoAprobado") ? PagoAprobadoEvent.class : utn.back.mordiscoapi.event.payment.PagoRechazadoEvent.class);
+            TransactionalEventListener transactional = method.getAnnotation(TransactionalEventListener.class);
+            assertNotNull(transactional);
+            assertEquals(TransactionPhase.AFTER_COMMIT, transactional.phase());
+            assertNull(method.getAnnotation(Async.class));
+        }
+        Method blockedMethod = EmailEventListener.class.getDeclaredMethod("handleCuentaBloqueada", CuentaBloqueadaEvent.class);
+        TransactionalEventListener blockedTransactional = blockedMethod.getAnnotation(TransactionalEventListener.class);
+        assertNotNull(blockedTransactional);
+        assertEquals(TransactionPhase.AFTER_COMMIT, blockedTransactional.phase());
+        assertTrue(blockedTransactional.fallbackExecution());
+        assertNull(blockedMethod.getAnnotation(Async.class));
         assertNull(EmailSender.class.getDeclaredMethod("sendHtmlEmail", String.class, String.class, String.class)
                 .getAnnotation(Async.class));
+    }
+
+    @Test
+    void paymentEmailDeliveryIsSynchronousAndContainedWithinTheRequestThread() throws Exception {
+        IEmailService emailService = mock(IEmailService.class);
+        AppProperties properties = new AppProperties();
+        properties.setFrontendUrl("https://frontend.example");
+        EmailEventListener listener = new EmailEventListener(emailService, properties);
+
+        Usuario cliente = Usuario.builder().id(1L).email("client@example.test").nombre("Client").build();
+        Usuario restauranteUsuario = Usuario.builder().id(2L).email("restaurant@example.test").nombre("Restaurant").build();
+        Restaurante restaurante = Restaurante.builder()
+                .id(3L)
+                .razonSocial("Synthetic Restaurant")
+                .usuario(restauranteUsuario)
+                .build();
+        Pedido pedido = Pedido.builder().id(4L).cliente(cliente).restaurante(restaurante).build();
+
+        listener.handlePagoAprobado(new PagoAprobadoEvent(pedido));
+
+        verify(emailService).sendPagoConfirmadoEmailCliente(
+                "client@example.test", "Client", 4L, "https://frontend.example/cliente/pedidos/detalle/4");
+        verify(emailService).sendPagoConfirmadoEmailRestaurante(
+                "restaurant@example.test", "Synthetic Restaurant", 4L,
+                "https://frontend.example/restaurante/pedidos/detalle/4");
     }
 
     @Configuration

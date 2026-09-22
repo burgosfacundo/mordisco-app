@@ -36,6 +36,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
+    static final String MAINTENANCE_ENDPOINT = "/api/internal/maintenance";
+
     private final JwtRequestFilter jwtRequestFilter;
 
     private static final String[] AUTH_WHITELIST = {
@@ -51,6 +53,8 @@ public class SecurityConfiguration {
             "/api/auth/login",
             "/api/auth/refresh",
             "/api/auth/logout",
+            "/api/pagos/webhook",
+            MAINTENANCE_ENDPOINT,
             "/api/usuarios/recover-password",
             "/api/usuarios/reset-password",
             "/api/ws/**",
@@ -80,8 +84,20 @@ public class SecurityConfiguration {
     };
 
 
+    private static final String[] CSRF_IGNORED_ENDPOINTS = {
+            "/api/auth/login",
+            "/api/auth/refresh",
+            "/api/auth/logout",
+            "/api/pagos/webhook",
+            MAINTENANCE_ENDPOINT,
+            "/api/ws/**"
+    };
+
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -89,7 +105,7 @@ public class SecurityConfiguration {
             http
                     .csrf(csrf -> csrf
                             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                            .ignoringRequestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/logout", "/api/ws/**")
+                            .ignoringRequestMatchers(CSRF_IGNORED_ENDPOINTS)
                     )
                     .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
         } else {
@@ -118,7 +134,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedOrigins(List.of(frontendUrl));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));

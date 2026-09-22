@@ -2,8 +2,6 @@ package utn.back.mordiscoapi.event.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.stereotype.Component;
@@ -18,7 +16,9 @@ import utn.back.mordiscoapi.model.entity.Pedido;
 import utn.back.mordiscoapi.service.interf.IEmailService;
 
 /**
- * Listener asíncrono para eventos de notificación vía Email
+ * Synchronous email listener for request-bound portfolio notifications.
+ * Transactional events run after commit while the request is still waiting;
+ * delivery failures are contained and never expose mail credentials.
  */
 @Slf4j
 @Component
@@ -31,8 +31,7 @@ public class EmailEventListener {
     /**
      * Envía email al restaurante cuando se crea un nuevo pedido
      */
-    @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handlePedidoCreated(PedidoCreatedEvent event) {
         if (!event.shouldSendEmail()) return;
 
@@ -55,8 +54,7 @@ public class EmailEventListener {
     /**
      * Envía email al cliente cuando su pedido pasa a preparación
      */
-    @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handlePedidoEnPreparacion(PedidoEnPreparacionEvent event) {
         if (!event.shouldSendEmail()) return;
 
@@ -78,8 +76,7 @@ public class EmailEventListener {
     /**
      * Envía email al cliente cuando su pedido está listo para retirar
      */
-    @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handlePedidoListoParaRetirar(PedidoListoParaRetirarEvent event) {
         if (!event.shouldSendEmail()) return;
 
@@ -101,8 +98,7 @@ public class EmailEventListener {
     /**
      * Envía email al cliente cuando su pedido está en camino
      */
-    @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handlePedidoEnCamino(PedidoEnCaminoEvent event) {
         if (!event.shouldSendEmail()) return;
 
@@ -124,8 +120,7 @@ public class EmailEventListener {
     /**
      * Envía emails al cliente Y al restaurante cuando un pedido es cancelado
      */
-    @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handlePedidoCancelado(PedidoCanceladoEvent event) {
         if (!event.shouldSendEmail()) return;
 
@@ -158,8 +153,7 @@ public class EmailEventListener {
     /**
      * Envía emails al cliente Y al restaurante cuando un pago es aprobado
      */
-    @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handlePagoAprobado(PagoAprobadoEvent event) {
         if (!event.shouldSendEmail()) return;
 
@@ -192,8 +186,7 @@ public class EmailEventListener {
     /**
      * Envía emails al cliente Y al restaurante cuando un pago es rechazado
      */
-    @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handlePagoRechazado(PagoRechazadoEvent event) {
         if (!event.shouldSendEmail()) return;
 
@@ -224,7 +217,6 @@ public class EmailEventListener {
         }
     }
 
-    @Async("passwordRecoveryEmailExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePasswordResetRequested(PasswordResetRequestedEvent event) {
         if (!event.shouldSendEmail()) return;
@@ -240,7 +232,6 @@ public class EmailEventListener {
         }
     }
 
-    @Async("passwordRecoveryEmailExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePasswordChanged(PasswordChangedEvent event) {
         if (!event.shouldSendEmail()) return;
@@ -256,8 +247,7 @@ public class EmailEventListener {
         }
     }
 
-    @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handleCuentaBloqueada(CuentaBloqueadaEvent event) {
         if (!event.shouldSendEmail()) return;
 

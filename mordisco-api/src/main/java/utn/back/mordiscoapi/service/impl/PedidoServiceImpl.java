@@ -146,9 +146,8 @@ public class PedidoServiceImpl implements IPedidoService {
             // Para efectivo, publicar evento de nuevo pedido
             eventPublisher.publishEvent(new PedidoCreatedEvent(pedido));
 
-            // Retornar response sin preference (para que el front sepa que es efectivo)
-            return new MercadoPagoPreferenceResponse(null, null, null,
-                    pedido.getId());
+            // Cash orders do not have a payment checkout payload.
+            return null;
         }
         return null;
     }

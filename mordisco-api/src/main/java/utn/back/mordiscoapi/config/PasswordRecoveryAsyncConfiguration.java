@@ -2,19 +2,17 @@ package utn.back.mordiscoapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 @Configuration
 public class PasswordRecoveryAsyncConfiguration {
+    /**
+     * Retains the bean name for compatibility while ensuring a future qualified
+     * listener cannot leave security mail queued after a Vercel response.
+     */
     @Bean("passwordRecoveryEmailExecutor")
-    public AsyncTaskExecutor passwordRecoveryEmailExecutor() {
-        ThreadPoolTaskExecutor delegate = new ThreadPoolTaskExecutor();
-        delegate.setCorePoolSize(1);
-        delegate.setMaxPoolSize(1);
-        delegate.setQueueCapacity(100);
-        delegate.setThreadNamePrefix("password-recovery-email-");
-        delegate.initialize();
-        return new RecoveryEmailTaskExecutor(delegate);
+    public TaskExecutor passwordRecoveryEmailExecutor() {
+        return new SyncTaskExecutor();
     }
 }

@@ -1,7 +1,9 @@
 package utn.back.mordiscoapi.repository;
 
 import utn.back.mordiscoapi.model.entity.Pago;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -21,6 +23,7 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
      * Encuentra un pago por ID del pedido con todas las relaciones necesarias cargadas
      * para evitar LazyInitializationException en eventos asíncronos
      */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
             SELECT pa FROM Pago pa
             JOIN FETCH pa.pedido p

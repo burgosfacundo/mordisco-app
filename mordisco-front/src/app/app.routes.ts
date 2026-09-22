@@ -22,6 +22,7 @@ import { CarritoPage } from './features/carrito/components/carrito-page/carrito-
 import { CheckoutPage } from './features/carrito/components/checkout-page/checkout-page';
 import { PagoExitosoPage } from './features/carrito/components/pago-exitoso-page/pago-exitoso-page';
 import { PagoFallidoPage } from './features/carrito/components/pago-fallido-page/pago-fallido-page';
+import { PagoPendientePage } from './features/carrito/components/pago-pendiente-page/pago-pendiente-page';
 import { RestauranteDetallePage } from './features/menu/detalle-restaurante/detalle-restaurante';
 import { MisPedidosClientePage } from './features/mis-pedidos/components/mis-pedidos-cliente-page/mis-pedidos-cliente-page';
 import { RecoverPasswordPage } from './features/auth/components/recover-password-page/recover-password-page';
@@ -135,7 +136,7 @@ export const routes: Routes = [
       { path: 'calificar/:var/:id', component : CalificacionFormPage},
       { path: 'pedidos/pago-exitoso', component: PagoExitosoPage },
       { path: 'pedidos/pago-fallido', component: PagoFallidoPage },
-      { path: 'pedidos/pago-pendiente', component: PagoExitosoPage },
+      { path: 'pedidos/pago-pendiente', component: PagoPendientePage },
       { path: 'pedidos', component: MisPedidosClientePage },
       { path: 'pedidos/detalle/:id', component: DetallePedidoPage }
     ]

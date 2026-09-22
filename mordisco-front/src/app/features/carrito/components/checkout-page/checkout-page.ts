@@ -214,13 +214,18 @@ export class CheckoutPage implements OnInit {
 
     this.pedidoService.crearPedido(request).subscribe({
       next: (response) => {
-        if (formValue.metodoPago === MetodoPago.MERCADO_PAGO && response.initPoint) {
+        if (formValue.metodoPago === MetodoPago.MERCADO_PAGO) {
+          const urlPago = response.checkoutUrl?.trim();
+
+          if (!urlPago) {
+            this.toastService.error('Mercado Pago no devolvió una URL de checkout válida');
+            this.isProcessing.set(false);
+            return;
+          }
+
           this.toastService.success('Redirigiendo a Mercado Pago...');
- 
           this.carritoService.vaciarCarrito();
-          const urlPago = response.sandboxInitPoint || response.initPoint;
           window.location.href = urlPago;
-          
         } else if (formValue.metodoPago === MetodoPago.EFECTIVO) {
           this.toastService.success('✅ Pedido confirmado - Pago en efectivo al recibir');
           this.carritoService.vaciarCarrito();

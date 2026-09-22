@@ -50,28 +50,38 @@ public class MercadoPagoService {
                     .email(pedido.getCliente().getEmail())
                     .build();
 
-            // 4. Configurar preferencia
-            PreferenceRequest preferenceRequest = PreferenceRequest.builder()
+            // 4. Configurar preferencia. A notification URL is sent only when
+            // explicitly configured; production validation requires a public HTTPS URL.
+            var preferenceBuilder = PreferenceRequest.builder()
                     .items(items)
                     .payer(payer)
                     .backUrls(backUrls)
                     .externalReference(pedido.getId().toString())
-                    .notificationUrl(appProperties.getMercadoPago().getNotificationUrl())
                     .statementDescriptor("MORDISCO") // Aparece en el resumen de la tarjeta
                     .expires(false) // La preferencia no expira
-                    .binaryMode(false) // Permitir pagos pending
-                    .build();
+                    .binaryMode(false); // Permitir pagos pending
+            String notificationUrl = appProperties.getMercadoPago().getNotificationUrl();
+            if (notificationUrl != null && !notificationUrl.isBlank()) {
+                preferenceBuilder.notificationUrl(notificationUrl);
+            }
+            PreferenceRequest preferenceRequest = preferenceBuilder.build();
 
             // 5. Crear preferencia en Mercado Pago
             PreferenceClient client = new PreferenceClient();
             Preference preference = client.create(preferenceRequest);
 
-            // 6. Retornar respuesta
+            // 6. Return both provider URLs plus the explicitly configured checkout URL.
+            String checkoutUrl = selectCheckoutUrl(
+                    appProperties.getMercadoPago().isSandbox(),
+                    preference.getInitPoint(),
+                    preference.getSandboxInitPoint()
+            );
             return new MercadoPagoPreferenceResponse(
                     preference.getId(),
                     preference.getInitPoint(),
                     preference.getSandboxInitPoint(),
-                    pedido.getId()
+                    pedido.getId(),
+                    checkoutUrl
             );
 
         } catch (MPApiException e) {
@@ -82,6 +92,14 @@ public class MercadoPagoService {
         } catch (Exception e) {
             throw new RuntimeException("Error inesperado al procesar el pago: " + e.getMessage(), e);
         }
+    }
+
+    static String selectCheckoutUrl(boolean sandbox, String initPoint, String sandboxInitPoint) {
+        String checkoutUrl = sandbox ? sandboxInitPoint : initPoint;
+        if (checkoutUrl == null || checkoutUrl.isBlank()) {
+            throw new IllegalArgumentException("Selected checkout URL is required");
+        }
+        return checkoutUrl;
     }
 
     /**

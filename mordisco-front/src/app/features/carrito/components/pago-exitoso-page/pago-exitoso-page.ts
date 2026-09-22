@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { PedidoService } from '../../../../shared/services/pedido/pedido-service';
+import { PagoService } from '../../../../shared/services/pagos/pago-service';
 import PedidoResponse from '../../../../shared/models/pedido/pedido-response';
 
 @Component({
@@ -15,6 +16,7 @@ export class PagoExitosoPage implements OnInit {
   private route = inject(ActivatedRoute)
   private router = inject(Router)
   private pedidoService = inject(PedidoService)
+  private pagoService = inject(PagoService)
 
   pedido = signal<PedidoResponse | null>(null)
   isLoading = signal(true)
@@ -27,7 +29,23 @@ export class PagoExitosoPage implements OnInit {
       return
     }
 
-    this.cargarPedido(Number(pedidoId));
+    const id = Number(pedidoId);
+    this.pagoService.getPagoByPedidoId(id).subscribe({
+      next: pago => {
+        if (pago.estado === 'PENDIENTE') {
+          this.router.navigate(['/cliente/pedidos/pago-pendiente'], { queryParams: { pedido: id } });
+          return;
+        }
+        if (pago.estado !== 'APROBADO') {
+          this.router.navigate(['/cliente/pedidos/pago-fallido'], { queryParams: { pedido: id } });
+          return;
+        }
+        this.cargarPedido(id);
+      },
+      // A redirect is not proof of payment. Keep the user on the pending route
+      // when the authoritative status cannot be read yet.
+      error: () => this.router.navigate(['/cliente/pedidos/pago-pendiente'], { queryParams: { pedido: id } })
+    });
   }
 
   private cargarPedido(pedidoId: number): void {

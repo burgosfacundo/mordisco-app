@@ -4,6 +4,12 @@ public record MercadoPagoPreferenceResponse(
         String preferenceId,
         String initPoint,
         String sandboxInitPoint,
-        Long pedidoId
+        Long pedidoId,
+        String checkoutUrl
 ) {
+    public MercadoPagoPreferenceResponse {
+        if (checkoutUrl == null || checkoutUrl.isBlank()) {
+            throw new IllegalArgumentException("checkoutUrl is required");
+        }
+    }
 }

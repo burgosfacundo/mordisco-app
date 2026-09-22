@@ -15,9 +15,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import utn.back.mordiscoapi.config.AppProperties;
 import utn.back.mordiscoapi.model.entity.Usuario;
+import utn.back.mordiscoapi.security.MercadoPagoWebhookSignatureValidator;
 import utn.back.mordiscoapi.security.PedidoSecurity;
 import utn.back.mordiscoapi.security.UsuarioSecurity;
+import utn.back.mordiscoapi.service.MercadoPagoService;
 import utn.back.mordiscoapi.service.PagoService;
 import utn.back.mordiscoapi.service.interf.IRepartidorService;
 
@@ -233,7 +236,12 @@ class RepartidorPagoControllerAuthorizationTest {
 
         @Bean
         PagoController pagoController(PagoService pagoService) {
-            return new PagoController(pagoService);
+            return new PagoController(
+                    pagoService,
+                    Mockito.mock(MercadoPagoService.class),
+                    Mockito.mock(MercadoPagoWebhookSignatureValidator.class),
+                    new AppProperties()
+            );
         }
     }
 

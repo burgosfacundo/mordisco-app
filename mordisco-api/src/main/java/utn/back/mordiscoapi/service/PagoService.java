@@ -8,7 +8,8 @@ import utn.back.mordiscoapi.event.order.PedidoCreatedEvent;
 import utn.back.mordiscoapi.event.payment.PagoAprobadoEvent;
 import utn.back.mordiscoapi.event.payment.PagoRechazadoEvent;
 import utn.back.mordiscoapi.model.dto.pago.PagoResponse;
-import utn.back.mordiscoapi.model.dto.pago.WebhookMercadoPagoRequest;
+
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,96 +26,99 @@ public class PagoService {
 
     private final PagoRepository pagoRepository;
     private final PedidoRepository pedidoRepository;
-    private final MercadoPagoService mercadoPagoService;
     private final ApplicationEventPublisher eventPublisher;
 
     /**
-     * Procesa el webhook de Mercado Pago
+     * Applies an authoritative Mercado Pago response inside one database transaction.
+     * The controller performs the remote PaymentClient lookup before entering this
+     * method, so the transaction contains only the local idempotent state transition.
      */
     @Transactional
-    public void procesarWebhook(WebhookMercadoPagoRequest webhook) {
-        log.info("🔔 Procesando webhook de Mercado Pago: {}", webhook);
-
-        // Validar que sea un webhook de pago
-        if (!"payment".equals(webhook.getType())) {
-            log.warn("⚠️ Webhook no es de tipo 'payment'. Tipo: {}", webhook.getType());
-            return;
+    public void procesarWebhook(String paymentId, Payment payment) {
+        if (paymentId == null || paymentId.isBlank() || payment == null) {
+            throw new IllegalArgumentException("Mercado Pago payment data is required");
         }
 
-        // Obtener el ID del pago
-        String paymentId = webhook.getData().getId();
-
-        if (paymentId == null || paymentId.isEmpty()) {
-            log.error("❌ Webhook sin payment ID");
-            return;
+        if (payment.getId() != null && !paymentId.equals(payment.getId().toString())) {
+            throw new IllegalStateException("Mercado Pago payment identity mismatch");
         }
 
+        String externalReference = payment.getExternalReference();
+        if (externalReference == null || externalReference.isBlank()) {
+            throw new IllegalStateException("Mercado Pago payment has no external reference");
+        }
+
+        Long pedidoId;
         try {
-            // Consultar el pago en Mercado Pago
-            Payment payment = mercadoPagoService.obtenerPago(paymentId);
-
-            // Obtener la referencia externa (ID del pedido)
-            String externalReference = payment.getExternalReference();
-
-            if (externalReference == null) {
-                log.error("❌ Payment {} sin external_reference", paymentId);
-                return;
-            }
-
-            Long pedidoId = Long.parseLong(externalReference);
-
-            // Buscar el pago en la BD con relaciones cargadas para eventos
-            Pago pago = pagoRepository.findByPedidoIdWithRelations(pedidoId)
-                    .orElseThrow(() -> new RuntimeException("Pago no encontrado para pedido #" + pedidoId));
-
-            // Actualizar información del pago
-            pago.setMercadoPagoPaymentId(paymentId);
-            pago.setMercadoPagoStatus(payment.getStatus());
-            pago.setMercadoPagoStatusDetail(payment.getStatusDetail());
-            pago.setMercadoPagoPaymentType(payment.getPaymentTypeId());
-
-            // Actualizar estado según el status de Mercado Pago
-            EstadoPago nuevoEstadoPago = mapearEstadoMercadoPago(payment.getStatus());
-            pago.setEstado(nuevoEstadoPago);
-
-            pagoRepository.save(pago);
-            log.info("✅ Pago actualizado: {} - Estado: {}", paymentId, nuevoEstadoPago);
-
-            // Actualizar estado del pedido
-            Pedido pedido = pago.getPedido();
-
-            if (nuevoEstadoPago == EstadoPago.APROBADO) {
-                // Pago aprobado -> Pedido EN_PROCESO
-                pedido.setEstado(EstadoPedido.EN_PREPARACION);
-                pedidoRepository.save(pedido);
-
-                // Publicar eventos
-                eventPublisher.publishEvent(new PedidoCreatedEvent(pedido)); // Notificar al restaurante
-                eventPublisher.publishEvent(new PagoAprobadoEvent(pedido)); // Notificar al cliente
-
-                log.info("✅ Pedido #{} confirmado y eventos publicados", pedidoId);
-
-            } else if (nuevoEstadoPago == EstadoPago.RECHAZADO) {
-                // Pago rechazado -> Pedido CANCELADO
-                pedido.setEstado(EstadoPedido.CANCELADO);
-                pedidoRepository.save(pedido);
-
-                // Publicar evento de pago rechazado
-                eventPublisher.publishEvent(new PagoRechazadoEvent(pedido, "Pago rechazado por Mercado Pago"));
-
-                log.info("❌ Pedido #{} cancelado por pago rechazado", pedidoId);
-            }
-
-        } catch (Exception e) {
-            log.error("❌ Error procesando webhook para payment {}", paymentId, e);
-            throw new RuntimeException("Error procesando webhook", e);
+            pedidoId = Long.valueOf(externalReference);
+        } catch (NumberFormatException exception) {
+            throw new IllegalStateException("Mercado Pago payment has an invalid external reference", exception);
         }
+
+        Pago pago = pagoRepository.findByPedidoIdWithRelations(pedidoId)
+                .orElseThrow(() -> new IllegalStateException("Pago no encontrado para pedido #" + pedidoId));
+
+        if (pago.getMercadoPagoPaymentId() != null
+                && !pago.getMercadoPagoPaymentId().isBlank()
+                && !paymentId.equals(pago.getMercadoPagoPaymentId())) {
+            throw new IllegalStateException("Mercado Pago payment identity mismatch");
+        }
+
+        EstadoPago nuevoEstadoPago = mapearEstadoMercadoPago(payment.getStatus());
+        boolean stateChanged = pago.getEstado() != nuevoEstadoPago;
+        boolean paymentDetailsChanged = !Objects.equals(pago.getMercadoPagoPaymentId(), paymentId)
+                || !Objects.equals(pago.getMercadoPagoStatus(), payment.getStatus())
+                || !Objects.equals(pago.getMercadoPagoStatusDetail(), payment.getStatusDetail())
+                || !Objects.equals(pago.getMercadoPagoPaymentType(), payment.getPaymentTypeId());
+
+        if (!stateChanged && !paymentDetailsChanged) {
+            return;
+        }
+
+        pago.setMercadoPagoPaymentId(paymentId);
+        pago.setMercadoPagoStatus(payment.getStatus());
+        pago.setMercadoPagoStatusDetail(payment.getStatusDetail());
+        pago.setMercadoPagoPaymentType(payment.getPaymentTypeId());
+        pago.setEstado(nuevoEstadoPago);
+        pagoRepository.save(pago);
+
+        if (!stateChanged) {
+            return;
+        }
+
+        Pedido pedido = pago.getPedido();
+        if (pedido == null) {
+            throw new IllegalStateException("Pago no tiene pedido asociado");
+        }
+
+        if (nuevoEstadoPago == EstadoPago.APROBADO) {
+            updatePedidoState(pedido, EstadoPedido.EN_PREPARACION);
+            eventPublisher.publishEvent(new PedidoCreatedEvent(pedido));
+            eventPublisher.publishEvent(new PagoAprobadoEvent(pedido));
+        } else if (nuevoEstadoPago == EstadoPago.RECHAZADO) {
+            updatePedidoState(pedido, EstadoPedido.CANCELADO);
+            eventPublisher.publishEvent(new PagoRechazadoEvent(pedido, "Pago rechazado por Mercado Pago"));
+        }
+    }
+
+    private void updatePedidoState(Pedido pedido, EstadoPedido targetState) {
+        EstadoPedido currentState = pedido.getEstado();
+        if (currentState == targetState
+                || currentState == EstadoPedido.COMPLETADO
+                || (currentState == EstadoPedido.CANCELADO && targetState == EstadoPedido.EN_PREPARACION)) {
+            return;
+        }
+        pedido.setEstado(targetState);
+        pedidoRepository.save(pedido);
     }
 
     /**
      * Mapea el estado de Mercado Pago a nuestro enum
      */
     private EstadoPago mapearEstadoMercadoPago(String mercadoPagoStatus) {
+        if (mercadoPagoStatus == null || mercadoPagoStatus.isBlank()) {
+            throw new IllegalStateException("Mercado Pago payment has no status");
+        }
         return switch (mercadoPagoStatus) {
             case "approved" -> EstadoPago.APROBADO;
             case "rejected", "cancelled" -> EstadoPago.RECHAZADO;
