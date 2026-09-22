@@ -25,8 +25,8 @@ The repository currently assumes Docker Compose, localhost service URLs, an alwa
 - Use Mercado Pago sandbox for the portfolio deployment.
 - Do not introduce paid infrastructure.
 - Do not claim durable realtime behavior from the in-memory STOMP broker.
-- Do not push, open a PR, publish, or deploy without explicit user authorization.
-- Do not commit unless separately authorized by the user.
+- Do not open a PR, publish, or deploy without explicit user authorization.
+- Commit and feature-branch push were authorized after repository verification.
 - Preserve existing local Docker Compose development where practical.
 
 ## Execution settings
@@ -36,8 +36,8 @@ The repository currently assumes Docker Compose, localhost service URLs, an alwa
 - Backend runner: `cd mordisco-api && mvn test` (focused `-Dtest=...` runs allowed per task).
 - Frontend runner: `cd mordisco-front && npm test -- --watch=false` where supported, plus `npm run build`.
 - Delivery strategy: `ask-on-risk`.
-- Chain strategy: pending; no commit is authorized yet.
-- Forecast: approximately 700–1100 authored changed lines. This exceeds the 400-line review guideline and should be sliced by the work units below if commits/PRs are later authorized.
+- Chain strategy: four work-unit commits on `feat/vercel-portfolio-deployment`; no PR is authorized yet.
+- Actual candidate exceeds the 400-line review guideline; any later PR should be review-sliced rather than submitted as one oversized diff.
 
 ## Tasks
 
@@ -158,6 +158,13 @@ The repository currently assumes Docker Compose, localhost service URLs, an alwa
 
 - Native risk assessment is unavailable because the package-local Gentle AI binary is missing; independent verifier runs were used under the high-risk fallback plan.
 
+## Delivery evidence
+
+- `60b0331` — `feat(deploy): add Vercel and TiDB runtime configuration`
+- `7e8c75e` — `feat(payments): harden checkout webhook and email delivery`
+- `e30f398` — `feat(deploy): add stateless polling and maintenance fallbacks`
+- `a69e00f` — `docs(deploy): add Vercel portfolio runbook`
+
 ## Next step
 
-Repository implementation is complete. If delivery is authorized later, split the candidate into reviewable work-unit commits/PR slices before any push; then perform the external deployment smoke checks with real provider credentials.
+Push `feat/vercel-portfolio-deployment` and use its Vercel Preview deployment with isolated preview credentials/data. Do not open a PR or merge until the live preview smoke checks pass.
