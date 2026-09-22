@@ -21,7 +21,7 @@
 
 ---
 
-## 🚀 Inicio Rápido con Docker
+## 🚀 Inicio Rápido local con Docker Compose
 
 ```bash
 git clone https://github.com/burgosfacundo/mordisco-app.git
@@ -42,6 +42,182 @@ Esto levanta MySQL, Backend y Frontend con datos de prueba. Accede en: **http://
 ### Configuracion local
 
 Antes de iniciar, copia `.env.example` a `.env`. Completa las credenciales locales cuando sea necesario, nunca confirmes `.env` y genera localmente un secreto JWT fuerte.
+
+> Esta sección es exclusivamente local: usa Docker Compose, MySQL y datos de prueba. No reutilices sus credenciales, URLs ni el volumen `mysql_data` para producción.
+
+---
+
+## Despliegue de producción (DEPLOY-5)
+
+> Esta ruta usa un único proyecto de Vercel. El frontend y el backend son servicios del mismo `vercel.json`; la persistencia queda fuera de Vercel, en TiDB Cloud.
+
+### Topología de producción
+
+| Entrada | Servicio | Contrato |
+|---|---|---|
+| `/` y cualquier ruta que no empiece por `/api` | Angular (`mordisco-front`) | Build de producción con `apiUrl: '/api'`; no necesita variables de entorno en runtime. |
+| `/api/*` | Spring Boot (`mordisco-api`) | Contenedor `Dockerfile.vercel`; Vercel le entrega `PORT`. |
+| Persistencia | TiDB Cloud externo | Endpoint MySQL-compatible de Connector/J, con los parámetros TLS entregados por el proveedor. |
+| TLS público | Edge de Vercel | Vercel termina HTTPS; el contenedor sirve HTTP y no usa keystore de aplicación. |
+
+`vercel.json` implementa los rewrites `/api/(.*) → backend` y `/(.*) → frontend`. No despliegues un segundo proyecto para separar el API: esa separación rompería la topología same-origin documentada.
+
+### Ruta rápida
+
+**Prerrequisitos**
+
+- Un proyecto de Vercel conectado al repositorio y un dominio HTTPS público.
+- Una base TiDB Cloud creada, con usuario, contraseña y JDBC URL emitidos por el proveedor.
+- Credenciales de Mercado Pago **Sandbox**, su secreto de firma de webhooks y una URL pública HTTPS.
+- Credenciales SMTP y una API key de OpenWeatherMap.
+- Un scheduler HTTP externo con plan gratuito que pueda ejecutar un `POST` al menos una vez por día.
+- Para validar localmente: Java 21, Maven, Node.js/npm y, para la suite completa, Docker disponible para Testcontainers.
+
+**Pasos**
+
+1. En **Vercel → Project Settings → Environment Variables**, carga las variables de las tablas siguientes para el entorno **Production**. Usa valores reales sólo en Vercel; el repositorio contiene únicamente placeholders.
+2. Haz el bootstrap de esquema **una sola vez**: cambia temporalmente `SPRING_PROFILES_ACTIVE` a `prod,schema-bootstrap` y ejecuta un arranque/redeploy. Verifica en los logs que la aplicación inicia y que TiDB acepta el DDL.
+3. Vuelve a `SPRING_PROFILES_ACTIVE=prod` y ejecuta el arranque/redeploy normal. Desde ese momento el esquema debe validarse, no modificarse automáticamente.
+4. Ejecuta los smoke checks de abajo y configura el scheduler de mantenimiento. No consideres completado el despliegue si queda alguno de los holds externos sin resolver.
+
+### Variables de producción del backend
+
+Los nombres de esta tabla son los nombres exactos que consume la configuración Spring. Los ejemplos son placeholders: no los copies como credenciales. Podés usar `mordisco-api/env.production.example` como checklist para cargar las variables en Vercel; no lo conviertas en un archivo con valores reales dentro del repositorio.
+
+#### Requeridas para el arranque `prod`
+
+| Variable | Placeholder/valor esperado | Uso y validación |
+|---|---|---|
+| `DATABASE_URL` | `<provider-issued-jdbc-url-with-tls-options>` | JDBC URL completa de TiDB; no tiene default útil. |
+| `DATABASE_USERNAME` | `<set-in-vercel>` | Usuario de TiDB; requerido y no versionado. |
+| `DATABASE_PASSWORD` | `<set-in-vercel>` | Contraseña de TiDB; requerido y no versionado. |
+| `FRONTEND_URL` | `https://<vercel-domain>` | Origin público para CORS y enlaces de correo; debe ser exacto, sin wildcard. |
+| `JWT_SECRET` | `<random-value-at-least-32-characters>` | Se rechaza un secreto de menos de 32 caracteres. No lo reutilices entre entornos. |
+| `SPRING_MAIL_HOST` | `<smtp-host>` | Host SMTP. |
+| `SPRING_MAIL_PORT` | `<smtp-port>` | Puerto SMTP; no hay default en la configuración base. |
+| `SPRING_MAIL_USERNAME` | `<smtp-username>` | Cuenta remitente SMTP. |
+| `SPRING_MAIL_PASSWORD` | `<set-in-vercel>` | Credencial SMTP. |
+| `OPENWEATHERMAP_API_KEY` | `<set-in-vercel>` | API externa usada por las funcionalidades meteorológicas. |
+| `MAINTENANCE_SECRET` | `<set-in-vercel>` | Secreto requerido para el endpoint de mantenimiento. |
+
+#### Requeridas para pagos y webhooks
+
+| Variable | Placeholder/valor esperado | Uso y validación |
+|---|---|---|
+| `MERCADOPAGO_ACCESS_TOKEN` | `<set-in-vercel>` | Crea preferencias y consulta pagos en Mercado Pago. Usa el token del mismo entorno seleccionado. |
+| `MERCADOPAGO_PUBLIC_KEY` | `<set-in-vercel>` | Propiedad de configuración de la cuenta MP; se carga junto con el token, pero el checkout actual es server-side y el frontend no la lee en runtime. |
+| `MERCADOPAGO_WEBHOOK_SECRET` | `<set-in-vercel>` | Secreto de firma v1 entregado por Mercado Pago; obligatorio en perfil `prod`. |
+| `MERCADOPAGO_NOTIFICATION_URL` | `https://<vercel-domain>/api/pagos/webhook` | URL pública HTTPS exacta; el perfil `prod` exige el path `/api/pagos/webhook` y rechaza localhost. |
+| `MERCADOPAGO_ENVIRONMENT` | `sandbox` | Selector admitido: `sandbox` o `production`. DEPLOY-5 usa `sandbox` con credenciales Sandbox. |
+
+#### Opcionales o con default seguro
+
+| Variable | Default | Nota operativa |
+|---|---:|---|
+| `SPRING_PROFILES_ACTIVE` | `prod` en `Dockerfile.vercel` | Para el bootstrap se cambia sólo una vez a `prod,schema-bootstrap`; luego debe volver a `prod`. |
+| `PORT` | `SERVER_PORT` o `8080` | Vercel entrega `PORT`; no fuerces un puerto TLS dentro del contenedor. |
+| `SERVER_PORT` | `8080` | Fallback si no existe `PORT`. |
+| `WEBSOCKET_ALLOWED_ORIGINS` | `FRONTEND_URL` en `prod` | Debe ser un origin exacto y sin `*`. STOMP está desactivado en producción, pero la validación de configuración sigue aplicando. |
+| `SMTP_CONNECTION_TIMEOUT_MS` | `5000` | Timeout de conexión SMTP en milisegundos. |
+| `SMTP_READ_TIMEOUT_MS` | `5000` | Timeout de lectura SMTP en milisegundos. |
+| `SMTP_WRITE_TIMEOUT_MS` | `5000` | Timeout de escritura SMTP en milisegundos. |
+| `PASSWORD_RECOVERY_EXPIRATION_SECONDS` | `3600` | Rango válido: 300–86400 segundos. |
+| `PASSWORD_RECOVERY_COOLDOWN_SECONDS` | `300` | Rango válido: 60–86400 segundos. |
+| `DB_POOL_MIN_IDLE` | `0` | Pool Hikari sin conexiones ociosas por defecto, adecuado para scale-to-zero. |
+| `DB_POOL_MAX_SIZE` | `4` | Máximo de conexiones Hikari por instancia. |
+| `DB_POOL_CONNECTION_TIMEOUT_MS` | `10000` | Timeout para obtener una conexión. |
+| `DB_POOL_VALIDATION_TIMEOUT_MS` | `5000` | Timeout de validación de conexión. |
+| `DB_POOL_IDLE_TIMEOUT_MS` | `60000` | Tiempo de inactividad antes de retirar una conexión. |
+| `DB_POOL_MAX_LIFETIME_MS` | `300000` | Vida máxima de una conexión. |
+
+El frontend **no tiene variables de entorno de runtime**. `mordisco-front/src/environments/environment.ts` compila `apiUrl: '/api'` y `websocketEnabled: false`; por eso el navegador usa el mismo origin y la producción no intenta abrir STOMP. No agregues secretos al build Angular.
+
+### TiDB, TLS y esquema
+
+- Copia en `DATABASE_URL` la JDBC URL completa emitida por TiDB Cloud. Conserva host, puerto, base, parámetros de certificado y opciones como `sslMode=VERIFY_IDENTITY`; no reconstruyas la URL ni le quites la query del proveedor.
+- `application-prod.properties` agrega además el guard de Connector/J `sslMode=VERIFY_IDENTITY`. El TLS de TiDB es independiente del TLS público: Vercel termina HTTPS en el edge y Spring no necesita `server.ssl.*`, certificado ni keystore.
+- `prod,schema-bootstrap` habilita el único arranque controlado con `spring.jpa.hibernate.ddl-auto=update` para crear/actualizar el esquema. Haz backup/verifica permisos antes de ejecutarlo y no lo repitas como mecanismo de migración sobre una base con datos.
+- El perfil normal `prod` usa `spring.jpa.hibernate.ddl-auto=validate`: si hay drift, el backend debe fallar al iniciar para que se corrija el esquema de forma controlada.
+- `spring.sql.init.mode=never` en producción: `data.sql` no se ejecuta automáticamente y no debe usarse para inicializar ni resetear una base real. Un reset implica una operación explícita del proveedor sobre una base descartable o respaldada; nunca borres datos de producción para repetir `data.sql`.
+
+### Mercado Pago Sandbox y SMTP
+
+**Webhook Sandbox**
+
+1. En el panel de Mercado Pago Sandbox, registra exactamente `https://<vercel-domain>/api/pagos/webhook` como URL de notificaciones. No agregues una `/` final.
+2. Guarda el secreto de firma v1 del proveedor en `MERCADOPAGO_WEBHOOK_SECRET`; no uses el access token como secreto de firma.
+3. Define `MERCADOPAGO_ENVIRONMENT=sandbox` y usa el access token/public key Sandbox. Cambiar a `production` requiere credenciales de producción y la URL HTTPS correspondiente.
+4. El webhook es autoritativo por consulta al proveedor: para `type=payment`, el backend valida `x-signature`/`x-request-id`, toma `data.id`, consulta el pago en Mercado Pago e ignora el body como fuente de estado. Una notificación firmada de otro tipo se confirma sin mutar el pago; una firma inválida responde `401`.
+
+**SMTP**
+
+Los tres timeouts SMTP son de 5 segundos por defecto (`connectiontimeout`, `timeout`, `writetimeout`). La recuperación y el cambio de contraseña se envían de forma síncrona en el mismo thread mediante listeners no asíncronos `AFTER_COMMIT`; no se encolan. El bean `SyncTaskExecutor` de `PasswordRecoveryAsyncConfiguration` se conserva sólo por compatibilidad y no participa en este flujo. El envío es best effort: un fallo SMTP no revierte la transacción, no hay reintento automático ni outbox durable. Un proveedor lento o caído es un hold externo y debe quedar visible durante la operación.
+
+### Mantenimiento periódico
+
+El endpoint público de operación es `POST /api/internal/maintenance` y se protege con el header exacto `X-Maintenance-Secret`. No espera un payload de negocio; el body puede ser `{}`. Una llamada autorizada responde `200` con:
+
+```json
+{"status":"completed"}
+```
+
+Plantilla segura (reemplaza sólo los placeholders en tu scheduler; nunca pegues un secreto real en documentación o shell history compartido):
+
+```bash
+curl --fail-with-body --silent --show-error \\
+  --request POST "https://<vercel-domain>/api/internal/maintenance" \\
+  --header "X-Maintenance-Secret: <set-in-vercel>" \\
+  --header "Content-Type: application/json" \\
+  --data '{}'
+```
+
+Configura este POST en un scheduler HTTP externo y gratuito al menos una vez por día. El job ejecuta limpieza de promociones vencidas, refresh tokens y credenciales de recuperación; Vercel puede escalar a cero y no es un lugar confiable para mantener un scheduler JVM activo.
+
+### Limitaciones conocidas de producción
+
+| Limitación | Efecto esperado |
+|---|---|
+| Scale-to-zero de Vercel | Puede haber cold start; no dependas de estado o tareas en memoria de una instancia. |
+| STOMP desactivado | `websocketEnabled=false`; no hay notificaciones WebSocket en producción. |
+| Polling de `CLIENTE` y `RESTAURANTE` | El frontend consulta cambios de pedidos cada 15 segundos. |
+| Estado de pago pendiente | La vista consulta el pago cada 5 segundos durante como máximo 2 minutos; después requiere volver a Mis Pedidos. |
+| `REPARTIDOR` | No hay polling de notificaciones de pedidos como fallback de producción. |
+| Scheduling JVM | Los `@Scheduled` están deshabilitados con el perfil `prod`; el mantenimiento externo es obligatorio. |
+| Dependencias externas | TiDB, Mercado Pago, SMTP, OpenWeatherMap, Vercel y el scheduler tienen disponibilidad, límites y credenciales propios. |
+
+### Verificación y holds
+
+Ejecuta desde la raíz del repositorio. Estas comprobaciones no sustituyen la validación de servicios externos:
+
+```bash
+# Backend: confirmar Java 21 y ejecutar primero el foco DEPLOY-5
+java -version
+cd mordisco-api
+mvn -q -Dtest=ProductionConfigurationValidatorTest,TiDbPersistenceConfigurationTest,SchedulingConfigurationTest,MaintenanceControllerTest,MercadoPagoWebhookControllerTest test
+
+# Empaquetado Maven sin repetir la suite
+mvn -q -DskipTests package
+
+# Suite completa: puede quedar en hold si Docker/Testcontainers no está disponible
+mvn -q test
+
+# Frontend: tests y build de producción (Angular usa environment.ts)
+cd ../mordisco-front
+npm test -- --watch=false --browsers=ChromeHeadless
+npm run build
+
+# Validaciones estáticas de raíz
+cd ..
+python3 -m json.tool vercel.json >/dev/null
+git diff --check
+```
+
+Checklist adicional:
+
+- [ ] El escaneo de secretos sobre los archivos cambiados sólo encuentra placeholders (`<...>`), nunca tokens, claves privadas, contraseñas ni valores reales.
+- [ ] `docker compose config` se usa únicamente como validación local del Compose; un pase local no prueba Vercel, TiDB ni la URL pública.
+- [ ] Los holds live externos (TiDB/TLS, Vercel/`PORT`, Mercado Pago Sandbox/webhook, SMTP, OpenWeatherMap y scheduler) tienen evidencia operativa separada.
+- [ ] Los smoke checks públicos devuelven el resultado esperado: `GET /api/restaurantes` responde, el mantenimiento devuelve `{"status":"completed"}` y el webhook sin firma no se acepta.
 
 ---
 
@@ -457,13 +633,13 @@ A UTC cleanup runs daily and deletes only records for which `cooldown_until <= n
 
 #### Delivery, privacy, and failure semantics
 
-Recovery and password-change email handlers run asynchronously only after the database transaction commits (`AFTER_COMMIT`). Delivery is best effort: an SMTP, template, or executor failure does not roll back a committed credential or password reset, does not retry automatically, and does not change the generic public response. A process failure between commit and dispatch can lose an email; this implementation is not a durable outbox.
+Recovery and password-change email handlers run synchronously on the publishing thread after the database transaction commits (`AFTER_COMMIT`); they are not asynchronous. The `SyncTaskExecutor` bean in `PasswordRecoveryAsyncConfiguration` is compatibility-only and is not part of this delivery path. Delivery is best effort: an SMTP or template failure does not roll back a committed credential or password reset, does not retry automatically, and does not change the generic public response. A process failure between commit and dispatch can lose an email; this implementation is not a durable outbox.
 
 Operational logs for these handlers use fixed aggregate failure text only. Do not add request-level success, suppression, account-state, recipient, exception-detail, credential, or link logging. Mail delivery is the sole boundary where the raw token and recipient address are used.
 
 #### MySQL deployment verification
 
-Hibernate additive DDL (`spring.jpa.hibernate.ddl-auto=update`) creates the table under the repository's no-migration-framework convention. Before deployment, confirm that the production database principal is permitted to apply this additive DDL. If runtime DDL is restricted, have an operator create the equivalent additive table and constraints before starting the backend; do not introduce a migration framework solely for this change.
+Normal production startup always uses `spring.jpa.hibernate.ddl-auto=validate` and must fail on schema drift rather than modify the database. The only schema-changing startup is the one-time `prod,schema-bootstrap` profile, which sets `spring.jpa.hibernate.ddl-auto=update`; return to `prod` immediately afterward. Before that bootstrap, confirm that the production database principal is permitted to apply the additive DDL. If runtime DDL is restricted, have an operator create the equivalent additive table and constraints before starting the backend; do not introduce a migration framework solely for this change.
 
 Before enabling recovery traffic, inspect the deployed MySQL schema and confirm:
 

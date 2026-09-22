@@ -24,3 +24,6 @@ temp/
 
 # Local Pi runtime state
 .atl/
+
+# Local CodeGraph tooling state
+.codegraph/
