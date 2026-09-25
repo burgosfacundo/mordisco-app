@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { BehaviorSubject, catchError, filter, Observable, switchMap, take, tap, throwError } from 'rxjs';
+import { catchError, finalize, Observable, shareReplay, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../../features/auth/models/auth-response';
@@ -24,9 +24,8 @@ export class AuthService {
   // Timer para renovar token antes de que expire
   private refreshTimer?: ReturnType<typeof setTimeout>;
 
-  // Subject para evitar múltiples refresh simultáneos
-  private refreshInProgress$ = new BehaviorSubject<boolean>(false);
-  private refreshTokenSubject$ = new BehaviorSubject<string | null>(null);
+  // Share only the active request; a later refresh must always make a fresh HTTP call.
+  private refreshInFlight$?: Observable<AuthResponse>;
 
   constructor() {
     this.loadStoredAuth();
@@ -45,42 +44,28 @@ export class AuthService {
   }
 
   refreshToken(): Observable<AuthResponse> {
-    // Si ya hay un refresh en progreso, esperar a que termine
-    if (this.refreshInProgress$.value) {
-      return this.refreshTokenSubject$.pipe(
-        filter(token => token !== null),
-        take(1),
-        switchMap(() => {
-          const userData = sessionStorage.getItem(this.USER_DATA_KEY);
-          if (userData) {
-            return new Observable<AuthResponse>(observer => {
-              observer.next(JSON.parse(userData));
-              observer.complete();
-            });
-          }
-          return throwError(() => new Error('No hay user data despues del refresh'));
-        })
-      );
+    const inFlightRefresh = this.refreshInFlight$;
+    if (inFlightRefresh) {
+      return inFlightRefresh;
     }
 
-    // Marcar que el refresh está en progreso
-    this.refreshInProgress$.next(true);
-    
-    return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {}, {
+    const refresh$ = this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {}, {
       withCredentials: true
     }).pipe(
-      tap(response => {
-        this.handleAuthResponse(response);
-        this.refreshTokenSubject$.next(response.accessToken);
-        this.refreshInProgress$.next(false);
-      }),
-      catchError((error) => {
-        this.refreshInProgress$.next(false);
-        this.refreshTokenSubject$.next(null);
-        this.clearAuth();
+      tap(response => this.handleAuthResponse(response)),
+      catchError(error => {
+        // Handle the shared failure once, regardless of how many callers are waiting.
+        this.clearAuthAndRedirect();
         return throwError(() => error);
-      })
+      }),
+      finalize(() => {
+        this.refreshInFlight$ = undefined;
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
+
+    this.refreshInFlight$ = refresh$;
+    return refresh$;
   }
 
   logout(): void {
@@ -201,17 +186,14 @@ export class AuthService {
             // Token muy viejo o a punto de expirar, hacer refresh inmediato
             this.refreshToken().subscribe({
               error: () => {
-                console.error('❌ Refresh falló, limpiando auth');
-                this.clearAuth();
-              }
-            });
+              console.error('❌ Refresh falló, limpiando auth');
+            }
+          });
           }
         } else {
           // Datos viejos sin timestamp, hacer refresh inmediato
           this.refreshToken().subscribe({
-            error: () => {
-              this.clearAuth();
-            }
+            error: () => {}
           });
         }
         

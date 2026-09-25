@@ -38,20 +38,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       // Si es 401 (Unauthorized), intentar refresh token
       if (error.status === 401 && !req.url.includes('/auth/refresh')) {
         return authService.refreshToken().pipe(
-          switchMap(() => {
-            // Después del refresh exitoso, reintentar la request original con el nuevo token
-            const newToken = sessionStorage.getItem('access_token');
+          switchMap(response => {
+            // Retry once with the access token returned by this refresh operation.
             const retryReq = req.clone({
               setHeaders: {
-                Authorization: `Bearer ${newToken}`
+                Authorization: `Bearer ${response.accessToken}`
               }
             });
             return next(retryReq);
-          }),
-          catchError((refreshError) => {
-            // Si el refresh falla, limpiar auth y redirigir a login
-            authService.clearAuthAndRedirect();
-            return throwError(() => refreshError);
           })
         );
       }
