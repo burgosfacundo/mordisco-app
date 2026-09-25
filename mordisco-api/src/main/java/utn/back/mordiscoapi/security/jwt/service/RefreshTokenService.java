@@ -13,86 +13,144 @@ import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.security.jwt.model.entity.RefreshToken;
 import utn.back.mordiscoapi.security.jwt.repository.RefreshTokenRepository;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RefreshTokenService {
+    private static final int TOKEN_BYTES = 32;
+    private static final String UNKNOWN_USER_AGENT = "Unknown";
+    private static final Pattern TOKEN_PATTERN = Pattern.compile("[A-Za-z0-9_-]{43}");
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final UsuarioRepository userRepository;
 
-    @Value("${jwt.refresh.expiration:2592000000}") // 30 días default
+    @Value("${app.jwt.refresh.expiration:2592000000}")
     private Long refreshTokenDuration;
 
-    @Value("${jwt.max-sessions:5}") // Máximo 5 sesiones activas
+    @Value("${app.jwt.max-sessions:5}")
     private int maxActiveSessions;
 
     @Transactional
     public RefreshToken createRefreshToken(Long userId, String userAgent, String ipAddress) throws NotFoundException {
-        long activeSessions = refreshTokenRepository
-                .countByUsuarioIdAndRevokedAtIsNullAndExpiryDateAfter(
-                        userId, LocalDateTime.now());
-
-        if (activeSessions >= maxActiveSessions) {
-            revokeOldestSession(userId);
-        }
-
-        Usuario usuario = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
-
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUsuario(usuario);
-        refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiryDate(LocalDateTime.now().plusSeconds(refreshTokenDuration / 1000));
-        refreshToken.setCreatedAt(LocalDateTime.now());
-        refreshToken.setUserAgent(userAgent);
-        refreshToken.setIpAddress(ipAddress);
-
-        return refreshTokenRepository.save(refreshToken);
+        return issueRefreshToken(userId, userAgent, ipAddress).refreshToken();
     }
 
     @Transactional
-    public RefreshToken rotateRefreshToken(String oldToken, String userAgent, String ipAddress) throws NotFoundException {
-        RefreshToken oldRefreshToken = verifyRefreshToken(oldToken);
-
-        oldRefreshToken.setRevokedAt(LocalDateTime.now());
-        refreshTokenRepository.save(oldRefreshToken);
-
-        return createRefreshToken(
-                oldRefreshToken.getUsuario().getId(),
-                userAgent,
-                ipAddress
-        );
+    public IssuedRefreshToken issueRefreshToken(Long userId, String userAgent, String ipAddress) throws NotFoundException {
+        Usuario usuario = userRepository.findByIdForUpdate(userId)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+        return issueRefreshToken(usuario, userAgent, ipAddress, LocalDateTime.now());
     }
 
+    private IssuedRefreshToken issueRefreshToken(
+            Usuario usuario, String userAgent, String ipAddress, LocalDateTime now) {
+        Long userId = usuario.getId();
+        long activeSessions = refreshTokenRepository
+                .countByUsuarioIdAndRevokedAtIsNullAndExpiryDateAfter(userId, now);
 
-    public RefreshToken verifyRefreshToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new AccessDeniedException("Refresh token no válido"));
-
-        if (refreshToken.isRevoked()) {
-            log.warn("Intento de uso de refresh token revocado: {}", token);
-            revokeAllUserSessions(refreshToken.getUsuario().getId());
-            throw new SecurityException("Token comprometido - sesiones revocadas");
+        if (activeSessions >= maxActiveSessions) {
+            revokeOldestSession(userId, now);
         }
 
-        if (refreshToken.isExpired()) {
-            throw new AccessDeniedException("Refresh token expirado");
+        String opaqueToken = generateToken();
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUsuario(usuario);
+        refreshToken.setTokenDigest(digestToken(opaqueToken));
+        refreshToken.setExpiryDate(now.plus(Duration.ofMillis(refreshTokenDuration)));
+        refreshToken.setCreatedAt(now);
+        refreshToken.setUserAgent(userAgent == null ? UNKNOWN_USER_AGENT : userAgent);
+        refreshToken.setIpAddress(ipAddress);
+
+        RefreshToken persistedToken = refreshTokenRepository.save(refreshToken);
+        return new IssuedRefreshToken(persistedToken, opaqueToken);
+    }
+
+    @Transactional(noRollbackFor = {
+            RefreshTokenReuseException.class,
+            DisabledUserRefreshException.class
+    })
+    public IssuedRefreshToken rotateRefreshToken(String rawToken, String userAgent, String ipAddress) throws NotFoundException {
+        String tokenDigest = digestToken(rawToken);
+        Long userId = refreshTokenRepository.findUsuarioIdByTokenDigest(tokenDigest)
+                .orElseThrow(RefreshTokenAuthenticationException::new);
+        Usuario usuario = userRepository.findByIdForUpdate(userId)
+                .orElseThrow(RefreshTokenAuthenticationException::new);
+        RefreshToken oldRefreshToken = refreshTokenRepository.findByTokenDigestForUpdate(tokenDigest)
+                .orElseThrow(RefreshTokenAuthenticationException::new);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (oldRefreshToken.isRevoked()) {
+            revokeAllUserSessions(userId, now);
+            throw new RefreshTokenReuseException();
+        }
+
+        if (!oldRefreshToken.getExpiryDate().isAfter(now)) {
+            throw new RefreshTokenAuthenticationException();
+        }
+
+        if (!usuario.isEnabled()) {
+            revokeAllUserSessions(userId, now);
+            throw new DisabledUserRefreshException();
+        }
+
+        oldRefreshToken.setRevokedAt(now);
+        refreshTokenRepository.save(oldRefreshToken);
+
+        return issueRefreshToken(usuario, userAgent, ipAddress, now);
+    }
+
+    @Transactional(noRollbackFor = {
+            RefreshTokenReuseException.class,
+            DisabledUserRefreshException.class
+    })
+    public RefreshToken verifyRefreshToken(String rawToken) {
+        String tokenDigest = digestToken(rawToken);
+        Long userId = refreshTokenRepository.findUsuarioIdByTokenDigest(tokenDigest)
+                .orElseThrow(RefreshTokenAuthenticationException::new);
+        Usuario usuario = userRepository.findByIdForUpdate(userId)
+                .orElseThrow(RefreshTokenAuthenticationException::new);
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenDigestForUpdate(tokenDigest)
+                .orElseThrow(RefreshTokenAuthenticationException::new);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (refreshToken.isRevoked()) {
+            revokeAllUserSessions(userId, now);
+            throw new RefreshTokenReuseException();
+        }
+        if (!refreshToken.getExpiryDate().isAfter(now)) {
+            throw new RefreshTokenAuthenticationException();
+        }
+        if (!usuario.isEnabled()) {
+            revokeAllUserSessions(userId, now);
+            throw new DisabledUserRefreshException();
         }
 
         return refreshToken;
     }
 
     @Transactional
-    public void revokeToken(String token) {
-        refreshTokenRepository.findByToken(token).ifPresent(rt -> {
-            rt.setRevokedAt(LocalDateTime.now());
-            refreshTokenRepository.save(rt);
+    public void revokeToken(String rawToken) {
+        if (!hasExpectedTokenShape(rawToken)) {
+            return;
+        }
+
+        refreshTokenRepository.findByTokenDigest(digestToken(rawToken)).ifPresent(refreshToken -> {
+            if (!refreshToken.isRevoked()) {
+                refreshToken.setRevokedAt(LocalDateTime.now());
+                refreshTokenRepository.save(refreshToken);
+            }
         });
     }
 
@@ -101,28 +159,69 @@ public class RefreshTokenService {
         revokeAllUserSessions(userId, LocalDateTime.now());
     }
 
+    @Transactional
     public void revokeAllUserSessions(Long userId, LocalDateTime now) {
         refreshTokenRepository.revokeAllUserTokens(userId, now);
-        log.info("Todas las sesiones del usuario {} han sido revocadas", userId);
+        log.info("All refresh sessions revoked for user {}", userId);
     }
 
-    private void revokeOldestSession(Long userId) {
-        List<RefreshToken> activeSessions = refreshTokenRepository
-                .findByUsuarioIdAndRevokedAtIsNull(userId);
-
-        activeSessions.stream()
+    private void revokeOldestSession(Long userId, LocalDateTime now) {
+        refreshTokenRepository.findByUsuarioIdAndRevokedAtIsNull(userId).stream()
+                .filter(session -> session.getExpiryDate().isAfter(now))
                 .min(Comparator.comparing(RefreshToken::getCreatedAt))
                 .ifPresent(oldest -> {
-                    oldest.setRevokedAt(LocalDateTime.now());
+                    oldest.setRevokedAt(now);
                     refreshTokenRepository.save(oldest);
                 });
     }
 
-    // Job para limpiar tokens expirados
-    @Scheduled(cron = "0 0 2 * * ?") // 2 AM todos los días
+    @Scheduled(cron = "0 0 2 * * ?")
     @Transactional
     public void cleanupExpiredTokens() {
         refreshTokenRepository.revokeExpiredTokens(LocalDateTime.now());
-        log.info("Limpieza de refresh tokens expirados completada");
+        log.info("Expired session cleanup completed");
+    }
+
+    private static String generateToken() {
+        byte[] tokenBytes = new byte[TOKEN_BYTES];
+        SECURE_RANDOM.nextBytes(tokenBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+    }
+
+    private static String digestToken(String rawToken) {
+        if (!hasExpectedTokenShape(rawToken)) {
+            throw new RefreshTokenAuthenticationException();
+        }
+
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(rawToken.getBytes(StandardCharsets.US_ASCII));
+            return java.util.HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 is unavailable", exception);
+        }
+    }
+
+    private static boolean hasExpectedTokenShape(String rawToken) {
+        return rawToken != null && TOKEN_PATTERN.matcher(rawToken).matches();
+    }
+
+    public record IssuedRefreshToken(RefreshToken refreshToken, String opaqueToken) {
+        @Override
+        public String toString() {
+            return "IssuedRefreshToken[opaqueToken=<redacted>]";
+        }
+    }
+
+    public static class RefreshTokenAuthenticationException extends AccessDeniedException {
+        public RefreshTokenAuthenticationException() {
+            super("Refresh token is invalid or unavailable");
+        }
+    }
+
+    public static final class RefreshTokenReuseException extends RefreshTokenAuthenticationException {
+    }
+
+    public static final class DisabledUserRefreshException extends RefreshTokenAuthenticationException {
     }
 }
