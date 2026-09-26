@@ -1,5 +1,5 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { AuthResponse } from '../../features/auth/models/auth-response';
@@ -57,6 +57,7 @@ describe('authInterceptor', () => {
   });
 
   it('shares a timer-triggered refresh with concurrent 401s and retries with the returned token', fakeAsync(() => {
+    const sessionGeneration = authService.getSessionGeneration();
     const results: unknown[] = [];
     http.get('/protected/resource').subscribe(result => results.push(result));
     http.get('/protected/another').subscribe(result => results.push(result));
@@ -85,6 +86,7 @@ describe('authInterceptor', () => {
 
     expect(results).toEqual([{ ok: true }, { ok: true }]);
     expect(authService.getAccessToken()).toBe('fresh-access-token');
+    expect(authService.getSessionGeneration()).toBe(sessionGeneration);
     expect(authService.isAuthenticated()).toBeTrue();
     authService.clearAuthSilently();
   }));
@@ -136,5 +138,96 @@ describe('authInterceptor', () => {
     expect(router.navigate).not.toHaveBeenCalled();
     expect(carritoService.vaciarCarrito).not.toHaveBeenCalled();
     expect(authService.isAuthenticated()).toBeTrue();
+  });
+
+  it('does not start a refresh when a protected 401 arrives after auth was cleared', () => {
+    const errors: unknown[] = [];
+    authService.clearAuthSilently();
+
+    http.get('/protected/after-logout').subscribe({ error: error => errors.push(error) });
+    const request = httpTestingController.expectOne('/protected/after-logout');
+    expect(request.request.headers.has('Authorization')).toBeFalse();
+    request.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    expect(errors.length).toBe(1);
+    expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(carritoService.vaciarCarrito).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not replay a session A request under session B after logout and login', () => {
+    const errors: unknown[] = [];
+    http.get('/protected/session-a').subscribe({ error: error => errors.push(error) });
+    const sessionARequest = httpTestingController.expectOne('/protected/session-a');
+    expect(sessionARequest.request.headers.get('Authorization')).toBe('Bearer expired-access-token');
+
+    authService.logout();
+    httpTestingController.expectOne(`${environment.apiUrl}/auth/logout`).flush({});
+    authService.login({ email: 'user@example.com', password: 'Password1!' }).subscribe();
+    httpTestingController
+      .expectOne(`${environment.apiUrl}/auth/login`)
+      .flush(authResponse('session-b-access-token'));
+
+    sessionARequest.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    expect(errors.length).toBe(1);
+    expect((errors[0] as HttpErrorResponse).status).toBe(401);
+    expect(authService.getAccessToken()).toBe('session-b-access-token');
+    expect(httpTestingController.match(request => request.url === '/protected/session-a').length).toBe(0);
+    expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
+  });
+
+  it('does not refresh a session A request whose 401 arrives after logout but before login', () => {
+    const errors: unknown[] = [];
+    http.get('/protected/session-a-before-login').subscribe({ error: error => errors.push(error) });
+    const sessionARequest = httpTestingController.expectOne('/protected/session-a-before-login');
+    expect(sessionARequest.request.headers.get('Authorization')).toBe('Bearer expired-access-token');
+
+    authService.logout();
+    const logoutRequest = httpTestingController.expectOne(`${environment.apiUrl}/auth/logout`);
+    sessionARequest.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    expect(errors.length).toBe(1);
+    expect((errors[0] as HttpErrorResponse).status).toBe(401);
+    expect(authService.getAccessToken()).toBeNull();
+    expect(httpTestingController.match(request => request.url === '/protected/session-a-before-login').length).toBe(0);
+    expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
+
+    logoutRequest.flush({});
+  });
+
+  it('does not retry or redirect a pending 401 refresh after logout-all clears auth', () => {
+    const errors: unknown[] = [];
+    http.get('/protected/logout-all-race').subscribe({ error: error => errors.push(error) });
+    httpTestingController
+      .expectOne('/protected/logout-all-race')
+      .flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    const refreshRequest = httpTestingController.expectOne(`${environment.apiUrl}/auth/refresh`);
+    authService.logoutAllDevices();
+
+    expect(authService.getAccessToken()).toBeNull();
+    const earlyLogoutAllRequests = httpTestingController.match(`${environment.apiUrl}/auth/logout-all`);
+    expect(earlyLogoutAllRequests.length).toBe(0);
+
+    refreshRequest.flush(authResponse('late-access-token'));
+
+    const logoutAllRequests = httpTestingController.match(`${environment.apiUrl}/auth/logout-all`);
+    expect(logoutAllRequests.length).toBe(1);
+    logoutAllRequests.forEach(request => {
+      expect(request.request.headers.get('Authorization')).toBe('Bearer late-access-token');
+      expect(request.request.withCredentials).toBeTrue();
+      request.flush({});
+    });
+
+    expect(errors.length).toBe(1);
+    expect(httpTestingController.match(request => request.url === '/protected/logout-all-race').length).toBe(0);
+    expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
+    expect(authService.getAccessToken()).toBeNull();
+    expect(sessionStorage.getItem('user_data')).toBeNull();
+    expect(authService.currentUser()).toBeNull();
+    expect(authService.isAuthenticated()).toBeFalse();
+    expect(carritoService.vaciarCarrito).toHaveBeenCalledTimes(1);
+    expect(router.navigate).toHaveBeenCalledOnceWith(['/login']);
   });
 });
