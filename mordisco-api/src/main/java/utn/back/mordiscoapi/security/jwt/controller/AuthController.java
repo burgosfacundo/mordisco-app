@@ -9,7 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,7 +31,6 @@ import utn.back.mordiscoapi.security.jwt.model.dto.SessionInfo;
 import utn.back.mordiscoapi.security.jwt.model.entity.RefreshToken;
 import utn.back.mordiscoapi.security.jwt.service.RefreshTokenService;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 
@@ -43,7 +44,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
 
-    @Value("${jwt.access.expiration:900000}")
+    @Value("${app.jwt.access.expiration:900000}")
     private Long accessTokenExpiration;
 
     /**
@@ -87,14 +88,14 @@ public class AuthController {
         String accessToken = jwtUtil.generateAccessToken(userDetails);
 
         // Generar refresh token (30 días) y guardarlo en BD
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(
+        RefreshTokenService.IssuedRefreshToken issuedRefreshToken = refreshTokenService.issueRefreshToken(
                 usuario.getId(),
                 httpRequest.getHeader("User-Agent"),
                 jwtUtil.getClientIP(httpRequest)
         );
 
         // Enviar refresh token en httpOnly cookie (SEGURO)
-        jwtUtil.setRefreshTokenCookie(httpResponse, refreshToken.getToken());
+        jwtUtil.setRefreshTokenCookie(httpResponse, issuedRefreshToken.opaqueToken());
 
         return ResponseEntity.ok(new AuthResponse(
                 accessToken,
@@ -111,27 +112,25 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(
             HttpServletRequest request,
-            HttpServletResponse response) throws NotFoundException, AccessDeniedException {
+            HttpServletResponse response) {
 
-        // Leer refresh token de la cookie
-        String refreshTokenValue = jwtUtil.extractRefreshTokenFromCookie(request)
-                .orElseThrow(() -> new AccessDeniedException("No se encontró refresh token"));
+        String refreshTokenValue = jwtUtil.extractRefreshTokenFromCookie(request).orElse(null);
+        if (refreshTokenValue == null) {
+            jwtUtil.clearRefreshTokenCookie(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         try {
-            // Verificar y rotar el refresh token
-            RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(
+            RefreshTokenService.IssuedRefreshToken issuedRefreshToken = refreshTokenService.rotateRefreshToken(
                     refreshTokenValue,
                     request.getHeader("User-Agent"),
                     jwtUtil.getClientIP(request)
             );
 
+            RefreshToken newRefreshToken = issuedRefreshToken.refreshToken();
             Usuario usuario = newRefreshToken.getUsuario();
-
-            // Generar nuevo access token
             String newAccessToken = jwtUtil.generateAccessToken(usuario);
-
-            // Actualizar cookie con nuevo refresh token
-            jwtUtil.setRefreshTokenCookie(response, newRefreshToken.getToken());
+            jwtUtil.setRefreshTokenCookie(response, issuedRefreshToken.opaqueToken());
 
             return ResponseEntity.ok(new AuthResponse(
                     newAccessToken,
@@ -140,14 +139,12 @@ public class AuthController {
                     usuario.getNombre(),
                     usuario.getRol().getNombre(),
                     accessTokenExpiration,
-                    false, // bajaLogica siempre false en refresh
-                    null   // motivoBaja siempre null en refresh
+                    false,
+                    null
             ));
-
-        } catch (SecurityException | NotFoundException e) {
-            // Token comprometido - limpiar cookies
+        } catch (AccessDeniedException | NotFoundException exception) {
             jwtUtil.clearRefreshTokenCookie(response);
-            throw e;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -156,10 +153,11 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        jwtUtil.extractRefreshTokenFromCookie(request).ifPresent(token -> {
-            refreshTokenService.revokeToken(token);
+        try {
+            jwtUtil.extractRefreshTokenFromCookie(request).ifPresent(refreshTokenService::revokeToken);
+        } finally {
             jwtUtil.clearRefreshTokenCookie(response);
-        });
+        }
 
         return ResponseEntity.noContent().build();
     }
@@ -171,8 +169,11 @@ public class AuthController {
             Authentication authentication) {
 
         Usuario usuario = (Usuario) authentication.getPrincipal();
-        refreshTokenService.revokeAllUserSessions(usuario.getId());
-        jwtUtil.clearRefreshTokenCookie(response);
+        try {
+            refreshTokenService.revokeAllUserSessions(usuario.getId());
+        } finally {
+            jwtUtil.clearRefreshTokenCookie(response);
+        }
 
         return ResponseEntity.noContent().build();
     }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
 
@@ -28,8 +29,17 @@ public class JwtUtil {
     @Value("${app.jwt.access.expiration:900000}") // 15 minutos
     private Long accessTokenExpiration;
 
-    @Value("${spring.profiles.active:dev}")
-    private String activeProfile;
+    @Value("${app.jwt.refresh.expiration:2592000000}")
+    private Long refreshTokenExpiration;
+
+    @Value("${server.servlet.session.cookie.secure:false}")
+    private boolean refreshTokenCookieSecure;
+
+    @Value("${server.servlet.session.cookie.same-site:lax}")
+    private String refreshTokenCookieSameSite;
+
+    private static final String REFRESH_COOKIE_NAME = "refreshToken";
+    private static final String REFRESH_COOKIE_PATH = "/api/auth";
 
     private Key secretKey;
 
@@ -107,38 +117,30 @@ public class JwtUtil {
 
 
     public void setRefreshTokenCookie(HttpServletResponse response, String token) {
-        boolean isProduction = "prod".equals(activeProfile);
-
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
-                .httpOnly(true)              // No accesible desde JavaScript
-                .secure(isProduction)                // Solo HTTPS
-                .path("/api/auth")           // Solo en endpoints de auth
-                .maxAge(30 * 24 * 60 * 60)  // 30 días
-                .sameSite(isProduction ? "Strict" : "Lax")          // Protección CSRF
-                .build();
-
+        ResponseCookie cookie = refreshTokenCookie(token, Duration.ofMillis(refreshTokenExpiration));
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     public void clearRefreshTokenCookie(HttpServletResponse response) {
-        boolean isProduction = "prod".equals(activeProfile);
-
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .secure(isProduction)
-                .path("/api/auth")
-                .maxAge(0)
-                .sameSite(isProduction ? "Strict" : "Lax")
-                .build();
-
+        ResponseCookie cookie = refreshTokenCookie("", Duration.ZERO);
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    private ResponseCookie refreshTokenCookie(String value, Duration maxAge) {
+        return ResponseCookie.from(REFRESH_COOKIE_NAME, value)
+                .httpOnly(true)
+                .secure(refreshTokenCookieSecure)
+                .path(REFRESH_COOKIE_PATH)
+                .maxAge(maxAge)
+                .sameSite(refreshTokenCookieSameSite)
+                .build();
     }
 
     public Optional<String> extractRefreshTokenFromCookie(HttpServletRequest request) {
         if (request.getCookies() == null) return Optional.empty();
 
         return Arrays.stream(request.getCookies())
-                .filter(cookie -> "refreshToken".equals(cookie.getName()))
+                .filter(cookie -> REFRESH_COOKIE_NAME.equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .findFirst();
     }

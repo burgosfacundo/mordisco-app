@@ -1,11 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { BehaviorSubject, catchError, filter, Observable, switchMap, take, tap, throwError } from 'rxjs';
+import {
+  catchError, defer, finalize, forkJoin, from, Observable, of, shareReplay, switchMap, take, tap, timeout, throwError
+} from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../../features/auth/models/auth-response';
 import { LoginRequest } from '../../features/auth/models/login-request';
 import { CarritoService } from './carrito/carrito-service';
+
+const LOGOUT_REFRESH_TIMEOUT_MS = 10_000;
+const LOGIN_REFRESH_TIMEOUT_MS = LOGOUT_REFRESH_TIMEOUT_MS;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -24,9 +29,14 @@ export class AuthService {
   // Timer para renovar token antes de que expire
   private refreshTimer?: ReturnType<typeof setTimeout>;
 
-  // Subject para evitar múltiples refresh simultáneos
-  private refreshInProgress$ = new BehaviorSubject<boolean>(false);
-  private refreshTokenSubject$ = new BehaviorSubject<string | null>(null);
+  // Share only the active request; a later refresh must always make a fresh HTTP call.
+  private refreshInFlight$?: Observable<AuthResponse>;
+  private refreshResponseInFlight$?: Observable<AuthResponse>;
+  private readonly pendingLogoutOperations = new Set<Promise<void>>();
+
+  // Fences refresh responses after this app instance changes authentication state.
+  private authStateVersion = 0;
+  private sessionGeneration = 0;
 
   constructor() {
     this.loadStoredAuth();
@@ -37,80 +47,114 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials, {
-      withCredentials: true
-    }).pipe(
-      tap(response => this.handleAuthResponse(response))
-    );
+    return defer(() => {
+      // Capture both guards on subscription, so logout calls between login() and subscribe() count.
+      const pendingRefresh = this.refreshResponseInFlight$;
+      const pendingLogouts = Array.from(this.pendingLogoutOperations);
+      const startLogin = () => this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials, {
+        withCredentials: true
+      }).pipe(
+        tap(response => {
+          this.sessionGeneration++;
+          this.handleAuthResponse(response);
+        })
+      );
+      const waits: Observable<unknown>[] = [];
+
+      if (pendingRefresh) {
+        // Let an older refresh response process its cookie before a new login can set one.
+        waits.push(pendingRefresh.pipe(
+          take(1),
+          catchError(() => of(null))
+        ));
+      }
+      if (pendingLogouts.length > 0) {
+        waits.push(from(Promise.all(pendingLogouts)));
+      }
+
+      if (waits.length === 0) {
+        return startLogin();
+      }
+
+      return forkJoin(waits).pipe(
+        timeout({
+          first: LOGIN_REFRESH_TIMEOUT_MS,
+          with: () => throwError(() => new Error(
+            'A previous session operation is still pending. Please retry login.'
+          ))
+        }),
+        switchMap(() => startLogin())
+      );
+    });
   }
 
   refreshToken(): Observable<AuthResponse> {
-    // Si ya hay un refresh en progreso, esperar a que termine
-    if (this.refreshInProgress$.value) {
-      return this.refreshTokenSubject$.pipe(
-        filter(token => token !== null),
-        take(1),
-        switchMap(() => {
-          const userData = sessionStorage.getItem(this.USER_DATA_KEY);
-          if (userData) {
-            return new Observable<AuthResponse>(observer => {
-              observer.next(JSON.parse(userData));
-              observer.complete();
-            });
-          }
-          return throwError(() => new Error('No hay user data despues del refresh'));
-        })
-      );
+    const inFlightRefresh = this.refreshInFlight$;
+    if (inFlightRefresh) {
+      return inFlightRefresh;
     }
 
-    // Marcar que el refresh está en progreso
-    this.refreshInProgress$.next(true);
-    
-    return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {}, {
+    const refreshStateVersion = this.authStateVersion;
+    let refreshResponse$: Observable<AuthResponse>;
+    refreshResponse$ = this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {}, {
       withCredentials: true
     }).pipe(
-      tap(response => {
-        this.handleAuthResponse(response);
-        this.refreshTokenSubject$.next(response.accessToken);
-        this.refreshInProgress$.next(false);
+      finalize(() => {
+        if (this.refreshResponseInFlight$ === refreshResponse$) {
+          this.refreshResponseInFlight$ = undefined;
+          this.refreshInFlight$ = undefined;
+        }
       }),
-      catchError((error) => {
-        this.refreshInProgress$.next(false);
-        this.refreshTokenSubject$.next(null);
-        this.clearAuth();
-        return throwError(() => error);
-      })
+      shareReplay({ bufferSize: 1, refCount: false })
     );
+    const refresh$ = refreshResponse$.pipe(
+      tap(response => {
+        if (refreshStateVersion !== this.authStateVersion) {
+          throw new Error('Refresh response superseded by an auth state change');
+        }
+        this.handleAuthResponse(response);
+      }),
+      catchError(error => {
+        // Handle the shared failure once, unless another auth operation superseded it.
+        if (refreshStateVersion === this.authStateVersion) {
+          this.clearAuthAndRedirect();
+        }
+        return throwError(() => error);
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
+    );
+
+    this.refreshResponseInFlight$ = refreshResponse$;
+    this.refreshInFlight$ = refresh$;
+    return refresh$;
   }
 
   logout(): void {
-    this.http.post(`${this.API_URL}/logout`, {}, {
-      withCredentials: true
-    }).subscribe({
-      next: () => {
-        this.clearAuth();
-        this.router.navigate(['/login']);
-      },
-      error: () => {
-        this.clearAuth();
-        this.router.navigate(['/login']);
-      }
-    });
+    const completeLogout = this.trackLogoutOperation();
+    const pendingRefresh = this.refreshResponseInFlight$;
+    const accessToken = this.getAccessToken();
+    this.clearAuth();
+    this.router.navigate(['/login']);
+
+    this.runAfterPendingRefresh(
+      pendingRefresh,
+      () => this.sendLogout(completeLogout),
+      () => this.sendLogoutAll(accessToken, completeLogout)
+    );
   }
 
   logoutAllDevices(): void {
-    this.http.post(`${this.API_URL}/logout-all`, {}, {
-      withCredentials: true
-    }).subscribe({
-      next: () => {
-        this.clearAuth();
-        this.router.navigate(['/login']);
-      },
-      error: () => {
-        this.clearAuth();
-        this.router.navigate(['/login']);
-      }
-    });
+    const completeLogout = this.trackLogoutOperation();
+    const pendingRefresh = this.refreshResponseInFlight$;
+    const accessToken = this.getAccessToken();
+    this.clearAuth();
+    this.router.navigate(['/login']);
+
+    this.runAfterPendingRefresh(
+      pendingRefresh,
+      response => this.sendLogoutAll(response?.accessToken ?? accessToken, completeLogout),
+      () => this.sendLogoutAll(accessToken, completeLogout)
+    );
   }
 
   clearAuthAndRedirect(): void {
@@ -124,11 +168,101 @@ export class AuthService {
     return sessionStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
 
+  getSessionGeneration(): number {
+    return this.sessionGeneration;
+  }
+
   getCurrentUser(): AuthResponse | null {
     return this.currentUser();
   }
 
+  private runAfterPendingRefresh(
+    pendingRefresh: Observable<AuthResponse> | undefined,
+    onRefreshSettled: (response: AuthResponse | null) => void,
+    onTimeout: () => void
+  ): void {
+    if (!pendingRefresh) {
+      onRefreshSettled(null);
+      return;
+    }
+
+    let settled = false;
+    let pendingSubscription: { unsubscribe(): void } | undefined;
+    const timeout = setTimeout(() => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      pendingSubscription?.unsubscribe();
+      onTimeout();
+    }, LOGOUT_REFRESH_TIMEOUT_MS);
+
+    pendingSubscription = pendingRefresh.pipe(
+      take(1),
+      catchError(() => of(null))
+    ).subscribe({
+      next: response => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        clearTimeout(timeout);
+        onRefreshSettled(response);
+      },
+      complete: () => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(timeout);
+          onRefreshSettled(null);
+        }
+      }
+    });
+  }
+
+  private trackLogoutOperation(): () => void {
+    let resolveCompletion!: () => void;
+    let completed = false;
+    const completion = new Promise<void>(resolve => {
+      resolveCompletion = resolve;
+    });
+    this.pendingLogoutOperations.add(completion);
+
+    return () => {
+      if (completed) {
+        return;
+      }
+      completed = true;
+      this.pendingLogoutOperations.delete(completion);
+      resolveCompletion();
+    };
+  }
+
+  private sendLogout(onSettled: () => void): void {
+    try {
+      this.http.post(`${this.API_URL}/logout`, {}, {
+        withCredentials: true
+      }).pipe(finalize(onSettled)).subscribe({ error: () => undefined });
+    } catch {
+      onSettled();
+    }
+  }
+
+  private sendLogoutAll(token: string | null, onSettled: () => void): void {
+    const options = token
+      ? { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
+      : { withCredentials: true };
+    try {
+      this.http.post(`${this.API_URL}/logout-all`, {}, options)
+        .pipe(finalize(onSettled))
+        .subscribe({ error: () => undefined });
+    } catch {
+      onSettled();
+    }
+  }
+
   private handleAuthResponse(response: AuthResponse): void {
+    this.authStateVersion++;
+
     // Guardar access token y datos de usuario en sessionStorage
     sessionStorage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken);
 
@@ -201,17 +335,14 @@ export class AuthService {
             // Token muy viejo o a punto de expirar, hacer refresh inmediato
             this.refreshToken().subscribe({
               error: () => {
-                console.error('❌ Refresh falló, limpiando auth');
-                this.clearAuth();
-              }
-            });
+              console.error('❌ Refresh falló, limpiando auth');
+            }
+          });
           }
         } else {
           // Datos viejos sin timestamp, hacer refresh inmediato
           this.refreshToken().subscribe({
-            error: () => {
-              this.clearAuth();
-            }
+            error: () => {}
           });
         }
         
@@ -228,6 +359,9 @@ export class AuthService {
    * Limpia todo el estado de autenticación
    */
   private clearAuth(): void {
+    this.authStateVersion++;
+    this.sessionGeneration++;
+    this.refreshInFlight$ = undefined;
     sessionStorage.removeItem(this.ACCESS_TOKEN_KEY);
     sessionStorage.removeItem(this.USER_DATA_KEY);
     

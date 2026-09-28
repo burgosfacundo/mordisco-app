@@ -48,8 +48,9 @@ export class EditPasswordComponent implements OnInit {
 
     this.authService.updatePassword({currentPassword : passwordActual, newPassword : password}).subscribe({
       next: () => {
+        this.authService.clearAuthSilently();
         this.toastService.success('✅ Contraseña actualizada correctamente');
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/login']);
       },
       error: () => {
         this.isSubmitting.set(false)

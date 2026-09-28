@@ -6,6 +6,7 @@ import { AuthService } from '../../shared/services/auth-service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+  const sessionGeneration = authService.getSessionGeneration();
   const token = sessionStorage.getItem('access_token');
   
   // Lista de endpoints que NO requieren autenticación
@@ -18,7 +19,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/auth/reset-password'
   ];
   
-  const isPublicEndpoint = publicEndpoints.some(endpoint => req.url.includes(endpoint));
+  const requestPath = req.url.split('?')[0];
+  const isPublicEndpoint = publicEndpoints.some(endpoint => requestPath.endsWith(endpoint));
   
   // Si es endpoint público o no hay token, continuar sin modificar
   if (isPublicEndpoint || !token) {
@@ -36,22 +38,25 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(clonedReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // Si es 401 (Unauthorized), intentar refresh token
-      if (error.status === 401 && !req.url.includes('/auth/refresh')) {
+      if (
+        error.status === 401 &&
+        !req.url.includes('/auth/refresh') &&
+        authService.isAuthenticated() &&
+        sessionGeneration === authService.getSessionGeneration()
+      ) {
         return authService.refreshToken().pipe(
-          switchMap(() => {
-            // Después del refresh exitoso, reintentar la request original con el nuevo token
-            const newToken = sessionStorage.getItem('access_token');
+          switchMap(response => {
+            if (sessionGeneration !== authService.getSessionGeneration()) {
+              return throwError(() => error);
+            }
+
+            // Retry once with the access token returned by this refresh operation.
             const retryReq = req.clone({
               setHeaders: {
-                Authorization: `Bearer ${newToken}`
+                Authorization: `Bearer ${response.accessToken}`
               }
             });
             return next(retryReq);
-          }),
-          catchError((refreshError) => {
-            // Si el refresh falla, limpiar auth y redirigir a login
-            authService.clearAuthAndRedirect();
-            return throwError(() => refreshError);
           })
         );
       }
