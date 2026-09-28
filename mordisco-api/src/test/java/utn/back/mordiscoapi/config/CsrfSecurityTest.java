@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import utn.back.mordiscoapi.common.constraint.ConstraintViolationMessageResolver;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
@@ -36,7 +38,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles({"prod", "ci"})
@@ -59,6 +63,30 @@ class CsrfSecurityTest {
     @MockBean private JwtUtil jwtUtil;
     @MockBean private RefreshTokenService refreshTokenService;
     @MockBean private UsuarioServiceImpl usuarioService;
+
+    @Test
+    void configuredOriginCanPreflightLoginWithCsrfAndContentTypeWithoutAuthentication() throws Exception {
+        mockMvc.perform(corsPreflight("https://frontend.example", "X-XSRF-TOKEN, Content-Type"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "https://frontend.example"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true"));
+    }
+
+    @Test
+    void preflightFromUnlistedOriginIsRejectedWithoutCredentialedCorsHeaders() throws Exception {
+        mockMvc.perform(corsPreflight("https://unlisted.example", "X-XSRF-TOKEN, Content-Type"))
+                .andExpect(status().isForbidden())
+                .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN))
+                .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS));
+    }
+
+    @Test
+    void preflightWithUnlistedHeaderIsRejectedWithoutCredentialedCorsHeaders() throws Exception {
+        mockMvc.perform(corsPreflight("https://frontend.example", "X-UNLISTED"))
+                .andExpect(status().isForbidden())
+                .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN))
+                .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS));
+    }
 
     @Test
     void csrfBootstrapReturnsTokenCookieFlagsWithoutCreatingASession() throws Exception {
@@ -154,6 +182,13 @@ class CsrfSecurityTest {
                 .andExpect(status().isNoContent());
 
         verify(refreshTokenService).revokeAllUserSessions(user.getId());
+    }
+
+    private MockHttpServletRequestBuilder corsPreflight(String origin, String requestedHeaders) {
+        return options("/api/auth/login")
+                .header(HttpHeaders.ORIGIN, origin)
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, requestedHeaders);
     }
 
     private CsrfCredentials bootstrap() throws Exception {
