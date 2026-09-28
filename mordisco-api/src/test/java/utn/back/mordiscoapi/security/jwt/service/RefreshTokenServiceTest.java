@@ -121,6 +121,17 @@ class RefreshTokenServiceTest {
     }
 
     @Test
+    void revokeAllUserSessionsLocksTheUserBeforeBulkRevocation() {
+        LocalDateTime now = LocalDateTime.now();
+
+        service.revokeAllUserSessions(USER_ID, now);
+
+        var revocationLockOrder = inOrder(userRepository, refreshTokenRepository);
+        revocationLockOrder.verify(userRepository).findByIdForUpdate(USER_ID);
+        revocationLockOrder.verify(refreshTokenRepository).revokeAllUserTokens(USER_ID, now);
+    }
+
+    @Test
     void malformedAndUnknownTokensDoNotTouchSessionsOrUsers() {
         assertThrows(RefreshTokenService.RefreshTokenAuthenticationException.class,
                 () -> service.rotateRefreshToken("malformed", "agent", "ip"));

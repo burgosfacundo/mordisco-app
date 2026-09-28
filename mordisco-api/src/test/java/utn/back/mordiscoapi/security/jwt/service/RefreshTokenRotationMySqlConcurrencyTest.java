@@ -96,6 +96,28 @@ class RefreshTokenRotationMySqlConcurrencyTest {
     }
 
     @Test
+    void concurrentLogoutAllAndRotationSerializeOnTheUserLock() throws Exception {
+        Usuario user = createUser();
+        persistRefreshToken(user, sha256(RAW_TOKEN));
+
+        LogoutRotationOutcome outcome = revokeAllAndRotateConcurrently(user.getId());
+
+        assertEquals(0, activeSessionCount(user.getId()));
+        int storedSessionCount = jdbcTemplate.queryForObject(
+                "select count(*) from refresh_tokens where usuario_id = ?",
+                Integer.class, user.getId());
+        assertEquals(outcome.rotationSucceeded() ? 2 : 1, storedSessionCount);
+        assertEquals(storedSessionCount, jdbcTemplate.queryForObject(
+                "select count(*) from refresh_tokens where usuario_id = ? and revoked_at is not null",
+                Integer.class, user.getId()));
+        if (outcome.rotationSucceeded()) {
+            assertEquals(1, jdbcTemplate.queryForObject(
+                    "select count(*) from refresh_tokens where usuario_id = ? and token = ? and revoked_at is not null",
+                    Integer.class, user.getId(), outcome.successorDigest()));
+        }
+    }
+
+    @Test
     void deterministicSecondUseCommitsRevocationOfThePersistedSuccessor() throws Exception {
         Usuario user = createUser();
         persistRefreshToken(user, sha256(RAW_TOKEN));
@@ -154,6 +176,37 @@ class RefreshTokenRotationMySqlConcurrencyTest {
         }
     }
 
+    private LogoutRotationOutcome revokeAllAndRotateConcurrently(Long userId) throws Exception {
+        CyclicBarrier startBarrier = new CyclicBarrier(2);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<LogoutRotationOutcome> rotation = executor.submit(
+                    () -> rotateAlongsideLogoutAfterBarrier(startBarrier));
+            Future<?> logoutAll = executor.submit(() -> {
+                startBarrier.await(10, TimeUnit.SECONDS);
+                refreshTokenService.revokeAllUserSessions(userId);
+                return null;
+            });
+            LogoutRotationOutcome outcome = rotation.get(20, TimeUnit.SECONDS);
+            logoutAll.get(20, TimeUnit.SECONDS);
+            return outcome;
+        } finally {
+            executor.shutdownNow();
+            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
+        }
+    }
+
+    private LogoutRotationOutcome rotateAlongsideLogoutAfterBarrier(CyclicBarrier startBarrier) throws Exception {
+        startBarrier.await(10, TimeUnit.SECONDS);
+        try {
+            RefreshTokenService.IssuedRefreshToken issued = refreshTokenService.rotateRefreshToken(
+                    RAW_TOKEN, "rotation-agent", "192.0.2.2");
+            return new LogoutRotationOutcome(true, sha256(issued.opaqueToken()));
+        } catch (RefreshTokenService.RefreshTokenAuthenticationException exception) {
+            return new LogoutRotationOutcome(false, null);
+        }
+    }
+
     private RotationOutcome rotateAfterBarrier(CyclicBarrier startBarrier) throws Exception {
         startBarrier.await(10, TimeUnit.SECONDS);
         try {
@@ -177,5 +230,8 @@ class RefreshTokenRotationMySqlConcurrencyTest {
     }
 
     private record RotationOutcome(boolean succeeded, String successorDigest) {
+    }
+
+    private record LogoutRotationOutcome(boolean rotationSucceeded, String successorDigest) {
     }
 }
