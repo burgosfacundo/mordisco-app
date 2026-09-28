@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: API
+    runs-on: ubuntu-24.04
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: mordisco
+          MYSQL_USER: mordisco
+          MYSQL_PASSWORD: dummy-db-password
+          MYSQL_ROOT_PASSWORD: dummy-root-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --host=127.0.0.1 --user=root --password=dummy-root-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DATABASE_URL: 'jdbc:mysql://127.0.0.1:3306/mordisco?allowPublicKeyRetrieval=true&useSSL=false'
+      DATABASE_USERNAME: mordisco
+      DATABASE_PASSWORD: dummy-db-password
+      SERVER_PORT: '8080'
+      SPRING_MAIL_HOST: localhost
+      SPRING_MAIL_PORT: '1025'
+      SPRING_MAIL_USERNAME: ci
+      SPRING_MAIL_PASSWORD: dummy-mail-password
+      JWT_SECRET: ci-only-dummy-secret-key-at-least-32-characters-long
+      MERCADOPAGO_ACCESS_TOKEN: TEST-dummy-ci-access-token
+      MERCADOPAGO_PUBLIC_KEY: TEST-dummy-ci-public-key
+      FRONTEND_URL: http://localhost:4200
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: mordisco-api/pom.xml
+      - name: Run API tests
+        run: mvn -B -DargLine=-Dapi.version=1.40 test
+        working-directory: mordisco-api
+      - name: Verify Surefire reports
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import sys
+          import xml.etree.ElementTree as ET
+
+          reports = sorted(Path("target/surefire-reports").glob("TEST-*.xml"))
+          if not reports:
+              sys.exit("No Surefire XML reports found")
+
+          skipped = 0
+          for report in reports:
+              root = ET.parse(report).getroot()
+              skipped += sum(int(suite.attrib.get("skipped", "0")) for suite in root.iter("testsuite"))
+
+          if skipped:
+              sys.exit(f"Surefire reported {skipped} skipped test(s)")
+          print(f"Checked {len(reports)} Surefire report(s); no tests were skipped")
+          PY
+        working-directory: mordisco-api
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: mordisco-front/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: mordisco-front
+      - name: Run frontend tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+        working-directory: mordisco-front
+      - name: Build frontend
+        run: npm run build
+        working-directory: mordisco-front
