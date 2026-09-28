@@ -1,9 +1,11 @@
 package utn.back.mordiscoapi.service.impl;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -12,11 +14,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import utn.back.mordiscoapi.common.exception.BadRequestException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
 import utn.back.mordiscoapi.config.AppProperties;
+import utn.back.mordiscoapi.model.dto.usuario.ChangePasswordDTO;
 import utn.back.mordiscoapi.model.dto.usuario.UsuarioCreateDTO;
 import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.repository.RolRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
+import utn.back.mordiscoapi.security.jwt.service.RefreshTokenService;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 import utn.back.mordiscoapi.security.jwt.utils.JwtUtil;
 import utn.back.mordiscoapi.service.interf.IEmailService;
@@ -28,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -35,7 +40,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UsuarioServiceImplTest {
     private static final Long ROLE_ID = 1L;
+    private static final Long USER_ID = 42L;
     private static final String PLAINTEXT_PASSWORD = "Password1!";
+    private static final String CURRENT_PASSWORD = "CurrentPassword1!";
 
     @Mock
     private JwtUtil jwtUtil;
@@ -45,6 +52,8 @@ class UsuarioServiceImplTest {
     private RolRepository rolRepository;
     @Mock
     private AuthUtils authUtils;
+    @Mock
+    private RefreshTokenService refreshTokenService;
     @Mock
     private AppProperties appProperties;
     @Mock
@@ -89,6 +98,99 @@ class UsuarioServiceImplTest {
 
         assertEquals("Rol no encontrado", exception.getMessage());
         verifyNoInteractions(repository);
+    }
+
+    @Test
+    void deleteRevokesAllRefreshSessionsAfterAccountCanBeDeactivated() throws Exception {
+        Usuario usuario = createUser();
+        when(repository.findByIdForUpdate(USER_ID)).thenReturn(Optional.of(usuario));
+        when(repository.countPedidosActivosComoCliente(USER_ID)).thenReturn(0L);
+
+        service.delete(USER_ID);
+
+        assertTrue(usuario.getBajaLogica());
+        InOrder order = inOrder(repository, refreshTokenService);
+        order.verify(repository).findByIdForUpdate(USER_ID);
+        order.verify(repository).countPedidosActivosComoCliente(USER_ID);
+        order.verify(refreshTokenService).revokeAllUserSessions(USER_ID);
+    }
+
+    @Test
+    void deleteMeRevokesAllRefreshSessionsForTheAuthenticatedUser() throws Exception {
+        Usuario usuario = createUser();
+        when(authUtils.getUsuarioAutenticado()).thenReturn(Optional.of(usuario));
+        when(repository.findByIdForUpdate(USER_ID)).thenReturn(Optional.of(usuario));
+
+        service.deleteMe();
+
+        assertTrue(usuario.getBajaLogica());
+        InOrder order = inOrder(repository, refreshTokenService);
+        order.verify(repository).findByIdForUpdate(USER_ID);
+        order.verify(refreshTokenService).revokeAllUserSessions(USER_ID);
+    }
+
+    @Test
+    void darDeBajaRevokesAllRefreshSessionsForTheDeactivatedUser() throws Exception {
+        Usuario usuario = createUser();
+        when(repository.findByIdForUpdate(USER_ID)).thenReturn(Optional.of(usuario));
+
+        service.darDeBaja(USER_ID, "Administrative deactivation");
+
+        assertTrue(usuario.getBajaLogica());
+        InOrder order = inOrder(repository, refreshTokenService);
+        order.verify(repository).findByIdForUpdate(USER_ID);
+        order.verify(refreshTokenService).revokeAllUserSessions(USER_ID);
+    }
+
+    @Test
+    void reactivarDoesNotRestoreOrIssueRefreshSessions() throws Exception {
+        Usuario usuario = createUser();
+        usuario.setBajaLogica(true);
+        when(repository.findByIdForUpdate(USER_ID)).thenReturn(Optional.of(usuario));
+
+        service.reactivar(USER_ID);
+
+        assertFalse(usuario.getBajaLogica());
+        verify(repository).findByIdForUpdate(USER_ID);
+        verifyNoInteractions(refreshTokenService);
+    }
+
+    @Test
+    void successfulPasswordChangeRevokesAllRefreshSessions() throws Exception {
+        Usuario usuario = createUser();
+        when(authUtils.getUsuarioAutenticado()).thenReturn(Optional.of(usuario));
+        when(repository.findByIdForUpdate(USER_ID)).thenReturn(Optional.of(usuario));
+
+        service.changePassword(new ChangePasswordDTO(CURRENT_PASSWORD, "NewPassword2!"));
+
+        assertTrue(new BCryptPasswordEncoder().matches("NewPassword2!", usuario.getPassword()));
+        InOrder order = inOrder(repository, refreshTokenService);
+        order.verify(repository).findByIdForUpdate(USER_ID);
+        order.verify(refreshTokenService).revokeAllUserSessions(USER_ID);
+    }
+
+    @Test
+    void incorrectCurrentPasswordDoesNotRevokeRefreshSessions() {
+        Usuario usuario = createUser();
+        when(authUtils.getUsuarioAutenticado()).thenReturn(Optional.of(usuario));
+        when(repository.findByIdForUpdate(USER_ID)).thenReturn(Optional.of(usuario));
+
+        assertThrows(NotFoundException.class, () -> service.changePassword(
+                new ChangePasswordDTO("WrongPassword1!", "NewPassword2!")));
+
+        verify(repository).findByIdForUpdate(USER_ID);
+        verifyNoInteractions(refreshTokenService);
+    }
+
+    private Usuario createUser() {
+        return Usuario.builder()
+                .id(USER_ID)
+                .nombre("Test")
+                .apellido("User")
+                .email("test@example.com")
+                .password(new BCryptPasswordEncoder().encode(CURRENT_PASSWORD))
+                .bajaLogica(false)
+                .build();
     }
 
     private UsuarioCreateDTO createDto() {

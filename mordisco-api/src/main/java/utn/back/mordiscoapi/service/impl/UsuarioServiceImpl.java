@@ -30,6 +30,7 @@ import utn.back.mordiscoapi.repository.RolRepository;
 import utn.back.mordiscoapi.repository.UsuarioRepository;
 import utn.back.mordiscoapi.service.interf.IEmailService;
 import utn.back.mordiscoapi.service.interf.IUsuarioService;
+import utn.back.mordiscoapi.security.jwt.service.RefreshTokenService;
 import utn.back.mordiscoapi.security.jwt.utils.AuthUtils;
 import utn.back.mordiscoapi.common.util.Sanitize;
 
@@ -47,6 +48,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     );
 
     private final PasswordRecoveryService passwordRecoveryService;
+    private final RefreshTokenService refreshTokenService;
     private final UsuarioRepository repository;
     private final RolRepository rolRepository;
     private final AuthUtils authUtils;
@@ -156,7 +158,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     @Transactional
     @Override
     public void delete(Long id) throws NotFoundException, BadRequestException {
-        Usuario usuario = repository.findById(id)
+        Usuario usuario = repository.findByIdForUpdate(id)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         long pedidosActivos = repository.countPedidosActivosComoCliente(id);
@@ -172,6 +174,8 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
 
             throw new BadRequestException(mensaje);
         }
+
+        refreshTokenService.revokeAllUserSessions(id);
 
         // Baja lógica - bloqueo por administrador
         usuario.setBajaLogica(true);
@@ -196,10 +200,13 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
                 .map(PedidoMapper::toDTO);
     }
 
+    @Transactional
     @Override
     public void deleteMe() throws NotFoundException, BadRequestException {
-        Usuario usuario = authUtils.getUsuarioAutenticado()
+        Usuario usuarioAutenticado = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("No autenticado"));
+        Usuario usuario = repository.findByIdForUpdate(usuarioAutenticado.getId())
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         // Validar pedidos activos según el rol
         if (usuario.getRol() != null) {
@@ -253,6 +260,8 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
             }
         }
 
+        refreshTokenService.revokeAllUserSessions(usuario.getId());
+
         // Baja lógica en lugar de eliminación física
         usuario.setBajaLogica(true);
         usuario.setFechaBaja(java.time.LocalDateTime.now());
@@ -279,7 +288,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
         var userAuthenticated = authUtils.getUsuarioAutenticado()
                 .orElseThrow(() -> new BadRequestException("No autenticado"));
 
-        Usuario usuario = repository.findById(userAuthenticated.getId()).orElseThrow(
+        Usuario usuario = repository.findByIdForUpdate(userAuthenticated.getId()).orElseThrow(
                 () -> new NotFoundException("Usuario no encontrado")
         );
 
@@ -289,6 +298,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
 
         usuario.setPassword(passwordEncoder.encode(dto.newPassword()));
         repository.save(usuario);
+        refreshTokenService.revokeAllUserSessions(usuario.getId());
         
         // Publicar evento de cambio de contraseña
         String loginLink = appProperties.getFrontendUrl() + "/login";
@@ -343,7 +353,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     @Transactional
     @Override
     public void darDeBaja(Long usuarioId, String motivo) throws NotFoundException, BadRequestException {
-        Usuario usuario = repository.findById(usuarioId)
+        Usuario usuario = repository.findByIdForUpdate(usuarioId)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         // Validar pedidos activos según el rol
@@ -380,6 +390,8 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
             }
         }
 
+        refreshTokenService.revokeAllUserSessions(usuarioId);
+
         usuario.setBajaLogica(true);
         usuario.setMotivoBaja(motivo);
         usuario.setFechaBaja(java.time.LocalDateTime.now());
@@ -405,7 +417,7 @@ public class UsuarioServiceImpl implements IUsuarioService, UserDetailsService {
     @Transactional
     @Override
     public void reactivar(Long usuarioId) throws NotFoundException {
-        Usuario usuario = repository.findById(usuarioId)
+        Usuario usuario = repository.findByIdForUpdate(usuarioId)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         usuario.setBajaLogica(false);
