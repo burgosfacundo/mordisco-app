@@ -2,11 +2,11 @@
 
 Objective: Add a small GitHub Actions gate for the Java API and Angular frontend on pull requests and pushes to `main`, using the real test commands and no production secrets. The workflow is distinct from issue #25's already merged implementation.
 
-Base: clean Orca worktree `repository-ci` from `origin/main` at `f11e62d` (the five merged PRs' final application tree). Branch: `ci/backend-frontend`. No private task history is an ancestor. Issue #25 is still open after stacked PRs merged; do not assert it closed or modify its status as part of CI implementation.
+Base: clean Orca worktree `repository-ci` from `origin/main` at `f11e62d` (the five merged PRs' final application tree). Branch: `ci/backend-frontend`. No private task history is an ancestor. Issue #25 is approved and its host state changed during CI preparation; do not mutate its status as part of CI implementation.
 
 - [x] CI-1 Establish the backend/frontend CI contract: required tool versions, disposable MySQL/Testcontainers setup, local-only placeholder configuration, ChromeHeadless, and published workflow scope. Read-only mapping first; record the plan and commit it before implementation. Rollback: this tracker document only.
 - [x] CI-2 Implement one workflow with isolated API/frontend jobs, lockfile-based setup, and actionable checks. Validate YAML/workflow semantics and run proportional local checks; record exact results and commit workflow with any necessary documentation. Rollback: `.github/workflows/ci.yml` and this CI-only tracker.
-- [ ] CI-3 Publish a CI PR and observe its actual hosted runs if the user explicitly authorizes push/PR. Do not merge without a separate decision; report missing or failed checks instead of claiming success. Rollback: no remote deletions without new authorization.
+- [ ] CI-3 Publish a CI PR and observe its actual hosted runs. The user explicitly authorized push/PR and chose to skip native review for this CI candidate; do not merge without a separate decision. Report missing or failed checks instead of claiming success. Rollback: no remote deletions without new authorization.
 
 ## CI contract
 
