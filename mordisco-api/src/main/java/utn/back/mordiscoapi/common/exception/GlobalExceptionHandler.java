@@ -35,6 +35,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
+    private static final String GENERIC_SERVER_ERROR_MESSAGE = "Ocurrió un error inesperado";
+
     private final ConstraintViolationMessageResolver messageResolver;
 
     /**
@@ -45,11 +47,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
-        log.error("Unexpected error: {}", ex.getMessage(), ex);
+        log.error("Unexpected error while processing request");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        "Ocurrió un error inesperado",
+                        GENERIC_SERVER_ERROR_MESSAGE,
                         LocalDateTime.now()
                 ));
     }
@@ -77,7 +79,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AuthorizationDeniedException ex) {
-        log.warn("Acceso denegado: {}", ex.getMessage());
+        log.warn("Access denied");
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(
                         HttpStatus.FORBIDDEN.value(),
@@ -93,11 +95,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<ErrorResponse> handleSecurity(SecurityException ex) {
-        log.error("Error de seguridad: {}", ex.getMessage());
+        log.warn("Security exception rejected");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(
                         HttpStatus.UNAUTHORIZED.value(),
-                        ex.getMessage(),
+                        "Acceso no autorizado",
                         LocalDateTime.now()
                 ));
     }
@@ -111,22 +113,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        // Log completo del error para debugging
-        log.error("DataIntegrityViolationException: ", ex);
+        log.warn("Data integrity violation while processing request");
 
         String rootMessage = Optional.ofNullable(ex.getRootCause())
                 .map(Throwable::getMessage)
                 .orElse("");
-
-        // Log del mensaje root para ver exactamente qué constraint falló
-        log.error("Root cause message: {}", rootMessage);
-
         String userMessage = messageResolver.resolveMessage(rootMessage);
 
         return Map.of(
                 "error", "Violación de integridad de datos",
-                "message", userMessage,
-                "debug", rootMessage // SOLO PARA DESARROLLO - Quitar en producción
+                "message", userMessage
         );
     }
 
@@ -184,11 +180,11 @@ public class GlobalExceptionHandler {
                 if (i < enumConstants.length - 1) valores.append(", ");
             }
             errors.put("error", "Valor de enumeración no válido");
-            errors.put("message", "El valor '" + ex.getValue() + "' no es válido para el parámetro '" + ex.getName() + "'. Valores permitidos: " + valores);
+            errors.put("message", "El valor de enumeración proporcionado no es válido.");
             return errors;
         }
         errors.put("error", "Tipo de argumento no válido");
-        errors.put("message", ex.getMessage());
+        errors.put("message", "El valor proporcionado no es válido para este parámetro.");
         return errors;
     }
 
@@ -203,7 +199,7 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("error", "JSON malformado");
-        errors.put("message", ex.getMessage());
+        errors.put("message", "No se pudo leer el cuerpo de la solicitud.");
         return errors;
     }
 
@@ -218,7 +214,7 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleNoResourceFoundException(NoResourceFoundException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("error", "No existe el recurso");
-        errors.put("message", ex.getMessage());
+        errors.put("message", "No existe el recurso solicitado.");
         return errors;
     }
 
@@ -233,7 +229,7 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("error", "Método no soportado");
-        errors.put("message", ex.getMessage());
+        errors.put("message", "El método HTTP solicitado no está permitido.");
         return errors;
     }
 
@@ -250,7 +246,7 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("error", "Parámetro faltante");
-        errors.put("message", ex.getMessage());
+        errors.put("message", "Falta un parámetro requerido.");
         return errors;
     }
 
@@ -282,7 +278,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        e.getMessage(),
+                        GENERIC_SERVER_ERROR_MESSAGE,
                         LocalDateTime.now()
                 ));
     }
@@ -295,7 +291,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AccountDeactivatedException.class)
     public ResponseEntity<ErrorResponse> handleAccountDeactivated(AccountDeactivatedException ex) {
-        log.warn("Intento de login con cuenta desactivada: {}", ex.getMessage());
+        log.warn("Login rejected for deactivated account");
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(
                         HttpStatus.FORBIDDEN.value(),
