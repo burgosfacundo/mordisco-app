@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "app.websocket-allowed-origins=http://localhost:4200",
+                "app.http-allowed-origins=http://localhost:4200",
                 "server.ssl.enabled=false"
         }
 )
@@ -119,10 +120,11 @@ class WebSocketTransportIntegrationTest {
     }
 
     @Test
-    void productionCsrfStillRejectsAnUnrelatedProtectedPost() throws Exception {
+    void productionUnrelatedPostIsDeniedByAuthorizationNotCsrf() throws Exception {
         HttpResponse response = request("POST", "/api/pedidos/save", configuredOrigins.getFirst(), "{}", false);
 
         assertEquals(403, response.status());
+        assertFalse(response.body().contains("Invalid CSRF token"));
     }
 
     private HttpResponse sockJsInfo(String origin) throws Exception {

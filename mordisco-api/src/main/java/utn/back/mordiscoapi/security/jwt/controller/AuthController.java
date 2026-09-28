@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.csrf.DeferredCsrfToken;
 import org.springframework.web.bind.annotation.*;
 import utn.back.mordiscoapi.common.exception.AccountDeactivatedException;
 import utn.back.mordiscoapi.common.exception.NotFoundException;
@@ -32,6 +33,7 @@ import utn.back.mordiscoapi.security.jwt.model.entity.RefreshToken;
 import utn.back.mordiscoapi.security.jwt.service.RefreshTokenService;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Tag(name = "Usuarios", description = "Operaciones relacionadas a la autenticación y autorización de usuarios")
@@ -46,6 +48,13 @@ public class AuthController {
 
     @Value("${app.jwt.access.expiration:900000}")
     private Long accessTokenExpiration;
+
+    @GetMapping("/csrf")
+    public ResponseEntity<Map<String, String>> csrfToken(HttpServletRequest request) {
+        DeferredCsrfToken deferredCsrfToken = (DeferredCsrfToken) request.getAttribute(
+                DeferredCsrfToken.class.getName());
+        return ResponseEntity.ok(Map.of("token", deferredCsrfToken.get().getToken()));
+    }
 
     /**
      * Endpoint para autenticar un usuario y generar un token JWT.
