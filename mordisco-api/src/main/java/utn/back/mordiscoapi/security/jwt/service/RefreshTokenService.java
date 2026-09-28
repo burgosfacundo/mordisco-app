@@ -161,6 +161,7 @@ public class RefreshTokenService {
 
     @Transactional
     public void revokeAllUserSessions(Long userId, LocalDateTime now) {
+        userRepository.findByIdForUpdate(userId);
         refreshTokenRepository.revokeAllUserTokens(userId, now);
         log.info("All refresh sessions revoked for user {}", userId);
     }
