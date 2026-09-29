@@ -5,6 +5,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
+import { csrfInterceptor } from './core/interceptors/csrf-interceptor';
 import { httpErrorInterceptor } from './core/interceptors/http-error-interceptor';
 
 export const appConfig: ApplicationConfig = {
@@ -15,7 +16,8 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([
       authInterceptor, // intercepta peticiones y agrega jwt
-      httpErrorInterceptor // manejo centralizado de errores HTTP
+      httpErrorInterceptor, // manejo centralizado de errores HTTP
+      csrfInterceptor // protect targeted auth calls; bootstrap uses HttpBackend directly
     ]),withFetch()),
   ]
 };
