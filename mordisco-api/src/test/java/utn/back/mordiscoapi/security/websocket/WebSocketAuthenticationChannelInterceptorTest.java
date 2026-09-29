@@ -16,7 +16,9 @@ import utn.back.mordiscoapi.model.entity.Rol;
 import utn.back.mordiscoapi.model.entity.Usuario;
 import utn.back.mordiscoapi.security.jwt.utils.JwtUtil;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,8 +61,21 @@ class WebSocketAuthenticationChannelInterceptorTest {
         when(userDetailsService.loadUserByUsername(EMAIL)).thenReturn(usuario);
         when(jwtUtil.isAccessTokenValid(ACCESS_TOKEN, usuario)).thenReturn(true);
 
-        Message<?> result = interceptor.preSend(connect(List.of("Bearer " + ACCESS_TOKEN)), null);
+        StompHeaderAccessor originalAccessor = StompHeaderAccessor.create(StompCommand.CONNECT);
+        originalAccessor.addNativeHeader("Authorization", "Bearer " + ACCESS_TOKEN);
+        originalAccessor.addNativeHeader("X-Safe-Header", "safe-value");
+        originalAccessor.setLeaveMutable(true);
+        AtomicReference<Principal> changedUser = new AtomicReference<>();
+        originalAccessor.setUserChangeCallback(changedUser::set);
+        Message<byte[]> originalMessage = MessageBuilder.createMessage(
+                new byte[0], originalAccessor.getMessageHeaders());
+
+        Message<?> result = interceptor.preSend(originalMessage, null);
         StompHeaderAccessor headers = StompHeaderAccessor.wrap(result);
+
+        assertSame(originalMessage, result);
+        assertInstanceOf(UsernamePasswordAuthenticationToken.class, changedUser.get());
+        assertSame(headers.getUser(), changedUser.get());
 
         UsernamePasswordAuthenticationToken authentication =
                 assertInstanceOf(UsernamePasswordAuthenticationToken.class, headers.getUser());
@@ -126,7 +141,7 @@ class WebSocketAuthenticationChannelInterceptorTest {
     void leavesNonConnectFramesForTheLaterAuthorizationInterceptor() {
         Message<byte[]> message = stompMessage(StompCommand.SUBSCRIBE);
 
-        assertEquals(message, interceptor.preSend(message, null));
+        assertSame(message, interceptor.preSend(message, null));
         verify(jwtUtil, never()).extractUserName(org.mockito.ArgumentMatchers.anyString());
     }
 
