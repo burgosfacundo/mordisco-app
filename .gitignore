@@ -24,3 +24,6 @@ temp/
 
 # Local Pi runtime state
 .atl/
+
+# Per-worktree CodeGraph index
+.codegraph/
