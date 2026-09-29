@@ -2,10 +2,11 @@ import {
   HttpBackend,
   HttpClient,
   HttpErrorResponse,
-  HttpInterceptorFn
+  HttpInterceptorFn,
+  HttpResponse
 } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, finalize, map, Observable, of, shareReplay, switchMap, throwError } from 'rxjs';
+import { catchError, finalize, map, Observable, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 interface CsrfToken {
@@ -26,6 +27,21 @@ function csrfEndpoint(): string {
   const apiUrl = new URL(environment.apiUrl);
   const apiPath = apiUrl.pathname.replace(/\/+$/, '');
   return new URL(`${apiPath}/auth/csrf`, apiUrl.origin).toString();
+}
+
+function isLoginRequest(requestUrl: string): boolean {
+  try {
+    const apiUrl = new URL(environment.apiUrl);
+    const request = new URL(requestUrl, document.baseURI);
+    const apiPath = apiUrl.pathname.replace(/\/+$/, '');
+
+    return request.origin === apiUrl.origin &&
+      !request.username &&
+      !request.password &&
+      request.pathname === `${apiPath}/auth/login`;
+  } catch {
+    return false;
+  }
 }
 
 function isProtectedAuthRequest(method: string, requestUrl: string): boolean {
@@ -109,11 +125,17 @@ export const csrfInterceptor: HttpInterceptorFn = (request, next) => {
   }
 
   const csrfTokenService = inject(CsrfTokenService);
+  const isLogin = isLoginRequest(request.urlWithParams);
   return csrfTokenService.getToken().pipe(
     switchMap(token => next(request.clone({
       withCredentials: true,
       setHeaders: { 'X-XSRF-TOKEN': token.value }
     })).pipe(
+      tap(event => {
+        if (isLogin && event instanceof HttpResponse && event.ok) {
+          csrfTokenService.invalidate(token);
+        }
+      }),
       catchError((error: unknown) => {
         if (error instanceof HttpErrorResponse && error.status === 403) {
           csrfTokenService.invalidate(token);

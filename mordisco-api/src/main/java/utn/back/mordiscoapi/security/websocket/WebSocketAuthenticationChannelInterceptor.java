@@ -6,7 +6,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,8 +33,8 @@ public class WebSocketAuthenticationChannelInterceptor implements ChannelInterce
 
     @Override
     public Message<?> preSend(@NonNull Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        if (accessor.getCommand() != StompCommand.CONNECT) {
+        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        if (accessor == null || accessor.getCommand() != StompCommand.CONNECT) {
             return message;
         }
 
@@ -52,7 +52,7 @@ public class WebSocketAuthenticationChannelInterceptor implements ChannelInterce
                     user.getAuthorities()
             ));
             accessor.removeNativeHeader(AUTHORIZATION_HEADER);
-            return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+            return message;
         } catch (BadCredentialsException exception) {
             throw exception;
         } catch (Exception exception) {

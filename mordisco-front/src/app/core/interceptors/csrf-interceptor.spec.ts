@@ -67,35 +67,65 @@ describe('csrfInterceptor', () => {
     localStorage.clear();
   });
 
-  it('shares one credentialed bootstrap and adds its token only to login, refresh, and logout', () => {
-    const endpoints = [
-      `${environment.apiUrl}/auth/login`,
-      `${environment.apiUrl}/auth/refresh`,
-      `${environment.apiUrl}/auth/logout`
-    ];
+  it('bootstraps again after successful login before reusing the token for refresh and logout', () => {
+    const loginUrl = `${environment.apiUrl}/auth/login`;
+    const refreshUrl = `${environment.apiUrl}/auth/refresh`;
+    const logoutUrl = `${environment.apiUrl}/auth/logout`;
 
-    endpoints.forEach(url => http.post(url, {}, { withCredentials: false }).subscribe());
+    http.post(loginUrl, {}, { withCredentials: false }).subscribe();
+    const loginBootstrap = httpTestingController.expectOne(csrfUrl);
+    expect(loginBootstrap.request.method).toBe('GET');
+    expect(loginBootstrap.request.withCredentials).toBeTrue();
+    expect(loginBootstrap.request.headers.has('X-XSRF-TOKEN')).toBeFalse();
+    loginBootstrap.flush({ token: 'csrf-token-a' });
 
-    const bootstrap = httpTestingController.expectOne(csrfUrl);
-    expect(bootstrap.request.method).toBe('GET');
-    expect(bootstrap.request.withCredentials).toBeTrue();
-    expect(bootstrap.request.headers.has('X-XSRF-TOKEN')).toBeFalse();
-    bootstrap.flush({ token: 'csrf-token-a' });
+    const loginRequest = httpTestingController.expectOne(loginUrl);
+    expect(loginRequest.request.withCredentials).toBeTrue();
+    expect(loginRequest.request.headers.get('X-XSRF-TOKEN')).toBe('csrf-token-a');
+    expect(loginRequest.request.headers.has('Authorization')).toBeFalse();
+    loginRequest.flush({});
 
-    endpoints.forEach(url => {
-      const request = httpTestingController.expectOne(candidate =>
-        candidate.url === url && candidate.method === 'POST'
-      );
-      expect(request.request.withCredentials).toBeTrue();
-      expect(request.request.headers.get('X-XSRF-TOKEN')).toBe('csrf-token-a');
-      expect(request.request.headers.has('Authorization')).toBeFalse();
-      request.flush({});
-    });
+    http.post(refreshUrl, {}).subscribe();
+    const refreshBootstrap = httpTestingController.expectOne(csrfUrl);
+    refreshBootstrap.flush({ token: 'csrf-token-b' });
+    const refreshRequest = httpTestingController.expectOne(refreshUrl);
+    expect(refreshRequest.request.headers.get('X-XSRF-TOKEN')).toBe('csrf-token-b');
+    expect(refreshRequest.request.headers.has('Authorization')).toBeFalse();
+    refreshRequest.flush({});
+
+    http.post(logoutUrl, {}).subscribe();
+    const logoutRequest = httpTestingController.expectOne(logoutUrl);
+    expect(logoutRequest.request.withCredentials).toBeTrue();
+    expect(logoutRequest.request.headers.get('X-XSRF-TOKEN')).toBe('csrf-token-b');
+    expect(logoutRequest.request.headers.has('Authorization')).toBeFalse();
+    logoutRequest.flush({});
+    httpTestingController.expectNone(csrfUrl);
 
     expect(sessionStorage.getItem('csrf-token')).toBeNull();
     expect(sessionStorage.getItem('XSRF-TOKEN')).toBeNull();
     expect(localStorage.getItem('csrf-token')).toBeNull();
     expect(localStorage.getItem('XSRF-TOKEN')).toBeNull();
+  });
+
+  it('fetches a fresh token for logout after successful login', () => {
+    const loginUrl = `${environment.apiUrl}/auth/login`;
+    const logoutUrl = `${environment.apiUrl}/auth/logout`;
+
+    http.post(loginUrl, {}).subscribe();
+    httpTestingController.expectOne(csrfUrl).flush({ token: 'csrf-token-a' });
+    const loginRequest = httpTestingController.expectOne(loginUrl);
+    expect(loginRequest.request.headers.get('X-XSRF-TOKEN')).toBe('csrf-token-a');
+    loginRequest.flush({});
+
+    http.post(logoutUrl, {}).subscribe();
+    const logoutBootstrap = httpTestingController.expectOne(csrfUrl);
+    expect(logoutBootstrap.request.method).toBe('GET');
+    expect(logoutBootstrap.request.withCredentials).toBeTrue();
+    logoutBootstrap.flush({ token: 'csrf-token-b' });
+
+    const logoutRequest = httpTestingController.expectOne(logoutUrl);
+    expect(logoutRequest.request.headers.get('X-XSRF-TOKEN')).toBe('csrf-token-b');
+    logoutRequest.flush({});
   });
 
   it('does not bootstrap or add a CSRF header for safe methods, logout-all, or non-exact API URLs', () => {
