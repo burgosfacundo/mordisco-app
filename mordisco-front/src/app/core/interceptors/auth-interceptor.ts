@@ -1,46 +1,67 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { AuthService } from '../../shared/services/auth-service';
 
+const PUBLIC_AUTH_PATHS = new Set([
+  '/auth/login',
+  '/auth/register',
+  '/auth/refresh',
+  '/auth/logout',
+  '/auth/recover-password',
+  '/auth/reset-password',
+  '/auth/csrf'
+]);
+
+function getApiRelativePath(requestUrl: string): string | null {
+  try {
+    const apiUrl = new URL(environment.apiUrl);
+    const request = new URL(requestUrl, document.baseURI);
+    const hasUserInfo = request.username !== '' || request.password !== '' ||
+      /^(?:[a-z][a-z\d+.-]*:)?\/\/[^/?#]*@/i.test(requestUrl.trim());
+    const apiPath = apiUrl.pathname.replace(/\/+$/, '');
+    const isApiPath = apiPath === ''
+      ? request.pathname.startsWith('/')
+      : request.pathname === apiPath || request.pathname.startsWith(`${apiPath}/`);
+
+    if (
+      request.origin !== apiUrl.origin ||
+      hasUserInfo ||
+      !isApiPath
+    ) {
+      return null;
+    }
+
+    return request.pathname.slice(apiPath.length);
+  } catch {
+    return null;
+  }
+}
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  const sessionGeneration = authService.getSessionGeneration();
-  const token = sessionStorage.getItem('access_token');
-  
-  // Lista de endpoints que NO requieren autenticación
-  const publicEndpoints = [
-    '/auth/login',
-    '/auth/register',
-    '/auth/refresh',
-    '/auth/logout',
-    '/auth/recover-password',
-    '/auth/reset-password'
-  ];
-  
-  const requestPath = req.url.split('?')[0];
-  const isPublicEndpoint = publicEndpoints.some(endpoint => requestPath.endsWith(endpoint));
-  
-  // Si es endpoint público o no hay token, continuar sin modificar
-  if (isPublicEndpoint || !token) {
+  const apiRelativePath = getApiRelativePath(req.urlWithParams);
+  if (apiRelativePath === null || PUBLIC_AUTH_PATHS.has(apiRelativePath)) {
     return next(req);
   }
 
-  // Clonar request y agregar token
+  const authService = inject(AuthService);
+  const sessionGeneration = authService.getSessionGeneration();
+  const token = sessionStorage.getItem('access_token');
+  if (!token) {
+    return next(req);
+  }
+
   const clonedReq = req.clone({
     setHeaders: {
       Authorization: `Bearer ${token}`
     }
   });
 
-  // Ejecutar request y manejar errores 401
   return next(clonedReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Si es 401 (Unauthorized), intentar refresh token
       if (
         error.status === 401 &&
-        !req.url.includes('/auth/refresh') &&
         authService.isAuthenticated() &&
         sessionGeneration === authService.getSessionGeneration()
       ) {

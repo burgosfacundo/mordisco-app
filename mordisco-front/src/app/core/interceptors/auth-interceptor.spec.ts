@@ -24,6 +24,8 @@ describe('authInterceptor', () => {
     expiresIn
   });
 
+  const protectedUrl = (path: string) => `${environment.apiUrl}/protected/${path}`;
+
   beforeEach(() => {
     sessionStorage.clear();
     sessionStorage.setItem('access_token', 'expired-access-token');
@@ -56,14 +58,89 @@ describe('authInterceptor', () => {
     sessionStorage.clear();
   });
 
+  it('omits credentials from exact public auth routes on the configured API', () => {
+    const publicEndpoints: { method: 'GET' | 'POST'; path: string }[] = [
+      { method: 'POST', path: '/auth/login' },
+      { method: 'POST', path: '/auth/register' },
+      { method: 'POST', path: '/auth/refresh' },
+      { method: 'POST', path: '/auth/logout' },
+      { method: 'POST', path: '/auth/recover-password' },
+      { method: 'POST', path: '/auth/reset-password' },
+      { method: 'GET', path: '/auth/csrf' }
+    ];
+
+    for (const endpoint of publicEndpoints) {
+      const url = `${environment.apiUrl}${endpoint.path}`;
+      const request$ = endpoint.method === 'GET' ? http.get(url) : http.post(url, {});
+      request$.subscribe();
+      const request = httpTestingController.expectOne(url);
+      expect(request.request.headers.has('Authorization')).withContext(url).toBeFalse();
+      request.flush({});
+    }
+  });
+
+  it('does not exempt nested API paths that end with a public auth route', () => {
+    const url = `${environment.apiUrl}/protected/auth/login`;
+    http.get(url).subscribe();
+
+    const request = httpTestingController.expectOne(url);
+    expect(request.request.headers.get('Authorization')).toBe('Bearer expired-access-token');
+    request.flush({ ok: true });
+  });
+
+  it('does not attach a stored token or refresh an external request after 401', () => {
+    const errors: unknown[] = [];
+    const url = 'https://third-party.example/protected/resource';
+    http.get(url).subscribe({ error: error => errors.push(error) });
+
+    const request = httpTestingController.expectOne(url);
+    expect(request.request.headers.has('Authorization')).toBeFalse();
+    request.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    expect(errors.length).toBe(1);
+    expect(authService.getAccessToken()).toBe('expired-access-token');
+    expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
+  });
+
+  it('does not attach bearer or refresh for same-origin paths outside the exact API boundary', () => {
+    const configuredApi = new URL(environment.apiUrl);
+    const apiPath = configuredApi.pathname.replace(/\/+$/, '');
+    const alternatePort = configuredApi.port === '1' ? '2' : '1';
+    const alternateScheme = configuredApi.protocol === 'http:' ? 'https:' : 'http:';
+    const outsideApiUrls = [
+      '/protected/resource',
+      new URL('/outside/protected', configuredApi.origin).toString(),
+      new URL(`${apiPath}/protected`, `${alternateScheme}//${configuredApi.host}`).toString(),
+      new URL(`${apiPath}-evil/protected`, configuredApi.origin).toString(),
+      new URL(
+        `${apiPath}/protected`,
+        `${configuredApi.protocol}//${configuredApi.hostname}.evil.test${configuredApi.port ? `:${configuredApi.port}` : ''}`
+      ).toString(),
+      new URL(`${apiPath}/protected`, `${configuredApi.protocol}//${configuredApi.hostname}:${alternatePort}`).toString(),
+      new URL(`${apiPath}/protected`, `${configuredApi.protocol}//user:password@${configuredApi.host}`).toString(),
+      `${configuredApi.protocol}//@${configuredApi.host}${apiPath}/protected`
+    ];
+
+    for (const url of outsideApiUrls) {
+      const errors: unknown[] = [];
+      http.get(url).subscribe({ error: error => errors.push(error) });
+      const request = httpTestingController.expectOne(url);
+      expect(request.request.headers.has('Authorization')).withContext(url).toBeFalse();
+      request.flush({}, { status: 401, statusText: 'Unauthorized' });
+      expect(errors.length).withContext(url).toBe(1);
+    }
+
+    expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
+  });
+
   it('shares a timer-triggered refresh with concurrent 401s and retries with the returned token', fakeAsync(() => {
     const sessionGeneration = authService.getSessionGeneration();
     const results: unknown[] = [];
-    http.get('/protected/resource').subscribe(result => results.push(result));
-    http.get('/protected/another').subscribe(result => results.push(result));
+    http.get(protectedUrl('resource')).subscribe(result => results.push(result));
+    http.get(protectedUrl('another')).subscribe(result => results.push(result));
 
-    const firstRequest = httpTestingController.expectOne('/protected/resource');
-    const secondRequest = httpTestingController.expectOne('/protected/another');
+    const firstRequest = httpTestingController.expectOne(protectedUrl('resource'));
+    const secondRequest = httpTestingController.expectOne(protectedUrl('another'));
     expect(firstRequest.request.headers.get('Authorization')).toBe('Bearer expired-access-token');
     expect(secondRequest.request.headers.get('Authorization')).toBe('Bearer expired-access-token');
 
@@ -77,8 +154,8 @@ describe('authInterceptor', () => {
     httpTestingController.expectNone(`${environment.apiUrl}/auth/refresh`);
 
     refreshRequest.flush(authResponse('fresh-access-token'));
-    const firstRetry = httpTestingController.expectOne('/protected/resource');
-    const secondRetry = httpTestingController.expectOne('/protected/another');
+    const firstRetry = httpTestingController.expectOne(protectedUrl('resource'));
+    const secondRetry = httpTestingController.expectOne(protectedUrl('another'));
     expect(firstRetry.request.headers.get('Authorization')).toBe('Bearer fresh-access-token');
     expect(secondRetry.request.headers.get('Authorization')).toBe('Bearer fresh-access-token');
     firstRetry.flush({ ok: true });
@@ -94,14 +171,14 @@ describe('authInterceptor', () => {
   it('clears and redirects once on a shared refresh failure without retrying failed requests', () => {
     const firstErrors: unknown[] = [];
     const secondErrors: unknown[] = [];
-    http.get('/protected/first').subscribe({ error: error => firstErrors.push(error) });
-    http.get('/protected/second').subscribe({ error: error => secondErrors.push(error) });
+    http.get(protectedUrl('first')).subscribe({ error: error => firstErrors.push(error) });
+    http.get(protectedUrl('second')).subscribe({ error: error => secondErrors.push(error) });
 
     httpTestingController
-      .expectOne('/protected/first')
+      .expectOne(protectedUrl('first'))
       .flush({}, { status: 401, statusText: 'Unauthorized' });
     httpTestingController
-      .expectOne('/protected/second')
+      .expectOne(protectedUrl('second'))
       .flush({}, { status: 401, statusText: 'Unauthorized' });
 
     httpTestingController
@@ -116,20 +193,20 @@ describe('authInterceptor', () => {
     expect(carritoService.vaciarCarrito).toHaveBeenCalledTimes(1);
     expect(router.navigate).toHaveBeenCalledTimes(1);
     expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
-    expect(httpTestingController.match(request => request.url.startsWith('/protected/')).length).toBe(0);
+    expect(httpTestingController.match(request => request.url.startsWith(`${environment.apiUrl}/protected/`)).length).toBe(0);
   });
 
   it('does not start another refresh when a retried request still returns 401', () => {
     const errors: unknown[] = [];
-    http.get('/protected/resource').subscribe({ error: error => errors.push(error) });
+    http.get(protectedUrl('resource')).subscribe({ error: error => errors.push(error) });
     httpTestingController
-      .expectOne('/protected/resource')
+      .expectOne(protectedUrl('resource'))
       .flush({}, { status: 401, statusText: 'Unauthorized' });
 
     httpTestingController
       .expectOne(`${environment.apiUrl}/auth/refresh`)
       .flush(authResponse('fresh-access-token'));
-    const retryRequest = httpTestingController.expectOne('/protected/resource');
+    const retryRequest = httpTestingController.expectOne(protectedUrl('resource'));
     expect(retryRequest.request.headers.get('Authorization')).toBe('Bearer fresh-access-token');
     retryRequest.flush({}, { status: 401, statusText: 'Unauthorized' });
 
@@ -144,8 +221,8 @@ describe('authInterceptor', () => {
     const errors: unknown[] = [];
     authService.clearAuthSilently();
 
-    http.get('/protected/after-logout').subscribe({ error: error => errors.push(error) });
-    const request = httpTestingController.expectOne('/protected/after-logout');
+    http.get(protectedUrl('after-logout')).subscribe({ error: error => errors.push(error) });
+    const request = httpTestingController.expectOne(protectedUrl('after-logout'));
     expect(request.request.headers.has('Authorization')).toBeFalse();
     request.flush({}, { status: 401, statusText: 'Unauthorized' });
 
@@ -157,8 +234,8 @@ describe('authInterceptor', () => {
 
   it('does not replay a session A request under session B after logout and login', () => {
     const errors: unknown[] = [];
-    http.get('/protected/session-a').subscribe({ error: error => errors.push(error) });
-    const sessionARequest = httpTestingController.expectOne('/protected/session-a');
+    http.get(protectedUrl('session-a')).subscribe({ error: error => errors.push(error) });
+    const sessionARequest = httpTestingController.expectOne(protectedUrl('session-a'));
     expect(sessionARequest.request.headers.get('Authorization')).toBe('Bearer expired-access-token');
 
     authService.logout();
@@ -173,14 +250,14 @@ describe('authInterceptor', () => {
     expect(errors.length).toBe(1);
     expect((errors[0] as HttpErrorResponse).status).toBe(401);
     expect(authService.getAccessToken()).toBe('session-b-access-token');
-    expect(httpTestingController.match(request => request.url === '/protected/session-a').length).toBe(0);
+    expect(httpTestingController.match(request => request.url === protectedUrl('session-a')).length).toBe(0);
     expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
   });
 
   it('does not refresh a session A request whose 401 arrives after logout but before login', () => {
     const errors: unknown[] = [];
-    http.get('/protected/session-a-before-login').subscribe({ error: error => errors.push(error) });
-    const sessionARequest = httpTestingController.expectOne('/protected/session-a-before-login');
+    http.get(protectedUrl('session-a-before-login')).subscribe({ error: error => errors.push(error) });
+    const sessionARequest = httpTestingController.expectOne(protectedUrl('session-a-before-login'));
     expect(sessionARequest.request.headers.get('Authorization')).toBe('Bearer expired-access-token');
 
     authService.logout();
@@ -190,7 +267,7 @@ describe('authInterceptor', () => {
     expect(errors.length).toBe(1);
     expect((errors[0] as HttpErrorResponse).status).toBe(401);
     expect(authService.getAccessToken()).toBeNull();
-    expect(httpTestingController.match(request => request.url === '/protected/session-a-before-login').length).toBe(0);
+    expect(httpTestingController.match(request => request.url === protectedUrl('session-a-before-login')).length).toBe(0);
     expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
 
     logoutRequest.flush({});
@@ -198,9 +275,9 @@ describe('authInterceptor', () => {
 
   it('does not retry or redirect a pending 401 refresh after logout-all clears auth', () => {
     const errors: unknown[] = [];
-    http.get('/protected/logout-all-race').subscribe({ error: error => errors.push(error) });
+    http.get(protectedUrl('logout-all-race')).subscribe({ error: error => errors.push(error) });
     httpTestingController
-      .expectOne('/protected/logout-all-race')
+      .expectOne(protectedUrl('logout-all-race'))
       .flush({}, { status: 401, statusText: 'Unauthorized' });
 
     const refreshRequest = httpTestingController.expectOne(`${environment.apiUrl}/auth/refresh`);
@@ -221,7 +298,7 @@ describe('authInterceptor', () => {
     });
 
     expect(errors.length).toBe(1);
-    expect(httpTestingController.match(request => request.url === '/protected/logout-all-race').length).toBe(0);
+    expect(httpTestingController.match(request => request.url === protectedUrl('logout-all-race')).length).toBe(0);
     expect(httpTestingController.match(request => request.url.includes('/auth/refresh')).length).toBe(0);
     expect(authService.getAccessToken()).toBeNull();
     expect(sessionStorage.getItem('user_data')).toBeNull();
