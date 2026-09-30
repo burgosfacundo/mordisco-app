@@ -21,6 +21,11 @@
 
 ---
 
+## Videos de demostración
+
+- [Flujo del pedido - Cliente](https://drive.google.com/file/d/1cHdIQmJoE-6BG5IxZBqy4qj9T2btGmeX/view): navegación, selección de productos y confirmación de compra dentro de la plataforma.
+- [Gestión del pedido - Multirol](https://drive.google.com/file/d/1y84EctAzGetQWCfFAtkFp6WMjqGqzdGY/view): restaurante, repartidor y cliente interactúan en tiempo real hasta la entrega final con validación mediante código.
+
 ## 🚀 Demo local con Docker
 
 ### Inicio rápido
