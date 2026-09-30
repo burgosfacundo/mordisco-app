@@ -64,6 +64,12 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void unavailablePaymentReturnsSafeServiceUnavailableResponse() throws Exception {
+        assertSafePaymentUnavailable(mockMvc.perform(get("/probe/payment-unavailable")).andReturn());
+        assertSafePaymentUnavailable(mockMvc.perform(get("/probe/payment-unavailable-wrapped")).andReturn());
+    }
+
+    @Test
     void unexpectedAndExplicitInternalErrorsReturnGenericFiveHundredResponses() throws Exception {
         assertGenericServerError(mockMvc.perform(get("/probe/unexpected")).andReturn());
         assertGenericServerError(mockMvc.perform(get("/probe/internal")).andReturn());
@@ -152,6 +158,15 @@ class GlobalExceptionHandlerTest {
         }
     }
 
+    private void assertSafePaymentUnavailable(MvcResult result) throws Exception {
+        assertEquals(503, result.getResponse().getStatus());
+        assertEquals(503, json(result).get("status").asInt());
+        assertEquals("Mercado Pago no está configurado para esta demo. Elegí efectivo o configurá tus credenciales.",
+                json(result).get("message").asText());
+        assertDoesNotContain(result.getResponse().getContentAsString(),
+                "TOKEN_SECRET", "access_token", "PaymentUnavailableException");
+    }
+
     private void assertGenericServerError(MvcResult result) throws Exception {
         assertEquals(500, result.getResponse().getStatus());
         assertEquals("Ocurrió un error inesperado", json(result).get("message").asText());
@@ -191,6 +206,16 @@ class GlobalExceptionHandlerTest {
         @GetMapping("/probe/unexpected")
         void unexpected() {
             throw new IllegalStateException(SENSITIVE_EXCEPTION);
+        }
+
+        @GetMapping("/probe/payment-unavailable")
+        void paymentUnavailable() {
+            throw new PaymentUnavailableException("TOKEN_SECRET access_token");
+        }
+
+        @GetMapping("/probe/payment-unavailable-wrapped")
+        void paymentUnavailableWrapped() {
+            throw new RuntimeException("webhook wrapper", new PaymentUnavailableException("TOKEN_SECRET access_token"));
         }
 
         @GetMapping("/probe/internal")

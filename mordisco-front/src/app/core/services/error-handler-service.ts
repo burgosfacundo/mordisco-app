@@ -1,9 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 
 export type ErrorSeverity = 'error' | 'warning' | 'info' | 'success';
+
+/** Requests whose caller owns presenting the HTTP error to the user. */
+export const LOCAL_HTTP_ERROR_HANDLING = new HttpContextToken<boolean>(() => false);
 
 export interface ErrorContext {
   type: 'http' | 'validation' | 'business' | 'network';

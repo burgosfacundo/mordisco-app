@@ -47,6 +47,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
+        if (hasCause(ex, PaymentUnavailableException.class)) {
+            return paymentUnavailableResponse();
+        }
         log.error("Unexpected error while processing request");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(
@@ -256,6 +259,29 @@ public class GlobalExceptionHandler {
      * @param e la excepción capturada
      * @return una respuesta con el mensaje de error y estado HTTP 400
      */
+    @ExceptionHandler(PaymentUnavailableException.class)
+    public ResponseEntity<ErrorResponse> paymentUnavailable(PaymentUnavailableException e) {
+        return paymentUnavailableResponse();
+    }
+
+    private ResponseEntity<ErrorResponse> paymentUnavailableResponse() {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new ErrorResponse(
+                        HttpStatus.SERVICE_UNAVAILABLE.value(),
+                        "Mercado Pago no está configurado para esta demo. Elegí efectivo o configurá tus credenciales.",
+                        LocalDateTime.now()
+                ));
+    }
+
+    private boolean hasCause(Throwable throwable, Class<? extends Throwable> type) {
+        for (Throwable current = throwable; current != null; current = current.getCause()) {
+            if (type.isInstance(current)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> badRequest(BadRequestException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

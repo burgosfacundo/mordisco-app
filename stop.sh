@@ -1,17 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# ============================================
-# MORDISCO APP - Script de Detención
-# ============================================
-
-echo ""
-echo "🛑 Deteniendo y eliminando Mordisco App..."
-echo ""
-
-docker-compose down -v
-
-echo ""
-echo "✅ Todo eliminado (servicios + volúmenes + datos)"
-echo ""
-echo "   🔄 Para volver a iniciar: ./start.sh"
-echo ""
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/demo-common.sh
+source "$ROOT/scripts/demo-common.sh"
+demo_stop

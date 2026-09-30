@@ -1,7 +1,8 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError } from 'rxjs/operators';
-import { ErrorHandlerService } from '../services/error-handler-service';
+import { throwError } from 'rxjs';
+import { ErrorHandlerService, LOCAL_HTTP_ERROR_HANDLING } from '../services/error-handler-service';
 import { ToastService } from '../services/toast-service';
 
 /**
@@ -40,6 +41,11 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       // Si es una URL sensible, NO mostrar el error automáticamente
       if (isSensitiveUrl) {
         return errorHandler.handle(error);
+      }
+
+      // Requests marked by their caller retain HttpErrorResponse and own their toast.
+      if (req.context.get(LOCAL_HTTP_ERROR_HANDLING)) {
+        return throwError(() => error);
       }
 
       // Procesar el error con el servicio centralizado
