@@ -21,7 +21,11 @@
 
 ---
 
-## 🚀 Inicio Rápido con Docker
+## 🚀 Demo local con Docker
+
+### Inicio rápido
+
+Necesitás Bash, Docker Engine o Docker Desktop con Docker Compose v2, y conexión a Internet durante el primer build para descargar imágenes y dependencias. Para esta demo no hace falta instalar Java, Node.js, Maven, MySQL, `curl` ni `openssl` en el host.
 
 ```bash
 git clone https://github.com/burgosfacundo/mordisco-app.git
@@ -29,7 +33,20 @@ cd mordisco-app
 ./start.sh
 ```
 
-Esto levanta MySQL, Backend y Frontend con datos de prueba. Accede en: **http://localhost:4200**
+`./start.sh` construye y levanta la demo, espera a MySQL y comprueba una ruta de API que consulta la base, el frontend y Mailpit mediante pruebas HTTP ejecutadas en contenedores. Después ejecuta el seed. En una base vacía, `data.sql` y el comprobante de seed se aplican en una transacción bajo un lock de MySQL; los inicios siguientes detectan el comprobante y omiten el seed. Si encuentra usuarios sin comprobante, se detiene en vez de volver a insertar datos y sugiere evaluar un reset. Las tablas del seed deben usar InnoDB para permitir rollback.
+
+| Servicio | Dirección | Uso |
+|---|---|---|
+| Aplicación | http://localhost:4200 | Frontend de la demo |
+| API | http://localhost:8080 | Backend |
+| MySQL | `localhost:3306` | Base local de la demo |
+| Mailpit | http://localhost:8025 | Bandeja local para inspeccionar correo SMTP |
+
+Los puertos publicados se enlazan a `127.0.0.1`: la demo es local, no de producción, y no queda expuesta a la red. Compose usa credenciales de base de datos exclusivas para esta demo. No hacen falta claves privadas de proveedores ni credenciales de Gmail para iniciar.
+
+Mailpit está configurado como receptor SMTP local. Que su interfaz HTTP responda —o que una prueba SMTP sintética llegue a la bandeja— no demuestra que un flujo de la aplicación haya emitido un correo, ni que se entregue a destinatarios reales.
+
+Por defecto, cada inicio con `./start.sh` genera una clave JWT aleatoria de 32 bytes dentro de un contenedor temporal y se la pasa al contenedor backend como variable de entorno. El script no la imprime ni la escribe en `.env`, pero Docker la mantiene en la configuración/entorno del contenedor mientras este exista. Al iniciar de nuevo se genera otra clave y las sesiones existentes dejan de servir: vas a tener que iniciar sesión otra vez. Si definís `JWT_SECRET` en el entorno antes de ejecutar el script, se reutiliza ese valor. No reutilices esta configuración de demo en producción.
 
 **Usuarios de prueba:**
 - Admin: `mordiscoapp@gmail.com` / `Admin123!`
@@ -37,11 +54,42 @@ Esto levanta MySQL, Backend y Frontend con datos de prueba. Accede en: **http://
 - Cliente: `usuario1@gmail.com` / `Mordisco123!`
 - Repartidor: `repartidor1@gmail.com` / `Mordisco123!`
 
-**Detener:** `./stop.sh`
+### Detener y reiniciar
 
-### Configuracion local
+- `./stop.sh` detiene los contenedores y **conserva** los datos persistidos. Volvé a ejecutar `./start.sh` para continuar; se generará otra clave JWT y vas a tener que iniciar sesión de nuevo.
+- `./reset-demo.sh` solicita confirmación escribiendo `mordisco-demo`. Solo entonces elimina los contenedores de este proyecto Compose, su red y su volumen de datos; esta acción borra permanentemente los datos de la demo.
+- El reset no elimina imágenes Docker, archivos del repositorio ni recursos de otros proyectos, y no hace limpieza global de Docker. No se ejecuta ningún reset al iniciar o detener.
 
-Antes de iniciar, copia `.env.example` a `.env`. Completa las credenciales locales cuando sea necesario, nunca confirmes `.env` y genera localmente un secreto JWT fuerte.
+### Configuración local opcional
+
+Compose toma automáticamente las variables del archivo `.env` en la raíz del repositorio cuando ejecutás `./start.sh`. No necesitás crear ese archivo para usar los valores predeterminados de la demo. `demo.env.example` es una plantilla segura con ajustes locales opcionales; si querés personalizarlos, copiála solo cuando `.env` todavía no exista:
+
+```bash
+if [ ! -e .env ]; then cp demo.env.example .env; else printf '.env ya existe; no se sobrescribió.\n'; fi
+```
+
+Editá tu `.env` sin compartirlo ni confirmar su contenido. Si ya existe, conservá sus valores y agregá solo las variables que necesites.
+
+### Pagos opcionales: Mercado Pago
+
+La demo inicia y permite pagar en efectivo sin credenciales de proveedores. Mercado Pago requiere credenciales de prueba propias; sin ellas, el checkout informa que no está disponible, conserva el carrito y permite elegir efectivo. Que una credencial esté configurada no prueba que sea válida: Mercado Pago debe aceptarla. No se simulan pagos aprobados ni se verifica la validez de credenciales reales.
+
+1. Iniciá sesión en [Mercado Pago Developers](https://www.mercadopago.com.ar/developers/es/docs/your-integrations/credentials), abrí **Tus integraciones**, elegí tu aplicación y entrá en **Pruebas > Credenciales de prueba**.
+2. Guardá tu **Access Token privado** y tu **Public Key** de prueba en `.env` (Compose los pasa al backend):
+
+   ```dotenv
+   MERCADOPAGO_ACCESS_TOKEN=tu_access_token_de_prueba
+   MERCADOPAGO_PUBLIC_KEY=tu_public_key_de_prueba
+   ```
+
+   No uses ni solicites las claves del dueño del proyecto. Si `.env` ya existe, agregá las variables sin sobrescribirlo; para crearlo, seguí la instrucción de arriba. Usá únicamente credenciales de prueba: no se deben generar cargos reales.
+3. Reiniciá la demo para que el backend lea las variables.
+
+El checkout local puede crear y abrir una preferencia de prueba, pero eso **no** confirma que el ciclo de pago se haya completado en la aplicación. El webhook de Mercado Pago necesita una URL pública alcanzable por el proveedor; `localhost` no es accesible desde Internet. Para probar notificaciones, desplegá la API o usá un túnel público y definí `MERCADOPAGO_NOTIFICATION_URL` con una URL HTTPS pública terminada en `/api/pagos/webhook`. No expongas servicios locales sin entender el riesgo.
+
+### Clima: configuración futura, no implementada
+
+La aplicación actualmente no consume OpenWeatherMap ni implementa funcionalidad de clima. Obtener una clave no agrega ni habilita esa función. Si querés conservar una clave para una futura integración, creá una cuenta, generá una API key en [OpenWeatherMap](https://openweathermap.org/appid) / [tus API keys](https://home.openweathermap.org/api_keys) y guardala opcionalmente como `OPENWEATHERMAP_API_KEY` en `.env`. No es necesaria para iniciar ni usar la demo.
 
 ---
 
@@ -157,7 +205,7 @@ mordisco-app/
 | **Sistema de Promociones** | Visualizacion de restaurantes con promociones activas y descuentos aplicados |
 | **Carrito de Compras** | Agregar/eliminar productos, persistencia local, resumen de pedido |
 | **Checkout Completo** | Seleccion de direccion, tipo de entrega (delivery/retiro), calculo de costos |
-| **Pagos Integrados** | MercadoPago (tarjetas credito/debito) o pago en efectivo contra entrega |
+| **Métodos de Pago** | Mercado Pago con credenciales propias configuradas, o pago en efectivo contra entrega |
 | **Seguimiento de Pedidos** | Estados en tiempo real: Pendiente → En Preparacion → En Camino → Completado |
 | **Notificaciones Push** | WebSocket para actualizaciones instantaneas del estado del pedido |
 | **Historial de Pedidos** | Lista completa con filtros por estado y fecha |
@@ -242,7 +290,7 @@ mordisco-app/
 
 | Herramienta | Uso |
 |-------------|-----|
-| Docker | Contenedorizacion de MySQL |
+| Docker Compose v2 | Stack local de demo (MySQL, API, frontend y Mailpit) |
 | Maven | Gestion de dependencias backend |
 | npm | Gestion de paquetes frontend |
 | Git | Control de versiones |
@@ -322,7 +370,9 @@ Cualquier estado (excepto Completado) → Cancelado
 
 ## Instalacion y Ejecucion
 
-### Requisitos Previos
+El inicio recomendado para probar la aplicación con datos de demo es el quickstart Docker de arriba. Esta sección describe una alternativa para desarrollo manual desde el host; no es necesaria para la demo y no ejecuta su seed ni levanta Mailpit.
+
+### Requisitos para desarrollo manual
 
 - Java 21+
 - Node.js 18+ (LTS)
@@ -332,11 +382,13 @@ Cualquier estado (excepto Completado) → Cancelado
 ### Backend
 
 ```bash
-# 1. Iniciar MySQL con Docker
+# 1. Iniciar MySQL con Docker Compose v2.
+#    Definí MYSQL_ROOT_PASSWORD y MYSQL_PASSWORD en el entorno antes de arrancar.
 cd mordisco-api
-docker-compose up -d
+docker compose up -d
 
-# 2. Ejecutar la API (perfil dev)
+# 2. Configurar las variables de entorno requeridas por la API para tu entorno local.
+#    Luego ejecutar la API (perfil dev).
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 # La API estará disponible en http://localhost:8080

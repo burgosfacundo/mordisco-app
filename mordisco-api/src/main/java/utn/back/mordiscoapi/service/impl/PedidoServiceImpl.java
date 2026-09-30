@@ -59,6 +59,10 @@ public class PedidoServiceImpl implements IPedidoService {
     @Transactional
     @Override
     public MercadoPagoPreferenceResponse save(PedidoRequestDTO dto) throws NotFoundException, BadRequestException {
+        if (dto.metodoPago() == MetodoPago.MERCADO_PAGO) {
+            mercadoPagoService.validarDisponibilidad();
+        }
+
         Restaurante restaurante = restauranteRepository.findById(dto.idRestaurante())
                 .orElseThrow(() -> new NotFoundException("El restaurante no existe"));
 

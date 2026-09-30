@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
@@ -8,6 +8,7 @@ import PedidoResponse from '../../models/pedido/pedido-response';
 import { CrearPedidoRequest } from '../../models/pedido/crear-pedido-request';
 import { MercadoPagoPreferenceResponse } from '../../models/pago/mercado-pago-preference-response';
 import BajaLogisticaDTO from '../../models/BajaLogisticaRequestDTO';
+import { LOCAL_HTTP_ERROR_HANDLING } from '../../../core/services/error-handler-service';
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +45,8 @@ export class PedidoService {
   }
 
   crearPedido(request: CrearPedidoRequest): Observable<MercadoPagoPreferenceResponse> {
-    return this.http.post<MercadoPagoPreferenceResponse>(`${environment.apiUrl}/pedidos/save`,request)
+    const context = new HttpContext().set(LOCAL_HTTP_ERROR_HANDLING, true);
+    return this.http.post<MercadoPagoPreferenceResponse>(`${environment.apiUrl}/pedidos/save`, request, { context });
   }
 
   getAllByCliente(clienteId: number, page: number, size: number): Observable<PaginationResponse<PedidoResponse>> {

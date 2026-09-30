@@ -219,7 +219,12 @@ export class CheckoutPage implements OnInit {
  
           this.carritoService.vaciarCarrito();
           const urlPago = response.sandboxInitPoint || response.initPoint;
-          window.location.href = urlPago;
+          this.redirectToMercadoPago(urlPago);
+
+        } else if (formValue.metodoPago === MetodoPago.MERCADO_PAGO) {
+          this.toastService.error(
+            'Mercado Pago no devolvió un enlace de pago. Elegí efectivo o intentá nuevamente; tu carrito sigue guardado.'
+          );
           
         } else if (formValue.metodoPago === MetodoPago.EFECTIVO) {
           this.toastService.success('✅ Pedido confirmado - Pago en efectivo al recibir');
@@ -229,10 +234,21 @@ export class CheckoutPage implements OnInit {
 
         this.isProcessing.set(false);
       },
-      error: () => {
+      error: (error: { status?: number }) => {
+        const isMercadoPago = formValue.metodoPago === MetodoPago.MERCADO_PAGO;
+        const message = isMercadoPago && error?.status === 503
+          ? 'Mercado Pago no está disponible en esta demo. Elegí efectivo o configurá tus credenciales; tu carrito sigue guardado.'
+          : isMercadoPago
+            ? 'No se pudo iniciar el pago con Mercado Pago. Probá nuevamente o elegí efectivo; tu carrito sigue guardado.'
+            : 'No se pudo confirmar el pedido en efectivo. Probá nuevamente; tu carrito sigue guardado.';
+        this.toastService.error(message);
         this.isProcessing.set(false);
       }
     });
+  }
+
+  private redirectToMercadoPago(url: string): void {
+    window.location.href = url;
   }
 
   agregarDireccion(): void {

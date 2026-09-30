@@ -1,72 +1,50 @@
 services:
-  # ============================================
-  # BASE DE DATOS MYSQL 8.0
-  # ============================================
-  # Contiene todos los datos de la aplicación
-  # Los datos de prueba se cargan automáticamente desde data.sql
   mysql:
     image: mysql:8.0
-    container_name: mordisco-db
-    command: --default-time-zone='-03:00' --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DEMO_MYSQL_ROOT_PASSWORD:-mordisco-demo-root}
       MYSQL_DATABASE: mordisco
       MYSQL_USER: mordisco_user
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_PASSWORD: ${DEMO_DB_PASSWORD:-mordisco-demo-pass}
       TZ: America/Argentina/Buenos_Aires
+    command: --default-time-zone='-03:00' --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
-      # Persistencia de datos
       - mysql_data:/var/lib/mysql
-      # NO cargamos data.sql aquí porque las tablas no existen aún
-      # Spring Boot creará las tablas y luego el script cargará los datos
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
-      interval: 10s
+      test: ["CMD", "mysqladmin", "ping", "--host=127.0.0.1", "--silent"]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 20
+      start_period: 30s
     networks:
       - mordisco-network
 
-  # ============================================
-  # BACKEND - SPRING BOOT 3
-  # ============================================
-  # API REST + WebSocket para notificaciones en tiempo real
-  # Swagger UI disponible en: http://localhost:8080/swagger-ui/index.html
   backend:
     build:
       context: ./mordisco-api
       dockerfile: Dockerfile
-    container_name: mordisco-backend
     environment:
-      # Base de datos
-      - DATABASE_URL=jdbc:mysql://mysql:3306/mordisco?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=America/Argentina/Buenos_Aires&characterEncoding=UTF-8&useUnicode=true
-      - DATABASE_USERNAME=mordisco_user
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
-      # Servidor
-      - SERVER_PORT=8080
-      - FRONTEND_URL=http://localhost:4200
-      - WEBSOCKET_ALLOWED_ORIGINS=${WEBSOCKET_ALLOWED_ORIGINS}
-      # Encoding UTF-8
-      - server.servlet.encoding.charset=UTF-8
-      - server.servlet.encoding.enabled=true
-      - server.servlet.encoding.force=true
-      - spring.http.encoding.charset=UTF-8
-      - spring.http.encoding.enabled=true
-      # Seguridad JWT
-      - JWT_SECRET=${JWT_SECRET}
-      # Email (SMTP Gmail - Para testing)
-      - SPRING_MAIL_HOST=smtp.gmail.com
-      - SPRING_MAIL_PORT=587
-      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
-      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
-      # API Keys externas (Demo keys - reemplazar con las tuyas)
-      - OPENWEATHERMAP_API_KEY=${OPENWEATHERMAP_API_KEY}
-      - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
-      - MERCADOPAGO_PUBLIC_KEY=${MERCADOPAGO_PUBLIC_KEY}
+      SPRING_PROFILES_ACTIVE: demo
+      DATABASE_URL: jdbc:mysql://mysql:3306/mordisco?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=America/Argentina/Buenos_Aires&characterEncoding=UTF-8&useUnicode=true
+      DATABASE_USERNAME: mordisco_user
+      DATABASE_PASSWORD: ${DEMO_DB_PASSWORD:-mordisco-demo-pass}
+      SERVER_PORT: 8080
+      FRONTEND_URL: http://localhost:4200
+      WEBSOCKET_ALLOWED_ORIGINS: ${WEBSOCKET_ALLOWED_ORIGINS:-http://localhost:4200}
+      HTTP_ALLOWED_ORIGINS: ${HTTP_ALLOWED_ORIGINS:-http://localhost:4200}
+      JWT_SECRET: ${JWT_SECRET:?start.sh must generate or receive JWT_SECRET before startup}
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
+      SPRING_MAIL_USERNAME: ""
+      SPRING_MAIL_PASSWORD: ""
+      OPENWEATHERMAP_API_KEY: ${OPENWEATHERMAP_API_KEY:-}
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:-}
+      MERCADOPAGO_PUBLIC_KEY: ${MERCADOPAGO_PUBLIC_KEY:-}
+      MERCADOPAGO_NOTIFICATION_URL: ${MERCADOPAGO_NOTIFICATION_URL:-http://localhost:8080/api/pagos/webhook}
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     depends_on:
       mysql:
         condition: service_healthy
@@ -74,38 +52,37 @@ services:
       - mordisco-network
     restart: unless-stopped
 
-  # ============================================
-  # FRONTEND - ANGULAR 20
-  # ============================================
-  # Aplicación web con interfaz para los 4 roles
-  # Accede en: http://localhost:4200
-  # NOTA: El primer build puede tardar 5-7 minutos
   frontend:
     build:
       context: ./mordisco-front
       dockerfile: Dockerfile
-    container_name: mordisco-frontend
     ports:
-      - "4200:80"
+      - "127.0.0.1:4200:80"
     depends_on:
       - backend
     networks:
       - mordisco-network
     restart: unless-stopped
 
-# ============================================
-# VOLÚMENES
-# ============================================
-# Los datos de MySQL persisten aquí
-# Para resetear: docker-compose down -v
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:8025:8025"
+    networks:
+      - mordisco-network
+    restart: unless-stopped
+
+  probe:
+    image: curlimages/curl:8.12.1
+    entrypoint: ["curl"]
+    profiles: ["tools"]
+    networks:
+      - mordisco-network
+
 volumes:
   mysql_data:
     driver: local
 
-# ============================================
-# REDES
-# ============================================
-# Red interna para comunicación entre servicios
 networks:
   mordisco-network:
     driver: bridge

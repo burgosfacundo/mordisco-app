@@ -10,6 +10,7 @@ import com.mercadopago.resources.preference.Preference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import utn.back.mordiscoapi.common.exception.PaymentUnavailableException;
 import utn.back.mordiscoapi.config.AppProperties;
 import utn.back.mordiscoapi.model.dto.pago.MercadoPagoPreferenceResponse;
 import utn.back.mordiscoapi.model.entity.Pedido;
@@ -28,6 +29,7 @@ public class MercadoPagoService {
      * Crea una preferencia de pago en Mercado Pago
      */
     public MercadoPagoPreferenceResponse crearPreferenciaDePago(Pedido pedido) {
+        validarDisponibilidad();
         try {
             var token = appProperties.getMercadoPago().getAccessToken();
             MercadoPagoConfig.setAccessToken(token);
@@ -111,6 +113,7 @@ public class MercadoPagoService {
      * Obtiene información de un pago por su ID
      */
     public Payment obtenerPago(String paymentId) {
+        validarDisponibilidad();
         try {
             MercadoPagoConfig.setAccessToken(appProperties.getMercadoPago().getAccessToken());
 
@@ -121,6 +124,32 @@ public class MercadoPagoService {
         } catch (MPException | MPApiException e) {
             throw new RuntimeException("Error al consultar pago: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Rejects unset or obvious template values without claiming credentials are valid.
+     */
+    public void validarDisponibilidad() {
+        String accessToken = appProperties.getMercadoPago().getAccessToken();
+        if (accessToken == null || accessToken.isBlank() || esValorPlantilla(accessToken)) {
+            throw new PaymentUnavailableException();
+        }
+    }
+
+    private boolean esValorPlantilla(String value) {
+        String normalized = value.trim().toLowerCase(java.util.Locale.ROOT);
+        return normalized.contains("${")
+                || normalized.contains("your")
+                || normalized.contains("example")
+                || normalized.contains("replace")
+                || normalized.contains("insert_token")
+                || normalized.contains("insert-token")
+                || normalized.contains("token_here")
+                || normalized.contains("token-here")
+                || normalized.contains("changeme")
+                || normalized.contains("change_me")
+                || normalized.contains("placeholder")
+                || normalized.startsWith("<") && normalized.endsWith(">");
     }
 
     /**
