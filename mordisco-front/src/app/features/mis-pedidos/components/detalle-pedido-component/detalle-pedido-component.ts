@@ -25,15 +25,6 @@ export class DetallePedidoComponent {
   readonly tipoEntregaEnum = TipoEntrega;
   readonly estadoPedidoEnum = EstadoPedido;
 
-  getEstadoClasses(): string {
-    const estado = this.pedidoResponse()?.estado as EstadoPedido;
-    if (!estado) return 'bg-gray-500 text-white';
-    
-    const colorClasses = ESTADO_PEDIDO_COLORS[estado] || 'bg-gray-100 text-gray-700';
-
-    return colorClasses.replace('bg-', 'bg-').replace('-100', '-500').replace('text-', 'text-').replace('-700', '-white');
-  }
-
   getEstadoBadgeClass(): string {
     const estado = this.pedidoResponse()?.estado as EstadoPedido;
     if (!estado) return 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-gray-100 text-gray-700';
